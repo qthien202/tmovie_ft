@@ -58,37 +58,41 @@ class IndexView extends StatelessWidget {
       ),
       backgroundColor: GlobalColor.backgroundColor,
       body: Obx(() => items[controller.tabIndex.value??0]['screen']),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: GlobalColor.backgroundColor,
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 20,
-              color: Colors.black.withOpacity(.1),
-            )
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8),
-          child: GNav(
-            onTabChange: (value)=>controller.tabIndex.value=value,
-              // rippleColor: Colors.grey[800], // tab button ripple color when pressed
-              // hoverColor: Colors.grey[700], // tab button hover color
-               rippleColor: Color(0xff252836),
-                  hoverColor: Color(0xff252836),
-                  gap: 5,
-                  activeColor: GlobalColor.primary,
-                  iconSize: 20,
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  duration: Duration(milliseconds: 400),
-                  tabBackgroundColor: Color(0xff252836),
-                  color: Colors.grey,
-              tabs: items.map((e){
-                return GButton(
-                  icon: e['icon'],
-                  text: e['title'],
-                );
-              }).toList()
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 15),
+        child: Container(
+          decoration: BoxDecoration(
+            color: GlobalColor.backgroundColor,
+            boxShadow: [
+              BoxShadow(
+                blurRadius: 20,
+                color: Colors.black.withOpacity(.1),
+              )
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8),
+            child: GNav(
+
+              onTabChange: (value)=>controller.tabIndex.value=value,
+                // rippleColor: Colors.grey[800], // tab button ripple color when pressed
+                // hoverColor: Colors.grey[700], // tab button hover color
+                 rippleColor: Color(0xff252836),
+                    hoverColor: Color(0xff252836),
+                    gap: 5,
+                    activeColor: GlobalColor.primary,
+                    iconSize: 20,
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    duration: Duration(milliseconds: 400),
+                    tabBackgroundColor: Color(0xff252836),
+                    color: Colors.grey,
+                tabs: items.map((e){
+                  return GButton(
+                    icon: e['icon'],
+                    text: e['title'],
+                  );
+                }).toList()
+            ),
           ),
         ),
       ),
