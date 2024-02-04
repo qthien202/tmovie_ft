@@ -170,10 +170,10 @@ class _FilterPageState extends State<FilterPage> {
     return GridView.builder(
       scrollDirection: Axis.horizontal,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
+        crossAxisCount: 3,
         crossAxisSpacing: 20,
         mainAxisSpacing: 20,
-        childAspectRatio: 10 / 19,
+        childAspectRatio: 10 / 30,
       ),
       itemCount: items.length,
       itemBuilder: (context, index) {
@@ -204,9 +204,11 @@ class _FilterPageState extends State<FilterPage> {
       ),
       child: Text(
         text,
+        textAlign: TextAlign.start,
         style: TextStyle(
-          fontSize: 16,
+          fontSize: 12,
           color: !isSelected ? Colors.white : GlobalColor.primary,
+          
         ),
       ),
     ),
