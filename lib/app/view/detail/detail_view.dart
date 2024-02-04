@@ -19,86 +19,90 @@ class DetailView extends StatelessWidget {
     final controller = Get.put(DetailController());
     controller.getFilmDetail(slug: slug??"");
     
-      return Scaffold(
-      backgroundColor: GlobalColor.backgroundColor,
-      appBar: AppBar(
+      return RefreshIndicator(
         backgroundColor: GlobalColor.backgroundColor,
-        centerTitle: true,
-        title: Text(name??"--",
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 16,
-          fontWeight: FontWeight.bold
-        ),
-        ),
-        foregroundColor: Colors.white,
-      ),
-      body: Obx((){
-        final data = controller.filmDetail.value?.pageProps?.data?.item;
-        if(data==null){
-                return Center(
-                  child: CircularProgressIndicator(
-                    strokeWidth: 5,
-                    backgroundColor: GlobalColor.primary,
-                  ),
-                );
-              }
-        return ListView(
-        children: [
-          GlobalImage(
-            imageUrl:data?.thumbUrl??"",
-            width: MediaQuery.of(context).size.width*.4,
-            height: 300,
-            // fit: BoxFit.fill,
+        onRefresh: ()async=>controller.getFilmDetail(slug: slug??""),
+        child: Scaffold(
+        backgroundColor: GlobalColor.backgroundColor,
+        appBar: AppBar(
+          backgroundColor: GlobalColor.backgroundColor,
+          centerTitle: true,
+          title: Text(name??"--",
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.bold
           ),
-          const SizedBox(height: 15,),
-          const Info(),
-          const SizedBox(height: 15,),
-          Container(
-            padding: EdgeInsets.symmetric(vertical: 10),
-            margin: EdgeInsets.symmetric(vertical: 10,horizontal: 30),
-            
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(30),
-              color: GlobalColor.primary
+          ),
+          foregroundColor: Colors.white,
+        ),
+        body: Obx((){
+          final data = controller.filmDetail.value?.pageProps?.data?.item;
+          if(data==null){
+                  return Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 5,
+                      backgroundColor: GlobalColor.primary,
+                    ),
+                  );
+                }
+          return ListView(
+          children: [
+            GlobalImage(
+              imageUrl:data?.thumbUrl??"",
+              width: MediaQuery.of(context).size.width*.4,
+              height: 300,
+              // fit: BoxFit.fill,
             ),
-            child: InkWell(
-              onTap: (){
-                Get.to(ChewieVideoPlayer(fileName: data?.name??"--",episode: data?.episodes?.first.serverData?.first.name??"",videoUrl: data?.episodes?.first.serverData?.first.linkM3u8??"",));
-              },
-              child: Center(child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+            const SizedBox(height: 15,),
+            const Info(),
+            const SizedBox(height: 15,),
+            Container(
+              padding: EdgeInsets.symmetric(vertical: 10),
+              margin: EdgeInsets.symmetric(vertical: 10,horizontal: 30),
+              
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30),
+                color: GlobalColor.primary
+              ),
+              child: InkWell(
+                onTap: (){
+                  Get.to(ChewieVideoPlayer(fileName: data?.name??"--",episode: data?.episodes?.first.serverData?.first.name??"",videoUrl: data?.episodes?.first.serverData?.first.linkM3u8??"",));
+                },
+                child: Center(child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.play_arrow,color: Colors.white,),
+                    const SizedBox(width: 10,),
+                    Text("Xem phim",style: TextStyle(fontSize: 15,fontWeight: FontWeight.bold),),
+                  ],
+                )),
+              ),
+            ),
+            const InfoDetail(),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: const Text("Tập phim",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16)),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal:8.0),
+              child: const Espisode(),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.play_arrow,color: Colors.white,),
-                  const SizedBox(width: 10,),
-                  Text("Xem phim",style: TextStyle(fontSize: 15,fontWeight: FontWeight.bold),),
+                  Text("Nội dung phim",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16),),
+                  const SizedBox(height: 10,),
+                  HtmlWidget("${data?.content}")
                 ],
-              )),
+              ),
+            )
+          ],
+        );
+        })
             ),
-          ),
-          const InfoDetail(),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: const Text("Tập phim",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16)),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal:8.0),
-            child: const Espisode(),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Nội dung phim",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16),),
-                const SizedBox(height: 10,),
-                HtmlWidget("${data?.content}")
-              ],
-            ),
-          )
-        ],
       );
-      })
-    );
   }
 }

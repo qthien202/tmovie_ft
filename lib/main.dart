@@ -23,7 +23,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primaryColor: GlobalColor.backgroundColor,
         useMaterial3: true,
-       
+        indicatorColor: GlobalColor.primary,
+        progressIndicatorTheme: ProgressIndicatorThemeData(
+          circularTrackColor: GlobalColor.primary
+        ),
         textTheme: TextTheme(
           bodyText1:TextStyle(
             color: Colors.white,

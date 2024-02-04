@@ -21,6 +21,7 @@ class HomeView extends StatelessWidget {
       backgroundColor: GlobalColor.backgroundColor,
       
       body: RefreshIndicator(
+        backgroundColor: GlobalColor.backgroundColor,
         onRefresh: ()async=>controller.onReady(),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 5),
