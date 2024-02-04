@@ -1,6 +1,7 @@
 import 'package:app_ft_movies/app/controller/list_movie/list_movie_controller.dart';
 import 'package:app_ft_movies/app/core/global_color.dart';
 import 'package:app_ft_movies/app/view/detail/detail_view.dart';
+import 'package:app_ft_movies/app/view/drawer/drawer_view.dart';
 import 'package:app_ft_movies/app/view/home/card_cinema/card_cinema.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -13,16 +14,35 @@ class ListMovieView extends StatelessWidget {
   final String titlePage;
   @override
   Widget build(BuildContext context) {
+    final GlobalKey<ScaffoldState> key = GlobalKey<ScaffoldState>();
     final controller = Get.put(ListMovieController());
     controller.getListMovie(slug: slug);
      
    
       return Scaffold(
+        endDrawer: Drawer(
+          child: FilterPage(),
+        ),
+        key: key,
         backgroundColor: GlobalColor.backgroundColor,
         appBar: AppBar(
           backgroundColor: GlobalColor.backgroundColor,
           foregroundColor: Colors.white,
           title: Text(titlePage),
+          actions: [
+            InkWell(
+            onTap: (){
+              key.currentState?.openEndDrawer();
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal:8.0),
+              child: const Icon(
+                Icons.menu,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          ],
         ),
         body: ListView(
           children: [
@@ -41,6 +61,7 @@ class ListMovieView extends StatelessWidget {
                 );
               }
               return GridView.builder(
+                padding: EdgeInsets.all(5),
               physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
               itemCount: data?.items?.length ?? 0,
@@ -54,10 +75,10 @@ class ListMovieView extends StatelessWidget {
                 );
               },
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                childAspectRatio: 12 / 20,
-                crossAxisCount: 2,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
+                childAspectRatio: 12 / 33,
+                crossAxisCount: 3,
+                crossAxisSpacing: 5,
+                mainAxisSpacing: 5,
               ),
             );
             }),
@@ -66,40 +87,40 @@ class ListMovieView extends StatelessWidget {
             ),
           ],
         ),
-        bottomNavigationBar: Obx((){
-          final int totalPage = int.parse(((controller.listMovie.value?.pageProps?.data?.params?.pagination?.pageRanges??0).toString()));
+       bottomNavigationBar: Obx((){
+          
+          
+          
           return Visibility(
-          visible: totalPage!=0,
+          visible: controller.totalPage.value!=0,
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 20),
             child: SizedBox(
               height: 40,
               child: ListView.separated(
                 shrinkWrap: true,
                 scrollDirection: Axis.horizontal,
-                itemCount: totalPage,
+                itemCount: controller.totalPage.value??0,
                 itemBuilder: (context, index) {
                   return Obx(() {
                     return InkWell(
                       onTap: () async{
                         controller.selectIndex.value = index;
-                        controller.selectIndex.value = index;
                         print(">>>>>>>>>>>>>${controller.selectIndex.value}");
                         controller.listMovie.value=null;
                         await controller.getListMovie(slug: slug);
-                        print(">>>>>>>>>>>>>${controller.selectIndex.value}");
                       },
                       child: Container(
                         padding:
-                            EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                            const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                         decoration: BoxDecoration(
                             //  border: Border.all(color: GlobalColor.primary)
-                            color: Color(0xff252836),
+                            color: const Color(0xff252836),
                             border: Border.all(
                                 color: controller.selectIndex.value == index
                                     ? GlobalColor.primary
                                     : Colors.transparent)),
-                        child: Text("${index + 1}"),
+                        child: Text("${index + 1}",style: const TextStyle(fontSize: 13),),
                       ),
                     );
                   });

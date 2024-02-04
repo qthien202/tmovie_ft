@@ -25,22 +25,22 @@ class SliderCinema extends StatelessWidget {
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
+                      // borderRadius: BorderRadius.circular(5),
                       child: InkWell(
                         onTap: ()=>Get.to(DetailView(slug: controller.getNewFilmData.value?.items[index].slug,name: controller.getNewFilmData.value?.items[index].name,)),
                         child: GlobalImage(
                           imageUrl:
-                              "${controller.getNewFilmData.value?.items[index].posterUrl}",
+                              "${controller.getNewFilmData.value?.items[index].thumbUrl}",
                           boxFit: BoxFit.fill,
                           width: MediaQuery.of(context).size.width,
-                          height: MediaQuery.of(context).size.height * .4,
+                          height: MediaQuery.of(context).size.height * .5,
                         ),
                       )),
                 );
               },
               options: CarouselOptions(
-                  aspectRatio: 24 / 11,
-                  // enlargeCenterPage: true,
+                  aspectRatio: 24 / 24,
+                  enlargeCenterPage: true,
                   autoPlay: true,
                   autoPlayInterval: const Duration(seconds: 7),
                   // viewportFraction: 1,

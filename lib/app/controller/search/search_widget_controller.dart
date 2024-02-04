@@ -9,7 +9,8 @@ class SearchWidgetController extends GetxController{
   final Services2 api = Get.find();
   Rxn<GetFilmByCategory>search = Rxn();
   TextEditingController keywordController = TextEditingController();
-  Rxn<int>totalSearch = Rxn(0);
+  Rxn<int>totalPage = Rxn(0);
+  Rxn<int>selectIndex = Rxn(0);
 
   void onReady()async{
     super.onReady();
@@ -21,6 +22,8 @@ class SearchWidgetController extends GetxController{
    
     search.value = await api.getSearch(keyWord: keywordController.text);
     search.refresh();
+    final double itemLength = (search.value?.pageProps?.data?.params?.pagination?.totalItems??0) / (search.value?.pageProps?.data?.params?.pagination?.totalItemsPerPage??0);
+    totalPage.value = itemLength.round();
     //  final data = search.value?.pageProps?.data;
     // for(var i =0; i<=(data?.items?.length ?? 0);i++){
     //   if(data?.items?[i].slug!="[redacted]"){

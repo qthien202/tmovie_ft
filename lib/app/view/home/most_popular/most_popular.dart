@@ -35,7 +35,7 @@ class MostPopular extends StatelessWidget {
                 final data = controller.getNewFilmData.value?.items[index];
                 return CardCinema(
                   nameProduct: data?.name,
-                  imageLink:data?.posterUrl,
+                  imageLink:data?.thumbUrl,
                   originName: data?.originName,
                   slug: data?.slug,
                 );

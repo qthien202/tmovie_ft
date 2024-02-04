@@ -30,7 +30,7 @@ class HomeView extends StatelessWidget {
                 children:  [
                   
                   const SliderCinema(),
-                  const MostPopular(),
+                  // const MostPopular(),
                   Obx(() => FilmByCategory(type: "Phim bộ",getFilmByCategory: controller.phimBo.value),),
                   Obx(() => FilmByCategory(type: "Phim lẻ",getFilmByCategory: controller.phimLe.value,)),
                   Obx(() => FilmByCategory(type: "TV show",getFilmByCategory: controller.shows.value,)),

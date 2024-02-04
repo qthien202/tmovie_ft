@@ -15,6 +15,9 @@ class SearchWidget extends StatelessWidget {
         onSubmitted: (val)async{
           await controller.getSearch();
         },
+        onChanged: (val)async{
+          await controller.getSearch();
+        },
         controller: controller.keywordController,
         readOnly: false,
         decoration: InputDecoration(

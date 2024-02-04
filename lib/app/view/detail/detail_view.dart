@@ -60,7 +60,7 @@ class DetailView extends StatelessWidget {
             
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(30),
-              color: Colors.orange
+              color: GlobalColor.primary
             ),
             child: InkWell(
               onTap: (){
@@ -71,7 +71,7 @@ class DetailView extends StatelessWidget {
                 children: [
                   Icon(Icons.play_arrow,color: Colors.white,),
                   const SizedBox(width: 10,),
-                  Text("Xem phim"),
+                  Text("Xem phim",style: TextStyle(fontSize: 15,fontWeight: FontWeight.bold),),
                 ],
               )),
             ),

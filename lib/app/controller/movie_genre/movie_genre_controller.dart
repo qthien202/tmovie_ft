@@ -8,6 +8,7 @@ class MovieGenreController extends GetxController{
   
   Rxn<GetFilmByCategory>movieGenre = Rxn();
   Rxn<int>selectIndex = Rxn(0);
+  Rxn<int>totalPage = Rxn();
   
 
   @override
@@ -20,9 +21,11 @@ class MovieGenreController extends GetxController{
 
   
 
-  Future<GetFilmByCategory?>getMovieGenre({required String? slug})async{
-    movieGenre.value = await api.getMovieGenre(path: slug??"", slug: slug??"",page: (selectIndex.value??0)+1);
+  Future<GetFilmByCategory?>getMovieGenre({required String? slug,required String country, required String year})async{
+    movieGenre.value = await api.getMovieGenre(path: slug??"", slug: slug??"",page: (selectIndex.value??0)+1,country: country,year: year);
     movieGenre.refresh();
+    final double itemLength = (movieGenre.value?.pageProps?.data?.params?.pagination?.totalItems??0) / (movieGenre.value?.pageProps?.data?.params?.pagination?.totalItemsPerPage??0);
+    totalPage.value = itemLength.round();
     return movieGenre.value;
   }
 }

@@ -34,10 +34,10 @@ class IndexView extends StatelessWidget {
       ),
       appBar: AppBar(
         backgroundColor: GlobalColor.backgroundColor,
-        
+        centerTitle: false,
         title: Text("TMOVIE",style: TextStyle(
           color: GlobalColor.primary,
-          fontSize: 15,
+          fontSize: 16,
           fontWeight: FontWeight.bold
         ),),
         actions: [
@@ -81,7 +81,7 @@ class IndexView extends StatelessWidget {
                     hoverColor: Color(0xff252836),
                     gap: 5,
                     activeColor: GlobalColor.primary,
-                    iconSize: 20,
+                    iconSize: 25,
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                     duration: Duration(milliseconds: 400),
                     tabBackgroundColor: Color(0xff252836),

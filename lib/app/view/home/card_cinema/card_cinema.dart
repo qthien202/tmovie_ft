@@ -33,19 +33,19 @@ class CardCinema extends StatelessWidget {
       // padding: EdgeInsets.symmetric(vertical: 20),
       width: MediaQuery.of(context).size.width*.4,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(5),
+        borderRadius: BorderRadius.circular(3),
         // border: Border.all(color: Colors.red),
         border: Border.all(color: Colors.transparent,width: 0),
-        color: Color(0xff252836),
+        color: const Color(0xff252836),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(5),
-              topRight: Radius.circular(5)
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(3),
+              topRight: Radius.circular(3)
             ),
             child: InkWell(
               onTap: ()=>Get.to(DetailView(slug: slug,name: nameProduct,)),
@@ -72,17 +72,17 @@ class CardCinema extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 8.0,vertical: 5),
             child: Text(nameProduct??'',
               // textAlign: TextAlign.center,
-              maxLines: 2,
+              maxLines: 3,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                   height: 1.5,
                   fontWeight: FontWeight.bold,
-                  fontSize: 16,
+                  fontSize: 14,
                 color: Colors.white
                   ),),
           ),
            Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0,vertical: 5),
+            padding: const EdgeInsets.symmetric(horizontal: 8.0,vertical: 3),
             child: Text("( $originName )",
               // textAlign: TextAlign.center,
               maxLines: 1,
@@ -90,25 +90,12 @@ class CardCinema extends StatelessWidget {
               style: const TextStyle(
                   height: 1.5,
                   fontWeight: FontWeight.bold,
-                  fontSize: 12,
+                  fontSize: 10,
                 color: Colors.white
                   ),),
           ),
 
-          // Visibility(
-          //     visible: widget.shortDes!='',
-          //     child:Column(
-          //       children: [
-          //         Text(
-          //           widget.shortDes??'',
-          //           style: const TextStyle(fontSize: 12,
-          //             fontWeight: FontWeight.w300,
-          //           ),
-          //           maxLines: 1,),
-          //         const SizedBox(height: 5,),
-          //       ],
-          //     )
-          // ),
+       
          
           
           

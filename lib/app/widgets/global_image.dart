@@ -41,11 +41,7 @@ class GlobalImage extends StatelessWidget {
           width: width,
           height:height,
           color: Colors.white,
-          child:Image.asset("assets/images/placeholder.png",
-            width: width,
-            height: height,
-            // fit: BoxFit.contain,
-          )
+          child:Icon(Icons.image,size: 20,)
         ),
       ),
     );
