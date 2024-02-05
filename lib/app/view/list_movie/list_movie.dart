@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:shimmer/shimmer.dart';
 
 class ListMovieView extends StatelessWidget {
   const ListMovieView({super.key, required this.slug, required this.titlePage});
@@ -53,28 +54,40 @@ class ListMovieView extends StatelessWidget {
                 height: 10,
               ),
               Obx((){
+                final isLoading = controller.listMovie.value==null;
                  final data = controller.listMovie.value?.pageProps?.data;
                 
-                if(data?.items==null){
-                  return Center(
-                    child: CircularProgressIndicator(
-                      strokeWidth: 5,
-                      backgroundColor: GlobalColor.primary,
-                    ),
-                  );
-                }
+                
                 return GridView.builder(
                   padding: EdgeInsets.all(5),
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
-                itemCount: data?.items?.length ?? 0,
+                itemCount: isLoading?6:data?.items?.length ?? 0,
                 itemBuilder: (context, index) {
                   final items = data?.items?[index];
-                  return CardCinema(
-                    imageLink: items?.thumbUrl ?? "",
-                    nameProduct: items?.name,
-                    originName: items?.originName ?? "",
-                    slug: items?.slug ?? "",
+                  return Visibility(
+                    visible: !isLoading,
+                    replacement: SizedBox(
+                     width: MediaQuery.of(context).size.width*.4,
+                     child: Shimmer.fromColors(
+                                baseColor: Colors.grey,
+                                highlightColor: Colors.grey.shade600,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    
+                                    
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                    )
+                                
+                  ),
+                    child: CardCinema(
+                      imageLink: items?.thumbUrl ?? "",
+                      nameProduct: items?.name,
+                      originName: items?.originName ?? "",
+                      slug: items?.slug ?? "",
+                    ),
                   );
                 },
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(

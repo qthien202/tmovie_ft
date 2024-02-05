@@ -4,6 +4,7 @@ import 'package:app_ft_movies/app/view/home/card_cinema/card_cinema.dart';
 import 'package:app_ft_movies/app/widgets/search_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shimmer/shimmer.dart';
 
 class SearchView extends StatelessWidget {
   const SearchView({super.key});
@@ -23,16 +24,17 @@ class SearchView extends StatelessWidget {
               height: 20,
             ),
             Obx(() {
+              final isLoading = controller.search.value==null;
               final data = controller.search.value?.pageProps?.data;
 
-              if (data?.items == null) {
-                return Center(
-                  child: CircularProgressIndicator(
-                    strokeWidth: 5,
-                    backgroundColor: GlobalColor.primary,
-                  ),
-                );
-              }
+              // if (data?.items == null) {
+              //   return Center(
+              //     child: CircularProgressIndicator(
+              //       strokeWidth: 5,
+              //       backgroundColor: GlobalColor.primary,
+              //     ),
+              //   );
+              // }
               if (data?.items?.isEmpty == true) {
                 return Center(
                   child: Text("Rất tiếc phim bạn tìm kiếm không tồn tại!"),
@@ -42,14 +44,31 @@ class SearchView extends StatelessWidget {
                 padding: EdgeInsets.all(5),
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
-                itemCount: data?.items?.length ?? 0,
+                itemCount: isLoading?6:data?.items?.length ?? 0,
                 itemBuilder: (context, index) {
                   final items = data?.items?[index];
-                  return CardCinema(
-                    imageLink: items?.thumbUrl ?? "",
-                    nameProduct: items?.name,
-                    originName: items?.originName ?? "",
-                    slug: items?.slug ?? "",
+                  return Visibility(
+                    visible: !isLoading,
+                    replacement: SizedBox(
+                     width: MediaQuery.of(context).size.width*.4,
+                     child: Shimmer.fromColors(
+                                baseColor: Colors.grey,
+                                highlightColor: Colors.grey.shade600,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                    )
+                                
+                  ),
+                    child: CardCinema(
+                      imageLink: items?.thumbUrl ?? "",
+                      nameProduct: items?.name,
+                      originName: items?.originName ?? "",
+                      slug: items?.slug ?? "",
+                    ),
                   );
                 },
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(

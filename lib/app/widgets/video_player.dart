@@ -1,6 +1,7 @@
 import 'package:app_ft_movies/app/core/global_color.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:video_player/video_player.dart';
 
 class ChewieVideoPlayer extends StatefulWidget {
@@ -27,9 +28,22 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
     _chewieController = ChewieController(
       videoPlayerController: _videoPlayerController,
       autoPlay: true,
-      looping: true,
-      allowFullScreen: true,
+      looping: false,
+      autoInitialize: true,
+      // allowFullScreen: true,
       allowMuting: true,
+      fullScreenByDefault: true,
+      // allowPlaybackSpeedChanging: true,
+      overlay: Padding(
+        padding: const EdgeInsets.all(8),
+        child: Text("${widget.fileName}-${widget.episode}"),
+      ),
+      
+      
+
+      // isLive: true,
+      // showControls: true,
+      // zoomAndPan: true
       
     );
   }
@@ -38,18 +52,7 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: GlobalColor.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: GlobalColor.backgroundColor,
-        centerTitle: false,
-        foregroundColor: Colors.white,
-        title: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
-            "EP ${widget.episode}",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold,color: Colors.white),
-          ),
-        ),
-      ),
+      
       body: Chewie(
 
       controller: _chewieController,
@@ -64,5 +67,6 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
     super.dispose();
     _videoPlayerController.dispose();
     _chewieController.dispose();
+    Navigator.pop(context);
   }
 }

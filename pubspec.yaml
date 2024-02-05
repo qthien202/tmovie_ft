@@ -50,6 +50,8 @@ dependencies:
   flutter_widget_from_html: ^0.14.11
   video_player: ^2.8.2
   chewie: ^1.7.4
+  connectivity_plus: ^5.0.2
+  
 
 dev_dependencies:
   flutter_test:

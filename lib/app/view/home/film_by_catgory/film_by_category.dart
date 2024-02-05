@@ -6,6 +6,7 @@ import 'package:app_ft_movies/app/view/list_movie/list_movie.dart';
 import 'package:app_ft_movies/app/view/movie_genre/movie_genre_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shimmer/shimmer.dart';
 
 class FilmByCategory extends StatelessWidget {
   const FilmByCategory({super.key, this.getFilmByCategory, this.type});
@@ -15,7 +16,7 @@ class FilmByCategory extends StatelessWidget {
   @override
    @override
   Widget build(BuildContext context) {
-    
+    final isLoading = getFilmByCategory==null;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal:5),
       child: Column(
@@ -35,14 +36,31 @@ class FilmByCategory extends StatelessWidget {
             child: ListView.separated(
               shrinkWrap: true,
               scrollDirection: Axis.horizontal,
-              itemCount: getFilmByCategory?.pageProps?.data?.items?.length??0,
+              itemCount: isLoading?5:getFilmByCategory?.pageProps?.data?.items?.length??0,
               itemBuilder: (context,index){
                 final data = getFilmByCategory?.pageProps?.data?.items?[index];
-                return CardCinema(
-                  nameProduct: data?.name,
-                  imageLink:data?.thumbUrl,
-                  originName: data?.originName,
-                  slug: data?.slug,
+                return Visibility(
+                  visible: !isLoading,
+                  replacement: SizedBox(
+                     width: MediaQuery.of(context).size.width*.4,
+                     child: Shimmer.fromColors(
+                                baseColor: Colors.grey,
+                                highlightColor: Colors.grey.shade600,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                   
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                    )
+                                
+                  ),
+                  child: CardCinema(
+                    nameProduct: data?.name,
+                    imageLink:data?.thumbUrl,
+                    originName: data?.originName,
+                    slug: data?.slug,
+                  ),
                 );
               }, separatorBuilder: (BuildContext context, int index)=>const SizedBox(width: 8,),
             ),

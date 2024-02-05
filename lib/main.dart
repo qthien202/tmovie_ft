@@ -1,6 +1,7 @@
 import 'package:app_ft_movies/app/core/dependency_injections.dart';
 import 'package:app_ft_movies/app/core/global_color.dart';
 import 'package:app_ft_movies/app/view/splash/splash.dart';
+import 'package:app_ft_movies/app/widgets/connect_wrap/connect_wrap_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -27,7 +28,7 @@ class MyApp extends StatelessWidget {
         progressIndicatorTheme: ProgressIndicatorThemeData(
           circularTrackColor: GlobalColor.primary
         ),
-        textTheme: TextTheme(
+        textTheme: const TextTheme(
           bodyText1:TextStyle(
             color: Colors.white,
             fontSize: 14
@@ -37,7 +38,7 @@ class MyApp extends StatelessWidget {
             fontSize: 14
           )  
         )
-
+    
         
       ),
       home: const SplashView(),

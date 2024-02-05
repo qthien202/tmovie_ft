@@ -67,7 +67,7 @@ class DetailView extends StatelessWidget {
               ),
               child: InkWell(
                 onTap: (){
-                  Get.to(ChewieVideoPlayer(fileName: data?.name??"--",episode: data?.episodes?.first.serverData?.first.name??"",videoUrl: data?.episodes?.first.serverData?.first.linkM3u8??"",));
+                  Get.to(ChewieVideoPlayer(fileName: data.name??"--",episode: data.episodes?.first.serverData?.first.name??"",videoUrl: data?.episodes?.first.serverData?.first.linkM3u8??"",));
                 },
                 child: Center(child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,

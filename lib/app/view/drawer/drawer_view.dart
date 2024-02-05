@@ -110,7 +110,7 @@ class _FilterPageState extends State<FilterPage> {
               ),
               onPressed: () {
                 if(selectedGenre==null){
-                  Get.snackbar("Thông báo", "Bạn cần chọn thêm thể loại phim trước");
+                  Get.snackbar("Thông báo", "Bạn cần chọn thể loại phim trước");
                 }
                 else{
                   Get.to(MovieGenreview(
@@ -171,6 +171,7 @@ class _FilterPageState extends State<FilterPage> {
       scrollDirection: Axis.horizontal,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
+        // mainAxisExtent: 3,
         crossAxisSpacing: 20,
         mainAxisSpacing: 20,
         childAspectRatio: 10 / 30,
@@ -206,7 +207,7 @@ class _FilterPageState extends State<FilterPage> {
         text,
         textAlign: TextAlign.start,
         style: TextStyle(
-          fontSize: 12,
+          fontSize: 11,
           color: !isSelected ? Colors.white : GlobalColor.primary,
           
         ),

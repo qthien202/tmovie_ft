@@ -6,6 +6,7 @@ import 'package:app_ft_movies/app/widgets/global_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class SliderCinema extends StatelessWidget {
@@ -15,27 +16,43 @@ class SliderCinema extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(HomeController());
     return Obx(() {
+      final isLoading = controller.getNewFilmData.value==null;
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 20),
         child: Column(
           children: [
             CarouselSlider.builder(
-              itemCount: controller.getNewFilmData.value?.items.length ?? 0,
+              itemCount: isLoading?4:controller.getNewFilmData.value?.items.length ?? 0,
               itemBuilder: (context, index, realIndex) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: ClipRRect(
-                      // borderRadius: BorderRadius.circular(5),
-                      child: InkWell(
-                        onTap: ()=>Get.to(DetailView(slug: controller.getNewFilmData.value?.items[index].slug,name: controller.getNewFilmData.value?.items[index].name,)),
-                        child: GlobalImage(
-                          imageUrl:
-                              "${controller.getNewFilmData.value?.items[index].thumbUrl}",
-                          boxFit: BoxFit.fill,
-                          width: MediaQuery.of(context).size.width,
-                          height: MediaQuery.of(context).size.height * .5,
-                        ),
-                      )),
+                return Visibility(
+                  visible: !isLoading,
+                  replacement: SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height * .5,
+                    child: Shimmer.fromColors(
+                                baseColor: Colors.grey,
+                                highlightColor: Colors.grey.shade600,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                    )
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: InkWell(
+                      onTap: ()=>Get.to(DetailView(slug: controller.getNewFilmData.value?.items[index].slug,name: controller.getNewFilmData.value?.items[index].name,)),
+                      child: GlobalImage(
+                        imageUrl:
+                            "${controller.getNewFilmData.value?.items[index].thumbUrl}",
+                        boxFit: BoxFit.fill,
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height * .5,
+                      ),
+                    ),
+                  ),
                 );
               },
               options: CarouselOptions(
