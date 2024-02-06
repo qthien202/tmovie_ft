@@ -104,7 +104,7 @@ class SearchView extends StatelessWidget {
                               print(
                                   ">>>>>>>>>>>>>${controller.selectIndex.value}");
                               controller.search.value = null;
-                              await controller.getSearch();
+                              await controller.getSearch(page: index+1);
                             },
                             child: Container(
                               padding: const EdgeInsets.symmetric(

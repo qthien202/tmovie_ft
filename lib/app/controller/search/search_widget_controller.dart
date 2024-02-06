@@ -19,9 +19,9 @@ class SearchWidgetController extends GetxController{
   }
   
 
-  Future<GetFilmByCategory?>getSearch()async{
+  Future<GetFilmByCategory?>getSearch({ int? page})async{
    
-    search.value = await api.getSearch(keyWord: keywordController.text);
+    search.value = await api.getSearch(keyWord: keywordController.text,page: page);
     search.refresh();
     final double itemLength = (search.value?.pageProps?.data?.params?.pagination?.totalItems??0) / (search.value?.pageProps?.data?.params?.pagination?.totalItemsPerPage??0);
     totalPage.value = itemLength.round();
