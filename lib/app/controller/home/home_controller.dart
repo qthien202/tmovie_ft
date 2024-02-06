@@ -5,12 +5,19 @@ import 'package:get/get.dart';
 
 class HomeController extends GetxController { 
   final Services api = Get.find();
-  final Services2 api2 = Get.find();
+  
   Rxn<GetNewFilm>getNewFilmData = Rxn();
   Rxn<GetFilmByCategory>phimBo = Rxn();
   Rxn<GetFilmByCategory>phimLe = Rxn();
   Rxn<GetFilmByCategory>shows = Rxn();
   Rxn<GetFilmByCategory>hoatHinh = Rxn();
+  Rxn<GetFilmByCategory>vietSub = Rxn();
+  Rxn<GetFilmByCategory>thuyetMinh = Rxn();
+  Rxn<GetFilmByCategory>longTieng = Rxn();
+  Rxn<GetFilmByCategory>dangChieu = Rxn();
+  Rxn<GetFilmByCategory>tronBo = Rxn();
+  Rxn<GetFilmByCategory>sapChieu = Rxn();
+  
   Rxn<int>activeIndex = Rxn();
 
   @override
@@ -22,15 +29,24 @@ class HomeController extends GetxController {
   }
 
   Future<GetNewFilm?>getNewFilm()async{
-    getNewFilmData.value = await api.getNewFilm(page: "1");
+    getNewFilmData.value = await api.getNewFilm();
     return getNewFilmData.value;
   }
 
   Future<void>getFilmByCategory()async{
-    phimLe.value = await api2.getFilmByCategory(path: "phim-le", slug: "phim-le",page: 1);
-    phimBo.value = await api2.getFilmByCategory(path: "phim-bo", slug: "phim-bo",page: 1);
-    shows.value = await api2.getFilmByCategory(path: "tv-shows", slug: "tv-shows",page: 1);
-    hoatHinh.value = await api2.getFilmByCategory(path: "hoat-hinh", slug: "hoat-hinh",page: 1);
+    phimLe.value = await api.getFilmByCategory(path: "phim-le", page: 1);
+    phimBo.value = await api.getFilmByCategory(path: "phim-bo", page: 1);
+    shows.value = await api.getFilmByCategory(path: "tv-shows", page: 1);
+    hoatHinh.value = await api.getFilmByCategory(path: "hoat-hinh", page: 1);
+    vietSub.value = await api.getFilmByCategory(path: "phim-vietsub", page: 1);
+    thuyetMinh.value = await api.getFilmByCategory(path: "phim-thuyet-minh", page: 1);
+    longTieng.value = await api.getFilmByCategory(path: "phim-long-tieng", page: 1);
+    dangChieu.value = await api.getFilmByCategory(path: "phim-bo-dang-chieu", page: 1);
+    tronBo.value = await api.getFilmByCategory(path: "phim-hoan-thanh", page: 1);
+    sapChieu.value = await api.getFilmByCategory(path: "phim-sap-chieu", page: 1);
+
+
+
   }
 
 }

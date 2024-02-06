@@ -14,7 +14,7 @@ class DependencyInjections implements Bindings {
   Future<void> dependencies() async {
        final dio = await Get.putAsync(() => _dio());
        Get.put(Services(dio));
-       Get.put(Services2(dio));
+       
   
   }
 

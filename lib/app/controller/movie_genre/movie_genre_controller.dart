@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 
 class MovieGenreController extends GetxController{
   
-  final Services2 api = Get.find();
+  final Services api = Get.find();
   
   Rxn<GetFilmByCategory>movieGenre = Rxn();
   Rxn<int>selectIndex = Rxn(0);
@@ -22,7 +22,7 @@ class MovieGenreController extends GetxController{
   
 
   Future<GetFilmByCategory?>getMovieGenre({required String? slug,required String country, required String year})async{
-    movieGenre.value = await api.getMovieGenre(path: slug??"", slug: slug??"",page: (selectIndex.value??0)+1,country: country,year: year);
+    movieGenre.value = await api.getMovieGenre(path: slug??"", page: (selectIndex.value??0)+1,country: country,year: year);
     movieGenre.refresh();
     final double itemLength = (movieGenre.value?.pageProps?.data?.params?.pagination?.totalItems??0) / (movieGenre.value?.pageProps?.data?.params?.pagination?.totalItemsPerPage??0);
     totalPage.value = itemLength.round();

@@ -57,36 +57,52 @@ class DetailView extends StatelessWidget {
             const SizedBox(height: 15,),
             const Info(),
             const SizedBox(height: 15,),
-            Container(
-              padding: EdgeInsets.symmetric(vertical: 10),
-              margin: EdgeInsets.symmetric(vertical: 10,horizontal: 30),
-              
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(30),
-                color: GlobalColor.primary
-              ),
-              child: InkWell(
-                onTap: (){
-                  Get.to(ChewieVideoPlayer(fileName: data.name??"--",episode: data.episodes?.first.serverData?.first.name??"",videoUrl: data?.episodes?.first.serverData?.first.linkM3u8??"",));
-                },
-                child: Center(child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.play_arrow,color: Colors.white,),
-                    const SizedBox(width: 10,),
-                    Text("Xem phim",style: TextStyle(fontSize: 15,fontWeight: FontWeight.bold),),
-                  ],
-                )),
+            Visibility(
+              visible: data.status=="completed",
+            
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 10),
+                margin: EdgeInsets.symmetric(vertical: 10,horizontal: 30),
+                
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(30),
+                  color: GlobalColor.primary
+                ),
+                child: InkWell(
+                  onTap: (){
+                    Get.to(ChewieVideoPlayer(fileName: data.name??"--",episode: data.episodes?.first.serverData?.first.name??"",videoUrl: data?.episodes?.first.serverData?.first.linkM3u8??"",));
+                  },
+                  child: Center(child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.play_arrow,color: Colors.white,),
+                      const SizedBox(width: 10,),
+                      Text("Xem phim",style: TextStyle(fontSize: 15,fontWeight: FontWeight.bold),),
+                    ],
+                  )),
+                ),
               ),
             ),
             const InfoDetail(),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: const Text("Tập phim",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16)),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal:8.0),
-              child: const Espisode(),
+            Visibility(
+              visible: data.status=="completed",
+              replacement: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text("Trạng thái : phim sắp chiếu"),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: const Text("Tập phim",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16)),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal:8.0),
+                child: const Espisode(),
+              ),
+                ],
+              ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),

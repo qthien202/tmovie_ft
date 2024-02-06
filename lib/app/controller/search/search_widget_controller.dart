@@ -6,7 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
 class SearchWidgetController extends GetxController{
-  final Services2 api = Get.find();
+  final Services api = Get.find();
   Rxn<GetFilmByCategory>search = Rxn();
   TextEditingController keywordController = TextEditingController();
   Rxn<int>totalPage = Rxn(0);
@@ -14,6 +14,7 @@ class SearchWidgetController extends GetxController{
 
   void onReady()async{
     super.onReady();
+    
     await getSearch();
   }
   
