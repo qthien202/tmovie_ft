@@ -58,7 +58,7 @@ class DetailView extends StatelessWidget {
             const Info(),
             const SizedBox(height: 15,),
             Visibility(
-              visible: data.status=="completed",
+              visible: data.status!="trailer",
             
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: 10),
@@ -85,7 +85,7 @@ class DetailView extends StatelessWidget {
             ),
             const InfoDetail(),
             Visibility(
-              visible: data.status=="completed",
+              visible: data.status!="trailer",
               replacement: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text("Trạng thái : phim sắp chiếu"),
