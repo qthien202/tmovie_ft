@@ -1,9 +1,9 @@
 import 'dart:developer';
-
 import 'package:app_ft_movies/app/data/apis/services.dart';
 import 'package:app_ft_movies/app/data/repository/get_film_by_category.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+
 
 class SearchWidgetController extends GetxController{
   final Services api = Get.find();
@@ -11,11 +11,12 @@ class SearchWidgetController extends GetxController{
   TextEditingController keywordController = TextEditingController();
   Rxn<int>totalPage = Rxn(0);
   Rxn<int>selectIndex = Rxn(0);
+  // final  genre = Get.put(MovieGenreController());
 
   void onReady()async{
     super.onReady();
-    
-    await getSearch();
+    search.value = await api.getMovieGenre(path: "hanh-dong", page: 1, country: "", year: "2024");
+    await getSearch(page: 1);
   }
   
 

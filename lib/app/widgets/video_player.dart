@@ -52,7 +52,11 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: GlobalColor.backgroundColor,
-      
+      appBar: AppBar(
+        backgroundColor: GlobalColor.backgroundColor,
+        automaticallyImplyLeading: true,
+        foregroundColor: Colors.white,
+      ),
       body: Chewie(
 
       controller: _chewieController,

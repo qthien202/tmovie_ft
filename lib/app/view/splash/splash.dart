@@ -13,15 +13,9 @@ class SplashView extends StatelessWidget {
     return Scaffold(
       backgroundColor: GlobalColor.backgroundColor,
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SvgPicture.asset("assets/images/logo.svg"),
-            Text(
-              "TMOVIE",
-              style: TextStyle(color: GlobalColor.primary),
-            )
-          ],
+        child: Text(
+          "TMOVIE",
+          style: TextStyle(color: GlobalColor.primary,fontSize: 20,fontWeight: FontWeight.bold),
         ),
       ),
     );

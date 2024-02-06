@@ -23,11 +23,9 @@ class MovieGenreview extends StatelessWidget {
       backgroundColor: GlobalColor.backgroundColor,
         onRefresh: ()async=>controller.getMovieGenre(slug: slug, country: country, year: year),
       child: Scaffold(
-        key: key,
+        
           backgroundColor: GlobalColor.backgroundColor,
-          endDrawer: Drawer(
-            child: FilterPage(),
-          ),
+          
           appBar: AppBar(
             backgroundColor: GlobalColor.backgroundColor,
             foregroundColor: Colors.white,
@@ -35,8 +33,8 @@ class MovieGenreview extends StatelessWidget {
             actions: [
               InkWell(
               onTap: (){
-                Get.back();
-                key.currentState?.openEndDrawer();
+                
+                Get.to(FilterPage(),transition: Transition.rightToLeft);
               },
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal:8.0),

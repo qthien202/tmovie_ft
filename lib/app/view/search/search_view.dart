@@ -1,5 +1,6 @@
 import 'package:app_ft_movies/app/controller/search/search_widget_controller.dart';
 import 'package:app_ft_movies/app/core/global_color.dart';
+import 'package:app_ft_movies/app/view/drawer/drawer_view.dart';
 import 'package:app_ft_movies/app/view/home/card_cinema/card_cinema.dart';
 import 'package:app_ft_movies/app/widgets/search_widget.dart';
 import 'package:flutter/material.dart';
@@ -16,12 +17,31 @@ class SearchView extends StatelessWidget {
       backgroundColor: GlobalColor.backgroundColor,
       onRefresh: () async => controller.onReady(),
       child: Scaffold(
+        appBar: AppBar(
+          centerTitle: false,
+          backgroundColor: GlobalColor.backgroundColor,
+          title: const SearchWidget(),
+          actions: [
+            InkWell(
+              onTap: (){
+                Get.to(FilterPage(),transition: Transition.rightToLeft);
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal:8.0),
+                child: const Icon(
+                  Icons.menu,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
         backgroundColor: GlobalColor.backgroundColor,
         body: ListView(
           children: [
-            const SearchWidget(),
+            
             const SizedBox(
-              height: 20,
+              height: 10,
             ),
             Obx(() {
               final isLoading = controller.search.value==null;

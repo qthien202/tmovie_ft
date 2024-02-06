@@ -24,10 +24,7 @@ class ListMovieView extends StatelessWidget {
         backgroundColor: GlobalColor.backgroundColor,
         onRefresh: ()async=>controller.getListMovie(slug: slug),
         child: Scaffold(
-          endDrawer: Drawer(
-            child: FilterPage(),
-          ),
-          key: key,
+         
           backgroundColor: GlobalColor.backgroundColor,
           appBar: AppBar(
             backgroundColor: GlobalColor.backgroundColor,
@@ -36,7 +33,7 @@ class ListMovieView extends StatelessWidget {
             actions: [
               InkWell(
               onTap: (){
-                key.currentState?.openEndDrawer();
+                Get.to(FilterPage(),transition: Transition.rightToLeft);
               },
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal:8.0),

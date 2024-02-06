@@ -18,6 +18,7 @@ class HomeView extends StatelessWidget {
     final controller = Get.put(HomeController());
     final GlobalKey<ScaffoldState> key = GlobalKey<ScaffoldState>();
     return Scaffold(
+      
       extendBodyBehindAppBar: true,
       backgroundColor: GlobalColor.backgroundColor,
       body: RefreshIndicator(
@@ -36,7 +37,7 @@ class HomeView extends StatelessWidget {
                 actions: [
                   InkWell(
             onTap: (){
-              key.currentState?.openEndDrawer();
+              Get.to(FilterPage(),transition: Transition.rightToLeft);
             },
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal:8.0),
@@ -51,12 +52,28 @@ class HomeView extends StatelessWidget {
                 backgroundColor: GlobalColor.backgroundColor,
                 systemOverlayStyle: const SystemUiOverlayStyle(
                     statusBarBrightness: Brightness.dark),
-                expandedHeight: MediaQuery.of(context).size.height * .6,
+                expandedHeight: MediaQuery.of(context).size.height *.64,
                 flexibleSpace: FlexibleSpaceBar(
                   background: const SliderCinema(),
                 ),
               ),
-              SliverToBoxAdapter()
+              SliverToBoxAdapter(
+                child: Column(
+                  children:  [
+                    // const MostPopular(),
+                    Obx(() => FilmByCategory(type: "Phim bộ",getFilmByCategory: controller.phimBo.value),),
+                    Obx(() => FilmByCategory(type: "Phim lẻ",getFilmByCategory: controller.phimLe.value,)),
+                    Obx(() => FilmByCategory(type: "TV show",getFilmByCategory: controller.shows.value,)),
+                    Obx(() => FilmByCategory(type: "Hoạt hình",getFilmByCategory: controller.hoatHinh.value,)),
+                    Obx(() => FilmByCategory(type: "Phim vietsub",getFilmByCategory: controller.vietSub.value,)),
+                    Obx(() => FilmByCategory(type: "Phim thuyết minh",getFilmByCategory: controller.thuyetMinh.value,)),
+                    Obx(() => FilmByCategory(type: "Phim lồng tiếng",getFilmByCategory: controller.longTieng.value,)),
+                    Obx(() => FilmByCategory(type: "Phim đang chiếu",getFilmByCategory: controller.dangChieu.value,)),
+                    Obx(() => FilmByCategory(type: "Phim trọn bộ",getFilmByCategory: controller.tronBo.value,)),
+                    Obx(() => FilmByCategory(type: "Phim sắp chiếu",getFilmByCategory: controller.sapChieu.value,))
+                  ],
+                ),
+              )
             ],
           )),
     );

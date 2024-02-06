@@ -27,7 +27,7 @@ class FilmByCategory extends StatelessWidget {
               Text(type??"",style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),),
               TextButton(onPressed: (){
                 Get.to(ListMovieView(slug: getFilmByCategory?.pageProps?.data?.typeList??"", titlePage: type??""));
-              }, child: Text("Xem thêm",style: TextStyle(color: GlobalColor.primary),)
+              }, child: Text("Xem thêm",style: TextStyle(color: Colors.white,decoration: TextDecoration.underline,decorationColor: Colors.white),)
               )
             ],
           ),

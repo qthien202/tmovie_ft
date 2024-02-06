@@ -1,10 +1,13 @@
+import 'package:app_ft_movies/app/controller/detail/detail_controller.dart';
 import 'package:app_ft_movies/app/data/apis/services.dart';
 import 'package:app_ft_movies/app/data/repository/get_film_by_category.dart';
 import 'package:app_ft_movies/app/data/repository/get_new_film.dart';
+import 'package:app_ft_movies/app/widgets/video_player.dart';
 import 'package:get/get.dart';
 
 class HomeController extends GetxController { 
   final Services api = Get.find();
+  final detail = Get.put(DetailController());
   
   Rxn<GetNewFilm>getNewFilmData = Rxn();
   Rxn<GetFilmByCategory>phimBo = Rxn();
@@ -46,6 +49,19 @@ class HomeController extends GetxController {
     sapChieu.value = await api.getFilmByCategory(path: "phim-sap-chieu", page: 1);
 
 
+
+  }
+
+  Future<void>watchNow({required String slug})async{
+    
+    await detail.getFilmDetail(slug: slug);
+    final data = detail.filmDetail.value?.pageProps?.data?.item;
+    
+    Get.to(ChewieVideoPlayer(
+      videoUrl: data?.episodes?.first.serverData?.first.linkM3u8??"",
+       fileName: data?.name??"",
+        episode: data?.episodes?.first.serverData?.first.name??""
+        ));
 
   }
 

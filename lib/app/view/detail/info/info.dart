@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 class Info extends StatelessWidget {
   const Info({super.key});
+  
 
   @override
   Widget build(BuildContext context) {
@@ -11,42 +12,24 @@ class Info extends StatelessWidget {
     
     return Obx((){
       final data = controller.filmDetail.value?.pageProps?.data?.item;
-      return Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Icon(Icons.calendar_today,color: Colors.white,size: 15,),
-                  const SizedBox(width: 5,),
-                  Text(data?.year.toString()??"--",style: const TextStyle(color: Colors.white,fontSize: 11),),
-                   Padding(
-                     padding: const EdgeInsets.symmetric(horizontal: 10),
-                     child: Container(
-                      height: 10,
-                      width: 1,
-                      color: Colors.white,
-                                       ),
-                   ),
-                  const Icon(Icons.access_time,color: Colors.white,size: 15,),
-                  const SizedBox(width: 5,),
-                  Text(data?.time.toString()??"--",style: const TextStyle(color: Colors.white,fontSize: 11)),
-                  Padding(
-                     padding: const EdgeInsets.symmetric(horizontal: 10),
-                     child: Container(
-                      height: 10,
-                      width: 1,
-                      color: Colors.white,
-                                       ),
-                   ),
-                  const Icon(Icons.theaters,color: Colors.white,size: 15,),
-                  const SizedBox(width: 5,),
-                  Text(data?.category?.first.name??"--",style: const TextStyle(color: Colors.white,fontSize: 11),)
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 15),
+        child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("${data?.name}  •  ${data?.quality}",
+                maxLines: 2,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold
+                ),),
+                Text("${data?.year} • ${data?.category?.first.name} / ${data?.category?.last.name}"),
+                Text("${data?.time}")
 
-                ],
-              )
-            ],
-          );
+                
+              ],
+            ),
+      );
     });
   }
 }

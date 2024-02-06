@@ -10,60 +10,41 @@ class InfoDetail extends StatelessWidget {
     final controller = Get.put(DetailController());
     return Obx((){
       final data = controller.filmDetail.value?.pageProps?.data?.item;
-      return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Thông tin phim",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16),),
-                const SizedBox(height: 10,),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text("Số tập :"),
-                    const SizedBox(width: 10,),
-                    Text(data?.episodeTotal??"--")
-                  ],
-                ),
-                const SizedBox(height: 10,),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text("Chất lượng :"),
-                    const SizedBox(width: 10,),
-                    Text(data?.quality??"--"),
-                  ],
-                ),
-                const SizedBox(height: 10,),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text("Ngôn ngữ :"),
-                    const SizedBox(width: 10,),
-                    Text(data?.lang??"--"),
-                  ],
-                ),
-                const SizedBox(height: 10,),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text("Thể loại :"),
-                    const SizedBox(width: 10,),
-                    Text(data?.category?.first.name??"--"),
-                  ],
-                ),
-                const SizedBox(height: 10,),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text("Quốc gia :"),
-                    const SizedBox(width: 10,),
-                    Text(data?.country?.first.name??"--"),
-                  ],
-                )
-              ],
-            ),
-          );
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Thông tin phim",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16),),
+          const SizedBox(height: 10,),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text("Số tập :"),
+              const SizedBox(width: 10,),
+              Text(data?.episodeTotal??"--")
+            ],
+          ),
+          
+          const SizedBox(height: 10,),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text("Ngôn ngữ :"),
+              const SizedBox(width: 10,),
+              Text(data?.lang??"--"),
+            ],
+          ),
+          const SizedBox(height: 10,),
+          
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text("Quốc gia :"),
+              const SizedBox(width: 10,),
+              Text(data?.country?.first.name??"--"),
+            ],
+          )
+        ],
+      );
     });
   }
 }

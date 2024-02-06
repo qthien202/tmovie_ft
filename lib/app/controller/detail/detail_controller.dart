@@ -9,6 +9,7 @@ class DetailController extends GetxController{
   Rxn<String>selectTab = Rxn();
 
   Future<GetFilmDetails?>getFilmDetail({required String slug})async{
+    filmDetail.value=null;
     filmDetail.value = await api.getFilmDetails(path: slug);
     filmDetail.refresh();
     return filmDetail.value;

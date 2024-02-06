@@ -10,7 +10,7 @@ class SearchWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(SearchWidgetController());
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 5),
       child: TextField(
         onSubmitted: (val)async{
           controller.selectIndex.value = 0;

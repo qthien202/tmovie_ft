@@ -80,7 +80,7 @@ class IndexView extends StatelessWidget {
                  rippleColor: Color(0xff252836),
                     hoverColor: Color(0xff252836),
                     gap: 5,
-                    activeColor: GlobalColor.primary,
+                    activeColor: Colors.white,
                     iconSize: 25,
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                     duration: Duration(milliseconds: 400),

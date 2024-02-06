@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 class GlobalColor {
   GlobalColor._();
  
-  static const Color _primary = Color(0xff12CDD9);
+  static const Color _primary = Color(0xffE50914);
   static const Color _second = Colors.orange;
   static const Color container = Colors.white;
   // static const Color backgroundColor = Color(0xff1F1D2B);
-  static const Color backgroundColor = Color(0xff333333);
+  static const Color backgroundColor = Colors.black;
 
  
 
