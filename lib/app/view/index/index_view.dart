@@ -32,30 +32,30 @@ class IndexView extends StatelessWidget {
       endDrawer:  Drawer(
         child: FilterPage(),
       ),
-      appBar: AppBar(
-        backgroundColor: GlobalColor.backgroundColor,
-        centerTitle: false,
-        title: Text("TMOVIE",style: TextStyle(
-          color: GlobalColor.primary,
-          fontSize: 16,
-          fontWeight: FontWeight.bold
-        ),),
-        actions: [
+      // appBar: AppBar(
+      //   backgroundColor: GlobalColor.backgroundColor,
+      //   centerTitle: false,
+      //   title: Text("TMOVIE",style: TextStyle(
+      //     color: GlobalColor.primary,
+      //     fontSize: 16,
+      //     fontWeight: FontWeight.bold
+      //   ),),
+      //   actions: [
           
-          InkWell(
-            onTap: (){
-              key.currentState?.openEndDrawer();
-            },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal:8.0),
-              child: const Icon(
-                Icons.menu,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ],
-      ),
+      //     InkWell(
+      //       onTap: (){
+      //         key.currentState?.openEndDrawer();
+      //       },
+      //       child: Padding(
+      //         padding: const EdgeInsets.symmetric(horizontal:8.0),
+      //         child: const Icon(
+      //           Icons.menu,
+      //           color: Colors.white,
+      //         ),
+      //       ),
+      //     ),
+      //   ],
+      // ),
       backgroundColor: GlobalColor.backgroundColor,
       body: Obx(() => items[controller.tabIndex.value??0]['screen']),
       bottomNavigationBar: Padding(

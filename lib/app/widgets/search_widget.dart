@@ -22,32 +22,32 @@ class SearchWidget extends StatelessWidget {
         readOnly: false,
         decoration: InputDecoration(
           hintText: 'Nhập phim bạn cần tìm',
-          hintStyle: TextStyle(
+          hintStyle: const TextStyle(
             color: Colors.grey,
             fontWeight: FontWeight.w300,
             fontSize: 14
           ),
-          contentPadding: EdgeInsets.symmetric(vertical: 10,horizontal: 20),
-          suffixIcon: Icon(Icons.search,color: Colors.grey,size: 20,),
+          contentPadding: const EdgeInsets.symmetric(vertical: 10,horizontal: 20),
+          suffixIcon: const Icon(Icons.search,color: Colors.grey,size: 20,),
           filled: true,
-          fillColor: Color(0xff252836),
+          fillColor: const Color(0xff252836),
           border: OutlineInputBorder(
       
             borderRadius: BorderRadius.circular(24),
-            borderSide: BorderSide(
+            borderSide: const BorderSide(
                 color: Colors.transparent
             ),
       
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(24),
-            borderSide: BorderSide(
+            borderSide: const BorderSide(
                 color: Colors.transparent
             ),
           ),
           enabledBorder:  OutlineInputBorder(
             borderRadius: BorderRadius.circular(24),
-            borderSide: BorderSide(
+            borderSide: const BorderSide(
                 color: Colors.transparent
             ),
           ),

@@ -40,17 +40,14 @@ class SliderCinema extends StatelessWidget {
                                 ),
                     )
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: InkWell(
-                      onTap: ()=>Get.to(DetailView(slug: controller.getNewFilmData.value?.items[index].slug,name: controller.getNewFilmData.value?.items[index].name,)),
-                      child: GlobalImage(
-                        imageUrl:
-                            "${controller.getNewFilmData.value?.items[index].thumbUrl}",
-                        boxFit: BoxFit.fill,
-                        width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.height * .5,
-                      ),
+                  child: InkWell(
+                    onTap: ()=>Get.to(DetailView(slug: controller.getNewFilmData.value?.items[index].slug,name: controller.getNewFilmData.value?.items[index].name,)),
+                    child: GlobalImage(
+                      imageUrl:
+                          "${controller.getNewFilmData.value?.items[index].thumbUrl}",
+                      boxFit: BoxFit.fill,
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height,
                     ),
                   ),
                 );
@@ -60,24 +57,24 @@ class SliderCinema extends StatelessWidget {
                   enlargeCenterPage: true,
                   autoPlay: true,
                   autoPlayInterval: const Duration(seconds: 7),
-                  // viewportFraction: 1,
+                  viewportFraction: 1,
                   onPageChanged: (index, reason) {
                     controller.activeIndex.value = index;
                   }),
             ),
             const SizedBox(height: 10,),
-            Center(
-                // bottom: 2,
-                child: AnimatedSmoothIndicator(
-              count: controller.getNewFilmData.value?.items.length ?? 0,
-              activeIndex: controller.activeIndex.value ?? 0,
-              effect: ScrollingDotsEffect(
-                dotWidth: 5,
-                dotHeight: 5,
-                dotColor: Colors.grey,
-                activeDotColor: GlobalColor.primary,
-              ),
-            )),
+            // Center(
+            //     // bottom: 2,
+            //     child: AnimatedSmoothIndicator(
+            //   count: controller.getNewFilmData.value?.items.length ?? 0,
+            //   activeIndex: controller.activeIndex.value ?? 0,
+            //   effect: ScrollingDotsEffect(
+            //     dotWidth: 5,
+            //     dotHeight: 5,
+            //     dotColor: Colors.grey,
+            //     activeDotColor: GlobalColor.primary,
+            //   ),
+            // )),
           ],
         ),
       );
