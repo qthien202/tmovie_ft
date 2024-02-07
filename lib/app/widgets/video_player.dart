@@ -59,6 +59,7 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
 
       _betterPlayerController = BetterPlayerController(
         BetterPlayerConfiguration(
+
           overlay: Padding(
             padding: const EdgeInsets.all(8),
             child: Text("${widget.fileName}-${widget.episode}"),
@@ -67,10 +68,11 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
           looping: false,
           aspectRatio: 16 / 9,
           fullScreenByDefault: true,
-          placeholder: Center(child: CircularProgressIndicator()),
+
           controlsConfiguration: BetterPlayerControlsConfiguration(
             controlBarColor: Colors.transparent,
           ),
+
         ),
         betterPlayerDataSource: BetterPlayerDataSource(
           BetterPlayerDataSourceType.network,
