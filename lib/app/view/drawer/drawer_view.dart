@@ -172,9 +172,9 @@ class _FilterPageState extends State<FilterPage> {
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
         // mainAxisExtent: 3,
-        crossAxisSpacing: 20,
-        mainAxisSpacing: 20,
-        childAspectRatio: 10 / 30,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        childAspectRatio: 15 / 30,
       ),
       itemCount: items.length,
       itemBuilder: (context, index) {
