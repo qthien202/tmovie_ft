@@ -103,6 +103,7 @@ class DetailView extends StatelessWidget {
                             child: InkWell(
                               onTap: () {
                                 Get.to(ChewieVideoPlayer(
+                                  slug: data.slug??"",
                                   fileName: data.name ?? "--",
                                   episode: data.episodes?.first.serverData
                                           ?.first.name ??

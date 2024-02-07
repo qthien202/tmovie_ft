@@ -58,6 +58,7 @@ class HomeController extends GetxController {
     final data = detail.filmDetail.value?.pageProps?.data?.item;
     
     Get.to(ChewieVideoPlayer(
+      slug: data?.slug??"",
       videoUrl: data?.episodes?.first.serverData?.first.linkM3u8??"",
        fileName: data?.name??"",
         episode: data?.episodes?.first.serverData?.first.name??""

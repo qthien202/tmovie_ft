@@ -1,76 +1,104 @@
-import 'package:app_ft_movies/app/core/global_color.dart';
-import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:video_player/video_player.dart';
+import 'package:better_player/better_player.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ChewieVideoPlayer extends StatefulWidget {
   final String videoUrl;
-  final String  fileName;
+  final String fileName;
   final String episode;
+  final String slug;
 
-  ChewieVideoPlayer({required this.videoUrl, required this.fileName, required this.episode});
+  ChewieVideoPlayer({
+    required this.videoUrl,
+    required this.fileName,
+    required this.episode,
+    required this.slug,
+  });
 
   @override
   _ChewieVideoPlayerState createState() => _ChewieVideoPlayerState();
 }
 
 class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
-  late VideoPlayerController _videoPlayerController;
-  late ChewieController _chewieController;
+  late BetterPlayerController _betterPlayerController;
+  late SharedPreferences _prefs;
+  late String _prefsKey;
 
   @override
   void initState() {
     super.initState();
-    _videoPlayerController = VideoPlayerController.network(
-      widget.videoUrl,
-    );
-    _chewieController = ChewieController(
-      videoPlayerController: _videoPlayerController,
-      autoPlay: true,
-      looping: false,
-      autoInitialize: true,
-      // allowFullScreen: true,
-      allowMuting: true,
-      fullScreenByDefault: true,
-      // allowPlaybackSpeedChanging: true,
-      overlay: Padding(
-        padding: const EdgeInsets.all(8),
-        child: Text("${widget.fileName}-${widget.episode}"),
-      ),
-      
-      
-
-      // isLive: true,
-      // showControls: true,
-      // zoomAndPan: true
-      
-    );
+    _prefsKey = "${widget.fileName}-${widget.episode}";
+    _initializePlayer();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: GlobalColor.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: GlobalColor.backgroundColor,
-        automaticallyImplyLeading: true,
-        foregroundColor: Colors.white,
-      ),
-      body: Chewie(
-
-      controller: _chewieController,
-    ),
-    ) ;
-    
-    
+      appBar: AppBar(),
+      body: BetterPlayer(controller: _betterPlayerController),
+    );
   }
 
   @override
   void dispose() {
     super.dispose();
-    _videoPlayerController.dispose();
-    _chewieController.dispose();
-    Navigator.pop(context);
+    _betterPlayerController.dispose();
+  }
+
+  void _initializePlayer() {
+    SharedPreferences.getInstance().then((prefs) {
+      setState(() {
+        _prefs = prefs;
+      });
+      int? savedPosition = _prefs.getInt(_prefsKey);
+
+      _betterPlayerController = BetterPlayerController(
+        BetterPlayerConfiguration(
+          overlay: Padding(
+            padding: const EdgeInsets.all(8),
+            child: Text("${widget.fileName}-${widget.episode}"),
+          ),
+          autoPlay: true,
+          looping: false,
+          aspectRatio: 16 / 9,
+          fullScreenByDefault: true,
+          placeholder: Center(child: CircularProgressIndicator()),
+          controlsConfiguration: BetterPlayerControlsConfiguration(
+            controlBarColor: Colors.transparent,
+          ),
+        ),
+        betterPlayerDataSource: BetterPlayerDataSource(
+          BetterPlayerDataSourceType.network,
+          widget.videoUrl,
+        ),
+      );
+
+      // Listen to video player events
+      _betterPlayerController.addEventsListener((event) {
+         if (event.betterPlayerEventType == BetterPlayerEventType.progress) {
+          _savePosition();
+          print(">>>>>>>>>>>>>>${_betterPlayerController.videoPlayerController!.value.position.inSeconds}");
+        }
+        if (event.betterPlayerEventType == BetterPlayerEventType.initialized) {
+          // Video player initialized, seek to saved position if available
+          if (savedPosition != null) {
+            _betterPlayerController.seekTo(Duration(seconds: savedPosition));
+            print(">>>>>>position: $savedPosition");
+          }
+        }
+      });
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant ChewieVideoPlayer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Save video position when widget updates
+    _savePosition();
+  }
+
+  void _savePosition() {
+    int positionInSeconds = _betterPlayerController.videoPlayerController!.value.position.inSeconds;
+    _prefs.setInt(_prefsKey, positionInSeconds);
   }
 }
