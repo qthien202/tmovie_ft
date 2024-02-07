@@ -1,3 +1,4 @@
+import 'package:app_ft_movies/app/core/global_color.dart';
 import 'package:flutter/material.dart';
 import 'package:better_player/better_player.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -34,7 +35,11 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      backgroundColor: GlobalColor.backgroundColor,
+      appBar: AppBar(
+        foregroundColor: Colors.white,
+        backgroundColor: GlobalColor.backgroundColor,
+      ),
       body: BetterPlayer(controller: _betterPlayerController),
     );
   }
