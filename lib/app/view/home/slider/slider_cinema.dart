@@ -27,7 +27,7 @@ class SliderCinema extends StatelessWidget {
                 visible: !isLoading,
                 replacement: SizedBox(
                   width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height * .5,
+                  height: MediaQuery.of(context).size.height,
                   child: Shimmer.fromColors(
                               baseColor: Colors.grey,
                               highlightColor: Colors.grey.shade600,

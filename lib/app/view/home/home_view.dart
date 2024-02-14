@@ -55,7 +55,7 @@ class HomeView extends StatelessWidget {
                         fontWeight: FontWeight.w900, fontSize: 14),
                     labelColor: Colors.white,
                     labelStyle:
-                        const TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+                        const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                         onTap: (ind)async{
                           controller.pathFilm.value = listFilm[ind]['slug'];
                           controller.tabIndex.value = ind;
@@ -76,6 +76,7 @@ class HomeView extends StatelessWidget {
                   ),
                 
                   elevation: 0.0,
+
                   backgroundColor: GlobalColor.backgroundColor,
                   systemOverlayStyle: const SystemUiOverlayStyle(
                       statusBarBrightness: Brightness.dark),
