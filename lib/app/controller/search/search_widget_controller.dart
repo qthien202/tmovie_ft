@@ -23,6 +23,12 @@ class SearchWidgetController extends GetxController{
   Future<GetFilmByCategory?>getSearch({ int? page})async{
    
     search.value = await api.getSearch(keyWord: keywordController.text,page: page);
+    for (var i = 0;
+        i < (search.value?.pageProps?.data?.items?.length ?? 0);
+        i++) {
+      search.value?.pageProps?.data?.items
+          ?.removeWhere((element) => element.category?.first.slug == "[redacted]");
+    }
     search.refresh();
     final double itemLength = (search.value?.pageProps?.data?.params?.pagination?.totalItems??0) / (search.value?.pageProps?.data?.params?.pagination?.totalItemsPerPage??0);
     totalPage.value = itemLength.round();

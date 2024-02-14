@@ -8,8 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
 
-class FilmByCategory extends StatelessWidget {
-  const FilmByCategory({super.key, this.getFilmByCategory, this.type});
+class NewFilm extends StatelessWidget {
+  const NewFilm({super.key, this.getFilmByCategory, this.type});
   final GetFilmByCategory? getFilmByCategory;
   final String? type;
 
@@ -17,6 +17,7 @@ class FilmByCategory extends StatelessWidget {
    @override
   Widget build(BuildContext context) {
     final isLoading = getFilmByCategory==null;
+  
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal:5),
       child: Column(
@@ -26,7 +27,7 @@ class FilmByCategory extends StatelessWidget {
             children: [
               Text(type??"",style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),),
               TextButton(onPressed: (){
-                Get.to(ListMovieView(slug: getFilmByCategory?.pageProps?.data?.typeList??"", titlePage: type??""));
+                Get.to(ListMovieView(slug: getFilmByCategory?.pageProps?.data?.typeList??"", titlePage: getFilmByCategory?.pageProps?.data?.titlePage??""));
               }, child: Text("Xem thêm",style: TextStyle(color: Colors.white,decoration: TextDecoration.underline,decorationColor: Colors.white),)
               )
             ],

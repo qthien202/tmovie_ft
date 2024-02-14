@@ -1,7 +1,7 @@
 import 'package:app_ft_movies/app/controller/movie_genre/movie_genre_controller.dart';
 import 'package:app_ft_movies/app/core/global_color.dart';
 import 'package:app_ft_movies/app/view/detail/detail_view.dart';
-import 'package:app_ft_movies/app/view/drawer/drawer_view.dart';
+import 'package:app_ft_movies/app/view/drawer/filter_page.dart';
 import 'package:app_ft_movies/app/view/home/card_cinema/card_cinema.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -9,10 +9,10 @@ import 'package:shimmer/shimmer.dart';
 
 class MovieGenreview extends StatelessWidget {
   final String slug;
-  final String titlePage;
+  final String? titlePage;
   final String country;
   final String year;
-  const MovieGenreview({super.key, required this.slug,  int? selectedYear, required this.country, required this.year, required this.titlePage});
+  const MovieGenreview({super.key, required this.slug,  int? selectedYear, required this.country,   required this.titlePage, required this.year});
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +29,7 @@ class MovieGenreview extends StatelessWidget {
           appBar: AppBar(
             backgroundColor: GlobalColor.backgroundColor,
             foregroundColor: Colors.white,
-            title: Text(titlePage),
+            title: Text("Phim $titlePage"),
             actions: [
               InkWell(
               onTap: (){

@@ -1,11 +1,20 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:app_ft_movies/app/view/list_movie/list_movie.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import 'package:app_ft_movies/app/core/global_color.dart';
 import 'package:app_ft_movies/app/view/movie_genre/movie_genre_view.dart';
 
 class FilterPage extends StatefulWidget {
+  const FilterPage({
+    Key? key,
+     this.slug,
+  }) : super(key: key);
+   final String? slug;
   @override
   _FilterPageState createState() => _FilterPageState();
+  
 }
 
 class _FilterPageState extends State<FilterPage> {
@@ -15,6 +24,7 @@ class _FilterPageState extends State<FilterPage> {
   String? titlePage;
 
   List<Map<String, dynamic>> drawerItems = [
+    // {"title":"Tất thể loại","slug":""},
     {"title": "Hành Động", "slug": "hanh-dong"},
     {"title": "Tình Cảm", "slug": "tinh-cam"},
     {"title": "Hài Hước", "slug": "hai-huoc"},
@@ -38,6 +48,7 @@ class _FilterPageState extends State<FilterPage> {
   ];
 
   List<Map<String, dynamic>> countries = [
+    {"name":"Tất cả quốc gia","slug":""},
     {"name": "Trung Quốc", "slug": "trung-quoc"},
     {"name": "Hàn Quốc", "slug": "han-quoc"},
     {"name": "Nhật Bản", "slug": "nhat-ban"},
@@ -69,23 +80,15 @@ class _FilterPageState extends State<FilterPage> {
     {"name": "Ả Rập Xê Út", "slug": "arap-xe-ut"},
   ];
 
-  List<Map<String, dynamic>> yearsList = [
-    {"year": 2010},
-    {"year": 2011},
-    {"year": 2012},
-    {"year": 2013},
-    {"year": 2014},
-    {"year": 2015},
-    {"year": 2016},
-    {"year": 2017},
-    {"year": 2018},
-    {"year": 2019},
-    {"year": 2020},
-    {"year": 2021},
-    {"year": 2022},
-    {"year": 2023},
-    {"year": 2024},
-  ];
+  // Lấy năm hiện tại
+
+
+// Tạo danh sách các năm từ 2010 đến năm hiện tại
+List<Map<String, dynamic>> yearsList = List.generate(
+  DateTime.now().year - 2009, // Số lượng năm là hiện tại trừ 2010 + 1
+  (index) => {"year": 2010 + index}, // Tạo map cho mỗi năm
+);
+
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +112,17 @@ class _FilterPageState extends State<FilterPage> {
                 ),
               ),
               onPressed: () {
-                if(selectedGenre==null){
+               if(widget.slug!=null){
+                Get.to(ListMovieView(
+                  titlePage: titlePage??"",
+                  country: selectedCountry??"",
+                  year: selectedYear.toString()??"",
+                  category: selectedGenre ?? "",
+                  slug: widget.slug,
+                ));
+               }
+               else{
+                 if(selectedGenre==null){
                   Get.snackbar("Thông báo", "Bạn cần chọn thể loại phim trước");
                 }
                 else{
@@ -117,9 +130,10 @@ class _FilterPageState extends State<FilterPage> {
                     titlePage: titlePage??"",
                   slug: selectedGenre ?? "",
                   country: selectedCountry??"",
-                  year: selectedYear.toString(),
+                  year: selectedYear.toString()??"",
                 ));
                 }
+               }
               },
               child: Text("Duyệt phim", style: TextStyle(color: Colors.white)),
             ),

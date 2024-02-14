@@ -1,6 +1,6 @@
 import 'package:app_ft_movies/app/controller/index/index_controller.dart';
 import 'package:app_ft_movies/app/core/global_color.dart';
-import 'package:app_ft_movies/app/view/drawer/drawer_view.dart';
+import 'package:app_ft_movies/app/view/drawer/filter_page.dart';
 import 'package:app_ft_movies/app/view/home/home_view.dart';
 import 'package:app_ft_movies/app/view/search/search_view.dart';
 import 'package:flutter/material.dart';
@@ -29,9 +29,9 @@ class IndexView extends StatelessWidget {
     final GlobalKey<ScaffoldState> key = GlobalKey<ScaffoldState>();
     return Scaffold(
       key: key,
-      endDrawer:  Drawer(
-        child: FilterPage(),
-      ),
+      // endDrawer:  Drawer(
+      //   child: FilterPage(),
+      // ),
       // appBar: AppBar(
       //   backgroundColor: GlobalColor.backgroundColor,
       //   centerTitle: false,

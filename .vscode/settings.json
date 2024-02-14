@@ -1,0 +1,8 @@
+{
+    "dart.flutterSdkPaths": [
+        "/path/to/your/flutter/bin"
+    ],
+    "dart.flutterCustomSdkPaths": {
+        "fvm": "/path/to/your/fvm/bin"
+    }
+}

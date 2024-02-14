@@ -16,12 +16,12 @@ class SliderCinema extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(HomeController());
     return Obx(() {
-      final isLoading = controller.getNewFilmData.value==null;
+      final isLoading = controller.getFilmData.value==null;
       return Stack(
         alignment: Alignment.topCenter,
         children: [
           CarouselSlider.builder(
-            itemCount: isLoading?4:controller.getNewFilmData.value?.items.length ?? 0,
+            itemCount: isLoading?4:controller.getFilmData.value?.pageProps?.data?.items?.length??0,
             itemBuilder: (context, index, realIndex) {
               return Visibility(
                 visible: !isLoading,
@@ -40,10 +40,10 @@ class SliderCinema extends StatelessWidget {
                   )
                 ),
                 child: InkWell(
-                  onTap: ()=>Get.to(DetailView(slug: controller.getNewFilmData.value?.items[index].slug,name: controller.getNewFilmData.value?.items[index].name,)),
+                  onTap: ()=>Get.to(DetailView(slug:controller.getFilmData.value?.pageProps?.data?.items?[index].slug,name: controller.getFilmData.value?.pageProps?.data?.items?[index].name,)),
                   child: GlobalImage(
                     imageUrl:
-                        "${controller.getNewFilmData.value?.items[index].thumbUrl}",
+                        "${controller.getFilmData.value?.pageProps?.data?.items?[index].thumbUrl}",
                     boxFit: BoxFit.fill,
                     width: MediaQuery.of(context).size.width,
                     height: MediaQuery.of(context).size.height,
@@ -67,23 +67,26 @@ class SliderCinema extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors.black,
-                    shape: RoundedRectangleBorder(
-                      // side: BorderSide(color: Colors.white),
-                      borderRadius: BorderRadius.circular(25)
-                    )
+                Visibility(
+                  visible: controller.getFilmData.value?.pageProps?.data?.items?[controller.activeIndex.value??0].episodeCurrent != "Trailer",
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: GlobalColor.primary,
+                      shape: RoundedRectangleBorder(
+                        // side: BorderSide(color: Colors.white),
+                        borderRadius: BorderRadius.circular(25)
+                      )
+                    ),
+                    onPressed: ()async{
+                      await controller.watchNow(slug: controller.getFilmData.value?.pageProps?.data?.items?[controller.activeIndex.value??0].slug??"");
+                    },
+                     child: const Row(
+                       children: [
+                        Icon(Icons.play_arrow_rounded,color: Colors.white,size: 20,),
+                         Text("Xem ngay",style: TextStyle(color: Colors.white,fontSize: 12),),
+                       ],
+                     )
                   ),
-                  onPressed: ()async{
-                    await controller.watchNow(slug: controller.getNewFilmData.value?.items[controller.activeIndex.value??0].slug??"");
-                  },
-                   child: const Row(
-                     children: [
-                      Icon(Icons.play_arrow_rounded,color: Colors.white,size: 20,),
-                       Text("Xem ngay",style: TextStyle(color: Colors.white,fontSize: 12),),
-                     ],
-                   )
                 ),
                 const SizedBox(width: 15,),
                 ElevatedButton(
@@ -94,7 +97,7 @@ class SliderCinema extends StatelessWidget {
                       borderRadius: BorderRadius.circular(25)
                     )
                   ),
-                  onPressed: ()=>Get.to(DetailView(slug: controller.getNewFilmData.value?.items[controller.activeIndex.value??0].slug,name: controller.getNewFilmData.value?.items[controller.activeIndex.value??0].name)),
+                  onPressed: ()=>Get.to(DetailView(slug: controller.getFilmData.value?.pageProps?.data?.items?[controller.activeIndex.value??0].slug,name: controller.getNewFilmData.value?.items[controller.activeIndex.value??0].name)),
                    child: const Row(
                      children: [
                       Icon(Icons.info,color: Colors.white,size: 20,),

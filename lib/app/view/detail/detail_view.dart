@@ -3,7 +3,7 @@ import 'package:app_ft_movies/app/core/global_color.dart';
 import 'package:app_ft_movies/app/view/detail/espisode/espisode.dart';
 import 'package:app_ft_movies/app/view/detail/info/info.dart';
 import 'package:app_ft_movies/app/view/detail/info_details/info_details.dart';
-import 'package:app_ft_movies/app/view/drawer/drawer_view.dart';
+import 'package:app_ft_movies/app/view/drawer/filter_page.dart';
 import 'package:app_ft_movies/app/widgets/global_image.dart';
 import 'package:app_ft_movies/app/widgets/video_player.dart';
 import 'package:flutter/material.dart';
@@ -75,7 +75,7 @@ class DetailView extends StatelessWidget {
                   backgroundColor: GlobalColor.backgroundColor,
                   systemOverlayStyle: const SystemUiOverlayStyle(
                       statusBarBrightness: Brightness.dark),
-                  expandedHeight: MediaQuery.of(context).size.height * .83,
+                  expandedHeight: MediaQuery.of(context).size.height * .6,
                   flexibleSpace: FlexibleSpaceBar(
                       background: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,7 +87,18 @@ class DetailView extends StatelessWidget {
                         boxFit: BoxFit.fill,
                       ),
 
-                      const Info(),
+                      
+                    ],
+                  )),
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 2, horizontal: 15),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Info(),
                       // const SizedBox(height: 20,),
                       Visibility(
                         visible: data.status != "trailer",
@@ -96,7 +107,7 @@ class DetailView extends StatelessWidget {
                             padding: EdgeInsets.symmetric(
                               vertical: 10,
                             ),
-                            width: MediaQuery.of(context).size.width * .9,
+                            width: MediaQuery.of(context).size.width * .95,
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(5),
                                 color: GlobalColor.primary),
@@ -135,17 +146,10 @@ class DetailView extends StatelessWidget {
                             ),
                           ),
                         ),
-                      )
-                    ],
-                  )),
-                ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 15),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+                      ),
+                      const SizedBox(
+                          height: 10,
+                        ),
                         const InfoDetail(),
                         const SizedBox(
                           height: 10,

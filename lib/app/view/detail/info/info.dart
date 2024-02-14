@@ -13,7 +13,7 @@ class Info extends StatelessWidget {
     return Obx((){
       final data = controller.filmDetail.value?.pageProps?.data?.item;
       return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 15),
+        padding: const EdgeInsets.symmetric(vertical: 10),
         child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

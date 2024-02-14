@@ -1,7 +1,7 @@
 import 'package:app_ft_movies/app/controller/list_movie/list_movie_controller.dart';
 import 'package:app_ft_movies/app/core/global_color.dart';
 import 'package:app_ft_movies/app/view/detail/detail_view.dart';
-import 'package:app_ft_movies/app/view/drawer/drawer_view.dart';
+import 'package:app_ft_movies/app/view/drawer/filter_page.dart';
 import 'package:app_ft_movies/app/view/home/card_cinema/card_cinema.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -10,14 +10,17 @@ import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ListMovieView extends StatelessWidget {
-  const ListMovieView({super.key, required this.slug, required this.titlePage});
-  final String slug;
+  const ListMovieView({super.key,  this.slug, required this.titlePage, this.country, this.category, this.year});
+  final String? slug;
   final String titlePage;
+  final String? country;
+  final String? category;
+  final String? year;
   @override
   Widget build(BuildContext context) {
     final GlobalKey<ScaffoldState> key = GlobalKey<ScaffoldState>();
     final controller = Get.put(ListMovieController());
-    controller.getListMovie(slug: slug);
+    controller.getListMovie(slug: slug,category: category??"",country: country??"",year: year??"");
      
    
       return RefreshIndicator(
@@ -29,11 +32,11 @@ class ListMovieView extends StatelessWidget {
           appBar: AppBar(
             backgroundColor: GlobalColor.backgroundColor,
             foregroundColor: Colors.white,
-            title: Text(titlePage),
+            title: Obx(() => Text(controller.listMovie.value?.pageProps?.data?.titlePage??""),),
             actions: [
               InkWell(
               onTap: (){
-                Get.to(FilterPage(),transition: Transition.rightToLeft);
+                Get.to( FilterPage(slug: slug??""),transition: Transition.rightToLeft);
               },
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal:8.0),
@@ -56,14 +59,14 @@ class ListMovieView extends StatelessWidget {
                 
                 
                 return GridView.builder(
-                  padding: EdgeInsets.all(5),
+                  padding: const EdgeInsets.all(5),
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 itemCount: isLoading?6:data?.items?.length ?? 0,
                 itemBuilder: (context, index) {
                   final items = data?.items?[index];
                   return Visibility(
-                    visible: !isLoading,
+                    visible: !isLoading ,
                     replacement: SizedBox(
                      width: MediaQuery.of(context).size.width*.4,
                      child: Shimmer.fromColors(
@@ -121,7 +124,7 @@ class ListMovieView extends StatelessWidget {
                           controller.selectIndex.value = index;
                           print(">>>>>>>>>>>>>${controller.selectIndex.value}");
                           controller.listMovie.value=null;
-                          await controller.getListMovie(slug: slug);
+                          await controller.getListMovie(slug: slug,category: category,country: country);
                         },
                         child: Container(
                           padding:
