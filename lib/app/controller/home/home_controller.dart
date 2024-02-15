@@ -22,19 +22,19 @@ class HomeController extends GetxController {
 
   List<Map<String, dynamic>> categoryList = [
     // {"title":"Tất thể loại","slug":""},
-    {"id":"0","title": "Phim mới nhất",},
-    {"id":"1","title": "Phim gia đình", "slug": "gia-dinh"},
-    {"id":"2","title": "Phim học đường", "slug": "hoc-duong"},
-    {"id":"3","title": "Phim tình cảm", "slug": "tinh-cam"},
-    {"id":"4","title": "Phim Hàn Quốc", "country": "han-quoc"},
-    {"id":"5","title": "Phim Trung Quốc", "country": "trung-quoc"},
-    {"id":"6","title": "Phim hành động", "slug": "hanh-dong"},
-    {"id":"7","title": "Phim cổ trang", "slug": "co-trang"},
-    {"id":"8","title": "Phim tâm lý", "slug": "tam-ly"},
-    {"id":"9","title": "Phim hình sự", "slug": "hinh-su"},
-    {"id":"10","title": "Phim viễn tưởng", "slug": "vien-tuong"},
-    {"id":"11","title": "Phim phiêu lưu", "slug": "phieu-luu"},
-    {"id":"12","title": "Phim khoa học", "slug": "khoa-hoc"},
+    {"id":"0","title": "Mới nhất",},
+    {"id":"1","title": "Gia đình", "slug": "gia-dinh"},
+    {"id":"2","title": "Học đường", "slug": "hoc-duong"},
+    {"id":"3","title": "Tình cảm", "slug": "tinh-cam"},
+    {"id":"4","title": "Hàn Quốc", "country": "han-quoc"},
+    {"id":"5","title": "Trung Quốc", "country": "trung-quoc"},
+    {"id":"6","title": "Hành động", "slug": "hanh-dong"},
+    {"id":"7","title": "Cổ trang", "slug": "co-trang"},
+    {"id":"8","title": "Tâm lý", "slug": "tam-ly"},
+    {"id":"9","title": "Hình sự", "slug": "hinh-su"},
+    {"id":"10","title": "Viễn tưởng", "slug": "vien-tuong"},
+    {"id":"11","title": "Phiêu lưu", "slug": "phieu-luu"},
+    {"id":"12","title": "Khoa học", "slug": "khoa-hoc"},
     
   ];
   RxList<Map<String, dynamic>> categories = RxList();
@@ -44,7 +44,7 @@ class HomeController extends GetxController {
   void onReady() async {
     // TODO: implement onReady
     super.onReady();
-    categories.addAll(categoryList);
+    
     pathFilm.value = "phim-bo";
      getFilm(slug: "phim-bo");
     await getFilmByCategory(slug: "phim-bo");

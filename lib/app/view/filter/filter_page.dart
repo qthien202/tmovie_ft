@@ -21,7 +21,7 @@ class _FilterPageState extends State<FilterPage> {
   String? selectedGenre;
   String? selectedCountry;
   int? selectedYear;
-  String? titlePage;
+  
 
   List<Map<String, dynamic>> drawerItems = [
     // {"title":"Tất thể loại","slug":""},
@@ -98,7 +98,7 @@ List<Map<String, dynamic>> yearsList = List.generate(
         backgroundColor: GlobalColor.backgroundColor,
         foregroundColor: Colors.white,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => Get.back(),
         ),
         actions: [
@@ -114,7 +114,7 @@ List<Map<String, dynamic>> yearsList = List.generate(
               onPressed: () {
                if(widget.slug!=null){
                 Get.to(ListMovieView(
-                  titlePage: titlePage??"",
+                  
                   country: selectedCountry??"",
                   year: selectedYear.toString()??"",
                   category: selectedGenre ?? "",
@@ -127,7 +127,7 @@ List<Map<String, dynamic>> yearsList = List.generate(
                 }
                 else{
                   Get.to(MovieGenreview(
-                    titlePage: titlePage??"",
+                   
                   slug: selectedGenre ?? "",
                   country: selectedCountry??"",
                   year: selectedYear.toString()??"",
@@ -135,7 +135,7 @@ List<Map<String, dynamic>> yearsList = List.generate(
                 }
                }
               },
-              child: Text("Duyệt phim", style: TextStyle(color: Colors.white)),
+              child: const Text("Duyệt phim", style: TextStyle(color: Colors.white)),
             ),
           )
         ],
@@ -143,19 +143,19 @@ List<Map<String, dynamic>> yearsList = List.generate(
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          ListTile(
+          const ListTile(
             title: Text('Thể loại', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
           ),
           Expanded(
             child: buildFilterList(drawerItems, selectedGenre, (genre) {
               setState(() {
-                titlePage = genre['title'];
+                
                 selectedGenre = genre["slug"];
                 
               });
             }),
           ),
-          ListTile(
+          const ListTile(
             title: Text('Quốc gia', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
           ),
           Expanded(
@@ -165,7 +165,7 @@ List<Map<String, dynamic>> yearsList = List.generate(
               });
             }),
           ),
-          ListTile(
+          const ListTile(
             title: Text('Năm', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
           ),
           Expanded(
@@ -183,7 +183,7 @@ List<Map<String, dynamic>> yearsList = List.generate(
   Widget buildFilterList(List<Map<String, dynamic>> items, dynamic selectedItem, Function(Map<String, dynamic>) onTap) {
     return GridView.builder(
       scrollDirection: Axis.horizontal,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
         // mainAxisExtent: 3,
         crossAxisSpacing: 10,
@@ -211,10 +211,10 @@ List<Map<String, dynamic>> yearsList = List.generate(
   
   return Center(
     child: Container(
-      padding: EdgeInsets.all(5),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: isSelected ? Color(0xff252836) : null,
-        border: isSelected ? Border.all(color: GlobalColor.primary) : null,
+        color: isSelected ? const Color(0xff252836) : null,
+        
         borderRadius: BorderRadius.circular(5),
       ),
       child: Text(

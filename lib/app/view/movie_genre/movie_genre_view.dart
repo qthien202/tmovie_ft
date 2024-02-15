@@ -1,7 +1,7 @@
 import 'package:app_ft_movies/app/controller/movie_genre/movie_genre_controller.dart';
 import 'package:app_ft_movies/app/core/global_color.dart';
 import 'package:app_ft_movies/app/view/detail/detail_view.dart';
-import 'package:app_ft_movies/app/view/drawer/filter_page.dart';
+import 'package:app_ft_movies/app/view/filter/filter_page.dart';
 import 'package:app_ft_movies/app/view/home/card_cinema/card_cinema.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -9,10 +9,10 @@ import 'package:shimmer/shimmer.dart';
 
 class MovieGenreview extends StatelessWidget {
   final String slug;
-  final String? titlePage;
+  
   final String country;
   final String year;
-  const MovieGenreview({super.key, required this.slug,  int? selectedYear, required this.country,   required this.titlePage, required this.year});
+  const MovieGenreview({super.key, required this.slug,  int? selectedYear, required this.country,    required this.year});
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +21,7 @@ class MovieGenreview extends StatelessWidget {
     controller.getMovieGenre(slug: slug, country: country, year: year);
     return RefreshIndicator(
       backgroundColor: GlobalColor.backgroundColor,
+      color: GlobalColor.primary,
         onRefresh: ()async=>controller.getMovieGenre(slug: slug, country: country, year: year),
       child: Scaffold(
         
@@ -29,16 +30,16 @@ class MovieGenreview extends StatelessWidget {
           appBar: AppBar(
             backgroundColor: GlobalColor.backgroundColor,
             foregroundColor: Colors.white,
-            title: Text("Phim $titlePage"),
+            title: Obx(() => Text(controller.movieGenre.value?.pageProps?.data?.titlePage??""),),
             actions: [
               InkWell(
               onTap: (){
                 
-                Get.to(FilterPage(),transition: Transition.rightToLeft);
+                Get.to(const FilterPage(),transition: Transition.rightToLeft);
               },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal:8.0),
-                child: const Icon(
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal:8.0),
+                child: Icon(
                   Icons.menu,
                   color: Colors.white,
                 ),
@@ -64,8 +65,8 @@ class MovieGenreview extends StatelessWidget {
                 //   );
                 // }
                 if(data?.items?.isEmpty==true){
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 100),
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 100),
                     child: Center(
                       child: Text("Rất tiếc không có phim!")
                     ),
@@ -87,7 +88,7 @@ class MovieGenreview extends StatelessWidget {
                                 baseColor: Colors.grey,
                                 highlightColor: Colors.grey.shade600,
                                 child: Container(
-                                  decoration: BoxDecoration(
+                                  decoration: const BoxDecoration(
                                    
                                     color: Colors.grey,
                                   ),

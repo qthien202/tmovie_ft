@@ -37,7 +37,7 @@ class FilmByCategory extends StatelessWidget {
                         category: controller.categoryList[ind]['slug']??"",
                         slug:controller.pathFilm.value,
                         country: controller.categoryList[ind]['country']??"",
-                        titlePage:controller.categoryList[ind]['title']
+                        
                       ));
                     },
                     child: Text(

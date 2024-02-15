@@ -1,9 +1,9 @@
 import 'package:app_ft_movies/app/controller/detail/detail_controller.dart';
 import 'package:app_ft_movies/app/core/global_color.dart';
-import 'package:app_ft_movies/app/view/detail/espisode/espisode.dart';
+import 'package:app_ft_movies/app/view/detail/episode/episode.dart';
 import 'package:app_ft_movies/app/view/detail/info/info.dart';
 import 'package:app_ft_movies/app/view/detail/info_details/info_details.dart';
-import 'package:app_ft_movies/app/view/drawer/filter_page.dart';
+import 'package:app_ft_movies/app/view/filter/filter_page.dart';
 import 'package:app_ft_movies/app/widgets/global_image.dart';
 import 'package:app_ft_movies/app/widgets/video_player.dart';
 import 'package:flutter/material.dart';
@@ -50,20 +50,44 @@ class DetailView extends StatelessWidget {
           }
           return RefreshIndicator(
             backgroundColor: GlobalColor.backgroundColor,
+            color: GlobalColor.primary,
             onRefresh: () async => controller.getFilmDetail(slug: slug ?? ""),
             child: CustomScrollView(
               slivers: [
                 SliverAppBar(
+                  pinned: true,
+                  leading: InkWell(
+                    onTap: ()=>Get.back(),
+                    child: Container(
+                      margin: EdgeInsets.symmetric(horizontal: 8.0),
+                            padding: EdgeInsets.all(3),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Color(0xff252836)
+                            ),
+                            child: Icon(
+                              Icons.arrow_back,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                          ),
+                  ),
                   actions: [
                     InkWell(
                       onTap: () {
-                        Get.to(FilterPage(),
+                        Get.to(const FilterPage(),
                             transition: Transition.rightToLeft);
                       },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: const Icon(
+                      child:  Container(
+                        margin: EdgeInsets.symmetric(horizontal: 8.0),
+                        padding: EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Color(0xff252836)
+                        ),
+                        child: Icon(
                           Icons.menu,
+                          
                           color: Colors.white,
                         ),
                       ),
@@ -104,12 +128,12 @@ class DetailView extends StatelessWidget {
                         visible: data.status != "trailer",
                         child: Center(
                           child: Container(
-                            padding: EdgeInsets.symmetric(
-                              vertical: 10,
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 15,
                             ),
                             width: MediaQuery.of(context).size.width * .95,
                             decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5),
+                                borderRadius: BorderRadius.circular(8),
                                 color: GlobalColor.primary),
                             child: InkWell(
                               onTap: () {
@@ -124,7 +148,7 @@ class DetailView extends StatelessWidget {
                                       "",
                                 ));
                               },
-                              child: Center(
+                              child: const Center(
                                   child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -132,7 +156,7 @@ class DetailView extends StatelessWidget {
                                     Icons.play_arrow,
                                     color: Colors.white,
                                   ),
-                                  const SizedBox(
+                                  SizedBox(
                                     width: 10,
                                   ),
                                   Text(
@@ -157,7 +181,7 @@ class DetailView extends StatelessWidget {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
+                            const Text(
                               "Nội dung phim",
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 16),
@@ -168,20 +192,20 @@ class DetailView extends StatelessWidget {
                             HtmlWidget("${data.content}")
                           ],
                         ),
+                        const SizedBox(height: 10,),
                         Visibility(
                           visible: data.status != "trailer",
-                          replacement: Text("Trạng thái : phim sắp chiếu"),
-                          child: Column(
+                          child: const Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text("Tập phim",
+                              Text("Tập phim",
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16)),
-                              const SizedBox(
+                              SizedBox(
                                 height: 10,
                               ),
-                              const Espisode(),
+                              Espisode(),
                             ],
                           ),
                         ),

@@ -1,6 +1,6 @@
 import 'package:app_ft_movies/app/controller/search/search_widget_controller.dart';
 import 'package:app_ft_movies/app/core/global_color.dart';
-import 'package:app_ft_movies/app/view/drawer/filter_page.dart';
+import 'package:app_ft_movies/app/view/filter/filter_page.dart';
 import 'package:app_ft_movies/app/view/home/card_cinema/card_cinema.dart';
 import 'package:app_ft_movies/app/widgets/search_widget.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +15,7 @@ class SearchView extends StatelessWidget {
     final controller = Get.put(SearchWidgetController());
     return RefreshIndicator(
       backgroundColor: GlobalColor.backgroundColor,
+      color: GlobalColor.primary,
       onRefresh: () async => controller.onReady(),
       child: Scaffold(
         appBar: AppBar(
@@ -24,11 +25,11 @@ class SearchView extends StatelessWidget {
           actions: [
             InkWell(
               onTap: (){
-                Get.to(FilterPage(),transition: Transition.rightToLeft);
+                Get.to(const FilterPage(),transition: Transition.rightToLeft);
               },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal:8.0),
-                child: const Icon(
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal:8.0),
+                child: Icon(
                   Icons.menu,
                   color: Colors.white,
                 ),
@@ -56,12 +57,12 @@ class SearchView extends StatelessWidget {
               //   );
               // }
               if (data?.items?.isEmpty == true) {
-                return Center(
+                return const Center(
                   child: Text("Rất tiếc phim bạn tìm kiếm không tồn tại!"),
                 );
               }
               return GridView.builder(
-                padding: EdgeInsets.all(5),
+                padding: const EdgeInsets.all(5),
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 itemCount: isLoading?6:data?.items?.length ?? 0,
@@ -75,7 +76,7 @@ class SearchView extends StatelessWidget {
                                 baseColor: Colors.grey,
                                 highlightColor: Colors.grey.shade600,
                                 child: Container(
-                                  decoration: BoxDecoration(
+                                  decoration: const BoxDecoration(
                                     
                                     color: Colors.grey,
                                   ),

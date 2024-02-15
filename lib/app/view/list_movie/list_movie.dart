@@ -1,7 +1,7 @@
 import 'package:app_ft_movies/app/controller/list_movie/list_movie_controller.dart';
 import 'package:app_ft_movies/app/core/global_color.dart';
 import 'package:app_ft_movies/app/view/detail/detail_view.dart';
-import 'package:app_ft_movies/app/view/drawer/filter_page.dart';
+import 'package:app_ft_movies/app/view/filter/filter_page.dart';
 import 'package:app_ft_movies/app/view/home/card_cinema/card_cinema.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -10,9 +10,9 @@ import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ListMovieView extends StatelessWidget {
-  const ListMovieView({super.key,  this.slug, required this.titlePage, this.country, this.category, this.year});
+  const ListMovieView({super.key,  this.slug,  this.country, this.category, this.year});
   final String? slug;
-  final String titlePage;
+  
   final String? country;
   final String? category;
   final String? year;
@@ -25,7 +25,8 @@ class ListMovieView extends StatelessWidget {
    
       return RefreshIndicator(
         backgroundColor: GlobalColor.backgroundColor,
-        onRefresh: ()async=>controller.getListMovie(slug: slug),
+        color: GlobalColor.primary,
+        onRefresh: ()async=>controller.getListMovie(slug: slug,category: category??"",country: country??"",year: year??""),
         child: Scaffold(
          
           backgroundColor: GlobalColor.backgroundColor,
@@ -38,9 +39,9 @@ class ListMovieView extends StatelessWidget {
               onTap: (){
                 Get.to( FilterPage(slug: slug??""),transition: Transition.rightToLeft);
               },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal:8.0),
-                child: const Icon(
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal:8.0),
+                child: Icon(
                   Icons.menu,
                   color: Colors.white,
                 ),
@@ -73,7 +74,7 @@ class ListMovieView extends StatelessWidget {
                                 baseColor: Colors.grey,
                                 highlightColor: Colors.grey.shade600,
                                 child: Container(
-                                  decoration: BoxDecoration(
+                                  decoration: const BoxDecoration(
                                     
                                     
                                     color: Colors.grey,

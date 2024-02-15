@@ -1,14 +1,13 @@
 import 'package:app_ft_movies/app/controller/home/home_controller.dart';
 import 'package:app_ft_movies/app/core/global_color.dart';
-import 'package:app_ft_movies/app/view/drawer/filter_page.dart';
+
 import 'package:app_ft_movies/app/view/home/film_by_category/film_by_category.dart';
-import 'package:app_ft_movies/app/view/home/new_film/new_film.dart';
-import 'package:app_ft_movies/app/view/home/most_popular/most_popular.dart';
+
 import 'package:app_ft_movies/app/view/home/slider/slider_cinema.dart';
-import 'package:app_ft_movies/app/widgets/search_widget.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+
 import 'package:get/get.dart';
 
 class HomeView extends StatelessWidget {
@@ -36,18 +35,24 @@ class HomeView extends StatelessWidget {
       builder: (controller) {
         return DefaultTabController(
           length: listFilm.length,
-          initialIndex: controller.tabIndex.value??0,
+          initialIndex: controller.tabIndex.value ?? 0,
           child: Scaffold(
             extendBodyBehindAppBar: true,
             backgroundColor: GlobalColor.backgroundColor,
             body: RefreshIndicator(
               backgroundColor: GlobalColor.backgroundColor,
-              onRefresh: () async => controller.onReady(),
+              color: GlobalColor.primary,
+              onRefresh: () async {
+                scrollController.jumpTo(0);
+                await controller.getFilm(
+                    slug: listFilm[controller.tabIndex.value ?? 0]['slug']);
+                controller.getFilmByCategory(
+                    slug: listFilm[controller.tabIndex.value ?? 0]['slug']);
+              },
               child: CustomScrollView(
                 controller: scrollController,
                 slivers: [
                   SliverAppBar(
-                    
                     pinned: true,
                     centerTitle: false,
                     title: TabBar(
@@ -67,7 +72,8 @@ class HomeView extends StatelessWidget {
                         controller.tabIndex.value = ind;
                         scrollController.jumpTo(0);
                         await controller.getFilm(slug: listFilm[ind]['slug']);
-                        controller.getFilmByCategory(slug: listFilm[ind]['slug']);
+                        controller.getFilmByCategory(
+                            slug: listFilm[ind]['slug']);
                       },
                       tabs: List<Widget>.generate(listFilm.length, (int index) {
                         return Tab(
@@ -80,7 +86,7 @@ class HomeView extends StatelessWidget {
                     systemOverlayStyle: const SystemUiOverlayStyle(
                         statusBarBrightness: Brightness.dark),
                     expandedHeight: MediaQuery.of(context).size.height * .6,
-                    flexibleSpace: FlexibleSpaceBar(
+                    flexibleSpace: const FlexibleSpaceBar(
                       background: SliderCinema(),
                     ),
                   ),
@@ -96,5 +102,3 @@ class HomeView extends StatelessWidget {
     );
   }
 }
-
-

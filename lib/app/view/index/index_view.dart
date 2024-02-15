@@ -1,6 +1,7 @@
 import 'package:app_ft_movies/app/controller/index/index_controller.dart';
 import 'package:app_ft_movies/app/core/global_color.dart';
-import 'package:app_ft_movies/app/view/drawer/filter_page.dart';
+import 'package:app_ft_movies/app/view/filter/filter_page.dart';
+import 'package:app_ft_movies/app/view/history/history_view.dart';
 import 'package:app_ft_movies/app/view/home/home_view.dart';
 import 'package:app_ft_movies/app/view/search/search_view.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +25,13 @@ class IndexView extends StatelessWidget {
         "screen":const SearchView(),
         "icon":Icons.search,
         "title":"Tìm kiếm"
-      }
+      },
+      
+      {
+        "screen":const HistoryView(),
+        "icon":Icons.play_circle_fill_rounded,
+        "title":"Lịch sử"
+      },
     ];
     final GlobalKey<ScaffoldState> key = GlobalKey<ScaffoldState>();
     return Scaffold(
@@ -73,15 +80,15 @@ class IndexView extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8),
             child: GNav(
-
+              selectedIndex: controller.tabIndex.value??0,
               onTabChange: (value)=>controller.tabIndex.value=value,
                 // rippleColor: Colors.grey[800], // tab button ripple color when pressed
                 // hoverColor: Colors.grey[700], // tab button hover color
                  rippleColor: Color(0xff252836),
                     hoverColor: Color(0xff252836),
                     gap: 5,
-                    activeColor: Colors.white,
-                    iconSize: 25,
+                    activeColor: GlobalColor.primary,
+                    iconSize: 28,
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                     duration: Duration(milliseconds: 400),
                     tabBackgroundColor: Color(0xff252836),

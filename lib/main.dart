@@ -26,7 +26,8 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         indicatorColor: GlobalColor.primary,
         progressIndicatorTheme: ProgressIndicatorThemeData(
-          circularTrackColor: GlobalColor.primary
+          // circularTrackColor: GlobalColor.primary,
+          color: GlobalColor.primary,
         ),
         textTheme: const TextTheme(
           bodyText1:TextStyle(
