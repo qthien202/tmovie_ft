@@ -15,7 +15,6 @@ class FilmByCategory extends StatelessWidget {
     final int itemCount = controller.categoryList.length;
     
     return ListView.separated(
-      controller: controller.scrollController.value,
       physics: NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       itemCount: itemCount,
@@ -24,35 +23,32 @@ class FilmByCategory extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 5),
           child: Column(
             children: [
-              Visibility(
-                visible: controller.getFimCategory.value[controller.categoryList[ind]['id']]?.pageProps?.data?.items?.isNotEmpty==true,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "${controller.categoryList[ind]['title']}",
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "${controller.categoryList[ind]['title']}",
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Get.to(ListMovieView(
+                        category: controller.categoryList[ind]['slug']??"",
+                        slug:controller.pathFilm.value,
+                        country: controller.categoryList[ind]['country']??"",
+                        titlePage:controller.categoryList[ind]['title']
+                      ));
+                    },
+                    child: Text(
+                      "Xem thêm",
                       style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold),
+                          color: Colors.white,
+                          decoration: TextDecoration.underline,
+                          decorationColor: Colors.white),
                     ),
-                    TextButton(
-                      onPressed: () {
-                        Get.to(ListMovieView(
-                          category: controller.categoryList[ind]['slug']??"",
-                          slug:controller.pathFilm.value,
-                          country: controller.categoryList[ind]['country']??"",
-                          titlePage:controller.categoryList[ind]['title']
-                        ));
-                      },
-                      child: Text(
-                        "Xem thêm",
-                        style: TextStyle(
-                            color: Colors.white,
-                            decoration: TextDecoration.underline,
-                            decorationColor: Colors.white),
-                      ),
-                    )
-                  ],
-                ),
+                  )
+                ],
               ),
               SizedBox(
                 height: MediaQuery.of(context).size.height * .4,
@@ -66,7 +62,7 @@ class FilmByCategory extends StatelessWidget {
                     itemBuilder: (context, index) {
                       final data = items?[index];
                       return Visibility(
-                        visible: !isLoading && data?.category?.first.slug!="[redacted]"&& items?.isNotEmpty==true,
+                        visible: !isLoading && data?.category?.first.slug!="[redacted]",
                         replacement: Visibility(
                           visible: data?.category?.first.slug!="[redacted]",
                           child: SizedBox(
