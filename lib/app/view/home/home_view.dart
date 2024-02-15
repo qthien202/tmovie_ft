@@ -47,7 +47,7 @@ class HomeView extends StatelessWidget {
                 controller: scrollController,
                 slivers: [
                   SliverAppBar(
-                    floating: true,
+                    
                     pinned: true,
                     centerTitle: false,
                     title: TabBar(
