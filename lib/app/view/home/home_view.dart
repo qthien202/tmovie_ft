@@ -30,68 +30,71 @@ class HomeView extends StatelessWidget {
     ];
 
     final controller = Get.put(HomeController());
-    
-    return DefaultTabController(
-      length: listFilm.length,
-      child: Scaffold(
-        extendBodyBehindAppBar: true,
-        backgroundColor: GlobalColor.backgroundColor,
-        body: RefreshIndicator(
+    ScrollController scrollController = ScrollController();
+    return GetBuilder<HomeController>(
+      init: controller,
+      builder: (controller) {
+        return DefaultTabController(
+          length: listFilm.length,
+          initialIndex: controller.tabIndex.value??0,
+          child: Scaffold(
+            extendBodyBehindAppBar: true,
             backgroundColor: GlobalColor.backgroundColor,
-            onRefresh: () async => controller.onReady(),
-            child: CustomScrollView(
-              slivers: [
-                SliverAppBar(
-                  pinned: true,
-                  centerTitle: false,
-                  title: TabBar(
-                    tabAlignment: TabAlignment.center,
-                    indicatorWeight: 5,
-                    isScrollable: true,
-                    dividerColor: Colors.transparent,
-                    indicatorColor: Colors.white,
-                    unselectedLabelColor: Colors.grey,
-                    unselectedLabelStyle: const TextStyle(
-                        fontWeight: FontWeight.w900, fontSize: 14),
-                    labelColor: Colors.white,
-                    labelStyle:
-                        const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                        onTap: (ind)async{
-                          controller.pathFilm.value = listFilm[ind]['slug'];
-                          controller.tabIndex.value = ind;
-                          await controller.getFilm(slug: listFilm[ind]['slug'],);
-                          controller.getFilmByCategory(slug: listFilm[ind]['slug'],);
-                          // controller.refresh();
-                          // controller.update();
-                         
-                          
-                          
-                         
-                        },
-                    tabs: List<Widget>.generate(listFilm.length, (int index) {
-                      return Tab(
-                        text: listFilm[index]["title"],
-                      );
-                    }),
+            body: RefreshIndicator(
+              backgroundColor: GlobalColor.backgroundColor,
+              onRefresh: () async => controller.onReady(),
+              child: CustomScrollView(
+                controller: scrollController,
+                slivers: [
+                  SliverAppBar(
+                    floating: true,
+                    pinned: true,
+                    centerTitle: false,
+                    title: TabBar(
+                      tabAlignment: TabAlignment.center,
+                      indicatorWeight: 2,
+                      isScrollable: true,
+                      dividerColor: Colors.transparent,
+                      indicatorColor: Colors.white,
+                      unselectedLabelColor: Colors.grey,
+                      unselectedLabelStyle: const TextStyle(
+                          fontWeight: FontWeight.w900, fontSize: 14),
+                      labelColor: Colors.white,
+                      labelStyle: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 20),
+                      onTap: (ind) async {
+                        controller.pathFilm.value = listFilm[ind]['slug'];
+                        controller.tabIndex.value = ind;
+                        scrollController.jumpTo(0);
+                        await controller.getFilm(slug: listFilm[ind]['slug']);
+                        controller.getFilmByCategory(slug: listFilm[ind]['slug']);
+                      },
+                      tabs: List<Widget>.generate(listFilm.length, (int index) {
+                        return Tab(
+                          text: listFilm[index]["title"],
+                        );
+                      }),
+                    ),
+                    elevation: 0.0,
+                    backgroundColor: GlobalColor.backgroundColor,
+                    systemOverlayStyle: const SystemUiOverlayStyle(
+                        statusBarBrightness: Brightness.dark),
+                    expandedHeight: MediaQuery.of(context).size.height * .6,
+                    flexibleSpace: FlexibleSpaceBar(
+                      background: SliderCinema(),
+                    ),
                   ),
-                
-                  elevation: 0.0,
-
-                  backgroundColor: GlobalColor.backgroundColor,
-                  systemOverlayStyle: const SystemUiOverlayStyle(
-                      statusBarBrightness: Brightness.dark),
-                  expandedHeight: MediaQuery.of(context).size.height * .6,
-                  flexibleSpace: const FlexibleSpaceBar(
-                    background: SliderCinema(),
-                  ),
-                ),
-                const SliverToBoxAdapter(
-                  child: FilmByCategory(),
-                )
-              ],
-            )),
-      ),
+                  const SliverToBoxAdapter(
+                    child: FilmByCategory(),
+                  )
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
+
 

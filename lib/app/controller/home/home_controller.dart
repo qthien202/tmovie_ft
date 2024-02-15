@@ -38,6 +38,7 @@ class HomeController extends GetxController {
     
   ];
   RxList<Map<String, dynamic>> categories = RxList();
+  Rxn<ScrollController> scrollController = Rxn();
 
   @override
   void onReady() async {
