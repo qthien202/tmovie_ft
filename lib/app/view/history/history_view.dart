@@ -122,7 +122,7 @@ class HistoryView extends StatelessWidget {
                     visible: controller.limit.value <
                         (controller.getHistoryData.value?.total ??
                             0),
-                    replacement: const Spacer(),
+                    replacement: const Center(),
                     child: Center(
                       child: CircularProgressIndicator(
                       color: GlobalColor.primary,
