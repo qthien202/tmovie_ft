@@ -22,8 +22,17 @@ class Espisode extends StatelessWidget {
           itemBuilder: (context,index){
             final episode =  data?.episodes?.first.serverData?[index];
             return InkWell(
-              onTap: (){
+              onTap: ()async{
                 controller.selectTab.value = episode?.name;
+                await controller.createToken(
+                                  name: data?.name??"",
+                                  description: data?.content??"",
+                                  originName: data?.originName??"",
+                                  slug: data?.slug??"",
+                                  thumbnail: data?.thumbUrl??"",
+                                  episode: episode?.name??""
+                                  
+                                );
                 Get.to(ChewieVideoPlayer(slug: data?.slug??"",fileName: data?.name??"",episode: episode?.name??"",videoUrl: episode?.linkM3u8??"",));
               },
               child: Obx((){

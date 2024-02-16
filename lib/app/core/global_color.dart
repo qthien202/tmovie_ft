@@ -8,6 +8,7 @@ class GlobalColor {
   static const Color container = Colors.white;
   // static const Color backgroundColor = Color(0xff1F1D2B);
   static const Color backgroundColor = Color(0xff1F1D2B);
+  static const Color background2 = Color(0xff252836);
 
  
 

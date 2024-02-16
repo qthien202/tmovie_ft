@@ -17,19 +17,19 @@ class IndexView extends StatelessWidget {
     final List<Map<String,dynamic>>items = [
       {
         "screen":const HomeView(),
-        "icon":Icons.home,
+        "icon":Icons.home_outlined,
         "title":"Trang chủ"
       },
 
       {
         "screen":const SearchView(),
-        "icon":Icons.search,
+        "icon":Icons.search_outlined,
         "title":"Tìm kiếm"
       },
       
       {
         "screen":const HistoryView(),
-        "icon":Icons.play_circle_fill_rounded,
+        "icon":Icons.history_outlined,
         "title":"Lịch sử"
       },
     ];

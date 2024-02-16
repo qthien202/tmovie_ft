@@ -129,14 +129,23 @@ class DetailView extends StatelessWidget {
                         child: Center(
                           child: Container(
                             padding: const EdgeInsets.symmetric(
-                              vertical: 15,
+                              vertical: 12,
                             ),
                             width: MediaQuery.of(context).size.width * .95,
                             decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(5),
                                 color: GlobalColor.primary),
                             child: InkWell(
-                              onTap: () {
+                              onTap: () async{
+                                await controller.createToken(
+                                  name: data.name??"",
+                                  description: data.content??"",
+                                  originName: data.originName??"",
+                                  slug: data.slug??"",
+                                  thumbnail: data.thumbUrl??"",
+                                  episode: data.episodes?.first.serverData?.first.name??""
+
+                                );
                                 Get.to(ChewieVideoPlayer(
                                   slug: data.slug??"",
                                   fileName: data.name ?? "--",
