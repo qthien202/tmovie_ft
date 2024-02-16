@@ -80,7 +80,7 @@ class IndexView extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8),
             child: GNav(
-              backgroundColor: GlobalColor.primary,
+              backgroundColor: GlobalColor.backgroundColor,
               selectedIndex: controller.tabIndex.value??0,
               onTabChange: (value)=>controller.tabIndex.value=value,
                 // rippleColor: Colors.grey[800], // tab button ripple color when pressed
