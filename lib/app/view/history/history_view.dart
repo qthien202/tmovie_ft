@@ -46,10 +46,10 @@ class HistoryView extends StatelessWidget {
                 final data = controller.getHistoryData.value?.data[index];
                 return Container(
                   padding: EdgeInsets.all(20),
-                  // decoration: BoxDecoration(
-                  //   color: GlobalColor.background2,
-                  //   borderRadius: BorderRadius.circular(5),
-                  // ),
+                  decoration: BoxDecoration(
+                    color: GlobalColor.background2,
+                    borderRadius: BorderRadius.circular(5),
+                  ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
