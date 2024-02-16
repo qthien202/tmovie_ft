@@ -14,7 +14,8 @@ class DetailController extends GetxController{
   Rxn<GetFilmDetails>filmDetail = Rxn();
   Rxn<String>selectTab = Rxn();
   Rxn<PostCreateTokenResponse>postCreateTokenData = Rxn();
-
+  RxBool isFocus = RxBool(false);
+  RxBool isFocusEp = RxBool(false);
   Future<GetFilmDetails?>getFilmDetail({required String slug})async{
     filmDetail.value=null;
     filmDetail.value = await api.getFilmDetails(path: slug);

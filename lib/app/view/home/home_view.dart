@@ -4,6 +4,7 @@ import 'package:app_ft_movies/app/core/global_color.dart';
 import 'package:app_ft_movies/app/view/home/film_by_category/film_by_category.dart';
 
 import 'package:app_ft_movies/app/view/home/slider/slider_cinema.dart';
+import 'package:app_ft_movies/app/view/index/index_view.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -27,7 +28,9 @@ class HomeView extends StatelessWidget {
       {"slug": "phim-hoan-thanh", "title": "Phim trọn bộ"},
       {"slug": "phim-sap-chieu", "title": "Phim sắp chiếu"}
     ];
-
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Scaffold.of(context).openDrawer();
+    });
     final controller = Get.put(HomeController());
     ScrollController scrollController = ScrollController();
     return GetBuilder<HomeController>(
@@ -37,6 +40,7 @@ class HomeView extends StatelessWidget {
           length: listFilm.length,
           initialIndex: controller.tabIndex.value ?? 0,
           child: Scaffold(
+            // drawer: const IndexView(),
             extendBodyBehindAppBar: true,
             backgroundColor: GlobalColor.backgroundColor,
             body: RefreshIndicator(
@@ -53,34 +57,44 @@ class HomeView extends StatelessWidget {
                 controller: scrollController,
                 slivers: [
                   SliverAppBar(
-                    pinned: true,
+                    
+                    // pinned: true,
                     centerTitle: false,
-                    title: TabBar(
-                      tabAlignment: TabAlignment.center,
-                      indicatorWeight: 2,
-                      isScrollable: true,
-                      dividerColor: Colors.transparent,
-                      indicatorColor: Colors.white,
-                      unselectedLabelColor: Colors.grey,
-                      unselectedLabelStyle: const TextStyle(
-                          fontWeight: FontWeight.w900, fontSize: 14),
-                      labelColor: Colors.white,
-                      labelStyle: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 20),
-                      onTap: (ind) async {
-                        controller.pathFilm.value = listFilm[ind]['slug'];
-                        controller.tabIndex.value = ind;
-                        scrollController.jumpTo(0);
-                        await controller.getFilm(slug: listFilm[ind]['slug']);
-                        controller.getFilmByCategory(
-                            slug: listFilm[ind]['slug']);
+                    title: Shortcuts(
+                      shortcuts: <LogicalKeySet, Intent>{
+                        LogicalKeySet(LogicalKeyboardKey.select):
+                            const ActivateIntent(),
                       },
-                      tabs: List<Widget>.generate(listFilm.length, (int index) {
-                        return Tab(
-                          text: listFilm[index]["title"],
-                        );
-                      }),
+                      child: TabBar(
+                        
+                        tabAlignment: TabAlignment.center,
+                        indicatorWeight: 2,
+                        isScrollable: true,
+                        dividerColor: Colors.transparent,
+                        indicatorColor: Colors.white,
+                        unselectedLabelColor: Colors.grey,
+                        unselectedLabelStyle: const TextStyle(
+                            fontWeight: FontWeight.w900, fontSize: 14),
+                        labelColor: Colors.white,
+                        labelStyle: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 20),
+                        onTap: (ind) async {
+                          controller.pathFilm.value = listFilm[ind]['slug'];
+                          controller.tabIndex.value = ind;
+                          scrollController.jumpTo(0);
+                          await controller.getFilm(slug: listFilm[ind]['slug']);
+                          controller.getFilmByCategory(
+                              slug: listFilm[ind]['slug']);
+                        },
+                        tabs:
+                            List<Widget>.generate(listFilm.length, (int index) {
+                          return Tab(
+                            text: listFilm[index]["title"],
+                          );
+                        }),
+                      ),
                     ),
+                    
                     elevation: 0.0,
                     backgroundColor: GlobalColor.backgroundColor,
                     systemOverlayStyle: const SystemUiOverlayStyle(

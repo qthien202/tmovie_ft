@@ -63,7 +63,7 @@ class ListMovieView extends StatelessWidget {
                   padding: const EdgeInsets.all(5),
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
-                itemCount: isLoading?6:data?.items?.length ?? 0,
+                itemCount: isLoading?16:data?.items?.length ?? 0,
                 itemBuilder: (context, index) {
                   final items = data?.items?[index];
                   return Visibility(
@@ -92,10 +92,10 @@ class ListMovieView extends StatelessWidget {
                   );
                 },
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  childAspectRatio: 12 / 33,
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 5,
-                  mainAxisSpacing: 5,
+                  childAspectRatio: 5 / 10,
+                  crossAxisCount: 8,
+                  crossAxisSpacing: 3,
+                  mainAxisSpacing: 3,
                 ),
               );
               }),

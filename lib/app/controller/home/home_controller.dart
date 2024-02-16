@@ -15,7 +15,8 @@ class HomeController extends GetxController {
   Rxn<GetNewFilm> getNewFilmData = Rxn();
   Rx<Map<String, GetFilmByCategory>> getFimCategory = Rx({});
   Rxn<GetFilmByCategory> getFilmData = Rxn();
-
+  RxBool isFocusWatch = RxBool(false);
+  RxBool isFocusInfo = RxBool(false);
   Rxn<int> activeIndex = Rxn();
   Rxn<int> tabIndex = Rxn();
   Rxn<String>pathFilm = Rxn();

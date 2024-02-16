@@ -7,120 +7,125 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class SliderCinema extends StatelessWidget {
-  const SliderCinema({super.key});
+  const SliderCinema({Key? key});
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(HomeController());
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Obx(() {
-      final isLoading = controller.getFilmData.value==null;
+      final isLoading = controller.getFilmData.value == null;
       return Stack(
         alignment: Alignment.topCenter,
         children: [
           CarouselSlider.builder(
-            itemCount: isLoading?4:controller.getFilmData.value?.pageProps?.data?.items?.length??0,
+            itemCount: isLoading
+                ? 4
+                : controller.getFilmData.value?.pageProps?.data?.items?.length ??
+                    0,
             itemBuilder: (context, index, realIndex) {
               return Visibility(
                 visible: !isLoading,
                 replacement: SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height,
+                  width: screenWidth,
+                  height: screenHeight * 0.6, // Thiết lập chiều cao tối thiểu cho banner
                   child: Shimmer.fromColors(
-                              baseColor: Colors.grey,
-                              highlightColor: Colors.grey.shade600,
-                              child: Container(
-                                decoration: const BoxDecoration(
-                                  
-                                  color: Colors.grey,
-                                ),
-                              ),
-                  )
+                    baseColor: Colors.grey,
+                    highlightColor: Colors.grey.shade600,
+                    child: Container(
+                      color: Colors.grey,
+                    ),
+                  ),
                 ),
                 child: InkWell(
-                  onTap: ()=>Get.to(DetailView(slug:controller.getFilmData.value?.pageProps?.data?.items?[index].slug,name: controller.getFilmData.value?.pageProps?.data?.items?[index].name,)),
+                  onTap: () => Get.to(
+                    DetailView(
+                      slug: controller.getFilmData.value?.pageProps?.data?.items?[index].slug ?? "",
+                      name: controller.getFilmData.value?.pageProps?.data?.items?[index].name ?? "",
+                    ),
+                  ),
                   child: GlobalImage(
-                    imageUrl:
-                        "${controller.getFilmData.value?.pageProps?.data?.items?[index].thumbUrl}",
-                    boxFit: BoxFit.fill,
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height,
+                    imageUrl: "${controller.getFilmData.value?.pageProps?.data?.items?[index].posterUrl}",
+                    boxFit: BoxFit.fill, // Hiển thị ảnh đúng tỷ lệ
+                    width: screenWidth,
+                    height: screenHeight * 0.6, // Thiết lập chiều cao tối thiểu cho banner
                   ),
                 ),
               );
             },
             options: CarouselOptions(
-                aspectRatio: 18 / 24,
-                // enlargeCenterPage: true,
-                autoPlay: true,
-                autoPlayInterval: const Duration(seconds: 7),
-                viewportFraction: 1,
-                onPageChanged: (index, reason) {
-                  controller.activeIndex.value = index;
-                }),
-          ),
-          const SizedBox(height: 10,),
-          Positioned(
-            top: MediaQuery.of(context).size.height*.55,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Visibility(
-                  visible: controller.getFilmData.value?.pageProps?.data?.items?[controller.activeIndex.value??0].episodeCurrent != "Trailer",
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: GlobalColor.primary,
-                      shape: RoundedRectangleBorder(
-                        // side: BorderSide(color: Colors.white),
-                        borderRadius: BorderRadius.circular(25)
-                      )
-                    ),
-                    onPressed: ()async{
-                      await controller.watchNow(slug: controller.getFilmData.value?.pageProps?.data?.items?[controller.activeIndex.value??0].slug??"");
-                    },
-                     child: const Row(
-                       children: [
-                        Icon(Icons.play_arrow_rounded,color: Colors.white,size: 20,),
-                         Text("Xem ngay",style: TextStyle(color: Colors.white,fontSize: 12),),
-                       ],
-                     )
-                  ),
-                ),
-                const SizedBox(width: 15,),
-                ElevatedButton(
-                   style: ElevatedButton.styleFrom(
-                    primary: Colors.transparent,
-                    shape: RoundedRectangleBorder(
-                      side: const BorderSide(color: Colors.white),
-                      borderRadius: BorderRadius.circular(25)
-                    )
-                  ),
-                  onPressed: ()=>Get.to(DetailView(slug: controller.getFilmData.value?.pageProps?.data?.items?[controller.activeIndex.value??0].slug,name: controller.getNewFilmData.value?.items[controller.activeIndex.value??0].name)),
-                   child: const Row(
-                     children: [
-                      Icon(Icons.info,color: Colors.white,size: 20,),
-                      SizedBox(width: 5,),
-                       Text("Chi tiết",style: TextStyle(color: Colors.white,fontSize: 12)),
-                     ],
-                   )
-                )
-              ],
+              aspectRatio: screenWidth / (screenHeight * 0.6), // Tỷ lệ ứng với tỷ lệ màn hình TV
+              autoPlay: true,
+              autoPlayInterval: const Duration(seconds: 4),
+              viewportFraction: 1,
+              onPageChanged: (index, reason) {
+                controller.activeIndex.value = index;
+              },
             ),
-          )
-          // Center(
-          //     // bottom: 2,
-          //     child: AnimatedSmoothIndicator(
-          //   count: controller.getNewFilmData.value?.items.length ?? 0,
-          //   activeIndex: controller.activeIndex.value ?? 0,
-          //   effect: ScrollingDotsEffect(
-          //     dotWidth: 5,
-          //     dotHeight: 5,
-          //     dotColor: Colors.grey,
-          //     activeDotColor: GlobalColor.primary,
+          ),
+          SizedBox(height: 10),
+          // Positioned(
+          //   top: screenHeight * 0.5,
+          //   child: Row(
+          //     mainAxisAlignment: MainAxisAlignment.center,
+          //     children: [
+          //       Visibility(
+          //         visible:
+          //             controller.getFilmData.value?.pageProps?.data?.items?[controller.activeIndex.value ?? 0].episodeCurrent != "Trailer",
+          //         child: ElevatedButton(
+          //           style: ElevatedButton.styleFrom(
+          //             primary: GlobalColor.primary,
+          //             shape: RoundedRectangleBorder(
+          //               borderRadius: BorderRadius.circular(25),
+          //               side: BorderSide(color: controller.isFocusWatch.value?Colors.white:Colors.transparent,width: 3)
+          //             ),
+          //           ),
+          //           onFocusChange: (hasFocus){
+          //             controller.isFocusWatch.value = hasFocus;
+          //           },
+          //           onPressed: () async {
+          //             await controller.watchNow(
+          //               slug: controller.getFilmData.value?.pageProps?.data?.items?[controller.activeIndex.value ?? 0].slug ?? "",
+          //             );
+          //           },
+          //           child: Row(
+          //             children: const [
+          //               Icon(Icons.play_arrow_rounded, color: Colors.white, size: 20),
+          //               Text("Xem ngay", style: TextStyle(color: Colors.white, fontSize: 12)),
+          //             ],
+          //           ),
+          //         ),
+          //       ),
+          //       SizedBox(width: 15),
+          //       ElevatedButton(
+          //         style: ElevatedButton.styleFrom(
+          //           primary: Colors.transparent,
+          //           shape: RoundedRectangleBorder(
+          //             side: const BorderSide(color: Colors.white),
+          //             borderRadius: BorderRadius.circular(25),
+          //           ),
+          //         ),
+          //         onPressed: () => Get.to(
+          //           DetailView(
+          //             slug: controller.getFilmData.value?.pageProps?.data?.items?[controller.activeIndex.value ?? 0].slug ?? "",
+          //             name: controller.getNewFilmData.value?.items[controller.activeIndex.value ?? 0].name ?? "",
+          //           ),
+          //         ),
+          //         child: Row(
+          //           children: const [
+          //             Icon(Icons.info, color: Colors.white, size: 20),
+          //             SizedBox(width: 5),
+          //             Text("Chi tiết", style: TextStyle(color: Colors.white, fontSize: 12)),
+          //           ],
+          //         ),
+          //       )
+          //     ],
           //   ),
-          // )),
+          // ),
         ],
       );
     });

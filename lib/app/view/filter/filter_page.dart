@@ -141,7 +141,7 @@ List<Map<String, dynamic>> yearsList = List.generate(
         ],
       ),
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+        // crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const ListTile(
             title: Text('Thể loại', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
@@ -186,9 +186,9 @@ List<Map<String, dynamic>> yearsList = List.generate(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
         // mainAxisExtent: 3,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-        childAspectRatio: 15 / 30,
+        crossAxisSpacing: 3,
+        mainAxisSpacing: 3,
+        childAspectRatio: 7 / 35,
       ),
       itemCount: items.length,
       itemBuilder: (context, index) {
