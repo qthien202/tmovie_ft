@@ -1,10 +1,12 @@
 import 'package:app_ft_movies/app/controller/history/history_controller.dart';
 import 'package:app_ft_movies/app/core/global_color.dart';
 import 'package:app_ft_movies/app/view/detail/detail_view.dart';
+import 'package:app_ft_movies/app/view/home/card_cinema/card_cinema.dart';
 import 'package:app_ft_movies/app/widgets/global_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:get/get.dart';
+import 'package:shimmer/shimmer.dart';
 
 class HistoryView extends StatelessWidget {
   const HistoryView({super.key});
@@ -20,108 +22,65 @@ class HistoryView extends StatelessWidget {
       //   foregroundColor: Colors.white,
       // ),
       backgroundColor: GlobalColor.backgroundColor,
-      body: Obx((){
-        if(controller.getHistoryData.value?.data.isEmpty==true){
-          return Center(
-            child: Text("Hiện vẫn chưa có lịch sử xem nhé",style: TextStyle(
-              fontSize: 14,fontWeight: FontWeight.bold
-            ),),
-          );
-        };
-        return RefreshIndicator(
-        onRefresh: ()async=>controller.onReady(),
-        backgroundColor: GlobalColor.backgroundColor,
-        color: GlobalColor.primary,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 30,horizontal: 10),
-          child: ListView(
-            controller: controller.scrollController,
-            children: [
-              ListView.separated(
-                physics: NeverScrollableScrollPhysics(),
-              
-              shrinkWrap: true,
-              itemCount: controller.getHistoryData.value?.data.length??0,
-              itemBuilder: (context, index) {
-                final data = controller.getHistoryData.value?.data[index];
-                return Container(
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: GlobalColor.background2,
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: GlobalImage(
-                        imageUrl: data?.thumbnailUrl??"",
-                        width: MediaQuery.of(context).size.width*.4,
-                          height: MediaQuery.of(context).size.height * .3,
-                          boxFit: BoxFit.fill,
+      body: ListView(
+        controller: controller.scrollController,
+              children: [
+                const SizedBox(
+                  height: 10,
+                ),
+                Obx((){
+                  final isLoading = controller.getHistoryData.value==null;
+                   final data = controller.getHistoryData.value?.data;
+                  
+                  
+                  return GridView.builder(
+                    padding: const EdgeInsets.all(5),
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: isLoading?16:data?.length ?? 0,
+                  itemBuilder: (context, index) {
+                    final items = data?[index];
+                    return Visibility(
+                      visible: !isLoading ,
+                      replacement: SizedBox(
+                       width: MediaQuery.of(context).size.width*.4,
+                       child: Shimmer.fromColors(
+                                  baseColor: Colors.grey,
+                                  highlightColor: Colors.grey.shade600,
+                                  child: Container(
+                                    decoration: const BoxDecoration(
+                                      
+                                      
+                                      color: Colors.grey,
                                     ),
-                      ),
-                      const SizedBox(width: 15,),
-                      Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("${data?.name} • ${data?.episode}",style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),),
-                            const SizedBox(height: 10,),
-                            Text(data?.originName??"",style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold),),
-                            const SizedBox(height: 10,),
-                             Text("${data?.description}",maxLines: 5,style: TextStyle(overflow: TextOverflow.ellipsis)),
-                            const SizedBox(height: 10,),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 12,
-                              ),
-                              width: MediaQuery.of(context).size.width,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5),
-                                  color: GlobalColor.primary),
-                              child: InkWell(
-                                onTap: () async{
-                                 Get.to(DetailView(slug: data?.slug??"",));
-                                },
-                                child: const Center(
-                                    child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.play_arrow,
-                                      color: Colors.white,
-                                    ),
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    Text(
-                                      "Xem phim",
-                                      style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ],
-                                )),
-                              ),
-                            ),
-                          ],
-                        ),
+                                  ),
                       )
-                    ],
+                                  
+                    ),
+                      child: CardCinema(
+                        imageLink: items?.thumbnailUrl?? "",
+                        nameProduct: items?.name,
+                        originName: items?.originName ?? "",
+                        slug: items?.slug ?? "",
+                      ),
+                    );
+                  },
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    childAspectRatio: 4 / 10,
+                    crossAxisCount: 8,
+                    crossAxisSpacing: 15,
+                    mainAxisSpacing: 15,
                   ),
                 );
-              }, separatorBuilder: (BuildContext context, int index) { 
-                return const SizedBox(height: 15,);
-               },
-              ),
-               const SizedBox(height: 30,),
+                }),
+                const SizedBox(
+                  height: 20,
+                ),
+                const SizedBox(height: 30,),
                   Visibility(
                     visible: controller.limit.value <
                         (controller.getHistoryData.value?.total ??
-                            0),
+                            0) && controller.isLoadmore.value,
                     replacement: const Center(),
                     child: Center(
                       child: CircularProgressIndicator(
@@ -129,11 +88,119 @@ class HistoryView extends StatelessWidget {
                       )
                     ),
                   ),
-            ],
-          ),
-        ),
-      );
-      })
+                 
+              ],
+            ),
+           
+      
+      
+      
+      
+      
+      
+      // Obx((){
+      //   if(controller.getHistoryData.value?.data.isEmpty==true){
+      //     return Center(
+      //       child: Text("Hiện vẫn chưa có lịch sử xem nhé",style: TextStyle(
+      //         fontSize: 14,fontWeight: FontWeight.bold
+      //       ),),
+      //     );
+      //   };
+      //   return RefreshIndicator(
+      //   onRefresh: ()async=>controller.onReady(),
+      //   backgroundColor: GlobalColor.backgroundColor,
+      //   color: GlobalColor.primary,
+      //   child: Padding(
+      //     padding: const EdgeInsets.symmetric(vertical: 30,horizontal: 10),
+      //     child: ListView(
+      //       controller: controller.scrollController,
+      //       children: [
+      //         ListView.separated(
+      //           physics: NeverScrollableScrollPhysics(),
+              
+      //         shrinkWrap: true,
+      //         itemCount: controller.getHistoryData.value?.data.length??0,
+      //         itemBuilder: (context, index) {
+      //           final data = controller.getHistoryData.value?.data[index];
+      //           return Container(
+      //             padding: EdgeInsets.all(20),
+      //             decoration: BoxDecoration(
+      //               color: GlobalColor.background2,
+      //               borderRadius: BorderRadius.circular(5),
+      //             ),
+      //             child: Row(
+      //               crossAxisAlignment: CrossAxisAlignment.start,
+      //               children: [
+      //                 ClipRRect(
+      //                   borderRadius: BorderRadius.circular(8),
+      //                   child: GlobalImage(
+      //                   imageUrl: data?.thumbnailUrl??"",
+      //                   width: MediaQuery.of(context).size.width*.4,
+      //                     height: MediaQuery.of(context).size.height * .3,
+      //                     boxFit: BoxFit.fill,
+      //                               ),
+      //                 ),
+      //                 const SizedBox(width: 15,),
+      //                 Expanded(
+      //                   child: Column(
+      //                     mainAxisAlignment: MainAxisAlignment.start,
+      //                     crossAxisAlignment: CrossAxisAlignment.start,
+      //                     children: [
+      //                       Text("${data?.name} • ${data?.episode}",style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),),
+      //                       const SizedBox(height: 10,),
+      //                       Text(data?.originName??"",style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold),),
+      //                       const SizedBox(height: 10,),
+      //                        Text("${data?.description}",maxLines: 5,style: TextStyle(overflow: TextOverflow.ellipsis)),
+      //                       const SizedBox(height: 10,),
+      //                       Container(
+      //                         padding: const EdgeInsets.symmetric(
+      //                           vertical: 12,
+      //                         ),
+      //                         width: MediaQuery.of(context).size.width,
+      //                         decoration: BoxDecoration(
+      //                             borderRadius: BorderRadius.circular(5),
+      //                             color: GlobalColor.primary),
+      //                         child: InkWell(
+      //                           onTap: () async{
+      //                            Get.to(DetailView(slug: data?.slug??"",));
+      //                           },
+      //                           child: const Center(
+      //                               child: Row(
+      //                             mainAxisAlignment: MainAxisAlignment.center,
+      //                             children: [
+      //                               Icon(
+      //                                 Icons.play_arrow,
+      //                                 color: Colors.white,
+      //                               ),
+      //                               SizedBox(
+      //                                 width: 10,
+      //                               ),
+      //                               Text(
+      //                                 "Xem phim",
+      //                                 style: TextStyle(
+      //                                     fontSize: 15,
+      //                                     fontWeight: FontWeight.bold),
+      //                               ),
+      //                             ],
+      //                           )),
+      //                         ),
+      //                       ),
+      //                     ],
+      //                   ),
+      //                 )
+      //               ],
+      //             ),
+      //           );
+      //         }, separatorBuilder: (BuildContext context, int index) { 
+      //           return const SizedBox(height: 15,);
+      //          },
+      //         ),
+      //          
+      //       ],
+      //     ),
+      //   ),
+      // );
+      // })
     );
   }
 }

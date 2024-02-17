@@ -23,18 +23,35 @@ class SearchView extends StatelessWidget {
           backgroundColor: GlobalColor.backgroundColor,
           title: const SearchWidget(),
           actions: [
-            InkWell(
-              onTap: (){
-                Get.to(const FilterPage(),transition: Transition.rightToLeft);
-              },
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal:8.0),
-                child: Icon(
-                  Icons.menu,
-                  color: Colors.white,
+           Obx(() => InkWell(
+                  onFocusChange: (hasFocus){
+                    controller.isFocusMenu.value = hasFocus;
+                    print(">>>>>>>>>>>>>>>>>$hasFocus");
+                  },
+                onTap: (){
+                  Get.to( const FilterPage(),transition: Transition.rightToLeft);
+                },
+                child:  Padding(
+                  padding: EdgeInsets.symmetric(horizontal:8.0),
+                  child: AnimatedContainer(
+                    duration: Duration(seconds: 200),
+                   curve: Curves.easeInOut, 
+                    child: Transform.scale(
+                      scale: controller.isFocusMenu.value?1.2:1,
+                      child: Container(
+                        padding: EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: controller.isFocusMenu.value?Colors.white:Colors.transparent,width: 2)
+                        ),
+                        child: Icon(
+                          Icons.menu,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ),
+              ),)
           ],
         ),
         backgroundColor: GlobalColor.backgroundColor,
@@ -93,69 +110,71 @@ class SearchView extends StatelessWidget {
                   );
                 },
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  childAspectRatio: 5 / 10,
-                  crossAxisCount: 8,
-                  crossAxisSpacing: 3,
-                  mainAxisSpacing: 3,
+                   childAspectRatio: 4 / 10,
+                    crossAxisCount: 8,
+                    crossAxisSpacing: 15,
+                    mainAxisSpacing: 15,
                 ),
               );
             }),
             const SizedBox(
               height: 20,
             ),
-            Obx(() {
-              final data = controller.search.value?.pageProps?.data;
-
-              return Visibility(
-                visible: controller.totalPage.value != 0 && data?.items != null,
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-                  child: SizedBox(
-                    height: 40,
-                    child: ListView.separated(
-                      shrinkWrap: true,
-                      scrollDirection: Axis.horizontal,
-                      itemCount: controller.totalPage.value ?? 0,
-                      itemBuilder: (context, index) {
-                        return Obx(() {
-                          return InkWell(
-                            onTap: () async {
-                              controller.selectIndex.value = index;
+            Obx((){
+            
+            
+            
+            return Visibility(
+            visible: controller.totalPage.value!=0,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 20),
+              child: SizedBox(
+                height: 40,
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  scrollDirection: Axis.horizontal,
+                  itemCount: controller.totalPage.value??0,
+                  itemBuilder: (context, index) {
+                    return Obx(() {
+                      return InkWell(
+                        onFocusChange: (value) {
+                            controller.isFocusPage.value=value;
+                            controller.selectIndex.value = index;
+                          },
+                        onTap: () async{
+                          controller.selectIndex.value = index;
                               print(
                                   ">>>>>>>>>>>>>${controller.selectIndex.value}");
                               controller.search.value = null;
                               await controller.getSearch(page: index+1);
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 15),
-                              decoration: BoxDecoration(
-                                  //  border: Border.all(color: GlobalColor.primary)
-                                  color: const Color(0xff252836),
-                                  border: Border.all(
-                                      color:
-                                          controller.selectIndex.value == index
-                                              ? GlobalColor.primary
-                                              : Colors.transparent)),
-                              child: Text(
-                                "${index + 1}",
-                                style: const TextStyle(fontSize: 13),
-                              ),
-                            ),
-                          );
-                        });
-                      },
-                      separatorBuilder: (BuildContext context, int index) {
-                        return const SizedBox(
-                          width: 20,
-                        );
-                      },
-                    ),
-                  ),
+                        },
+                        child: Container(
+                            padding:
+                                const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                            decoration: BoxDecoration(
+                                //  border: Border.all(color: GlobalColor.primary)
+                                color: const Color(0xff252836),
+                                border: Border.all(
+                                    color: controller.selectIndex.value == index && controller.isFocusPage.value
+                                        ? GlobalColor.primary
+                                        : Colors.transparent)),
+                            child: Text("${index + 1}",style: TextStyle(fontSize: 13,color: controller.selectPage.value == index 
+                                        ? GlobalColor.primary
+                                        : Colors.white),),
+                          ),
+                      );
+                    });
+                  },
+                  separatorBuilder: (BuildContext context, int index) {
+                    return const SizedBox(
+                      width: 20,
+                    );
+                  },
                 ),
-              );
-            })
+              ),
+            ),
+          );
+          })
           ],
         ),
       ),

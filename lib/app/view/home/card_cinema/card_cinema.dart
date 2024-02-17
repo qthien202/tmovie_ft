@@ -83,7 +83,7 @@ class _CardCinemaState extends State<CardCinema> {
                   // ),
                   borderRadius: BorderRadius.circular(3),
                   child: GlobalImage(
-                     imageUrl: widget.imageLink??"",
+                      imageUrl:widget.imageLink??"",
                     width: MediaQuery.of(context).size.width*.2,
                     height: MediaQuery.of(context).size.height * .25,
                     boxFit: BoxFit.fill,

@@ -3,17 +3,17 @@ import 'dart:io';
 import 'package:app_ft_movies/app/data/apis/services.dart';
 import 'package:curl_logger_dio_interceptor/curl_logger_dio_interceptor.dart';
 import 'package:dio/dio.dart';
-
-import 'package:get/get.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:get/get.dart'as GET;
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 
-class DependencyInjections implements Bindings {
+class DependencyInjections implements GET.Bindings {
   @override
   Future<void> dependencies() async {
-       final dio = await Get.putAsync(() => _dio());
-       Get.put(Services(dio));
+       final dio = await GET.Get.putAsync(() => _dio());
+       GET.Get.put(Services(dio));
        
   
   }
@@ -35,25 +35,27 @@ class DependencyInjections implements Bindings {
 
       dio.interceptors.add(InterceptorsWrapper(
         onRequest: (options, handler) async {
-          // var fileResponse = await DefaultCacheManager().getFileFromCache(options.uri.toString());
-          // if (fileResponse != null && fileResponse.file.existsSync()) {
-          //   handler.resolve(Response(
-          //     requestOptions: options,
-          //     statusCode: 200,
-          //     data: await fileResponse.file.readAsBytes(),
+          var fileResponse = await DefaultCacheManager().getFileFromCache(options.uri.toString());
+          if (fileResponse != null && fileResponse.file.existsSync()) {
+            handler.resolve(Response(
+              requestOptions: options,
+              statusCode: 200,
+              data: await fileResponse.file.readAsBytes(),
 
-          //   ));
-          // } else {
+            ));
+          } else {
             final SharedPreferences prefs = await SharedPreferences.getInstance();
-            // String token =  prefs.getString(GlobalData.token)!=null? prefs.getString(GlobalData.token)??"":GlobalData.storeToken;
+            
             options.headers = {
               "Access-Control-Allow-Origin": "*",
-              "Authorization": "Bearer ",
+              
 
               ...options.headers,
             };
             handler.next(options);
-          },
+          }
+
+        },
 
         // },
           onError: ( error, handler) async{
@@ -69,10 +71,11 @@ class DependencyInjections implements Bindings {
         onResponse: (response,handler)async{
           
           if (response.statusCode == 200 && response.data is List<int>) {
-            
+            await DefaultCacheManager().putFile(response.requestOptions.uri.toString(), response.data);
           }
           handler.next(response);
         }
+      
       ));
       return dio;
 

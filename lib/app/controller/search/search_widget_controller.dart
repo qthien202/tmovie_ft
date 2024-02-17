@@ -9,8 +9,11 @@ class SearchWidgetController extends GetxController{
   final Services api = Get.find();
   Rxn<GetFilmByCategory>search = Rxn();
   TextEditingController keywordController = TextEditingController();
-  Rxn<int>totalPage = Rxn(0);
-  Rxn<int>selectIndex = Rxn(0);
+  Rxn<int> selectPage = Rxn(0);
+  Rxn<int> selectIndex = Rxn(0);
+  Rxn<int> totalPage = Rxn();
+  RxBool isFocusPage = RxBool(false);
+  RxBool isFocusMenu = RxBool(false);
   // final  genre = Get.put(MovieGenreController());
 
   void onReady()async{

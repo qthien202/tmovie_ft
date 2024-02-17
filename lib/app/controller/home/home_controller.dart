@@ -15,7 +15,7 @@ class HomeController extends GetxController {
   Rxn<GetNewFilm> getNewFilmData = Rxn();
   Rx<Map<String, GetFilmByCategory>> getFimCategory = Rx({});
   Rxn<GetFilmByCategory> getFilmData = Rxn();
-  RxBool isFocusTab = RxBool(true);
+  RxBool isFocusTab = RxBool(false);
   RxBool isFocusInfo = RxBool(false);
   Rxn<int> activeIndex = Rxn();
   Rx<int> tabIndex = Rx(0);
@@ -44,16 +44,17 @@ class HomeController extends GetxController {
   ];
   RxList<Map<String, dynamic>> categories = RxList();
   Rxn<ScrollController> scrollController = Rxn();
+  Rx<int>page = Rx(1);
 
   @override
   void onReady() async {
     // TODO: implement onReady
     super.onReady();
-    
+    categories.addAll(categoryList);
     pathFilm.value = "phim-bo";
      getFilm(slug: "phim-bo");
     await getFilmByCategory(slug: "phim-bo");
-    
+    // getFimCategory.refresh();
     
     // getFimCategory.refresh();
   }
@@ -87,7 +88,7 @@ class HomeController extends GetxController {
       String? category,
       String? country,
       String? year}) async {
-    for (var category in categoryList) {
+    for (var category in categories) {
       getFimCategory.value.remove(category['id']) ;
       
 

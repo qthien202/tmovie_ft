@@ -9,6 +9,7 @@ class HistoryController extends GetxController{
    final Services api = Get.find();
    Rxn<GetHistoryRespone>getHistoryData = Rxn();
    Rx<int>limit = Rx(10);
+   RxBool isLoadmore = RxBool(false);
 
    @override
    onReady(){
@@ -19,6 +20,7 @@ class HistoryController extends GetxController{
    }
 
    Future<GetHistoryRespone?>getHistory()async{
+  
      final SharedPreferences sharedPreferences  = await SharedPreferences.getInstance();
      String userToken = await sharedPreferences.getString(GlobalData.userToken)??"";
     
@@ -30,12 +32,14 @@ class HistoryController extends GetxController{
   Future<void>loadMore()async {
     scrollController.addListener(() async{
       if(scrollController.position.maxScrollExtent == scrollController.offset){
+        
         if((limit.value)<(getHistoryData.value?.total??0)){
-          
+          isLoadmore.value = true;
           print(">>>>>>>>>>>>>>>>>>>>>>>>>AAAAAAAAAAAAAAAAAA");
           limit.value+=10;
           
           await getHistory();
+          isLoadmore.value = false;
         }
 
 

@@ -37,7 +37,7 @@ class _HomeViewState extends State<HomeView> {
       controller.pathFilm.value = listFilm[newIndex]['slug'];
       controller.tabIndex.value = newIndex;
       scrollController.jumpTo(0);
-      await controller.getFilm(slug: listFilm[newIndex]['slug']);
+       controller.getFilm(slug: listFilm[newIndex]['slug']);
       controller.getFilmByCategory(slug: listFilm[newIndex]['slug']);
 
       // Thực hiện animate khi chuyển tab

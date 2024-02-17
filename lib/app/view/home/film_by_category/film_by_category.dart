@@ -13,92 +13,93 @@ class FilmByCategory extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(HomeController());
-    final int itemCount = controller.categoryList.length;
+    final int itemCount = controller.categories.length;
     
     return ListView.separated(
       physics: NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       itemCount: itemCount,
       itemBuilder: (context, ind) {
+         
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 5),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              padding: const EdgeInsets.symmetric(horizontal: 5),
+              child: Column(
                 children: [
-                  Text(
-                    "${controller.categoryList[ind]['title']}",
-                    style: TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "${controller.categories[ind]['title']}",
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                      TextButton(
+                        onFocusChange: (hasFocus){
+                          controller.isFocusSeeAll.value = hasFocus;
+                        },
+                        onPressed: () {
+                          Get.to(ListMovieView(
+                            category: controller.categories[ind]['slug']??"",
+                            slug:controller.pathFilm.value,
+                            country: controller.categories[ind]['country']??"",
+                            
+                          ));
+                        },
+                        child: Text(
+                          "Xem thêm",
+                          style: TextStyle(
+                              color: Colors.white,
+                              decoration: TextDecoration.underline,
+                              decorationColor: Colors.white),
+                        ),
+                      )
+                    ],
                   ),
-                  TextButton(
-                    onFocusChange: (hasFocus){
-                      controller.isFocusSeeAll.value = hasFocus;
-                    },
-                    onPressed: () {
-                      Get.to(ListMovieView(
-                        category: controller.categoryList[ind]['slug']??"",
-                        slug:controller.pathFilm.value,
-                        country: controller.categoryList[ind]['country']??"",
-                        
-                      ));
-                    },
-                    child: Text(
-                      "Xem thêm",
-                      style: TextStyle(
-                          color: Colors.white,
-                          decoration: TextDecoration.underline,
-                          decorationColor: Colors.white),
-                    ),
-                  )
-                ],
-              ),
-              SizedBox(
-                height: MediaQuery.of(context).size.height * .45,
-                child: Obx(() {
-                  final isLoading = controller.getFimCategory.value[controller.categoryList[ind]['id']] == null;
-                  final items = controller.getFimCategory.value[controller.categoryList[ind]['id']]?.pageProps?.data?.items;
-                  return ListView.separated(
-                    shrinkWrap: true,
-                    scrollDirection: Axis.horizontal,
-                    itemCount: isLoading ? 8 : controller.getFimCategory.value[controller.categoryList[ind]['id']]?.pageProps?.data?.items?.length ?? 0,
-                    itemBuilder: (context, index) {
-                      final data = items?[index];
-                      return Visibility(
-                        visible: !isLoading && data?.category?.first.slug!="[redacted]",
-                        replacement: Visibility(
-                          visible: data?.category?.first.slug!="[redacted]",
-                          child: SizedBox(
-                            height: MediaQuery.of(context).size.height*.5,
-          // padding: EdgeInsets.symmetric(vertical: 20),
-          width: MediaQuery.of(context).size.width * .15,
-                            child: Shimmer.fromColors(
-                              baseColor: Colors.grey,
-                              highlightColor: Colors.grey.shade600,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.grey,
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * .45,
+                    child: Obx(() {
+                     final isLoading = controller.getFimCategory.value[controller.categories[ind]['id']] == null;
+                      final items = controller.getFimCategory.value[controller.categories[ind]['id']]?.pageProps?.data?.items;
+                      return ListView.separated(
+                        shrinkWrap: true,
+                        scrollDirection: Axis.horizontal,
+                        itemCount: isLoading ? 8 : (controller.getFimCategory.value[controller.categories[ind]['id']]?.pageProps?.data?.items?.length ?? 0)>10?10:(controller.getFimCategory.value[controller.categories[ind]['id']]?.pageProps?.data?.items?.length ?? 0),
+                        itemBuilder: (context, index) {
+                          final data = items?[index];
+                          return Visibility(
+                            visible: !isLoading && data?.category?.first.slug!="[redacted]",
+                            replacement: Visibility(
+                              visible: data?.category?.first.slug!="[redacted]",
+                              child: SizedBox(
+                                height: MediaQuery.of(context).size.height*.5,
+              // padding: EdgeInsets.symmetric(vertical: 20),
+              width: MediaQuery.of(context).size.width * .15,
+                                child: Shimmer.fromColors(
+                                  baseColor: Colors.grey,
+                                  highlightColor: Colors.grey.shade600,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ),
-                        child: CardCinema(
-                          nameProduct: data?.name,
-                          imageLink: data?.thumbUrl,
-                          originName: data?.originName,
-                          slug: data?.slug,
-                        ),
+                            child: CardCinema(
+                              nameProduct: data?.name,
+                              imageLink: data?.thumbUrl,
+                              originName: data?.originName,
+                              slug: data?.slug,
+                            ),
+                          );
+                        },
+                        separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 20),
                       );
-                    },
-                    separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 20),
-                  );
-                }),
+                    }),
+                  ),
+                ],
               ),
-            ],
-          ),
-        );
+            );
       },
       separatorBuilder: (BuildContext context, int index) => const SizedBox(height: 10),
     );
