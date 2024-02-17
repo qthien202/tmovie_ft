@@ -4,6 +4,7 @@ import 'package:app_ft_movies/app/view/home/home_view.dart';
 import 'package:app_ft_movies/app/view/splash/splash.dart';
 import 'package:app_ft_movies/app/widgets/connect_wrap/connect_wrap_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 void main() async{
@@ -19,31 +20,37 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'TMOVIE',
-      theme: ThemeData(
-        primaryColor: GlobalColor.backgroundColor,
-        useMaterial3: true,
-        indicatorColor: GlobalColor.primary,
-        progressIndicatorTheme: ProgressIndicatorThemeData(
-          // circularTrackColor: GlobalColor.primary,
-          color: GlobalColor.primary,
-        ),
-        textTheme: const TextTheme(
-          bodyText1:TextStyle(
-            color: Colors.white,
-            fontSize: 14
+    return Shortcuts(
+      shortcuts: <LogicalKeySet, Intent>{
+                    LogicalKeySet(LogicalKeyboardKey.select):
+                        const ActivateIntent(),
+                  },
+      child: GetMaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'TMOVIE',
+        theme: ThemeData(
+          primaryColor: GlobalColor.backgroundColor,
+          useMaterial3: true,
+          indicatorColor: GlobalColor.primary,
+          progressIndicatorTheme: ProgressIndicatorThemeData(
+            // circularTrackColor: GlobalColor.primary,
+            color: GlobalColor.primary,
           ),
-          bodyText2:TextStyle(
-            color: Colors.white,
-            fontSize: 14
-          )  
-        )
-    
-        
+          textTheme: const TextTheme(
+            bodyText1:TextStyle(
+              color: Colors.white,
+              fontSize: 14
+            ),
+            bodyText2:TextStyle(
+              color: Colors.white,
+              fontSize: 14
+            )  
+          )
+      
+          
+        ),
+        home: const SplashView(),
       ),
-      home: const HomeView(),
     );
   }
 }

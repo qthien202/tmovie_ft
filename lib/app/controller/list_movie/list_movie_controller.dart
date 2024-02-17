@@ -6,14 +6,16 @@ class ListMovieController extends GetxController {
   final Services api = Get.find();
 
   Rxn<GetFilmByCategory> listMovie = Rxn();
+  Rxn<int> selectPage = Rxn(0);
   Rxn<int> selectIndex = Rxn(0);
   Rxn<int> totalPage = Rxn();
-
+  RxBool isFocusPage = RxBool(false);
+  RxBool isFocusMenu = RxBool(false);
   Future<GetFilmByCategory?> getListMovie(
       {String? slug, String? category, String? country, String? year}) async {
     listMovie.value = await api.getFilmByCategory(
         path: slug ?? "",
-        page: (selectIndex.value ?? 0) + 1,
+        page: (selectPage.value ?? 0) + 1,
         category: category??"",
         country: country??"",
         year: year??"");

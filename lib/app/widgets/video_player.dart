@@ -66,7 +66,7 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
           ),
           autoPlay: true,
           looping: false,
-          aspectRatio: 16 / 9,
+          // aspectRatio: 16 / 9,
           fullScreenByDefault: true,
 
           controlsConfiguration: BetterPlayerControlsConfiguration(

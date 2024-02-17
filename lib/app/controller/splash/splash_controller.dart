@@ -1,4 +1,5 @@
 import 'package:app_ft_movies/app/controller/home/home_controller.dart';
+import 'package:app_ft_movies/app/view/home/home_view.dart';
 import 'package:app_ft_movies/app/view/index/index_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -10,7 +11,7 @@ class SplashController extends GetxController{
     // TODO: implement onReady
     super.onReady();
     await homeController.getFilm(slug: "phim-bo");
-    Get.offAll(const IndexView());
+    Get.offAll(const HomeView());
     
   }
 }

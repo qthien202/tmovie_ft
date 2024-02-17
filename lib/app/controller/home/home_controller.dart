@@ -15,11 +15,15 @@ class HomeController extends GetxController {
   Rxn<GetNewFilm> getNewFilmData = Rxn();
   Rx<Map<String, GetFilmByCategory>> getFimCategory = Rx({});
   Rxn<GetFilmByCategory> getFilmData = Rxn();
-  RxBool isFocusWatch = RxBool(false);
+  RxBool isFocusTab = RxBool(true);
   RxBool isFocusInfo = RxBool(false);
   Rxn<int> activeIndex = Rxn();
-  Rxn<int> tabIndex = Rxn();
+  Rx<int> tabIndex = Rx(0);
   Rxn<String>pathFilm = Rxn();
+  Rx<int>currentIndex = Rx(0);
+  Rx<int>selectTab = Rx(0);
+  Rx<bool>isFocusSlider = RxBool(false);
+  Rx<bool>isFocusSeeAll = RxBool(false);
 
   List<Map<String, dynamic>> categoryList = [
     // {"title":"Tất thể loại","slug":""},

@@ -12,10 +12,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 class DetailController extends GetxController{
   final Services api = Get.find();
   Rxn<GetFilmDetails>filmDetail = Rxn();
-  Rxn<String>selectTab = Rxn();
+  Rxn<int>selectTab = Rxn(0);
+  Rxn<int>selectIndex = Rxn(0);
   Rxn<PostCreateTokenResponse>postCreateTokenData = Rxn();
   RxBool isFocus = RxBool(false);
   RxBool isFocusEp = RxBool(false);
+
+
+  
   Future<GetFilmDetails?>getFilmDetail({required String slug})async{
     filmDetail.value=null;
     filmDetail.value = await api.getFilmDetails(path: slug);

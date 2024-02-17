@@ -32,19 +32,35 @@ class MovieGenreview extends StatelessWidget {
             foregroundColor: Colors.white,
             title: Obx(() => Text(controller.movieGenre.value?.pageProps?.data?.titlePage??""),),
             actions: [
-              InkWell(
-              onTap: (){
-                
-                Get.to(const FilterPage(),transition: Transition.rightToLeft);
-              },
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal:8.0),
-                child: Icon(
-                  Icons.menu,
-                  color: Colors.white,
+              Obx(() => InkWell(
+                  onFocusChange: (hasFocus){
+                    controller.isFocusMenu.value = hasFocus;
+                    print(">>>>>>>>>>>>>>>>>$hasFocus");
+                  },
+                onTap: (){
+                  Get.to( const FilterPage(),transition: Transition.rightToLeft);
+                },
+                child:  Padding(
+                  padding: EdgeInsets.symmetric(horizontal:8.0),
+                  child: AnimatedContainer(
+                    duration: Duration(seconds: 200),
+                   curve: Curves.easeInOut, 
+                    child: Transform.scale(
+                      scale: controller.isFocusMenu.value?1.2:1,
+                      child: Container(
+                        padding: EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: controller.isFocusMenu.value?Colors.white:Colors.transparent,width: 2)
+                        ),
+                        child: Icon(
+                          Icons.menu,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ),
+              ),)
             ],
           ),
           body: ListView(
@@ -115,9 +131,7 @@ class MovieGenreview extends StatelessWidget {
               const SizedBox(
                 height: 20,
               ),
-            ],
-          ),
-          bottomNavigationBar: Obx((){
+              Obx((){
             
             
             
@@ -134,24 +148,30 @@ class MovieGenreview extends StatelessWidget {
                   itemBuilder: (context, index) {
                     return Obx(() {
                       return InkWell(
+                        onFocusChange: (value) {
+                            controller.isFocusPage.value=value;
+                            controller.selectIndex.value = index;
+                          },
                         onTap: () async{
-                          controller.selectIndex.value = index;
+                          controller.selectPage.value = index;
                           print(">>>>>>>>>>>>>${controller.selectIndex.value}");
                           controller.movieGenre.value=null;
                           await controller.getMovieGenre(slug: slug,country: country,year: year);
                         },
                         child: Container(
-                          padding:
-                              const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                          decoration: BoxDecoration(
-                              //  border: Border.all(color: GlobalColor.primary)
-                              color: const Color(0xff252836),
-                              border: Border.all(
-                                  color: controller.selectIndex.value == index
-                                      ? GlobalColor.primary
-                                      : Colors.transparent)),
-                          child: Text("${index + 1}",style: const TextStyle(fontSize: 13),),
-                        ),
+                            padding:
+                                const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                            decoration: BoxDecoration(
+                                //  border: Border.all(color: GlobalColor.primary)
+                                color: const Color(0xff252836),
+                                border: Border.all(
+                                    color: controller.selectIndex.value == index && controller.isFocusPage.value
+                                        ? GlobalColor.primary
+                                        : Colors.transparent)),
+                            child: Text("${index + 1}",style: TextStyle(fontSize: 13,color: controller.selectPage.value == index 
+                                        ? GlobalColor.primary
+                                        : Colors.white),),
+                          ),
                       );
                     });
                   },
@@ -165,6 +185,9 @@ class MovieGenreview extends StatelessWidget {
             ),
           );
           })
+            ],
+          ),
+         
         ),
     );
   }

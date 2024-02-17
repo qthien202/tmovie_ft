@@ -7,8 +7,11 @@ class MovieGenreController extends GetxController{
   final Services api = Get.find();
   
   Rxn<GetFilmByCategory>movieGenre = Rxn();
-  Rxn<int>selectIndex = Rxn(0);
-  Rxn<int>totalPage = Rxn();
+ Rxn<int> selectPage = Rxn(0);
+  Rxn<int> selectIndex = Rxn(0);
+  Rxn<int> totalPage = Rxn();
+  RxBool isFocusPage = RxBool(false);
+  RxBool isFocusMenu = RxBool(false);
   
 
   @override

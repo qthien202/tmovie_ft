@@ -14,55 +14,54 @@ class Espisode extends StatelessWidget {
     final controller = Get.put(DetailController());
     return Obx((){
       final data = controller.filmDetail.value?.pageProps?.data?.item;
-      return SizedBox(
-        height: 40,
-        child: ListView.separated(
-          shrinkWrap: true,
-          scrollDirection: Axis.horizontal,
-          itemCount: data?.episodes?.first.serverData?.length??0,
-          itemBuilder: (context,index){
-            final episode =  data?.episodes?.first.serverData?[index];
-            return InkWell(
-              onFocusChange: (hasFocus){
-                controller.isFocusEp.value = hasFocus;
-              },
-              onTap: ()async{
-                controller.selectTab.value = episode?.name;
-                await controller.createToken(
-                                  name: data?.name??"",
-                                  description: data?.content??"",
-                                  originName: data?.originName??"",
-                                  slug: data?.slug??"",
-                                  thumbnail: data?.thumbUrl??"",
-                                  episode: episode?.name??""
-                                  
-                                );
-                Get.to(ChewieVideoPlayer(slug: data?.slug??"",fileName: data?.name??"",episode: episode?.name??"",videoUrl: episode?.linkM3u8??"",));
-              },
-              child: Obx((){
-                return Shortcuts(
-                  shortcuts: <LogicalKeySet, Intent>{
-                        LogicalKeySet(LogicalKeyboardKey.select):
-                            const ActivateIntent(),
-                      },
-                  child: Container(
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: SizedBox(
+          height: 40,
+          child: ListView.separated(
+            
+            shrinkWrap: true,
+            scrollDirection: Axis.horizontal,
+            itemCount: data?.episodes?.first.serverData?.length??0,
+            itemBuilder: (context,index){
+              final episode =  data?.episodes?.first.serverData?[index];
+              return InkWell(
+                onFocusChange: (hasFocus){
+                  controller.isFocusEp.value = hasFocus;
+                  controller.selectIndex.value = index;
+                },
+                onTap: ()async{
+                  controller.selectTab.value = index;
+                  await controller.createToken(
+                                    name: data?.name??"",
+                                    description: data?.content??"",
+                                    originName: data?.originName??"",
+                                    slug: data?.slug??"",
+                                    thumbnail: data?.thumbUrl??"",
+                                    episode: episode?.name??""
+                                    
+                                  );
+                  Get.to(ChewieVideoPlayer(slug: data?.slug??"",fileName: data?.name??"",episode: episode?.name??"",videoUrl: episode?.linkM3u8??"",));
+                },
+                child: Obx((){
+                  return Container(
                   padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 15),
                   decoration:  BoxDecoration( 
                     //  border: Border.all(color: GlobalColor.primary)
                     color: Color(0xff252836),
-                    border: Border.all(color:controller.selectTab.value == episode?.name?GlobalColor.primary:Colors.transparent,width: 3)
+                    border: Border.all(color:controller.isFocusEp.value && controller.selectIndex.value==index?GlobalColor.primary:Colors.transparent,width: 2)
                   ),
-                  child: Text("${episode?.name}"),
-                                ),
-                );
-              })
-            );
-          }, separatorBuilder: (BuildContext context, int index) {  
-            return const SizedBox(width: 20,);
-          },
-           
-            
-          ),
+                  child: Text("${episode?.name}",style: TextStyle(color: controller.selectTab.value==index?GlobalColor.primary:Colors.white),),
+                                );
+                })
+              );
+            }, separatorBuilder: (BuildContext context, int index) {  
+              return const SizedBox(width: 20,);
+            },
+             
+              
+            ),
+        ),
       );
     });
   }
