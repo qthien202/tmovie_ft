@@ -88,44 +88,35 @@ class _HomeViewState extends State<HomeView> {
                               controller.selectTab.value = index;
                               _handleTabChange(index);
                             },
-                            child: AnimatedContainer(
-                              duration: Duration(
-                                  milliseconds: 200), // Thời gian hiệu ứng
-                              curve: Curves.easeInOut,
-                              transform: controller.isFocusTab.value
-                                  ? Matrix4.identity() *
-                                      Matrix4.diagonal3Values(1.1, 1.1, 1.0)
-                                  : Matrix4.identity(),
-                              child: Container(
-                                  padding: const EdgeInsets.all(3),
-                                  decoration: BoxDecoration(
-                                    color: Colors.transparent,
-                                    border: Border(
-                                      bottom: BorderSide(
-                                          color: controller.isFocusTab.value &&
-                                                  controller.tabIndex.value ==
-                                                      index
-                                              ? GlobalColor.primary
-                                              : Colors.transparent,
-                                          width: 7),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    listFilm[index]["title"],
-                                    style: TextStyle(
-                                        color: controller.tabIndex.value == index||
-                                                controller.selectTab.value ==
-                                                    index
-                                            ? Colors.white
-                                            : Colors.grey,
-                                        fontSize: controller.isFocusTab.value &&
+                            child: Container(
+                                padding: const EdgeInsets.all(3),
+                                decoration: BoxDecoration(
+                                  color: Colors.transparent,
+                                  border: Border(
+                                    bottom: BorderSide(
+                                        color: controller.isFocusTab.value &&
                                                 controller.tabIndex.value ==
                                                     index
-                                            ? 20
-                                            : 16,
-                                        fontWeight: FontWeight.bold),
-                                  )),
-                            ));
+                                            ? GlobalColor.primary
+                                            : Colors.transparent,
+                                        width: 7),
+                                  ),
+                                ),
+                                child: Text(
+                                  listFilm[index]["title"],
+                                  style: TextStyle(
+                                      color: controller.tabIndex.value == index||
+                                              controller.selectTab.value ==
+                                                  index
+                                          ? Colors.white
+                                          : Colors.grey,
+                                      fontSize: controller.isFocusTab.value &&
+                                              controller.tabIndex.value ==
+                                                  index
+                                          ? 20
+                                          : 16,
+                                      fontWeight: FontWeight.bold),
+                                )));
                       },
                       separatorBuilder: (BuildContext context, int index) {
                         return const SizedBox(
