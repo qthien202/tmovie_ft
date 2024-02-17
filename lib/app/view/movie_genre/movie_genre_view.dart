@@ -121,10 +121,10 @@ class MovieGenreview extends StatelessWidget {
                   );
                 },
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                   childAspectRatio: 4 / 10,
-                    crossAxisCount: 8,
+                   childAspectRatio: 6 / 10,
+                    crossAxisCount: 6,
                     crossAxisSpacing: 15,
-                    mainAxisSpacing: 15,
+                    mainAxisSpacing: 20,
                 ),
               );
               }),

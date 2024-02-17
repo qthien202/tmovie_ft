@@ -37,7 +37,7 @@ class HistoryView extends StatelessWidget {
                     padding: const EdgeInsets.all(5),
                   physics: const NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
-                  itemCount: isLoading?16:data?.length ?? 0,
+                  itemCount: isLoading?6:data?.length ?? 0,
                   itemBuilder: (context, index) {
                     final items = data?[index];
                     return Visibility(
@@ -66,10 +66,10 @@ class HistoryView extends StatelessWidget {
                     );
                   },
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    childAspectRatio: 4 / 10,
-                    crossAxisCount: 8,
+                    childAspectRatio: 6 / 10,
+                    crossAxisCount: 6,
                     crossAxisSpacing: 15,
-                    mainAxisSpacing: 15,
+                    mainAxisSpacing: 20,
                   ),
                 );
                 }),
