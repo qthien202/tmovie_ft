@@ -55,32 +55,40 @@ class _CardCinemaState extends State<CardCinema> {
           });
         },
         child: Container(
-          height: MediaQuery.of(context).size.height*.5,
+          // height: MediaQuery.of(context).size.height*.5,
           // padding: EdgeInsets.symmetric(vertical: 20),
           width: MediaQuery.of(context).size.width * .15,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(3),
-            // border: Border.all(color: Colors.red),
-            border: Border.all(color: isFocus?Colors.white:Colors.transparent, width: 2),
-            color: GlobalColor.background2,
-          ),
+    borderRadius: BorderRadius.circular(15),
+    border: Border.all(
+      color: isFocus ? Colors.white : Colors.transparent,
+      width: 2,
+    ),
+    boxShadow: isFocus
+        ? [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5), // Màu của boxShadow
+              spreadRadius: 1, // Bán kính lan rộng của boxShadow
+              blurRadius: 4, // Độ mờ của boxShadow
+              offset: Offset(0, 2), // Độ dịch chuyển của boxShadow
+            ),
+          ]
+        : [],
+  ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               ClipRRect(
-                // borderRadius: const BorderRadius.only(
-                //   topLeft: Radius.circular(3),
-                //   topRight: Radius.circular(3)
-                // ),
-                borderRadius: BorderRadius.circular(3),
-                child: GlobalImage(
-                    imageUrl:widget.imageLink??"",
-                  width: MediaQuery.of(context).size.width*.2,
-                  height: MediaQuery.of(context).size.height * .25,
-                  boxFit: BoxFit.fill,
+                  borderRadius:BorderRadius.circular(10),
+                  
+                  child: GlobalImage(
+                      imageUrl:widget.imageLink??"",
+                    width: MediaQuery.of(context).size.width*.2,
+                    height: MediaQuery.of(context).size.height * .45,
+                    boxFit: BoxFit.fill,
+                  ),
                 ),
-              ),
               
               // Image.network(
               //   widget.badgesLink??"",
@@ -89,33 +97,33 @@ class _CardCinemaState extends State<CardCinema> {
               //   fit: BoxFit.cover,
               // ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5),
-                child: Text(
-                  widget.nameProduct ?? '--',
-                  // textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                      height: 1.5,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                      color: Colors.white),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 3),
-                child: Text(
-                  widget.originName??"--",
-                  // textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                      height: 1.5,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 10,
-                      color: Colors.white),
-                ),
-              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5),
+                              child: Text(
+              widget.nameProduct ?? '--',
+              // textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                  height: 1.5,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                  color: Colors.white),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 3),
+                              child: Text(
+              widget.originName??"--",
+              // textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                  height: 1.5,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 10,
+                  color: Colors.white),
+                              ),
+                            )
             ],
           ),
         ),

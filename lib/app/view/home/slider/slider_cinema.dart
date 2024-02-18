@@ -67,14 +67,11 @@ class SliderCinema extends StatelessWidget {
             ),
           ),
           SizedBox(height: 10),
-          // Positioned(
-          //   top: screenHeight * 0.5,
-          //   child: Column(
-          //     mainAxisAlignment: MainAxisAlignment.center,
-          //     children: [
-                
-          //     ],
-          //   ),
+          // Column(
+          //   mainAxisAlignment: MainAxisAlignment.center,
+          //   children: [
+          //     Text(controller.getFilmData.value?.pageProps?.data?.items?[controller.activeIndex.value??0].name,style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),)
+          //   ],
           // ),
         ],
       );

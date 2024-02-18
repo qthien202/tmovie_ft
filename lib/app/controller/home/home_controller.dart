@@ -14,6 +14,7 @@ class HomeController extends GetxController {
   Rxn<TabController> tabController = Rxn();
   Rxn<GetNewFilm> getNewFilmData = Rxn();
   Rx<Map<String, GetFilmByCategory>> getFimCategory = Rx({});
+  Rxn<GetFilmByCategory>getFilminHomeData = Rxn();
   Rxn<GetFilmByCategory> getFilmData = Rxn();
   RxBool isFocusTab = RxBool(false);
   RxBool isFocusInfo = RxBool(false);
@@ -44,7 +45,8 @@ class HomeController extends GetxController {
   ];
   RxList<Map<String, dynamic>> categories = RxList();
   Rxn<ScrollController> scrollController = Rxn();
-  Rx<int>page = Rx(1);
+  Rxn<int>indexSlider = Rxn(0);
+  
 
   @override
   void onReady() async {
@@ -53,7 +55,7 @@ class HomeController extends GetxController {
     categories.addAll(categoryList);
     pathFilm.value = "phim-bo";
      getFilm(slug: "phim-bo");
-    await getFilmByCategory(slug: "phim-bo");
+   
     // getFimCategory.refresh();
     
     // getFimCategory.refresh();
@@ -61,7 +63,7 @@ class HomeController extends GetxController {
   @override
   void refresh()async{
     super.refresh();
-    await getFilmByCategory(slug: "phim-bo");
+    // await getFilmByCategory(slug: "phim-bo");
 
   }
 
@@ -83,29 +85,37 @@ class HomeController extends GetxController {
     // getFilmByCategory(slug: slug);
   }
 
-  Future<void> getFilmByCategory(
-      {required String slug,
-      String? category,
-      String? country,
-      String? year}) async {
-    for (var category in categories) {
-      getFimCategory.value.remove(category['id']) ;
+  // Future<void> getFilmByCategory(
+  //     {required String slug,
+  //     String? category,
+  //     String? country,
+  //     String? year}) async {
+  //   for (var category in categories) {
+  //     getFimCategory.value.remove(category['id']) ;
       
 
 
-      getFimCategory.value[category['id']] = await api.getFilmByCategory(
-          path: slug,
-          page: 1,
-          category: category['slug']??"",
-          country: category['country']??"",
-          year: year);
+  //     getFimCategory.value[category['id']] = await api.getFilmByCategory(
+  //         path: slug,
+  //         page: 1,
+  //         category: category['slug']??"",
+  //         country: category['country']??"",
+  //         year: year);
           
-      getFimCategory.refresh();
+  //     getFimCategory.refresh();
 
      
-    }
+  //   }
      
-  }
+  // }
+
+  // Future<GetFilmByCategory?>getFilmInHome({required String path,String? category,
+  //     String? country,
+  //     String? year})async{
+  //   getFilminHomeData.value = await api.getFilmByCategory(path: path, category: category??"", page: 1, country: country??"", year: year??"");
+  //   getFilminHomeData.refresh();
+  //   return getFilminHomeData.value;
+  // }
 
   Future<void> watchNow({required String slug}) async {
     await detail.getFilmDetail(slug: slug);

@@ -19,9 +19,13 @@ class SearchView extends StatelessWidget {
       onRefresh: () async => controller.onReady(),
       child: Scaffold(
         appBar: AppBar(
+          
           centerTitle: false,
           backgroundColor: GlobalColor.backgroundColor,
-          title: const SearchWidget(),
+          title: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: const SearchWidget(),
+          ),
           actions: [
            Obx(() => InkWell(
                   onFocusChange: (hasFocus){
@@ -110,10 +114,10 @@ class SearchView extends StatelessWidget {
                   );
                 },
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                   childAspectRatio: 6 / 10,
-                    crossAxisCount: 6,
-                    crossAxisSpacing: 15,
-                    mainAxisSpacing: 20,
+                  childAspectRatio: 6 / 13,
+              crossAxisCount: 5,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 5,
                 ),
               );
             }),

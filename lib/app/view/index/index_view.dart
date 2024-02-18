@@ -36,6 +36,9 @@ class IndexView extends StatelessWidget {
         return Row(
           children: [
             NavigationRail(
+              // elevation: 0,
+              groupAlignment: 0.0,
+              useIndicator: false,
               indicatorColor: GlobalColor.primary,
               backgroundColor: GlobalColor.background2,
               unselectedIconTheme:
@@ -44,7 +47,7 @@ class IndexView extends StatelessWidget {
                 color: Colors.white,
               ),
               selectedIconTheme:
-                  IconThemeData(color: Colors.white),
+                  IconThemeData(color: GlobalColor.primary),
               extended: false,
               selectedIndex: controller.tabIndex.value ?? 0,
               onDestinationSelected: (int index) {

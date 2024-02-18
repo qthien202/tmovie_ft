@@ -36,20 +36,20 @@ class SearchWidget extends StatelessWidget {
           fillColor: const Color(0xff252836),
           border: OutlineInputBorder(
       
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(20),
             borderSide: const BorderSide(
                 color: Colors.transparent
             ),
       
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(20),
             borderSide: const BorderSide(
                 color: Colors.transparent
             ),
           ),
           enabledBorder:  OutlineInputBorder(
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(20),
             borderSide: const BorderSide(
                 color: Colors.transparent
             ),

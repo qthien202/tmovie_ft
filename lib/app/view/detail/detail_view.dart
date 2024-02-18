@@ -99,7 +99,7 @@ class DetailView extends StatelessWidget {
                   backgroundColor: GlobalColor.backgroundColor,
                   systemOverlayStyle: const SystemUiOverlayStyle(
                       statusBarBrightness: Brightness.dark),
-                  expandedHeight: MediaQuery.of(context).size.height * .6,
+                  expandedHeight: MediaQuery.of(context).size.height * .7,
                   flexibleSpace: FlexibleSpaceBar(
                       background: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -107,8 +107,8 @@ class DetailView extends StatelessWidget {
                       GlobalImage(
                         imageUrl: data.posterUrl ?? "",
                         width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.height * .6,
-                        boxFit: BoxFit.fill,
+                        height: MediaQuery.of(context).size.height * .7,
+                        boxFit: BoxFit.contain,
                       ),
 
                       
@@ -132,15 +132,7 @@ class DetailView extends StatelessWidget {
                                 controller.isFocus.value = value;
                               },
                               onTap: () async{
-                                await controller.createToken(
-                                  name: data.name??"",
-                                  description: data.content??"",
-                                  originName: data.originName??"",
-                                  slug: data.slug??"",
-                                  thumbnail: data.thumbUrl??"",
-                                  episode: data.episodes?.first.serverData?.first.name??""
-                          
-                                );
+                                 
                                 Get.to(ChewieVideoPlayer(
                                   slug: data.slug??"",
                                   fileName: data.name ?? "--",
@@ -151,6 +143,15 @@ class DetailView extends StatelessWidget {
                                           ?.first.linkM3u8 ??
                                       "",
                                 ));
+                                controller.createToken(
+                                  name: data.name??"",
+                                  description: data.content??"",
+                                  originName: data.originName??"",
+                                  slug: data.slug??"",
+                                  thumbnail: data.thumbUrl??"",
+                                  episode: data.episodes?.first.serverData?.first.name??""
+                          
+                                );
                               },
                             child: AnimatedContainer(
                               duration: Duration(milliseconds: 200), // Thời gian hiệu ứng
@@ -162,7 +163,7 @@ class DetailView extends StatelessWidget {
                                 ),
                                 width: MediaQuery.of(context).size.width * .95,
                                 decoration: BoxDecoration(
-                                    border: Border.all(color: controller.isFocus.value?Colors.white:Colors.transparent,width: 1),
+                                    border: Border.all(color: controller.isFocus.value?Colors.white:Colors.transparent,width: 3),
                                     borderRadius: BorderRadius.circular(5),
                                     color: GlobalColor.primary),
                                 child: Transform.scale(

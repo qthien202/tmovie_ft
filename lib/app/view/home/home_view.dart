@@ -1,6 +1,7 @@
 import 'package:app_ft_movies/app/controller/home/home_controller.dart';
 import 'package:app_ft_movies/app/core/global_color.dart';
 import 'package:app_ft_movies/app/view/home/film_by_category/film_by_category.dart';
+import 'package:app_ft_movies/app/view/home/film_in_home/film_in_home.dart';
 import 'package:app_ft_movies/app/view/home/slider/slider_cinema.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -38,7 +39,7 @@ class _HomeViewState extends State<HomeView> {
       controller.tabIndex.value = newIndex;
       scrollController.jumpTo(0);
        controller.getFilm(slug: listFilm[newIndex]['slug']);
-      controller.getFilmByCategory(slug: listFilm[newIndex]['slug']);
+      
 
       // Thực hiện animate khi chuyển tab
     }
@@ -53,14 +54,13 @@ class _HomeViewState extends State<HomeView> {
           scrollController.jumpTo(0);
           await controller.getFilm(
               slug: listFilm[controller.tabIndex.value ?? 0]['slug']);
-          controller.getFilmByCategory(
-              slug: listFilm[controller.tabIndex.value ?? 0]['slug']);
+          
         },
         child: CustomScrollView(
           controller: scrollController,
           slivers: [
             SliverAppBar(
-              pinned: true,
+              // pinned: true,
               centerTitle: false,
               title: Shortcuts(
                   shortcuts: <LogicalKeySet, Intent>{
@@ -70,6 +70,7 @@ class _HomeViewState extends State<HomeView> {
                   child: SizedBox(
                     height: 50,
                     child: ListView.separated(
+                      padding: EdgeInsets.symmetric(vertical: 5),
                       // shrinkWrap: true,
                       scrollDirection: Axis.horizontal,
                       itemCount: listFilm.length,
@@ -89,7 +90,7 @@ class _HomeViewState extends State<HomeView> {
                               _handleTabChange(index);
                             },
                             child: Container(
-                                padding: const EdgeInsets.all(3),
+                                // padding: const EdgeInsets.all(1),
                                 decoration: BoxDecoration(
                                   color: Colors.transparent,
                                   border: Border(
@@ -99,7 +100,7 @@ class _HomeViewState extends State<HomeView> {
                                                     index
                                             ? GlobalColor.primary
                                             : Colors.transparent,
-                                        width: 7),
+                                        width: 3),
                                   ),
                                 ),
                                 child: Text(
@@ -133,7 +134,7 @@ class _HomeViewState extends State<HomeView> {
               ),
             ),
             const SliverToBoxAdapter(
-              child: FilmByCategory(),
+              child: FilmInHome(),
             )
           ],
         ),
