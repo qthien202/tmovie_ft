@@ -55,10 +55,7 @@ dependencies:
     git:
       url: https://github.com/matthewrice345/betterplayer.git
       ref: Issue1057
-  scrollable_positioned_list: ^0.3.8
-  visibility_detector: ^0.3.3
-  flutter_cache_manager: ^3.3.1
-  flutter_vlc_player: ^7.4.1
+ 
   
 
 dev_dependencies:
