@@ -20,36 +20,39 @@ class FilmInHome extends StatelessWidget {
 
       return Column(
         children: [
-              Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Mới nhất",
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
-                      ),
-                      TextButton(
-                        onFocusChange: (hasFocus){
-                          controller.isFocusSeeAll.value = hasFocus;
-                        },
-                        onPressed: () {
-                          Get.to(ListMovieView(
-                            
-                            slug:controller.pathFilm.value,
-                            
-                            
-                          ));
-                        },
-                        child: Text(
-                          "Xem thêm",
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Mới nhất",
                           style: TextStyle(
-                              color: Colors.white,
-                              decoration: TextDecoration.underline,
-                              decorationColor: Colors.white),
+                              color: Colors.white, fontWeight: FontWeight.bold),
                         ),
-                      )
-                    ],
-                  ),
+                        TextButton(
+                          onFocusChange: (hasFocus){
+                            controller.isFocusSeeAll.value = hasFocus;
+                          },
+                          onPressed: () {
+                            Get.to(ListMovieView(
+                              
+                              slug:controller.pathFilm.value,
+                              
+                              
+                            ));
+                          },
+                          child: Text(
+                            "Xem thêm",
+                            style: TextStyle(
+                                color: Colors.white,
+                                decoration: TextDecoration.underline,
+                                decorationColor: Colors.white),
+                          ),
+                        )
+                      ],
+                    ),
+              ),
           GridView.builder(
             padding: const EdgeInsets.all(5),
             physics: const NeverScrollableScrollPhysics(),

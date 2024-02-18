@@ -70,7 +70,7 @@ class _CardCinemaState extends State<CardCinema> {
               color: Colors.grey.withOpacity(0.5), // Màu của boxShadow
               spreadRadius: 1, // Bán kính lan rộng của boxShadow
               blurRadius: 4, // Độ mờ của boxShadow
-              offset: Offset(0, 2), // Độ dịch chuyển của boxShadow
+              offset: const Offset(0, 2), // Độ dịch chuyển của boxShadow
             ),
           ]
         : [],
@@ -79,16 +79,32 @@ class _CardCinemaState extends State<CardCinema> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              ClipRRect(
-                  borderRadius:BorderRadius.circular(10),
-                  
-                  child: GlobalImage(
-                      imageUrl:widget.imageLink??"",
-                    width: MediaQuery.of(context).size.width*.2,
-                    height: MediaQuery.of(context).size.height * .45,
-                    boxFit: BoxFit.fill,
+              Visibility(
+                visible: isFocus,
+                replacement: ClipRRect(
+                    borderRadius:BorderRadius.circular(10),
+                    
+                    child: GlobalImage(
+                        imageUrl:widget.imageLink??"",
+                      width: MediaQuery.of(context).size.width*.2,
+                      height: MediaQuery.of(context).size.height * .45,
+                      boxFit: BoxFit.fill,
+                    ),
                   ),
-                ),
+                child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(15),
+                      topRight: Radius.circular(15)
+                    ),
+                    
+                    child: GlobalImage(
+                        imageUrl:widget.imageLink??"",
+                      width: MediaQuery.of(context).size.width*.2,
+                      height: MediaQuery.of(context).size.height * .45,
+                      boxFit: BoxFit.fill,
+                    ),
+                  ),
+              ),
               
               // Image.network(
               //   widget.badgesLink??"",
