@@ -23,35 +23,24 @@ class GlobalImage extends StatelessWidget {
 
         ),
       ),
-      child: ImageNetwork(
-        image:imageUrl??"",
-        width: width??0,
+      // child: 
+      child: Image.network(
+        "${GlobalData.baseUrlImage}/$imageUrl",
         height: height??0,
-        fitWeb: BoxFitWeb.fill,
+        width: width??0,
+        fit:boxFit,
+        // placeholder: (context, url) => Container(
+        //   width: width,
+        //   height: height,
+        //   color: Colors.white,
+        //   child:Image.asset("assets/images/placeholder.png",
+        //   width: width,
+        //     height: height,
+        //     // fit: BoxFit.contain,
+        //   )
+        // ),
         
       ),
-      // child: CachedNetworkImage(
-      //   imageUrl: "${GlobalData.baseUrlImage}/$imageUrl",
-      //   height: height??0,
-      //   width: width??0,
-      //   fit:boxFit,
-      //   // placeholder: (context, url) => Container(
-      //   //   width: width,
-      //   //   height: height,
-      //   //   color: Colors.white,
-      //   //   child:Image.asset("assets/images/placeholder.png",
-      //   //   width: width,
-      //   //     height: height,
-      //   //     // fit: BoxFit.contain,
-      //   //   )
-      //   // ),
-      //   errorWidget: (context, url, error) =>Container(
-      //     width: width,
-      //     height:height,
-      //     color: Colors.white,
-      //     child:Icon(Icons.image,size: 20,)
-      //   ),
-      // ),
     );
   }
 }
