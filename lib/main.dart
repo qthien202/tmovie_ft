@@ -20,37 +20,31 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return Shortcuts(
-      shortcuts: <LogicalKeySet, Intent>{
-                    LogicalKeySet(LogicalKeyboardKey.select):
-                        const ActivateIntent(),
-                  },
-      child: GetMaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'TMOVIE',
-        theme: ThemeData(
-          primaryColor: GlobalColor.backgroundColor,
-          useMaterial3: true,
-          indicatorColor: GlobalColor.primary,
-          progressIndicatorTheme: ProgressIndicatorThemeData(
-            // circularTrackColor: GlobalColor.primary,
-            color: GlobalColor.primary,
-          ),
-          textTheme: const TextTheme(
-            bodyText1:TextStyle(
-              color: Colors.white,
-              fontSize: 14
-            ),
-            bodyText2:TextStyle(
-              color: Colors.white,
-              fontSize: 14
-            )  
-          )
-      
-          
+    return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'TMOVIE',
+      theme: ThemeData(
+        primaryColor: GlobalColor.backgroundColor,
+        useMaterial3: true,
+        indicatorColor: GlobalColor.primary,
+        progressIndicatorTheme: ProgressIndicatorThemeData(
+          // circularTrackColor: GlobalColor.primary,
+          color: GlobalColor.primary,
         ),
-        home: const SplashView(),
+        textTheme: const TextTheme(
+          bodyText1:TextStyle(
+            color: Colors.white,
+            fontSize: 14
+          ),
+          bodyText2:TextStyle(
+            color: Colors.white,
+            fontSize: 14
+          )  
+        )
+    
+        
       ),
+      home: const SplashView(),
     );
   }
 }

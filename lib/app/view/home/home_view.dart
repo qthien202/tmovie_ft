@@ -1,19 +1,18 @@
 import 'package:app_ft_movies/app/controller/home/home_controller.dart';
 import 'package:app_ft_movies/app/core/global_color.dart';
+
 import 'package:app_ft_movies/app/view/home/film_by_category/film_by_category.dart';
+
 import 'package:app_ft_movies/app/view/home/slider/slider_cinema.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import 'package:get/get.dart';
 
-class HomeView extends StatefulWidget {
-  const HomeView({Key? key}) : super(key: key);
+class HomeView extends StatelessWidget {
+  const HomeView({super.key});
 
-  @override
-  State<HomeView> createState() => _HomeViewState();
-}
-
-class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     final List<Map<String, dynamic>> listFilm = [
@@ -31,113 +30,73 @@ class _HomeViewState extends State<HomeView> {
 
     final controller = Get.put(HomeController());
     ScrollController scrollController = ScrollController();
-
-    // Hàm xử lý khi chuyển tab
-    void _handleTabChange(int newIndex) async {
-      controller.pathFilm.value = listFilm[newIndex]['slug'];
-      controller.tabIndex.value = newIndex;
-      scrollController.jumpTo(0);
-       controller.getFilm(slug: listFilm[newIndex]['slug']);
-      controller.getFilmByCategory(slug: listFilm[newIndex]['slug']);
-
-      // Thực hiện animate khi chuyển tab
-    }
-
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      backgroundColor: GlobalColor.backgroundColor,
-      body: RefreshIndicator(
-        backgroundColor: GlobalColor.backgroundColor,
-        color: GlobalColor.primary,
-        onRefresh: () async {
-          scrollController.jumpTo(0);
-          await controller.getFilm(
-              slug: listFilm[controller.tabIndex.value ?? 0]['slug']);
-          controller.getFilmByCategory(
-              slug: listFilm[controller.tabIndex.value ?? 0]['slug']);
-        },
-        child: CustomScrollView(
-          controller: scrollController,
-          slivers: [
-            SliverAppBar(
-              pinned: true,
-              centerTitle: false,
-              title: Shortcuts(
-                  shortcuts: <LogicalKeySet, Intent>{
-                    LogicalKeySet(LogicalKeyboardKey.select):
-                        const ActivateIntent(),
-                  },
-                  child: SizedBox(
-                    height: 50,
-                    child: ListView.separated(
-                      // shrinkWrap: true,
-                      scrollDirection: Axis.horizontal,
-                      itemCount: listFilm.length,
-                      itemBuilder: (context, index) {
-                        return InkWell(
-                            onFocusChange: (hasFocus) {
-                              setState(() {
-                                controller.tabIndex.value = index;
-                                controller.isFocusTab.value = hasFocus;
-                                print(
-                                    ">>>>>>>>>>>>>${controller.isFocusTab.value}");
-                                // _handleTabChange(index);
-                              });
-                            },
-                            onTap: () {
-                              controller.selectTab.value = index;
-                              _handleTabChange(index);
-                            },
-                            child: Container(
-                                padding: const EdgeInsets.all(3),
-                                decoration: BoxDecoration(
-                                  color: Colors.transparent,
-                                  border: Border(
-                                    bottom: BorderSide(
-                                        color: controller.isFocusTab.value &&
-                                                controller.tabIndex.value ==
-                                                    index
-                                            ? GlobalColor.primary
-                                            : Colors.transparent,
-                                        width: 7),
-                                  ),
-                                ),
-                                child: Text(
-                                  listFilm[index]["title"],
-                                  style: TextStyle(
-                                      color: controller.tabIndex.value == index||
-                                              controller.selectTab.value ==
-                                                  index
-                                          ? Colors.white
-                                          : Colors.grey,
-                                      fontSize: controller.isFocusTab.value &&
-                                              controller.tabIndex.value ==
-                                                  index
-                                          ? 20
-                                          : 16,
-                                      fontWeight: FontWeight.bold),
-                                )));
-                      },
-                      separatorBuilder: (BuildContext context, int index) {
-                        return const SizedBox(
-                          width: 20,
-                        );
-                      },
-                    ),
-                  )),
-              elevation: 0.0,
+    return GetBuilder<HomeController>(
+      init: controller,
+      builder: (controller) {
+        return DefaultTabController(
+          length: listFilm.length,
+          initialIndex: controller.tabIndex.value ?? 0,
+          child: Scaffold(
+            extendBodyBehindAppBar: true,
+            backgroundColor: GlobalColor.backgroundColor,
+            body: RefreshIndicator(
               backgroundColor: GlobalColor.backgroundColor,
-              expandedHeight: MediaQuery.of(context).size.height * .6,
-              flexibleSpace: const FlexibleSpaceBar(
-                background: SliderCinema(),
+              color: GlobalColor.primary,
+              onRefresh: () async {
+                scrollController.jumpTo(0);
+                await controller.getFilm(
+                    slug: listFilm[controller.tabIndex.value ?? 0]['slug']);
+                controller.getFilmByCategory(
+                    slug: listFilm[controller.tabIndex.value ?? 0]['slug']);
+              },
+              child: CustomScrollView(
+                controller: scrollController,
+                slivers: [
+                  SliverAppBar(
+                    pinned: true,
+                    centerTitle: false,
+                    title: TabBar(
+                      tabAlignment: TabAlignment.center,
+                      indicatorWeight: 2,
+                      isScrollable: true,
+                      dividerColor: Colors.transparent,
+                      indicatorColor: Colors.white,
+                      unselectedLabelColor: Colors.grey,
+                      unselectedLabelStyle: const TextStyle(
+                          fontWeight: FontWeight.w900, fontSize: 14),
+                      labelColor: Colors.white,
+                      labelStyle: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 20),
+                      onTap: (ind) async {
+                        controller.pathFilm.value = listFilm[ind]['slug'];
+                        controller.tabIndex.value = ind;
+                        scrollController.jumpTo(0);
+                        await controller.getFilm(slug: listFilm[ind]['slug']);
+                        controller.getFilmByCategory(
+                            slug: listFilm[ind]['slug']);
+                      },
+                      tabs: List<Widget>.generate(listFilm.length, (int index) {
+                        return Tab(
+                          text: listFilm[index]["title"],
+                        );
+                      }),
+                    ),
+                    elevation: 0.0,
+                    backgroundColor: GlobalColor.backgroundColor,
+                    systemOverlayStyle: const SystemUiOverlayStyle(
+                        statusBarBrightness: Brightness.dark),
+                    expandedHeight: MediaQuery.of(context).size.height * .65,
+                    flexibleSpace: const FlexibleSpaceBar(
+                      background: SliderCinema(),
+                    ),
+                  ),
+                  const FilmByCategory(),
+                ],
               ),
             ),
-            const SliverToBoxAdapter(
-              child: FilmByCategory(),
-            )
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

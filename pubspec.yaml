@@ -47,7 +47,7 @@ dependencies:
   shimmer: ^3.0.0
   cached_network_image: ^3.3.1
   retrofit: ^4.0.3
-  flutter_widget_from_html: ^0.8.3
+  flutter_widget_from_html: any
   # video_player: ^2.8.2
   # chewie: ^1.7.4
   connectivity_plus: ^5.0.2
@@ -55,6 +55,8 @@ dependencies:
     git:
       url: https://github.com/matthewrice345/betterplayer.git
       ref: Issue1057
+  # flutter_inappwebview: ^5.7.2+3
+  image_network: ^2.5.4
  
   
 

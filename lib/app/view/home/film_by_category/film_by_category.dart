@@ -15,14 +15,15 @@ class FilmByCategory extends StatelessWidget {
     final controller = Get.put(HomeController());
     final int itemCount = controller.categories.length;
     
-    return ListView.separated(
-      physics: NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
+    return SliverList.separated(
+      
+      // physics: NeverScrollableScrollPhysics(),
+      // shrinkWrap: true,
       itemCount: itemCount,
       itemBuilder: (context, ind) {
          
         return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 children: [
                   Row(
@@ -34,7 +35,7 @@ class FilmByCategory extends StatelessWidget {
                             color: Colors.white, fontWeight: FontWeight.bold),
                       ),
                       TextButton(
-                        onFocusChange: (hasFocus){
+                        onHover: (hasFocus){
                           controller.isFocusSeeAll.value = hasFocus;
                         },
                         onPressed: () {
@@ -56,44 +57,50 @@ class FilmByCategory extends StatelessWidget {
                     ],
                   ),
                   SizedBox(
-                    height: MediaQuery.of(context).size.height * .45,
+                    height: MediaQuery.of(context).size.height * .48,
                     child: Obx(() {
-                     final isLoading = controller.getFimCategory.value[controller.categories[ind]['id']] == null;
+                     final isLoading = controller.getFimCategory.value.isEmpty == true;
                       final items = controller.getFimCategory.value[controller.categories[ind]['id']]?.pageProps?.data?.items;
-                      return ListView.separated(
-                        shrinkWrap: true,
+                      return ListView.builder(
+                        shrinkWrap: false,
                         scrollDirection: Axis.horizontal,
-                        itemCount: isLoading ? 8 : (controller.getFimCategory.value[controller.categories[ind]['id']]?.pageProps?.data?.items?.length ?? 0)>10?10:(controller.getFimCategory.value[controller.categories[ind]['id']]?.pageProps?.data?.items?.length ?? 0),
+                        itemCount: isLoading ? 4 : (controller.getFimCategory.value[controller.categories[ind]['id']]?.pageProps?.data?.items?.length ?? 0)>10?4:(controller.getFimCategory.value[controller.categories[ind]['id']]?.pageProps?.data?.items?.length ?? 0),
                         itemBuilder: (context, index) {
                           final data = items?[index];
                           return Visibility(
                             visible: !isLoading && data?.category?.first.slug!="[redacted]",
                             replacement: Visibility(
                               visible: data?.category?.first.slug!="[redacted]",
-                              child: SizedBox(
-                                height: MediaQuery.of(context).size.height*.5,
-              // padding: EdgeInsets.symmetric(vertical: 20),
-              width: MediaQuery.of(context).size.width * .15,
-                                child: Shimmer.fromColors(
-                                  baseColor: Colors.grey,
-                                  highlightColor: Colors.grey.shade600,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 40,vertical: 10),
+                                child: SizedBox(
+                                  height: MediaQuery.of(context).size.height*.5,
+                                              // padding: EdgeInsets.symmetric(vertical: 20),
+                                              width: MediaQuery.of(context).size.width * .15,
+                                  child: Shimmer.fromColors(
+                                    baseColor: Colors.grey,
+                                    highlightColor: Colors.grey.shade600,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey,
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
                             ),
-                            child: CardCinema(
-                              nameProduct: data?.name,
-                              imageLink: data?.thumbUrl,
-                              originName: data?.originName,
-                              slug: data?.slug,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 40,vertical: 10),
+                              child: CardCinema(
+                                nameProduct: data?.name,
+                                imageLink: data?.thumbUrl,
+                                originName: data?.originName,
+                                slug: data?.slug,
+                              ),
                             ),
                           );
                         },
-                        separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 20),
+                        
                       );
                     }),
                   ),

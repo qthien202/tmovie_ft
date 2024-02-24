@@ -36,27 +36,31 @@ class IndexView extends StatelessWidget {
         return Row(
           children: [
             NavigationRail(
+              
+              useIndicator: false,
               indicatorColor: GlobalColor.primary,
               backgroundColor: GlobalColor.background2,
+              selectedLabelTextStyle: TextStyle(color: GlobalColor.primary),
               unselectedIconTheme:
                   IconThemeData(color: Colors.white, opacity: 1),
               unselectedLabelTextStyle: TextStyle(
                 color: Colors.white,
               ),
               selectedIconTheme:
-                  IconThemeData(color: Colors.white),
-              extended: false,
+                  IconThemeData(color: GlobalColor.primary),
+              extended: true,
               selectedIndex: controller.tabIndex.value ?? 0,
               onDestinationSelected: (int index) {
                 controller.tabIndex.value = index;
               },
-              labelType: NavigationRailLabelType.all,
+              
+              // labelType: NavigationRailLabelType.all,
               
               destinations: items.map((item) {
                 return NavigationRailDestination(
 
                   icon: Icon(item['icon'],size: 25,),
-                  label: Text(""),
+                  label: Text(item['title']),
                   
                   
                    // Đặt chiều rộng tối thiểu tại đây

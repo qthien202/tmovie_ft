@@ -37,9 +37,7 @@ class HomeController extends GetxController {
     {"id":"7","title": "Cổ trang", "slug": "co-trang"},
     {"id":"8","title": "Tâm lý", "slug": "tam-ly"},
     {"id":"9","title": "Hình sự", "slug": "hinh-su"},
-    {"id":"10","title": "Viễn tưởng", "slug": "vien-tuong"},
-    {"id":"11","title": "Phiêu lưu", "slug": "phieu-luu"},
-    {"id":"12","title": "Khoa học", "slug": "khoa-hoc"},
+    
     
   ];
   RxList<Map<String, dynamic>> categories = RxList();

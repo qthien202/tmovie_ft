@@ -5,12 +5,13 @@ import 'package:app_ft_movies/app/view/detail/info/info.dart';
 import 'package:app_ft_movies/app/view/detail/info_details/info_details.dart';
 import 'package:app_ft_movies/app/view/filter/filter_page.dart';
 import 'package:app_ft_movies/app/widgets/global_image.dart';
+
 import 'package:app_ft_movies/app/widgets/video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
-
+import 'dart:html' as html;
 class DetailView extends StatelessWidget {
   const DetailView({super.key, this.slug, this.name});
   final String? slug;
@@ -124,74 +125,65 @@ class DetailView extends StatelessWidget {
                       children: [
                         const Info(),
                       // const SizedBox(height: 20,),
-                      Visibility(
-                        visible: data.status != "trailer",
-                        child: Center(
-                          child: InkWell(
-                            onFocusChange: (value) {
-                                controller.isFocus.value = value;
-                              },
-                              onTap: () async{
-                                await controller.createToken(
-                                  name: data.name??"",
-                                  description: data.content??"",
-                                  originName: data.originName??"",
-                                  slug: data.slug??"",
-                                  thumbnail: data.thumbUrl??"",
-                                  episode: data.episodes?.first.serverData?.first.name??""
+                      // Visibility(
+                      //   visible: data.status != "trailer",
+                      //   child: Center(
+                      //     child: InkWell(
+                      //       onFocusChange: (value) {
+                      //           controller.isFocus.value = value;
+                      //         },
+                      //         onTap: () async{
+                      //           await controller.createToken(
+                      //             name: data.name??"",
+                      //             description: data.content??"",
+                      //             originName: data.originName??"",
+                      //             slug: data.slug??"",
+                      //             thumbnail: data.thumbUrl??"",
+                      //             episode: data.episodes?.first.serverData?.first.name??""
                           
-                                );
-                                Get.to(ChewieVideoPlayer(
-                                  slug: data.slug??"",
-                                  fileName: data.name ?? "--",
-                                  episode: data.episodes?.first.serverData
-                                          ?.first.name ??
-                                      "",
-                                  videoUrl: data?.episodes?.first.serverData
-                                          ?.first.linkM3u8 ??
-                                      "",
-                                ));
-                              },
-                            child: AnimatedContainer(
-                              duration: Duration(milliseconds: 200), // Thời gian hiệu ứng
-                              curve: Curves.easeInOut, 
+                      //           );
+                      //           html.window.open( data?.episodes?.first.serverData?.first.linkEmbed ?? "", data?.name??"");
+                      //         },
+                      //       child: AnimatedContainer(
+                      //         duration: Duration(milliseconds: 200), // Thời gian hiệu ứng
+                      //         curve: Curves.easeInOut, 
                       
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 12,
-                                ),
-                                width: MediaQuery.of(context).size.width * .95,
-                                decoration: BoxDecoration(
-                                    border: Border.all(color: controller.isFocus.value?Colors.white:Colors.transparent,width: 1),
-                                    borderRadius: BorderRadius.circular(5),
-                                    color: GlobalColor.primary),
-                                child: Transform.scale(
-                                  scale: controller.isFocus.value?1.2:1,
-                                  child: const Center(
-                                      child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.play_arrow,
-                                        color: Colors.white,
-                                      ),
-                                      SizedBox(
-                                        width: 10,
-                                      ),
-                                      Text(
-                                        "Xem phim",
-                                        style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ],
-                                  )),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
+                      //         child: Container(
+                      //           padding: const EdgeInsets.symmetric(
+                      //             vertical: 12,
+                      //           ),
+                      //           width: MediaQuery.of(context).size.width * .95,
+                      //           decoration: BoxDecoration(
+                      //               border: Border.all(color: controller.isFocus.value?Colors.white:Colors.transparent,width: 1),
+                      //               borderRadius: BorderRadius.circular(5),
+                      //               color: GlobalColor.primary),
+                      //           child: Transform.scale(
+                      //             scale: controller.isFocus.value?1.2:1,
+                      //             child: const Center(
+                      //                 child: Row(
+                      //               mainAxisAlignment: MainAxisAlignment.center,
+                      //               children: [
+                      //                 Icon(
+                      //                   Icons.play_arrow,
+                      //                   color: Colors.white,
+                      //                 ),
+                      //                 SizedBox(
+                      //                   width: 10,
+                      //                 ),
+                      //                 Text(
+                      //                   "Xem phim",
+                      //                   style: TextStyle(
+                      //                       fontSize: 15,
+                      //                       fontWeight: FontWeight.bold),
+                      //                 ),
+                      //               ],
+                      //             )),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     ),
+                      //   ),
+                      // ),
                       const SizedBox(
                           height: 10,
                         ),

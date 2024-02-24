@@ -1,8 +1,9 @@
 {
-    "dart.flutterSdkPaths": [
-        "/path/to/your/flutter/bin"
-    ],
-    "dart.flutterCustomSdkPaths": {
-        "fvm": "/path/to/your/fvm/bin"
-    }
+  "dart.flutterSdkPaths": [
+    "/path/to/your/flutter/bin"
+  ],
+  "dart.flutterCustomSdkPaths": {
+    "fvm": "/path/to/your/fvm/bin"
+  },
+  "dart.flutterSdkPath": ".fvm\\versions\\3.16.9"
 }

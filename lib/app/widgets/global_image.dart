@@ -1,6 +1,7 @@
 import 'package:app_ft_movies/app/core/global_data.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import'package:flutter/material.dart';
+import 'package:image_network/image_network.dart';
 class GlobalImage extends StatelessWidget {
   final String? imageUrl;
   final double? width;
@@ -22,28 +23,35 @@ class GlobalImage extends StatelessWidget {
 
         ),
       ),
-      child: CachedNetworkImage(
-        imageUrl: "${GlobalData.baseUrlImage}/$imageUrl",
-        height: height??0,
+      child: ImageNetwork(
+        image:imageUrl??"",
         width: width??0,
-        fit:boxFit,
-        // placeholder: (context, url) => Container(
-        //   width: width,
-        //   height: height,
-        //   color: Colors.white,
-        //   child:Image.asset("assets/images/placeholder.png",
-        //   width: width,
-        //     height: height,
-        //     // fit: BoxFit.contain,
-        //   )
-        // ),
-        errorWidget: (context, url, error) =>Container(
-          width: width,
-          height:height,
-          color: Colors.white,
-          child:Icon(Icons.image,size: 20,)
-        ),
+        height: height??0,
+        fitWeb: BoxFitWeb.fill,
+        
       ),
+      // child: CachedNetworkImage(
+      //   imageUrl: "${GlobalData.baseUrlImage}/$imageUrl",
+      //   height: height??0,
+      //   width: width??0,
+      //   fit:boxFit,
+      //   // placeholder: (context, url) => Container(
+      //   //   width: width,
+      //   //   height: height,
+      //   //   color: Colors.white,
+      //   //   child:Image.asset("assets/images/placeholder.png",
+      //   //   width: width,
+      //   //     height: height,
+      //   //     // fit: BoxFit.contain,
+      //   //   )
+      //   // ),
+      //   errorWidget: (context, url, error) =>Container(
+      //     width: width,
+      //     height:height,
+      //     color: Colors.white,
+      //     child:Icon(Icons.image,size: 20,)
+      //   ),
+      // ),
     );
   }
 }

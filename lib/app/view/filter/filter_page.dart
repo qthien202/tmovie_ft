@@ -114,7 +114,7 @@ class _FilterPageState extends State<FilterPage> {
                 ),
                 side: BorderSide(color: isFocusButton?Colors.white:Colors.transparent,width: 2)
               ),
-              onFocusChange: (hasFocus)=>setState(() {
+              onHover: (hasFocus)=>setState(() {
                 isFocusButton=hasFocus;
               }),
               onPressed: () {

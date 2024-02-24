@@ -33,7 +33,7 @@ class MovieGenreview extends StatelessWidget {
             title: Obx(() => Text(controller.movieGenre.value?.pageProps?.data?.titlePage??""),),
             actions: [
               Obx(() => InkWell(
-                  onFocusChange: (hasFocus){
+                  onHover: (hasFocus){
                     controller.isFocusMenu.value = hasFocus;
                     print(">>>>>>>>>>>>>>>>>$hasFocus");
                   },
@@ -148,7 +148,7 @@ class MovieGenreview extends StatelessWidget {
                   itemBuilder: (context, index) {
                     return Obx(() {
                       return InkWell(
-                        onFocusChange: (value) {
+                        onHover: (value) {
                             controller.isFocusPage.value=value;
                             controller.selectIndex.value = index;
                           },

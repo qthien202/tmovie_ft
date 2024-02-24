@@ -24,7 +24,7 @@ class SearchView extends StatelessWidget {
           title: const SearchWidget(),
           actions: [
            Obx(() => InkWell(
-                  onFocusChange: (hasFocus){
+                  onHover: (hasFocus){
                     controller.isFocusMenu.value = hasFocus;
                     print(">>>>>>>>>>>>>>>>>$hasFocus");
                   },
@@ -137,7 +137,7 @@ class SearchView extends StatelessWidget {
                   itemBuilder: (context, index) {
                     return Obx(() {
                       return InkWell(
-                        onFocusChange: (value) {
+                        onHover: (value) {
                             controller.isFocusPage.value=value;
                             controller.selectIndex.value = index;
                           },

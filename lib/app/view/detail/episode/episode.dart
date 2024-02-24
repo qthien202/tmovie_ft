@@ -5,7 +5,7 @@ import 'package:app_ft_movies/app/widgets/video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-
+import 'dart:html' as html;
 class Espisode extends StatelessWidget {
   const Espisode({super.key, });
   
@@ -26,7 +26,7 @@ class Espisode extends StatelessWidget {
             itemBuilder: (context,index){
               final episode =  data?.episodes?.first.serverData?[index];
               return InkWell(
-                onFocusChange: (hasFocus){
+                onHover: (hasFocus){
                   controller.isFocusEp.value = hasFocus;
                   controller.selectIndex.value = index;
                 },
@@ -41,7 +41,7 @@ class Espisode extends StatelessWidget {
                                     episode: episode?.name??""
                                     
                                   );
-                  Get.to(ChewieVideoPlayer(slug: data?.slug??"",fileName: data?.name??"",episode: episode?.name??"",videoUrl: episode?.linkM3u8??"",));
+                  html.window.open(episode?.linkEmbed??"", data?.name??"");
                 },
                 child: Obx((){
                   return Container(
