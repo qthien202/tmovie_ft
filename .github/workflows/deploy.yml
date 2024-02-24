@@ -1,0 +1,23 @@
+name: Deploy Flutter web
+on:
+  push:
+    branches:
+      - dev-web
+jobs:
+  web-deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get the latest code
+        uses: actions/checkout@v3
+      - name: Build Flutter web
+        run: flutter build web
+      - name: 📂 Sync files
+        uses: SamKirkland/FTP-Deploy-Action@v4.0.0
+        with:
+          server: ${{ secrets.FTP_SERVER}}
+          username: ${{ secrets.FTP_USERNAME}}
+          password: ${{ secrets.FTP_PASSWORD}}
+          local-dir: build/web/
+          
+          
