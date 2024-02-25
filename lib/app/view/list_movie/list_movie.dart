@@ -58,7 +58,7 @@ class ListMovieView extends StatelessWidget {
                         border: Border.all(color: controller.isFocusMenu.value?Colors.white:Colors.transparent,width: 2)
                       ),
                       child: Icon(
-                        Icons.menu,
+                        Icons.filter_alt_outlined,
                         color: Colors.white,
                       ),
                     ),
@@ -111,7 +111,7 @@ class ListMovieView extends StatelessWidget {
                   );
                 },
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  childAspectRatio: MediaQuery.of(context).size.width < 600?12/33:6 / 10,
+                  childAspectRatio: MediaQuery.of(context).size.width < 600?18/33:7 / 10,
               crossAxisCount: MediaQuery.of(context).size.width < 600?3:6,
               crossAxisSpacing: MediaQuery.of(context).size.width < 600?5:15,
               mainAxisSpacing: MediaQuery.of(context).size.width < 600?5:20,

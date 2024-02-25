@@ -59,7 +59,7 @@ class HomeView extends StatelessWidget {
                 controller: scrollController,
                 slivers: [
                   SliverAppBar(
-                    pinned: false,
+                    pinned: MediaQuery.of(context).size.width < 600?true:false,
                     centerTitle: false,
                     title: Row(
                       children: [

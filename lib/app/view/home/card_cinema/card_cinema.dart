@@ -49,13 +49,13 @@ class _CardCinemaState extends State<CardCinema> {
 
 
         child: Container(
-          // height: MediaQuery.of(context).size.height * 0.5,
+          height: 50,
           width: MediaQuery.of(context).size.width < 600?MediaQuery.of(context).size.width*.4:MediaQuery.of(context).size.width * 0.15,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(3),
-            // border: Border.all(color: isHovering ? Colors.white : Colors.transparent, width: 2),
-            // color: GlobalColor.background2,
-          ),
+          // decoration: BoxDecoration(
+          //   borderRadius: BorderRadius.circular(3),
+          //   // border: Border.all(color: isHovering ? Colors.white : Colors.transparent, width: 2),
+          //   // color: GlobalColor.background2,
+          // ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.stretch,

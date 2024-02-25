@@ -87,7 +87,7 @@ class DetailView extends StatelessWidget {
                           color: Color(0xff252836)
                         ),
                         child: Icon(
-                          Icons.menu,
+                          Icons.filter_alt_outlined,
                           
                           color: Colors.white,
                         ),
@@ -106,7 +106,7 @@ class DetailView extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       GlobalImage(
-                        imageUrl: data.posterUrl ?? "",
+                        imageUrl: MediaQuery.of(context).size.width < 600?data.thumbUrl:data.posterUrl ?? "",
                         width: MediaQuery.of(context).size.width,
                         height: MediaQuery.of(context).size.height * .6,
                         boxFit: BoxFit.fill,

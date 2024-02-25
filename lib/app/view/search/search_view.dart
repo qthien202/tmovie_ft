@@ -18,7 +18,7 @@ class SearchView extends StatelessWidget {
       children: [
 
       Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20,vertical: 20),
+        padding: EdgeInsets.symmetric(horizontal: 10,vertical: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -71,7 +71,7 @@ class SearchView extends StatelessWidget {
               );
             },
             gridDelegate:  SliverGridDelegateWithFixedCrossAxisCount(
-              childAspectRatio: MediaQuery.of(context).size.width < 600?12/33:6 / 10,
+              childAspectRatio: MediaQuery.of(context).size.width < 600?18/33:6 / 10,
               crossAxisCount: MediaQuery.of(context).size.width < 600?3:6,
               crossAxisSpacing: MediaQuery.of(context).size.width < 600?5:15,
               mainAxisSpacing: MediaQuery.of(context).size.width < 600?5:20,
