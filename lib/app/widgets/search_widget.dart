@@ -1,4 +1,5 @@
 import 'package:app_ft_movies/app/controller/search/search_widget_controller.dart';
+import 'package:app_ft_movies/app/core/global_color.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -10,46 +11,51 @@ class SearchWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(SearchWidgetController());
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 5),
+      padding: EdgeInsets.symmetric(horizontal: 16,vertical: 5),
       child: TextField(
         onSubmitted: (val)async{
+          controller.isSearch.value=true;
+          controller.textSearch.value = controller.keywordController.text;
           controller.selectIndex.value = 0;
+          
           await controller.getSearch();
+          
+          
         },
-        onChanged: (val)async{
-          controller.selectIndex.value = 0;
+        // onChanged: (val)async{
+        //   controller.selectIndex.value = 0;
 
-          await controller.getSearch();
-        },
+        //   await controller.getSearch();
+        // },
         controller: controller.keywordController,
         readOnly: false,
         decoration: InputDecoration(
-          hintText: 'Nhập phim bạn cần tìm',
+          hintText: 'Tìm kiếm...',
           hintStyle: const TextStyle(
             color: Colors.grey,
             fontWeight: FontWeight.w300,
             fontSize: 14
           ),
           contentPadding: const EdgeInsets.symmetric(vertical: 10,horizontal: 20),
-          suffixIcon: const Icon(Icons.search,color: Colors.grey,size: 20,),
+          suffixIcon: const Icon(Icons.search,color: Colors.white,size: 20,),
           filled: true,
-          fillColor: const Color(0xff252836),
+          fillColor: GlobalColor.background2,
           border: OutlineInputBorder(
       
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(8),
             borderSide: const BorderSide(
                 color: Colors.transparent
             ),
       
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(8),
             borderSide: const BorderSide(
                 color: Colors.transparent
             ),
           ),
           enabledBorder:  OutlineInputBorder(
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(8),
             borderSide: const BorderSide(
                 color: Colors.transparent
             ),

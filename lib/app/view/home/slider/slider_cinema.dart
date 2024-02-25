@@ -42,6 +42,7 @@ class SliderCinema extends StatelessWidget {
                   ),
                 ),
                 child: Container(
+                  margin: EdgeInsets.symmetric(horizontal: 5),
                   width: screenWidth,
                     height: screenHeight * 0.6,
                     decoration: BoxDecoration(
@@ -59,8 +60,9 @@ class SliderCinema extends StatelessWidget {
             options: CarouselOptions(
               aspectRatio: screenWidth / (screenHeight * 0.6), // Tỷ lệ ứng với tỷ lệ màn hình TV
               autoPlay: true,
-              autoPlayInterval: const Duration(seconds: 10),
-              viewportFraction: 1,
+              enlargeCenterPage: true,
+              autoPlayInterval: const Duration(seconds: 5),
+              // viewportFraction: 1,
               onPageChanged: (index, reason) {
                 controller.activeIndex.value = index;
               },

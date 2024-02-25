@@ -14,11 +14,13 @@ class SearchWidgetController extends GetxController{
   Rxn<int> totalPage = Rxn();
   RxBool isFocusPage = RxBool(false);
   RxBool isFocusMenu = RxBool(false);
+  Rxn<bool>isSearch = Rxn(false);
+  Rxn<String>textSearch = Rxn();
   // final  genre = Get.put(MovieGenreController());
 
   void onReady()async{
     super.onReady();
-    search.value = await api.getMovieGenre(path: "hanh-dong", page: 1, country: "", year: "2024");
+    // search.value = await api.getMovieGenre(path: "hanh-dong", page: 1, country: "", year: "2024");
     await getSearch(page: 1);
   }
   

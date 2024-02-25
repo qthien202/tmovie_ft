@@ -32,6 +32,7 @@ class ListMovieView extends StatelessWidget {
          
           backgroundColor: GlobalColor.backgroundColor,
           appBar: AppBar(
+            automaticallyImplyLeading: false,
             backgroundColor: GlobalColor.backgroundColor,
             foregroundColor: Colors.white,
             title: Obx(() => Text(controller.listMovie.value?.pageProps?.data?.titlePage??""),),
