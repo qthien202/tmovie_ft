@@ -64,7 +64,7 @@ class FilmByCategory extends StatelessWidget {
                       return ListView.builder(
                         shrinkWrap: false,
                         scrollDirection: Axis.horizontal,
-                        itemCount: isLoading ? 5 : (controller.getFimCategory.value[controller.categories[ind]['id']]?.pageProps?.data?.items?.length ?? 0)>10?5:(controller.getFimCategory.value[controller.categories[ind]['id']]?.pageProps?.data?.items?.length ?? 0),
+                        itemCount: isLoading ? 5 : (controller.getFimCategory.value[controller.categories[ind]['id']]?.pageProps?.data?.items?.length ?? 0)>10?MediaQuery.of(context).size.width < 600?10:5:(controller.getFimCategory.value[controller.categories[ind]['id']]?.pageProps?.data?.items?.length ?? 0),
                         itemBuilder: (context, index) {
                           final data = items?[index];
                           return Visibility(

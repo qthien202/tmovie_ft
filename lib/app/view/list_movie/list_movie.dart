@@ -32,7 +32,7 @@ class ListMovieView extends StatelessWidget {
          
           backgroundColor: GlobalColor.backgroundColor,
           appBar: AppBar(
-            automaticallyImplyLeading: false,
+            
             backgroundColor: GlobalColor.backgroundColor,
             foregroundColor: Colors.white,
             title: Obx(() => Text(controller.listMovie.value?.pageProps?.data?.titlePage??""),),
@@ -110,11 +110,11 @@ class ListMovieView extends StatelessWidget {
                     ),
                   );
                 },
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  childAspectRatio: 6 / 10,
-                  crossAxisCount: 6,
-                  crossAxisSpacing: 15,
-                  mainAxisSpacing: 20,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  childAspectRatio: MediaQuery.of(context).size.width < 600?12/33:6 / 10,
+              crossAxisCount: MediaQuery.of(context).size.width < 600?3:6,
+              crossAxisSpacing: MediaQuery.of(context).size.width < 600?5:15,
+              mainAxisSpacing: MediaQuery.of(context).size.width < 600?5:20,
                 ),
               );
               }),

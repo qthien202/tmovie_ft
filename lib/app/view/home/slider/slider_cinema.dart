@@ -42,18 +42,22 @@ class SliderCinema extends StatelessWidget {
                     ),
                   ),
                 ),
-                child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 5,vertical: 10),
-                  width: screenWidth,
-                    height: screenHeight * 0.6,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: controller.isFocusSlider.value && controller.selectTab.value == index?GlobalColor.primary:Colors.transparent,width: 3)
-                    ),
-                  child: GlobalImage(
-                    imageUrl: MediaQuery.of(context).size.width < 600?"${controller.getFilmData.value?.pageProps?.data?.items?[index].posterUrl}":"${controller.getFilmData.value?.pageProps?.data?.items?[index].thumbUrl}",
-                    boxFit: BoxFit.fill, // Hiển thị ảnh đúng tỷ lệ
+                child: InkWell(
+                  onTap: ()=>Get.to(DetailView(slug: controller.getFilmData.value?.pageProps?.data?.items?[index].slug,)),
+                  child: Container(
+                    
+                    margin: EdgeInsets.symmetric(horizontal: 5,vertical: 10),
                     width: screenWidth,
-                    height: screenHeight * 0.7, // Thiết lập chiều cao tối thiểu cho banner
+                      height: screenHeight * 0.6,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: controller.isFocusSlider.value && controller.selectTab.value == index?GlobalColor.primary:Colors.transparent,width: 3)
+                      ),
+                    child: GlobalImage(
+                      imageUrl: MediaQuery.of(context).size.width < 600?"${controller.getFilmData.value?.pageProps?.data?.items?[index].thumbUrl}":"${controller.getFilmData.value?.pageProps?.data?.items?[index].posterUrl}",
+                      boxFit: BoxFit.fill, // Hiển thị ảnh đúng tỷ lệ
+                      width: screenWidth,
+                      height: screenHeight * 0.7, // Thiết lập chiều cao tối thiểu cho banner
+                    ),
                   ),
                 ),
               );
