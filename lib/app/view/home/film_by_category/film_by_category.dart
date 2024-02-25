@@ -72,7 +72,7 @@ class FilmByCategory extends StatelessWidget {
                             replacement: Visibility(
                               visible: data?.category?.first.slug!="[redacted]",
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 40,vertical: 10),
+                                padding:  EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width < 600?5:40,vertical: 10),
                                 child: SizedBox(
                                   height: MediaQuery.of(context).size.height*.5,
                                               // padding: EdgeInsets.symmetric(vertical: 20),
@@ -90,7 +90,7 @@ class FilmByCategory extends StatelessWidget {
                               ),
                             ),
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 40,vertical: 10),
+                              padding:  EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width < 600?5:40,vertical: 10),
                               child: CardCinema(
                                 nameProduct: data?.name,
                                 imageLink: data?.thumbUrl,

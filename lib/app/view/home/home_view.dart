@@ -99,7 +99,7 @@ class HomeView extends StatelessWidget {
                             }),
                           ),
                         ),
-                        Expanded(child: SearchWidget()),
+                        MediaQuery.of(context).size.width >= 800?Expanded(child: SearchWidget()):SizedBox(),
                       ],
                     ),
 
@@ -111,7 +111,16 @@ class HomeView extends StatelessWidget {
                             color: Colors.white,
                           ))
                     ],
-
+                    bottom: MediaQuery.of(context).size.width < 800 ? PreferredSize(
+    preferredSize: Size.fromHeight(56.0),
+    child: Row(
+      children: [
+        Expanded(
+          child: SearchWidget(),
+        ),
+      ],
+    ),
+  ) : null,
                     // elevation: 0.0,
                     backgroundColor: GlobalColor.backgroundColor,
                     // systemOverlayStyle: const SystemUiOverlayStyle(
