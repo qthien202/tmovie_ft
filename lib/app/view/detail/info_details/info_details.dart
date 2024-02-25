@@ -59,42 +59,36 @@ class InfoDetail extends StatelessWidget {
           const SizedBox(
             height: 10,
           ),
-          Visibility(
-            visible: data?.director?.isNotEmpty==true,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text("Đạo diễn :"),
-                const SizedBox(
-                  width: 10,
-                ),
-                Row(
-                  children: (data?.director ?? []).map((director) {
-                    return Text(director);
-                  }).toList(),
-                ),
-              ],
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text("Đạo diễn :"),
+              const SizedBox(
+                width: 10,
+              ),
+              Row(
+                children: (data?.director ?? []).map((director) {
+                  return Text(director==""?"chưa biết":"$director, ");
+                }).toList(),
+              ),
+            ],
           ),
           const SizedBox(
             height: 10,
           ),
-          Visibility(
-            visible: data?.actor?.isNotEmpty==true,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text("Diễn viên:"),
-                const SizedBox(
-                  width: 10,
-                ),
-                Row(
-                  children: (data?.actor?? []).map((actor) {
-                    return Text("$actor, ");
-                  }).toList(),
-                ),
-              ],
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text("Diễn viên:"),
+              const SizedBox(
+                width: 10,
+              ),
+              Row(
+                children: (data?.actor?? []).map((actor) {
+                  return Text(actor==""?"chưa biết":"$actor, ");
+                }).toList(),
+              ),
+            ],
           ),
         ],
       );

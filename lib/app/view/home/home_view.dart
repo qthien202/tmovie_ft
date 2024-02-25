@@ -27,10 +27,10 @@ class HomeView extends StatelessWidget {
       {"slug": "hoat-hinh", "title": "Hoạt hình"},
       {"slug": "phim-vietsub", "title": "Phim vietsub"},
       {"slug": "phim-thuyet-minh", "title": "Phim thuyết minh"},
-      {"slug": "phim-long-tieng", "title": "Phim lồng tiếng"},
+      // {"slug": "phim-long-tieng", "title": "Phim lồng tiếng"},
       {"slug": "phim-bo-dang-chieu", "title": "Phim bộ đang chiếu"},
       {"slug": "phim-hoan-thanh", "title": "Phim trọn bộ"},
-      {"slug": "phim-sap-chieu", "title": "Phim sắp chiếu"},
+      // {"slug": "phim-sap-chieu", "title": "Phim sắp chiếu"},
     ];
     final searchController = Get.put(SearchWidgetController());
     final controller = Get.put(HomeController());
@@ -107,7 +107,7 @@ class HomeView extends StatelessWidget {
                       IconButton(
                           onPressed: () => Get.to(FilterPage()),
                           icon: Icon(
-                            Icons.menu,
+                            Icons.filter_alt_outlined,
                             color: Colors.white,
                           ))
                     ],
