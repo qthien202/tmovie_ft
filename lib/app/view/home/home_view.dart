@@ -133,7 +133,10 @@ class HomeView extends StatelessWidget {
                               child: Row(
                                 children: [
                                   Expanded(
-                                    child: SearchWidget(),
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: 5),
+                                      child: SearchWidget(),
+                                    ),
                                   ),
                                 ],
                               ),

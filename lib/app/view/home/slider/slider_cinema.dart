@@ -15,6 +15,9 @@ class SliderCinema extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(HomeController());
+    if(MediaQuery.of(context).size.width<600){
+      return const ResponsiveApp();
+    }
     return Obx(() {
       final isLoading = controller.getFilmData.value == null;
       return Column(
@@ -116,6 +119,82 @@ class SliderCinema extends StatelessWidget {
             ),
           )),
         ],
+      );
+    });
+  }
+}
+
+class ResponsiveApp extends StatelessWidget {
+  const ResponsiveApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.put(HomeController());
+    return Obx(() {
+      final isLoading = controller.getFilmData.value==null;
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        child: Column(
+          children: [
+            CarouselSlider.builder(
+              itemCount: isLoading?4:controller.getFilmData.value?.pageProps?.data?.items?.length ?? 0,
+              itemBuilder: (context, index, realIndex) {
+                return Visibility(
+                  visible: !isLoading,
+                  replacement: SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height * .5,
+                    child: Shimmer.fromColors(
+                                baseColor: Colors.grey,
+                                highlightColor: Colors.grey.shade600,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                    )
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: InkWell(
+                      onTap: ()=>Get.to(DetailView(slug: controller.getFilmData.value?.pageProps?.data?.items?[index].slug,name: controller.getFilmData.value?.pageProps?.data?.items?[index].name,)),
+                      child: GlobalImage(
+                        imageUrl:
+                            "${controller.getFilmData.value?.pageProps?.data?.items?[index].thumbUrl}",
+                        boxFit: BoxFit.fill,
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height * .5,
+                      ),
+                    ),
+                  ),
+                );
+              },
+              options: CarouselOptions(
+                  aspectRatio: 24 / 24,
+                  enlargeCenterPage: true,
+                  autoPlay: true,
+                  autoPlayInterval: const Duration(seconds: 7),
+                  // viewportFraction: 1,
+                  onPageChanged: (index, reason) {
+                    controller.activeIndex.value = index;
+                  }),
+            ),
+            const SizedBox(height: 10,),
+            Center(
+                // bottom: 2,
+                child: AnimatedSmoothIndicator(
+              count: controller.getNewFilmData.value?.items.length ?? 0,
+              activeIndex: controller.activeIndex.value ?? 0,
+              effect: ScrollingDotsEffect(
+                dotWidth: 5,
+                dotHeight: 5,
+                dotColor: Colors.grey,
+                activeDotColor: GlobalColor.primary,
+              ),
+            )),
+          ],
+        ),
       );
     });
   }
