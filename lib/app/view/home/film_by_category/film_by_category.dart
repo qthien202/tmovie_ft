@@ -26,7 +26,7 @@ class FilmByCategory extends StatelessWidget {
         return Center(
           child: Container(
              color: GlobalColor.backgroundColor,
-                      width: MediaQuery.of(context).size.width * .85,
+                      width: MediaQuery.of(context).size.width<600?MediaQuery.of(context).size.width:MediaQuery.of(context).size.width * .85,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

@@ -20,7 +20,7 @@ class SearchView extends StatelessWidget {
       Center(
         child: Container(
            color: GlobalColor.backgroundColor,
-                    width: MediaQuery.of(context).size.width * .85,
+                    width: MediaQuery.of(context).size.width<600?MediaQuery.of(context).size.width:MediaQuery.of(context).size.width * .85,
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 10,vertical: 20),
             child: Column(
@@ -76,14 +76,14 @@ class SearchView extends StatelessWidget {
                 },
                 gridDelegate:  SliverGridDelegateWithFixedCrossAxisCount(
                   childAspectRatio: MediaQuery.of(context).size.width < 600
-                          ? 16 / 33
-                          : 5 / 10,
-                      crossAxisCount:
-                          MediaQuery.of(context).size.width < 600 ? 3 : 6,
-                      crossAxisSpacing:
-                          MediaQuery.of(context).size.width < 600 ? 8 : 20,
-                      mainAxisSpacing:
-                          MediaQuery.of(context).size.width < 600 ? 8 : 25,
+                      ? 14 / 33
+                      : 5 / 10,
+                  crossAxisCount:
+                      MediaQuery.of(context).size.width < 600 ? 3 : 6,
+                  crossAxisSpacing:
+                      MediaQuery.of(context).size.width < 600 ? 5 : 20,
+                  mainAxisSpacing:
+                      MediaQuery.of(context).size.width < 600 ? 5 : 25,
                 ),
               );
             }),

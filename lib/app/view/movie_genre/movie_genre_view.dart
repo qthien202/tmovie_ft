@@ -79,7 +79,7 @@ class MovieGenreview extends StatelessWidget {
         body: Center(
           child: Container(
             color: GlobalColor.backgroundColor,
-                    width: MediaQuery.of(context).size.width * .85,
+                    width: MediaQuery.of(context).size.width<600?MediaQuery.of(context).size.width:MediaQuery.of(context).size.width * .85,
             child: ListView(
               children: [
                 const SizedBox(
@@ -100,7 +100,7 @@ class MovieGenreview extends StatelessWidget {
                   if (data?.items?.isEmpty == true) {
                     return const Padding(
                       padding: EdgeInsets.symmetric(vertical: 100),
-                      child: Center(child: Text("Rất tiếc không có phim!")),
+                      child: Center(child: Text("Rất tiếc không có phim này!")),
                     );
                   }
             
@@ -135,14 +135,14 @@ class MovieGenreview extends StatelessWidget {
                     },
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       childAspectRatio: MediaQuery.of(context).size.width < 600
-                      ? 16 / 33
+                      ? 14 / 33
                       : 5 / 10,
                   crossAxisCount:
                       MediaQuery.of(context).size.width < 600 ? 3 : 6,
                   crossAxisSpacing:
-                      MediaQuery.of(context).size.width < 600 ? 8 : 20,
+                      MediaQuery.of(context).size.width < 600 ? 5 : 20,
                   mainAxisSpacing:
-                      MediaQuery.of(context).size.width < 600 ? 8 : 25,
+                      MediaQuery.of(context).size.width < 600 ? 5 : 25,
                     ),
                   );
                 }),
