@@ -22,7 +22,9 @@ class SplashView extends StatelessWidget {
             color: GlobalColor.primary,
             strokeWidth: 5,
             backgroundColor: const Color(0xff252836),
-          )
+          ),
+          const SizedBox(height: 10,),
+          Text("Đang tải")
         ],
       )
     );

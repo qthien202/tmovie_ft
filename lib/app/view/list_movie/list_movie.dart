@@ -116,10 +116,15 @@ class ListMovieView extends StatelessWidget {
                       );
                     },
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      childAspectRatio: MediaQuery.of(context).size.width < 600?16/33:6 / 10,
-                  crossAxisCount: MediaQuery.of(context).size.width < 600?3:6,
-                  crossAxisSpacing: MediaQuery.of(context).size.width < 600?5:15,
-                  mainAxisSpacing: MediaQuery.of(context).size.width < 600?5:20,
+                     childAspectRatio: MediaQuery.of(context).size.width < 600
+                      ? 16 / 33
+                      : 5 / 10,
+                  crossAxisCount:
+                      MediaQuery.of(context).size.width < 600 ? 3 : 6,
+                  crossAxisSpacing:
+                      MediaQuery.of(context).size.width < 600 ? 8 : 20,
+                  mainAxisSpacing:
+                      MediaQuery.of(context).size.width < 600 ? 8 : 25,
                     ),
                   );
                   }),

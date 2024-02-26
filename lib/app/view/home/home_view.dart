@@ -55,104 +55,114 @@ class HomeView extends StatelessWidget {
                   controller.getFilmByCategory(
                       slug: tabItem[controller.tabIndex.value ?? 0]['slug']);
                 },
-                child: Center(
-                  child: Container(
-                    color: GlobalColor.backgroundColor,
-                    width: MediaQuery.of(context).size.width * .85,
-                    child: CustomScrollView(
-                      controller: scrollController,
-                      slivers: [
-                        SliverAppBar(
-                          pinned:false,
-                          centerTitle: false,
-                          title: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                flex: 3,
-                                child: TabBar(
-                                  tabAlignment: TabAlignment.start,
-                                  indicatorWeight: 1,
-                                  isScrollable: true,
-                                  dividerColor: Colors.transparent,
-                                  indicatorColor: Colors.white,
-                                  unselectedLabelColor: Colors.grey,
-                                  unselectedLabelStyle: const TextStyle(
-                                    fontWeight: FontWeight.w900,
-                                    fontSize: 14,
-                                  ),
-                                  labelColor: Colors.white,
-                                  labelStyle: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                  ),
-                                  onTap: (ind) async {
-                                    searchController.isSearch.value = false;
-                                    controller.pathFilm.value =
-                                        tabItem[ind]['slug'];
-                                    controller.tabIndex.value = ind;
-                                    scrollController.jumpTo(0);
-                                    await controller.getFilm(
-                                        slug: tabItem[ind]['slug']);
-                                    controller.getFilmByCategory(
-                                        slug: tabItem[ind]['slug']);
-                                  },
-                                  tabs: List<Widget>.generate(tabItem.length,
-                                      (int index) {
-                                    return Tab(
-                                      text: tabItem[index]["title"],
-                                    );
-                                  }),
-                                ),
+                child: CustomScrollView(
+                  controller: scrollController,
+                  slivers: [
+                    SliverAppBar(
+                      
+                      pinned:false,
+                      centerTitle: false,
+                      title: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          InkWell(
+                            onTap: ()=>Get.offAll(const HomeView()),
+                            child: Text("TMOVIE",
+                            style: TextStyle(fontSize: 25,color: GlobalColor.primary,fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          const SizedBox(width: 20,),
+                          
+                          Expanded(
+                            flex: 2,
+                            child: TabBar(
+                              tabAlignment: TabAlignment.start,
+                              indicatorWeight: 1,
+                              isScrollable: true,
+                              dividerColor: Colors.transparent,
+                              indicatorColor: Colors.white,
+                              unselectedLabelColor: Colors.grey,
+                              unselectedLabelStyle: const TextStyle(
+                                fontWeight: FontWeight.w900,
+                                fontSize: 14,
                               ),
-                              MediaQuery.of(context).size.width >= 800
-                                  ? const Expanded(child: SearchWidget())
-                                  : const SizedBox(),
-                            ],
+                              labelColor: Colors.white,
+                              labelStyle: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                              ),
+                              onTap: (ind) async {
+                                searchController.isSearch.value = false;
+                                controller.pathFilm.value =
+                                    tabItem[ind]['slug'];
+                                controller.tabIndex.value = ind;
+                                scrollController.jumpTo(0);
+                                await controller.getFilm(
+                                    slug: tabItem[ind]['slug']);
+                                controller.getFilmByCategory(
+                                    slug: tabItem[ind]['slug']);
+                              },
+                              tabs: List<Widget>.generate(tabItem.length,
+                                  (int index) {
+                                return Tab(
+                                  text: tabItem[index]["title"],
+                                );
+                              }),
+                            ),
                           ),
-                  
-                          actions: [
-                            IconButton(
-                                onPressed: () => Get.to(const FilterPage()),
-                                icon: const Icon(
-                                  Icons.filter_alt_outlined,
-                                  color: Colors.white,
-                                ))
-                          ],
-                          bottom: MediaQuery.of(context).size.width < 800
-                              ? const PreferredSize(
-                                  preferredSize: Size.fromHeight(56.0),
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: SearchWidget(),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              : null,
-                          // elevation: 0.0,
-                          backgroundColor: GlobalColor.backgroundColor,
-                          // systemOverlayStyle: const SystemUiOverlayStyle(
-                          //     statusBarBrightness: Brightness.dark),
-                          // expandedHeight: MediaQuery.of(context).size.height * .8,
-                          // flexibleSpace: const FlexibleSpaceBar(
-                          //   background: SliderCinema(),
-                          // ),
-                        ),
-                        const SliverToBoxAdapter(
-                          child: SliderCinema(),
-                        ),
-                        Obx(
-                          () => Visibility(
-                            visible: searchController.isSearch.value == true,
-                            replacement: const FilmByCategory(),
-                            child: const SearchView(),
-                          ),
-                        )
+                          MediaQuery.of(context).size.width >= 800
+                              ? const Expanded(child: Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: SearchWidget(),
+                              ))
+                              : const SizedBox(),
+                        ],
+                      ),
+                                  
+                      actions: [
+                        IconButton(
+                            onPressed: () => Get.to(const FilterPage()),
+                            icon: const Icon(
+                              Icons.filter_alt_outlined,
+                              color: Colors.white,
+                            ))
                       ],
+                      bottom: MediaQuery.of(context).size.width < 800
+                          ? const PreferredSize(
+                              preferredSize: Size.fromHeight(56.0),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: SearchWidget(),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : null,
+                      // elevation: 0.0,
+                      backgroundColor: GlobalColor.backgroundColor,
+                      // systemOverlayStyle: const SystemUiOverlayStyle(
+                      //     statusBarBrightness: Brightness.dark),
+                      // expandedHeight: MediaQuery.of(context).size.height * .8,
+                      // flexibleSpace: const FlexibleSpaceBar(
+                      //   background: SliderCinema(),
+                      // ),
                     ),
-                  ),
+                     SliverToBoxAdapter(
+                      child: Center(child: Container(
+                        
+                         color: GlobalColor.backgroundColor,
+                    width: MediaQuery.of(context).size.width * .85,
+                        child: const SliderCinema())),
+                    ),
+                    Obx(
+                      () => Visibility(
+                        visible: searchController.isSearch.value == true,
+                        replacement: const FilmByCategory(),
+                        child: const SearchView(),
+                      ),
+                    )
+                  ],
                 )),
           ),
         );
