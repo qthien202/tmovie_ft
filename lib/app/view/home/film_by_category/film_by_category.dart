@@ -22,91 +22,94 @@ class FilmByCategory extends StatelessWidget {
       itemCount: itemCount,
       itemBuilder: (context, ind) {
          
-        return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "${controller.categories[ind]['title']}",
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
-                      ),
-                      TextButton(
-                        onHover: (hasFocus){
-                          controller.isFocusSeeAll.value = hasFocus;
-                        },
-                        onPressed: () {
-                          Get.to(ListMovieView(
-                            category: controller.categories[ind]['slug']??"",
-                            slug:controller.pathFilm.value,
-                            country: controller.categories[ind]['country']??"",
-                            
-                          ));
-                        },
-                        child: Text(
-                          "Xem thêm",
-                          style: TextStyle(
-                              color: Colors.white,
-                              decoration: TextDecoration.underline,
-                              decorationColor: Colors.white),
-                        ),
-                      )
-                    ],
+                  Text(
+                    "${controller.categories[ind]['title']}",
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * .48,
-                    child: Obx(() {
-                     final isLoading = controller.getFimCategory.value.isEmpty == true;
-                      final items = controller.getFimCategory.value[controller.categories[ind]['id']]?.pageProps?.data?.items;
-                      return ListView.builder(
-                        shrinkWrap: false,
-                        scrollDirection: Axis.horizontal,
-                        itemCount: isLoading ? 5 : (controller.getFimCategory.value[controller.categories[ind]['id']]?.pageProps?.data?.items?.length ?? 0)>10?MediaQuery.of(context).size.width < 600?10:5:(controller.getFimCategory.value[controller.categories[ind]['id']]?.pageProps?.data?.items?.length ?? 0),
-                        itemBuilder: (context, index) {
-                          final data = items?[index];
-                          return Visibility(
-                            visible: !isLoading && data?.category?.first.slug!="[redacted]",
-                            replacement: Visibility(
-                              visible: data?.category?.first.slug!="[redacted]",
-                              child: Padding(
-                                padding:  EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width < 600?5:40,vertical: 10),
-                                child: SizedBox(
-                                  height: MediaQuery.of(context).size.height*.5,
-                                              // padding: EdgeInsets.symmetric(vertical: 20),
-                                              width: MediaQuery.of(context).size.width * .15,
-                                  child: Shimmer.fromColors(
-                                    baseColor: Colors.grey,
-                                    highlightColor: Colors.grey.shade600,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                  ),
+                  TextButton(
+                    onHover: (hasFocus){
+                      controller.isFocusSeeAll.value = hasFocus;
+                    },
+                    onPressed: () {
+                      Get.to(ListMovieView(
+                        category: controller.categories[ind]['slug']??"",
+                        slug:controller.pathFilm.value,
+                        country: controller.categories[ind]['country']??"",
+                        
+                      ));
+                    },
+                    child: Text(
+                      "Xem thêm",
+                      style: TextStyle(
+                          color: Colors.white,
+                          decoration: TextDecoration.underline,
+                          decorationColor: Colors.white),
+                    ),
+                  )
+                ],
+              ),
+            ),
+            SizedBox(
+              height: MediaQuery.of(context).size.height * .48,
+              child: Obx(() {
+               final isLoading = controller.getFimCategory.value.isEmpty == true;
+                final items = controller.getFimCategory.value[controller.categories[ind]['id']]?.pageProps?.data?.items;
+                return ListView.builder(
+                  shrinkWrap: false,
+                  scrollDirection: Axis.horizontal,
+                  
+                  itemCount: isLoading ? 5 : (controller.getFimCategory.value[controller.categories[ind]['id']]?.pageProps?.data?.items?.length ?? 0)>10?10:(controller.getFimCategory.value[controller.categories[ind]['id']]?.pageProps?.data?.items?.length ?? 0),
+                  itemBuilder: (context, index) {
+                    final data = items?[index];
+                    return Visibility(
+                      visible: !isLoading && data?.category?.first.slug!="[redacted]",
+                      replacement: Visibility(
+                        visible: data?.category?.first.slug!="[redacted]",
+                        child: Padding(
+                          padding:  EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width < 600?5:40,vertical: 10),
+                          child: SizedBox(
+                            height: MediaQuery.of(context).size.height*.5,
+                                        // padding: EdgeInsets.symmetric(vertical: 20),
+                                        width: MediaQuery.of(context).size.width * .15,
+                            child: Shimmer.fromColors(
+                              baseColor: Colors.grey,
+                              highlightColor: Colors.grey.shade600,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.grey,
                                 ),
                               ),
                             ),
-                            child: Padding(
-                              padding:  EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width < 600?5:40,vertical: 10),
-                              child: CardCinema(
-                                nameProduct: data?.name,
-                                imageLink: data?.thumbUrl,
-                                originName: data?.originName,
-                                slug: data?.slug,
-                              ),
-                            ),
-                          );
-                        },
-                        
-                      );
-                    }),
-                  ),
-                ],
-              ),
-            );
+                          ),
+                        ),
+                      ),
+                      child: Padding(
+                        padding:  EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width < 600?5:40,vertical: 10),
+                        child: CardCinema(
+                          nameProduct: data?.name,
+                          imageLink: data?.thumbUrl,
+                          originName: data?.originName,
+                          slug: data?.slug,
+                          path: controller.getFimCategory.value[controller.categories[ind]['id']]?.pageProps?.data?.typeList??"",
+                        ),
+                      ),
+                    );
+                  },
+                  
+                );
+              }),
+            ),
+          ],
+        );
       },
       separatorBuilder: (BuildContext context, int index) => const SizedBox(height: 10),
     );

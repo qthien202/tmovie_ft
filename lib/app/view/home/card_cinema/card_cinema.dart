@@ -12,13 +12,14 @@ class CardCinema extends StatefulWidget {
   final String? nameProduct;
   final String? originName;
   final String? slug;
+  final String? path;
 
   const CardCinema({
     Key? key,
     this.imageLink,
     this.nameProduct,
     this.originName,
-    this.slug,
+    this.slug, this.path,
   }) : super(key: key);
 
   @override
@@ -32,10 +33,18 @@ class _CardCinemaState extends State<CardCinema> {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Get.to(DetailView(
-          slug: widget.slug,
-          name: widget.nameProduct,
-        ));
+        
+        
+       Navigator.of(context).push(
+  MaterialPageRoute(
+    builder: (context) => DetailView(
+      slug: widget.slug,
+      name: widget.nameProduct,
+      path: widget.path,
+    ),
+  ),
+);
+
       },
       onHover: (hovering) {
         setState(() {

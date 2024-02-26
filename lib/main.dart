@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:app_ft_movies/app/core/dependency_injections.dart';
 import 'package:app_ft_movies/app/core/global_color.dart';
 import 'package:app_ft_movies/app/view/home/home_view.dart';
@@ -21,6 +23,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      scrollBehavior: MyCustomScrollBehavior(),
       debugShowCheckedModeBanner: false,
       title: 'TMOVIE',
       theme: ThemeData(
@@ -47,6 +50,15 @@ class MyApp extends StatelessWidget {
       home: const SplashView(),
     );
   }
+}
+
+class MyCustomScrollBehavior extends MaterialScrollBehavior {
+  // Override behavior methods and getters like dragDevices
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+      };
 }
 
 
