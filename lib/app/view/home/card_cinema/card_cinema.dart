@@ -76,7 +76,7 @@ class _CardCinemaState extends State<CardCinema> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.circular(3),
+                borderRadius: BorderRadius.circular(5),
                 child: GlobalImage(
                   imageUrl: widget.imageLink ?? "",
                   width: MediaQuery.of(context).size.width < 600?MediaQuery.of(context).size.width:MediaQuery.of(context).size.width * 0.1,

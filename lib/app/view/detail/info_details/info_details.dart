@@ -94,7 +94,8 @@ class InfoDetail extends StatelessWidget {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 20,vertical: 10),
             decoration: BoxDecoration(
-              color: GlobalColor.primary
+              color: Colors.black,
+              // borderRadius: BorderRadius.circular(5)
             ),
             child: Text(data?.episodeCurrent??""))
         ],

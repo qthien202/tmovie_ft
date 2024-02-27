@@ -46,8 +46,8 @@ class Espisode extends StatelessWidget {
                           vertical: 10, horizontal: 15),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(5),
-                        //  border: Border.all(color: GlobalColor.primary)
-                        color:controller.selectIndexServer.value==index?GlobalColor.primary: Color(0xff252836),
+                         border: Border.all(color: controller.selectIndexServer.value==index?GlobalColor.primary: Color(0xff252836),width: 1.5),
+                        
                       ),
                       child: Text(
                         data?.episodes?[index].serverName ?? "",

@@ -34,7 +34,7 @@ class SliderCinema extends StatelessWidget {
               final int first = index * 2;
               final int second = first + 1;
               return Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [first, second].map((idx) {
                   final data = controller
                       .getFilmData.value?.pageProps?.data?.items?[idx];
@@ -42,9 +42,9 @@ class SliderCinema extends StatelessWidget {
                     visible: !isLoading,
                     replacement: Padding(
                      padding: const EdgeInsets.symmetric(
-                            horizontal: 7, vertical: 10),
+                             vertical: 10),
                       child: SizedBox(
-                         width: MediaQuery.of(context).size.width * .4,
+                         width: MediaQuery.of(context).size.width * .42,
                                 height: MediaQuery.of(context).size.height * .4,
                           child: Shimmer.fromColors(
                             baseColor: Colors.grey,
@@ -64,15 +64,18 @@ class SliderCinema extends StatelessWidget {
                       )),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 7, vertical: 10),
+                             vertical: 10),
                         child: Stack(
                           alignment: Alignment.bottomCenter,
                           children: [
-                            GlobalImage(
-                              imageUrl: "${data?.posterUrl}",
-                              boxFit: BoxFit.fill,
-                              width: MediaQuery.of(context).size.width * .4,
-                              height: MediaQuery.of(context).size.height * .4,
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: GlobalImage(
+                                imageUrl: "${data?.posterUrl}",
+                                boxFit: BoxFit.fill,
+                                width: MediaQuery.of(context).size.width * .42,
+                                height: MediaQuery.of(context).size.height * .4,
+                              ),
                             ),
                             Positioned(
                                 top: MediaQuery.of(context).size.height * .32,
