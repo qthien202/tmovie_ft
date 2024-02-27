@@ -64,7 +64,7 @@ class FilmByCategory extends StatelessWidget {
                   ),
                 ),
                 SizedBox(
-                  height: MediaQuery.of(context).size.height * .55,
+                  height: MediaQuery.of(context).size.width<600?MediaQuery.of(context).size.height * .45:MediaQuery.of(context).size.height*.55,
                   child: Obx(() {
                    final isLoading = controller.getFimCategory.value.isEmpty == true;
                     final items = controller.getFimCategory.value[controller.categories[ind]['id']]?.pageProps?.data?.items;

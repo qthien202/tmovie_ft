@@ -134,7 +134,7 @@ class HomeView extends StatelessWidget {
                                 children: [
                                   Expanded(
                                     child: Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: 5),
+                                      padding: EdgeInsets.symmetric(horizontal: 5,vertical: 10),
                                       child: SearchWidget(),
                                     ),
                                   ),

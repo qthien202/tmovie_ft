@@ -158,7 +158,7 @@ class DetailView extends StatelessWidget {
                           child: const Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text("Tập phim",
+                              Text("Chọn server",
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16)),
@@ -196,213 +196,219 @@ class ResponsiveApp extends StatelessWidget {
     final controller = Get.put(DetailController());
     controller.getFilmDetail(slug: slug ?? "");
 
-    return Scaffold(
-        extendBody: true,
-        extendBodyBehindAppBar: true,
-        backgroundColor: GlobalColor.backgroundColor,
-        // appBar: AppBar(
-        //   backgroundColor: GlobalColor.backgroundColor,
-        //   centerTitle: true,
-        //   title: Text(name??"--",
-        //   style: const TextStyle(
-        //     color: Colors.white,
-        //     fontSize: 16,
-        //     fontWeight: FontWeight.bold
-        //   ),
-        //   ),
-        //   foregroundColor: Colors.white,
-        // ),
-        body: Obx(() {
-          final data = controller.filmDetail.value?.pageProps?.data?.item;
-          if (data == null) {
-            return Center(
-              child: CircularProgressIndicator(
-                strokeWidth: 5,
-                backgroundColor: GlobalColor.primary,
-                color: Colors.white,
-              ),
-            );
-          }
-          return RefreshIndicator(
-            backgroundColor: GlobalColor.backgroundColor,
-            color: GlobalColor.primary,
-            onRefresh: () async => controller.getFilmDetail(slug: slug ?? ""),
-            child: CustomScrollView(
-              slivers: [
-                SliverAppBar(
-                  pinned: true,
-                  leading: InkWell(
-                    onTap: () => Get.back(),
-                    child: Container(
-                      margin: EdgeInsets.symmetric(horizontal: 8.0),
-                      padding: EdgeInsets.all(3),
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle, color: Color(0xff252836)),
-                      child: Icon(
-                        Icons.arrow_back,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                  actions: [
-                    InkWell(
-                      onTap: () {
-                        Get.to(const FilterPage(),
-                            transition: Transition.rightToLeft);
-                      },
+    return WillPopScope(
+      onWillPop: ()async{
+        controller.selectIndexServer.value = 0;
+        return true;
+      },
+      child: Scaffold(
+          extendBody: true,
+          extendBodyBehindAppBar: true,
+          backgroundColor: GlobalColor.backgroundColor,
+          // appBar: AppBar(
+          //   backgroundColor: GlobalColor.backgroundColor,
+          //   centerTitle: true,
+          //   title: Text(name??"--",
+          //   style: const TextStyle(
+          //     color: Colors.white,
+          //     fontSize: 16,
+          //     fontWeight: FontWeight.bold
+          //   ),
+          //   ),
+          //   foregroundColor: Colors.white,
+          // ),
+          body: Obx(() {
+            final data = controller.filmDetail.value?.pageProps?.data?.item;
+            if (data == null) {
+              return Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 5,
+                  backgroundColor: GlobalColor.primary,
+                  color: Colors.white,
+                ),
+              );
+            }
+            return RefreshIndicator(
+              backgroundColor: GlobalColor.backgroundColor,
+              color: GlobalColor.primary,
+              onRefresh: () async => controller.getFilmDetail(slug: slug ?? ""),
+              child: CustomScrollView(
+                slivers: [
+                  SliverAppBar(
+                    pinned: true,
+                    leading: InkWell(
+                      onTap: () => Get.back(),
                       child: Container(
                         margin: EdgeInsets.symmetric(horizontal: 8.0),
-                        padding: EdgeInsets.all(5),
+                        padding: EdgeInsets.all(3),
                         decoration: BoxDecoration(
                             shape: BoxShape.circle, color: Color(0xff252836)),
                         child: Icon(
-                          Icons.menu,
+                          Icons.arrow_back,
                           color: Colors.white,
+                          size: 20,
                         ),
                       ),
                     ),
-                  ],
-                  centerTitle: true,
-                  foregroundColor: Colors.white,
-                  elevation: 0.0,
-                  backgroundColor: GlobalColor.backgroundColor,
-                  systemOverlayStyle: const SystemUiOverlayStyle(
-                      statusBarBrightness: Brightness.dark),
-                  expandedHeight: MediaQuery.of(context).size.height * .6,
-                  flexibleSpace: FlexibleSpaceBar(
-                      background: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      GlobalImage(
-                        imageUrl: data.thumbUrl ?? "",
-                        width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.height * .6,
-                        boxFit: BoxFit.fill,
+                    actions: [
+                      InkWell(
+                        onTap: () {
+                          Get.to(const FilterPage(),
+                              transition: Transition.rightToLeft);
+                        },
+                        child: Container(
+                          margin: EdgeInsets.symmetric(horizontal: 8.0),
+                          padding: EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle, color: Color(0xff252836)),
+                          child: Icon(
+                            Icons.filter_alt_outlined,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
                     ],
-                  )),
-                ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 2, horizontal: 15),
-                    child: Column(
+                    centerTitle: true,
+                    foregroundColor: Colors.white,
+                    elevation: 0.0,
+                    backgroundColor: GlobalColor.backgroundColor,
+                    systemOverlayStyle: const SystemUiOverlayStyle(
+                        statusBarBrightness: Brightness.dark),
+                    expandedHeight: MediaQuery.of(context).size.height * .6,
+                    flexibleSpace: FlexibleSpaceBar(
+                        background: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Info(),
-                        // const SizedBox(height: 20,),
-                        Visibility(
-                          visible: data.status != "trailer",
-                          child: Center(
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 12,
-                              ),
-                              width: MediaQuery.of(context).size.width * .95,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5),
-                                  color: GlobalColor.primary),
-                              child: InkWell(
-                                onTap: () async {
-                                  await controller.createToken(
-                                      name: data.name ?? "",
-                                      description: data.content ?? "",
-                                      originName: data.originName ?? "",
+                        GlobalImage(
+                          imageUrl: data.thumbUrl ?? "",
+                          width: MediaQuery.of(context).size.width,
+                          height: MediaQuery.of(context).size.height * .6,
+                          boxFit: BoxFit.fill,
+                        ),
+                      ],
+                    )),
+                  ),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding:
+                          const EdgeInsets.symmetric(vertical: 2, horizontal: 15),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Info(),
+                          // const SizedBox(height: 20,),
+                          Visibility(
+                            visible: data.status != "trailer",
+                            child: Center(
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
+                                width: MediaQuery.of(context).size.width * .95,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    color: GlobalColor.primary),
+                                child: InkWell(
+                                  onTap: () async {
+                                    // await controller.createToken(
+                                    //     name: data.name ?? "",
+                                    //     description: data.content ?? "",
+                                    //     originName: data.originName ?? "",
+                                    //     slug: data.slug ?? "",
+                                    //     thumbnail: data.thumbUrl ?? "",
+                                    //     episode: data.episodes?.first.serverData
+                                    //             ?.first.name ??
+                                    //         "");
+                                    Get.to(ChewieVideoPlayer(
                                       slug: data.slug ?? "",
-                                      thumbnail: data.thumbUrl ?? "",
+                                      fileName: data.name ?? "--",
                                       episode: data.episodes?.first.serverData
                                               ?.first.name ??
-                                          "");
-                                  Get.to(ChewieVideoPlayer(
-                                    slug: data.slug ?? "",
-                                    fileName: data.name ?? "--",
-                                    episode: data.episodes?.first.serverData
-                                            ?.first.name ??
-                                        "",
-                                    videoUrl: data?.episodes?.first.serverData
-                                            ?.first.linkM3u8 ??
-                                        "",
-                                  ));
-                                },
-                                child: const Center(
-                                    child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.play_arrow,
-                                      color: Colors.white,
-                                    ),
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    Text(
-                                      "Xem phim",
-                                      style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ],
-                                )),
+                                          "",
+                                      videoUrl: data?.episodes?.first.serverData
+                                              ?.first.linkM3u8 ??
+                                          "",
+                                    ));
+                                  },
+                                  child: const Center(
+                                      child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.play_arrow,
+                                        color: Colors.white,
+                                      ),
+                                      SizedBox(
+                                        width: 10,
+                                      ),
+                                      Text(
+                                        "Xem phim",
+                                        style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  )),
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        const InfoDetail(),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              "Nội dung phim",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 16),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            HtmlWidget("${data.content}")
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Visibility(
-                          visible: data.status != "trailer",
-                          child: const Column(
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          const InfoDetail(),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text("Tập phim",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16)),
-                              SizedBox(
+                              const Text(
+                                "Nội dung phim",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 16),
+                              ),
+                              const SizedBox(
                                 height: 10,
                               ),
-                              Espisode(),
+                              HtmlWidget("${data.content}")
                             ],
                           ),
-                        ),
-                        const SizedBox(
-                          height: 30,
-                        ),
-                        Visibility(
-                            visible: path != null,
-                            child: OtherFilmView(
-                              path: path ?? "",
-                            ))
-                      ],
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Visibility(
+                            visible: data.status != "trailer",
+                            child: const Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("Chọn server",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16)),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Espisode(),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 30,
+                          ),
+                          Visibility(
+                              visible: path != null,
+                              child: OtherFilmView(
+                                path: path ?? "",
+                              ))
+                        ],
+                      ),
                     ),
-                  ),
-                )
-              ],
-            ),
-          );
-        }));
+                  )
+                ],
+              ),
+            );
+          })),
+    );
   }
 }

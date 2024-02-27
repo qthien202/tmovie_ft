@@ -1,4 +1,4 @@
-import 'package:chewie/chewie.dart';
+import 'package:app_ft_movies/app/core/global_color.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -22,9 +22,9 @@ class ChewieVideoPlayer extends StatefulWidget {
 
 class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
   late VideoPlayerController _videoPlayerController;
-  late ChewieController _chewieController;
   late SharedPreferences _prefs;
   late String _prefsKey;
+  bool _isInitialized = false;
 
   @override
   void initState() {
@@ -36,13 +36,16 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: GlobalColor.backgroundColor,
       appBar: AppBar(
-        title: Text("${widget.fileName}-${widget.episode}"),
+        foregroundColor: Colors.white,
+        backgroundColor: GlobalColor.backgroundColor,
       ),
       body: Center(
-        child: _chewieController != null && _chewieController.videoPlayerController.value.isInitialized
-            ? Chewie(
-                controller: _chewieController,
+        child: _isInitialized
+            ? AspectRatio(
+                aspectRatio: _videoPlayerController.value.aspectRatio,
+                child: VideoPlayer(_videoPlayerController),
               )
             : CircularProgressIndicator(),
       ),
@@ -53,7 +56,6 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
   void dispose() {
     super.dispose();
     _videoPlayerController.dispose();
-    _chewieController.dispose();
   }
 
   void _initializePlayer() {
@@ -63,34 +65,22 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
       });
       int? savedPosition = _prefs.getInt(_prefsKey);
 
-      _videoPlayerController = VideoPlayerController.network(
-        widget.videoUrl,
-      );
+      _videoPlayerController = VideoPlayerController.network(widget.videoUrl)
+        ..initialize().then((_) {
+          setState(() {
+            _isInitialized = true;
+            if (savedPosition != null) {
+              _videoPlayerController.seekTo(Duration(seconds: savedPosition));
+            }
+            _videoPlayerController.play();
+          });
+        });
 
-      _chewieController = ChewieController(
-        videoPlayerController: _videoPlayerController,
-        autoPlay: true,
-        looping: false,
-        allowMuting: true,
-        allowPlaybackSpeedChanging: false,
-        placeholder: CircularProgressIndicator(),
-        allowFullScreen: true,
-        showControls: true,
-      );
-
-      // Listen to video player events
       _videoPlayerController.addListener(() {
-        if (_videoPlayerController.value.isPlaying) {
+        if (_videoPlayerController.value.isPlaying &&
+            !_videoPlayerController.value.isBuffering) {
           _savePosition();
         }
-      });
-
-      _videoPlayerController.initialize().then((_) {
-        // Video player initialized, seek to saved position if available
-        if (savedPosition != null) {
-          _videoPlayerController.seekTo(Duration(seconds: savedPosition));
-        }
-        setState(() {});
       });
     });
   }
@@ -103,7 +93,9 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
   }
 
   void _savePosition() {
-    int positionInSeconds = _videoPlayerController.value.position.inSeconds;
-    _prefs.setInt(_prefsKey, positionInSeconds);
+    if (_videoPlayerController.value.isInitialized) {
+      int positionInSeconds = _videoPlayerController.value.position.inSeconds;
+      _prefs.setInt(_prefsKey, positionInSeconds);
+    }
   }
 }

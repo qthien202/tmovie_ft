@@ -241,7 +241,7 @@ class _FilterPageState extends State<FilterPage> {
           text,
           textAlign: TextAlign.start,
           style: TextStyle(
-            fontSize: 11,
+            fontSize: 14,
             color: !isSelected ? Colors.white : GlobalColor.primary,
           ),
         ),

@@ -58,12 +58,12 @@ class _CardCinemaState extends State<CardCinema> {
 
 
         child: Container(
-          height: 250,
+          // height: 250,
           width: MediaQuery.of(context).size.width < 600?MediaQuery.of(context).size.width*.4:MediaQuery.of(context).size.width * 0.15,
           // decoration: BoxDecoration(
           //   borderRadius: BorderRadius.circular(3),
           //   // border: Border.all(color: isHovering ? Colors.white : Colors.transparent, width: 2),
-          //   // color: GlobalColor.background2,
+          //   color: GlobalColor.background2,
           // ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -74,7 +74,7 @@ class _CardCinemaState extends State<CardCinema> {
                 child: GlobalImage(
                   imageUrl: widget.imageLink ?? "",
                   width: MediaQuery.of(context).size.width < 600?MediaQuery.of(context).size.width:MediaQuery.of(context).size.width * 0.1,
-                  height: MediaQuery.of(context).size.width < 600?MediaQuery.of(context).size.height*.35:MediaQuery.of(context).size.height * .4,
+                  height: MediaQuery.of(context).size.width < 600?MediaQuery.of(context).size.height*.28:MediaQuery.of(context).size.height * .4,
                   boxFit: BoxFit.fill,
                 ),
               ),

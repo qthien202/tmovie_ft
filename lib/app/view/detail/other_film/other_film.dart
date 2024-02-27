@@ -60,15 +60,15 @@ class OtherFilmView extends StatelessWidget {
                   );
                 },
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                childAspectRatio: MediaQuery.of(context).size.width < 600
-                      ? 14 / 33
+                 childAspectRatio: MediaQuery.of(context).size.width < 600
+                      ? 12 / 33
                       : 5 / 10,
                   crossAxisCount:
                       MediaQuery.of(context).size.width < 600 ? 3 : 6,
                   crossAxisSpacing:
-                      MediaQuery.of(context).size.width < 600 ? 5 : 20,
+                      MediaQuery.of(context).size.width < 600 ? 8 : 20,
                   mainAxisSpacing:
-                      MediaQuery.of(context).size.width < 600 ? 5 : 25,
+                      MediaQuery.of(context).size.width < 600 ? 8 : 25,
                 ),
               );
             }),

@@ -55,7 +55,7 @@ dependencies:
     git:
       url: https://github.com/matthewrice345/betterplayer.git
       ref: Issue1057
-  # flutter_inappwebview: ^5.7.2+3
+  flutter_inappwebview: ^5.7.2+3
   image_network: ^2.5.4
  
   
