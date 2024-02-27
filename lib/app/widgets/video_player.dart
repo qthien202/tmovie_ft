@@ -79,7 +79,7 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
         looping: false,
         allowFullScreen: true,
         allowMuting: true,
-        // aspectRatio: 16 / 9,
+        aspectRatio: 18 / 9,
         overlay: Padding(
           padding: const EdgeInsets.all(8),
           child: Text("${widget.fileName}-${widget.episode}"),
