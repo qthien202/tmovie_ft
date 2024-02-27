@@ -16,10 +16,10 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'dart:html' as html;
 
 class DetailView extends StatelessWidget {
-  const DetailView({super.key, this.slug, this.name, this.path});
+  const DetailView({super.key, this.slug, this.name, });
   final String? slug;
   final String? name;
-  final String? path;
+  
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +31,7 @@ class DetailView extends StatelessWidget {
       replacement: ResponsiveApp(
         name: name,
         slug: slug,
-        path: path,
+        
       ),
       child: Scaffold(
           extendBody: true,
@@ -91,10 +91,19 @@ class DetailView extends StatelessWidget {
             final data = controller.filmDetail.value?.pageProps?.data?.item;
             if (data == null) {
               return Center(
-                child: CircularProgressIndicator(
-                  strokeWidth: 5,
-                  backgroundColor: GlobalColor.primary,
-                  color: Colors.white,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(
+                      strokeWidth: 5,
+                      backgroundColor: GlobalColor.primary,
+                      color: Colors.white,
+                    ),
+                    const SizedBox(height: 10,),
+                    Text("Đang tải")
+                    
+                  ],
                 ),
               );
             }
@@ -107,6 +116,7 @@ class DetailView extends StatelessWidget {
                     color: GlobalColor.backgroundColor,
                     width: MediaQuery.of(context).size.width * .85,
                     child: ListView(
+                      controller: controller.scrollController,
                       children: [
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -173,9 +183,7 @@ class DetailView extends StatelessWidget {
                          const SizedBox(
                                 height: 30,
                               ),
-                              Visibility(
-                                visible: path!=null,
-                                child: OtherFilmView(path: path??"",))
+                              OtherFilmView()
                       ],
                     )),
               ),
@@ -389,11 +397,7 @@ class ResponsiveApp extends StatelessWidget {
                           const SizedBox(
                             height: 30,
                           ),
-                          Visibility(
-                              visible: path != null,
-                              child: OtherFilmView(
-                                path: path ?? "",
-                              ))
+                          OtherFilmView()
                         ],
                       ),
                     ),

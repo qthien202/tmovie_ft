@@ -60,8 +60,7 @@ class SliderCinema extends StatelessWidget {
                       onTap: () => Get.to(DetailView(
                         slug: data?.slug,
                         name: data?.name,
-                        path: controller
-                      .getFilmData.value?.pageProps?.data?.typeList??"",
+                        
                       )),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(

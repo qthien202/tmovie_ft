@@ -6,6 +6,7 @@ import 'package:app_ft_movies/app/data/repository/get_film_details.dart';
 import 'package:app_ft_movies/app/data/repository/post_add_history.dart';
 import 'package:app_ft_movies/app/data/repository/post_create_token.dart';
 import 'package:app_ft_movies/app/data/repository/post_create_token_response.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -18,6 +19,7 @@ class DetailController extends GetxController{
   RxBool isFocus = RxBool(false);
   RxBool isFocusEp = RxBool(false);
   Rxn<int>selectIndexServer = Rxn(0);
+  ScrollController scrollController = ScrollController();
 
   @override
   void onReady()async{
@@ -26,7 +28,8 @@ class DetailController extends GetxController{
   }
   
   Future<GetFilmDetails?>getFilmDetail({required String slug})async{
-    
+    filmDetail.value = null;
+    filmDetail.refresh();
     selectIndexServer.value = 0;
     filmDetail.value = await api.getFilmDetails(path: slug);
     filmDetail.refresh();

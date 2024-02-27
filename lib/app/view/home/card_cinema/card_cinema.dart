@@ -37,7 +37,7 @@ class _CardCinemaState extends State<CardCinema> {
         Get.to( DetailView(
       slug: widget.slug,
       name: widget.nameProduct,
-      path: widget.path,
+      
     ),);
         
         
