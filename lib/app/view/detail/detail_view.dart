@@ -319,16 +319,9 @@ class ResponsiveApp extends StatelessWidget {
                                     //     episode: data.episodes?.first.serverData
                                     //             ?.first.name ??
                                     //         "");
-                                    Get.to(ChewieVideoPlayer(
-                                      slug: data.slug ?? "",
-                                      fileName: data.name ?? "--",
-                                      episode: data.episodes?.first.serverData
-                                              ?.first.name ??
-                                          "",
-                                      videoUrl: data?.episodes?.first.serverData
-                                              ?.first.linkM3u8 ??
-                                          "",
-                                    ));
+                                    html.window.open(
+                              episode?.linkEmbed ?? "", data?.name ?? "");
+		                                    
                                   },
                                   child: const Center(
                                       child: Row(
