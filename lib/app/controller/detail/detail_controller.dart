@@ -12,7 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class DetailController extends GetxController{
   final Services api = Get.find();
   Rxn<GetFilmDetails>filmDetail = Rxn();
-  Rxn<int>selectTab = Rxn(0);
+  Rxn<int>selectTab = Rxn();
   Rxn<int>selectIndex = Rxn(0);
   Rxn<PostCreateTokenResponse>postCreateTokenData = Rxn();
   RxBool isFocus = RxBool(false);
