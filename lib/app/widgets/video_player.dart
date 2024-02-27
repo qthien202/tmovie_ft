@@ -39,14 +39,10 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: GlobalColor.backgroundColor,
-      appBar: AppBar(
-        foregroundColor: Colors.white,
-        backgroundColor: GlobalColor.backgroundColor,
-      ),
+     
       body: Center(
-        child: _isInitialized
-            ? Chewie(controller: _chewieController)
-            : CircularProgressIndicator(),
+        child:  Chewie(controller: _chewieController)
+            
       ),
     );
   }
@@ -75,16 +71,15 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
             _videoPlayerController.play();
           });
         });
-
+        
       _chewieController = ChewieController(
         videoPlayerController: _videoPlayerController,
         fullScreenByDefault: true,
-        
         autoPlay: true,
         looping: false,
         allowFullScreen: true,
         allowMuting: true,
-        aspectRatio: 16 / 9,
+        // aspectRatio: 16 / 9,
         overlay: Padding(
           padding: const EdgeInsets.all(8),
           child: Text("${widget.fileName}-${widget.episode}"),
