@@ -1,7 +1,8 @@
 import 'package:app_ft_movies/app/core/global_color.dart';
 import 'package:flutter/material.dart';
-import 'package:better_player/better_player.dart';
+import 'package:video_player/video_player.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:chewie/chewie.dart';
 
 class ChewieVideoPlayer extends StatefulWidget {
   final String videoUrl;
@@ -21,9 +22,11 @@ class ChewieVideoPlayer extends StatefulWidget {
 }
 
 class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
-  late BetterPlayerController _betterPlayerController;
+  late VideoPlayerController _videoPlayerController;
+  late ChewieController _chewieController;
   late SharedPreferences _prefs;
   late String _prefsKey;
+  bool _isInitialized = false;
 
   @override
   void initState() {
@@ -40,14 +43,19 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
         foregroundColor: Colors.white,
         backgroundColor: GlobalColor.backgroundColor,
       ),
-      body: BetterPlayer(controller: _betterPlayerController),
+      body: Center(
+        child: _isInitialized
+            ? Chewie(controller: _chewieController)
+            : CircularProgressIndicator(),
+      ),
     );
   }
 
   @override
   void dispose() {
     super.dispose();
-    _betterPlayerController.dispose();
+    _videoPlayerController.dispose();
+    _chewieController.dispose();
   }
 
   void _initializePlayer() {
@@ -57,41 +65,36 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
       });
       int? savedPosition = _prefs.getInt(_prefsKey);
 
-      _betterPlayerController = BetterPlayerController(
-        BetterPlayerConfiguration(
+      _videoPlayerController = VideoPlayerController.network(widget.videoUrl)
+        ..initialize().then((_) {
+          setState(() {
+            _isInitialized = true;
+            if (savedPosition != null) {
+              _videoPlayerController.seekTo(Duration(seconds: savedPosition));
+            }
+            _videoPlayerController.play();
+          });
+        });
 
-          overlay: Padding(
-            padding: const EdgeInsets.all(8),
-            child: Text("${widget.fileName}-${widget.episode}"),
-          ),
-          autoPlay: true,
-          looping: false,
-          aspectRatio: 16 / 9,
-          fullScreenByDefault: true,
-
-          controlsConfiguration: BetterPlayerControlsConfiguration(
-            controlBarColor: Colors.transparent,
-          ),
-
+      _chewieController = ChewieController(
+        videoPlayerController: _videoPlayerController,
+        fullScreenByDefault: true,
+        autoPlay: true,
+        looping: false,
+        allowFullScreen: true,
+        allowMuting: true,
+        aspectRatio: 16 / 9,
+        overlay: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Text("${widget.fileName}-${widget.episode}"),
         ),
-        betterPlayerDataSource: BetterPlayerDataSource(
-          BetterPlayerDataSourceType.network,
-          widget.videoUrl,
-        ),
+        // Other ChewieController configurations...
       );
 
-      // Listen to video player events
-      _betterPlayerController.addEventsListener((event) {
-         if (event.betterPlayerEventType == BetterPlayerEventType.progress) {
+      _videoPlayerController.addListener(() {
+        if (_videoPlayerController.value.isPlaying &&
+            !_videoPlayerController.value.isBuffering) {
           _savePosition();
-          print(">>>>>>>>>>>>>>${_betterPlayerController.videoPlayerController!.value.position.inSeconds}");
-        }
-        if (event.betterPlayerEventType == BetterPlayerEventType.initialized) {
-          // Video player initialized, seek to saved position if available
-          if (savedPosition != null) {
-            _betterPlayerController.seekTo(Duration(seconds: savedPosition));
-            print(">>>>>>position: $savedPosition");
-          }
         }
       });
     });
@@ -105,7 +108,9 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
   }
 
   void _savePosition() {
-    int positionInSeconds = _betterPlayerController.videoPlayerController!.value.position.inSeconds;
-    _prefs.setInt(_prefsKey, positionInSeconds);
+    if (_videoPlayerController.value.isInitialized) {
+      int positionInSeconds = _videoPlayerController.value.position.inSeconds;
+      _prefs.setInt(_prefsKey, positionInSeconds);
+    }
   }
 }
