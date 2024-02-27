@@ -127,7 +127,7 @@ class _FilterPageState extends State<FilterPage> {
                   ));
                 } else {
                   if (selectedGenre == null) {
-                    Get.snackbar("Thông báo", "Bạn cần chọn thể loại phim trước");
+                    Get.snackbar("Thông báo", "Vui lòng chọn thể loại phim trước",backgroundColor: Colors.white);
                   } else {
                     Get.to(MovieGenreview(
                       slug: selectedGenre ?? "",
@@ -201,6 +201,7 @@ class _FilterPageState extends State<FilterPage> {
 
   Widget buildFilterList(List<Map<String, dynamic>> items, dynamic selectedItem, Function(Map<String, dynamic>) onTap, int index) {
     return GridView.builder(
+      
       scrollDirection: Axis.horizontal,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,

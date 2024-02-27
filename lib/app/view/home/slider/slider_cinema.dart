@@ -134,69 +134,91 @@ class ResponsiveApp extends StatelessWidget {
     final controller = Get.put(HomeController());
     return Obx(() {
       final isLoading = controller.getFilmData.value==null;
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20),
-        child: Column(
-          children: [
-            CarouselSlider.builder(
-              itemCount: isLoading?4:controller.getFilmData.value?.pageProps?.data?.items?.length ?? 0,
-              itemBuilder: (context, index, realIndex) {
-                return Visibility(
-                  visible: !isLoading,
-                  replacement: SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height * .5,
-                    child: Shimmer.fromColors(
-                                baseColor: Colors.grey,
-                                highlightColor: Colors.grey.shade600,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    
-                                    color: Colors.grey,
-                                  ),
+      return Column(
+        children: [
+          CarouselSlider.builder(
+            itemCount: isLoading?4:controller.getFilmData.value?.pageProps?.data?.items?.length ?? 0,
+            itemBuilder: (context, index, realIndex) {
+              final data = controller
+                    .getFilmData.value?.pageProps?.data?.items?[index];
+              return Visibility(
+                visible: !isLoading,
+                replacement: SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height * .5,
+                  child: Shimmer.fromColors(
+                              baseColor: Colors.grey,
+                              highlightColor: Colors.grey.shade600,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  
+                                  color: Colors.grey,
                                 ),
-                    )
-                  ),
+                              ),
+                  )
+                ),
+                child: InkWell(
+                  onTap: () => Get.to(DetailView(
+                    slug: data?.slug,
+                    name: data?.name,
+                    
+                  )),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: InkWell(
-                      onTap: ()=>Get.to(DetailView(slug: controller.getFilmData.value?.pageProps?.data?.items?[index].slug,name: controller.getFilmData.value?.pageProps?.data?.items?[index].name,)),
-                      child: GlobalImage(
-                        imageUrl:
-                            "${controller.getFilmData.value?.pageProps?.data?.items?[index].thumbUrl}",
-                        boxFit: BoxFit.fill,
-                        width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.height * .5,
-                      ),
+                    padding: const EdgeInsets.symmetric(
+                         vertical: 10),
+                    child: Stack(
+                      alignment: Alignment.bottomCenter,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: GlobalImage(
+                            imageUrl: "${data?.posterUrl}",
+                            boxFit: BoxFit.fill,
+                            width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.height * .35,
+                          ),
+                        ),
+                        Positioned(
+                            top: 95,
+                            left: 15,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(data?.name??"--",style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold),),
+                                Text(data?.year.toString()??"--")
+                              ],
+                            ))
+                      ],
                     ),
                   ),
-                );
-              },
-              options: CarouselOptions(
-                  aspectRatio: 24 / 24,
-                  enlargeCenterPage: true,
-                  autoPlay: true,
-                  autoPlayInterval: const Duration(seconds: 7),
-                  // viewportFraction: 1,
-                  onPageChanged: (index, reason) {
-                    controller.activeIndex.value = index;
-                  }),
+                ),
+              );
+            },
+            options: CarouselOptions(
+                aspectRatio: 2.0,
+                enlargeCenterPage: true,
+                autoPlay: true,
+                autoPlayInterval: const Duration(seconds: 7),
+                // viewportFraction: 1,
+                onPageChanged: (index, reason) {
+                  controller.activeIndex.value = index;
+                }),
+          ),
+          Center(
+              // bottom: 2,
+              child: AnimatedSmoothIndicator(
+            count:
+                controller.getFilmData.value?.pageProps?.data?.items?.length ??
+                    0,
+            activeIndex: controller.activeIndex.value ?? 0,
+            effect: ScrollingDotsEffect(
+              dotWidth: 7,
+              dotHeight: 7,
+              dotColor: Colors.grey,
+              activeDotColor: GlobalColor.primary,
             ),
-            const SizedBox(height: 10,),
-            Center(
-                // bottom: 2,
-                child: AnimatedSmoothIndicator(
-              count: controller.getNewFilmData.value?.items.length ?? 0,
-              activeIndex: controller.activeIndex.value ?? 0,
-              effect: ScrollingDotsEffect(
-                dotWidth: 5,
-                dotHeight: 5,
-                dotColor: Colors.grey,
-                activeDotColor: GlobalColor.primary,
-              ),
-            )),
-          ],
-        ),
+          )),
+        ],
       );
     });
   }

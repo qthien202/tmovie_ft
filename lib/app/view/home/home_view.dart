@@ -65,17 +65,25 @@ class HomeView extends StatelessWidget {
                       title: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          InkWell(
-                            onTap: ()=>Get.offAll(const HomeView()),
-                            child: Text("TMOVIE",
-                            style: TextStyle(fontSize: 25,color: GlobalColor.primary,fontWeight: FontWeight.bold),
+                          Visibility(
+                            visible: MediaQuery.of(context).size.width>600,
+                            
+                            child: InkWell(
+                              onTap: ()=>Get.offAll(const HomeView()),
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 20),
+                                child: Text("TMOVIE",
+                                style: TextStyle(fontSize: 25,color: GlobalColor.primary,fontWeight: FontWeight.bold),
+                                ),
+                              ),
                             ),
                           ),
-                          const SizedBox(width: 20,),
+                          
                           
                           Expanded(
-                            flex: 2,
+                            flex: MediaQuery.of(context).size.width>600?2:1,
                             child: TabBar(
+                            
                               tabAlignment: TabAlignment.start,
                               indicatorWeight: 1,
                               isScrollable: true,
@@ -120,24 +128,34 @@ class HomeView extends StatelessWidget {
                       ),
                                   
                       actions: [
-                        IconButton(
-                            onPressed: () => Get.to(const FilterPage()),
-                            icon: const Icon(
-                              Icons.filter_alt_outlined,
-                              color: Colors.white,
-                            ))
+                        Visibility(
+                          visible: MediaQuery.of(context).size.width>600,
+                          child: IconButton(
+                              onPressed: () => Get.to(const FilterPage()),
+                              icon: const Icon(
+                                Icons.filter_alt_outlined,
+                                color: Colors.white,
+                              )),
+                        )
                       ],
                       bottom: MediaQuery.of(context).size.width < 800
-                          ? const PreferredSize(
+                          ? PreferredSize(
                               preferredSize: Size.fromHeight(56.0),
                               child: Row(
                                 children: [
-                                  Expanded(
+                                  const Expanded(
                                     child: Padding(
                                       padding: EdgeInsets.symmetric(horizontal: 5,vertical: 10),
                                       child: SearchWidget(),
                                     ),
                                   ),
+                                  IconButton(
+                              onPressed: () => Get.to(const FilterPage()),
+                              icon: const Icon(
+                                Icons.filter_alt_outlined,
+                                color: Colors.white,
+                              )),
+                                  
                                 ],
                               ),
                             )
