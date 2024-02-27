@@ -79,6 +79,7 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
       _chewieController = ChewieController(
         videoPlayerController: _videoPlayerController,
         fullScreenByDefault: true,
+        
         autoPlay: true,
         looping: false,
         allowFullScreen: true,

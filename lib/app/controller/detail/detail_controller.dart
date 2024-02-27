@@ -26,7 +26,7 @@ class DetailController extends GetxController{
   }
   
   Future<GetFilmDetails?>getFilmDetail({required String slug})async{
-    // filmDetail.value=null;
+    
     selectIndexServer.value = 0;
     filmDetail.value = await api.getFilmDetails(path: slug);
     filmDetail.refresh();

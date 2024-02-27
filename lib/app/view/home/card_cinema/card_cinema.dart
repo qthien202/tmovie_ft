@@ -33,17 +33,23 @@ class _CardCinemaState extends State<CardCinema> {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        
-        
-       Navigator.of(context).push(
-  MaterialPageRoute(
-    builder: (context) => DetailView(
+        Get.back();
+        Get.to( DetailView(
       slug: widget.slug,
       name: widget.nameProduct,
       path: widget.path,
-    ),
-  ),
-);
+    ),);
+        
+        
+//        Navigator.of(context).push(
+//   MaterialPageRoute(
+//     builder: (context) => DetailView(
+//       slug: widget.slug,
+//       name: widget.nameProduct,
+//       path: widget.path,
+//     ),
+//   ),
+// );
 
       },
       onHover: (hovering) {
