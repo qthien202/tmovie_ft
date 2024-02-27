@@ -11,8 +11,7 @@ jobs:
       - name: Get the latest code
         uses: actions/checkout@v3
       
-      - name: Build Flutter web for the first time
-        run: fvm flutter build web
+     
       
       - name: 📂 Sync files
         uses: SamKirkland/FTP-Deploy-Action@v4.0.0

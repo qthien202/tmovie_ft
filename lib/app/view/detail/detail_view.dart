@@ -297,55 +297,55 @@ class ResponsiveApp extends StatelessWidget {
                         children: [
                           const Info(),
                           // const SizedBox(height: 20,),
-                          Visibility(
-                            visible: data.status != "trailer",
-                            child: Center(
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 12,
-                                ),
-                                width: MediaQuery.of(context).size.width * .95,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(5),
-                                    color: GlobalColor.primary),
-                                child: InkWell(
-                                  onTap: () async {
-                                    // await controller.createToken(
-                                    //     name: data.name ?? "",
-                                    //     description: data.content ?? "",
-                                    //     originName: data.originName ?? "",
-                                    //     slug: data.slug ?? "",
-                                    //     thumbnail: data.thumbUrl ?? "",
-                                    //     episode: data.episodes?.first.serverData
-                                    //             ?.first.name ??
-                                    //         "");
-                                    html.window.open(
-                              episode?.linkEmbed ?? "", data?.name ?? "");
+                          // Visibility(
+                          //   visible: data.status != "trailer",
+                          //   child: Center(
+                          //     child: Container(
+                          //       padding: const EdgeInsets.symmetric(
+                          //         vertical: 12,
+                          //       ),
+                          //       width: MediaQuery.of(context).size.width * .95,
+                          //       decoration: BoxDecoration(
+                          //           borderRadius: BorderRadius.circular(5),
+                          //           color: GlobalColor.primary),
+                          //       child: InkWell(
+                          //         onTap: () async {
+                          //           // await controller.createToken(
+                          //           //     name: data.name ?? "",
+                          //           //     description: data.content ?? "",
+                          //           //     originName: data.originName ?? "",
+                          //           //     slug: data.slug ?? "",
+                          //           //     thumbnail: data.thumbUrl ?? "",
+                          //           //     episode: data.episodes?.first.serverData
+                          //           //             ?.first.name ??
+                          //           //         "");
+                          //           html.window.open(
+                          //     episode?.linkEmbed ?? "", data?.name ?? "");
 		                                    
-                                  },
-                                  child: const Center(
-                                      child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.play_arrow,
-                                        color: Colors.white,
-                                      ),
-                                      SizedBox(
-                                        width: 10,
-                                      ),
-                                      Text(
-                                        "Xem phim",
-                                        style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ],
-                                  )),
-                                ),
-                              ),
-                            ),
-                          ),
+                          //         },
+                          //         child: const Center(
+                          //             child: Row(
+                          //           mainAxisAlignment: MainAxisAlignment.center,
+                          //           children: [
+                          //             Icon(
+                          //               Icons.play_arrow,
+                          //               color: Colors.white,
+                          //             ),
+                          //             SizedBox(
+                          //               width: 10,
+                          //             ),
+                          //             Text(
+                          //               "Xem phim",
+                          //               style: TextStyle(
+                          //                   fontSize: 15,
+                          //                   fontWeight: FontWeight.bold),
+                          //             ),
+                          //           ],
+                          //         )),
+                          //       ),
+                          //     ),
+                          //   ),
+                          // ),
                           const SizedBox(
                             height: 10,
                           ),
