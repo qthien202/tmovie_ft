@@ -8,16 +8,16 @@ import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
 
 class MovieGenreview extends StatelessWidget {
-  final String slug;
+  final String? slug;
 
-  final String country;
-  final String year;
+  final String? country;
+  final String? year;
   const MovieGenreview(
       {super.key,
-      required this.slug,
+       this.slug,
       int? selectedYear,
-      required this.country,
-      required this.year});
+       this.country,
+       this.year});
 
   @override
   Widget build(BuildContext context) {
