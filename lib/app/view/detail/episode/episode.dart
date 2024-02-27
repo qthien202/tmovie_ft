@@ -81,17 +81,10 @@ class Espisode extends StatelessWidget {
                           final episode = data?.episodes?[controller.selectIndexServer.value??0].serverData?[ind];
                           return InkWell(onTap: () async {
                             controller.selectTab.value = ind;
-                            if (MediaQuery.of(context).size.width < 600) {
-                              Get.to(ChewieVideoPlayer(
-                                slug: data?.slug ?? "",
-                                fileName: data?.name ?? "",
-                                episode: episode?.name ?? "",
-                                videoUrl: episode?.linkM3u8 ?? "",
-                              ));
-                            } else {
+                            
                               html.window.open(
                                   episode?.linkEmbed ?? "", data?.name ?? "");
-                            }
+                            
                           }, child: Obx(() {
                             return Container(
                               padding: const EdgeInsets.symmetric(
