@@ -7,60 +7,136 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 class Espisode extends StatelessWidget {
-  const Espisode({super.key, });
-  
+  const Espisode({
+    super.key,
+  });
+
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(DetailController());
-    return Obx((){
+    return Obx(() {
       final data = controller.filmDetail.value?.pageProps?.data?.item;
-      return Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: SizedBox(
-          height: 40,
-          child: ListView.separated(
-            
-            shrinkWrap: true,
-            scrollDirection: Axis.horizontal,
-            itemCount: data?.episodes?.first.serverData?.length??0,
-            itemBuilder: (context,index){
-              final episode =  data?.episodes?.first.serverData?[index];
-              return InkWell(
-                onFocusChange: (hasFocus){
-                  controller.isFocusEp.value = hasFocus;
-                  controller.selectIndex.value = index;
+      return WillPopScope(
+        onWillPop: () async {
+          controller.selectIndexServer.value = 0;
+          return true;
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              height: 45,
+              child: ListView.separated(
+                shrinkWrap: true,
+                scrollDirection: Axis.horizontal,
+                itemCount: data?.episodes?.length ?? 0,
+                itemBuilder: (context, index) {
+                  final episode = data?.episodes?[index];
+                  print(">>>>>>>>>>>>${data?.episodes?.length}");
+                  return InkWell(
+                      onFocusChange: (hasFocus) {
+                        controller.isFocusSever.value = hasFocus;
+                        controller.selectIndexServer.value = index;
+                        controller.selectTabServer.value = index;
+                      },
+                      onTap: () => print("a"),
+                      child: Obx(() {
+                        return Container(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 15),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5),
+                              border: Border.all(
+                                  color:
+                                      controller.selectTabServer.value == index
+                                          ? GlobalColor.primary
+                                          : Color(0xff252836),
+                                  width: 1.5),
+                              color:GlobalColor.background2 
+                              ),
+                          child: Text(
+                            data?.episodes?[index].serverName ?? "",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        );
+                      }));
                 },
-                onTap: ()async{
-                  controller.selectTab.value = index;
-                  await controller.createToken(
-                                    name: data?.name??"",
-                                    description: data?.content??"",
-                                    originName: data?.originName??"",
-                                    slug: data?.slug??"",
-                                    thumbnail: data?.thumbUrl??"",
-                                    episode: episode?.name??""
-                                    
-                                  );
-                  Get.to(ChewieVideoPlayer(slug: data?.slug??"",fileName: data?.name??"",episode: episode?.name??"",videoUrl: episode?.linkM3u8??"",));
+                separatorBuilder: (BuildContext context, int index) {
+                  return const SizedBox(
+                    width: 20,
+                  );
                 },
-                child: Obx((){
-                  return Container(
-                  padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 15),
-                  decoration:  BoxDecoration( 
-                    //  border: Border.all(color: GlobalColor.primary)
-                    color: Color(0xff252836),
-                    border: Border.all(color:controller.isFocusEp.value && controller.selectIndex.value==index?GlobalColor.primary:Colors.transparent,width: 2)
-                  ),
-                  child: Text("${episode?.name}",style: TextStyle(color: controller.selectTab.value==index?GlobalColor.primary:Colors.white),),
-                                );
-                })
-              );
-            }, separatorBuilder: (BuildContext context, int index) {  
-              return const SizedBox(width: 20,);
-            },
-             
-              
+              ),
             ),
+            const SizedBox(
+              height: 15,
+            ),
+            Obx(() => GridView.builder(
+                  padding: EdgeInsets.only(bottom: 20),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    childAspectRatio: 40 / 15,
+                    crossAxisCount: 6,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                  ),
+                  shrinkWrap: true,
+                  itemCount: data
+                          ?.episodes?[controller.selectTabServer.value ?? 0]
+                          .serverData
+                          ?.length ??
+                      0,
+                  itemBuilder: (context, ind) {
+                    final episode = data
+                        ?.episodes?[controller.selectTabServer.value ?? 0]
+                        .serverData?[ind];
+                    return InkWell(
+                        onFocusChange: (isFocus){
+                          controller.selectTab.value =null;
+                          controller.isFocusEp.value = isFocus;
+                          controller.selectIndex.value = ind;
+                        },
+                            
+                            
+                        onTap: () async {
+                          controller.selectTab.value = ind;
+
+                          Get.to(ChewieVideoPlayer(
+                            videoUrl: episode?.linkM3u8 ?? "",
+                            fileName: data?.name ?? "",
+                            episode: episode?.name ?? "",
+                            slug: data?.slug ?? "",
+                          ));
+                        },
+                        child: Obx(() {
+                          return Container(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 15),
+                            decoration: BoxDecoration(
+                              //  border: Border.all(color: GlobalColor.primary)
+
+                              borderRadius: BorderRadius.circular(5),
+                              border: Border.all(
+                                  color: controller.selectTab.value == ind
+                                      ? GlobalColor.primary
+                                      : Color(0xff252836),
+                                  width: 1.5),
+                              color: controller.isFocusEp.value && controller.selectIndex.value == ind
+                                  ? GlobalColor.primary
+                                  : Color(0xff252836),
+                            ),
+                            child: Text(
+                              episode?.name != "Full"
+                                  ? "Tập ${episode?.name}"
+                                  : episode?.name ?? "",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  color: Colors.white),
+                            ),
+                          );
+                        }));
+                  },
+                )),
+          ],
         ),
       );
     });

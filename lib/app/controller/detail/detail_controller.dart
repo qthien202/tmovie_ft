@@ -17,7 +17,9 @@ class DetailController extends GetxController{
   Rxn<PostCreateTokenResponse>postCreateTokenData = Rxn();
   RxBool isFocus = RxBool(false);
   RxBool isFocusEp = RxBool(false);
-
+  RxBool isFocusSever = RxBool(false);
+  Rxn<int>selectIndexServer = Rxn();
+  Rxn<int>selectTabServer = Rxn();
 
   
   Future<GetFilmDetails?>getFilmDetail({required String slug})async{
