@@ -10,9 +10,9 @@ class Routes {
   static final List<GetPage> routes = [
     
     GetPage(name: '/', page: () =>  HomeView()),
-    GetPage(name: 'chi-tiet/:slug', page: ()=>const DetailView()),
-    GetPage(name: 'the-loai/:category', page: ()=>const MovieGenreview()),
-    GetPage(name: 'loai-phim/:slug', page: ()=>const ListMovieView())
+    GetPage(name: '/chi-tiet/:slug', page: ()=>const DetailView()),
+    GetPage(name: '/the-loai/:category', page: ()=>const MovieGenreview()),
+    GetPage(name: '/loai-phim/:slug', page: ()=>const ListMovieView())
     
     // Các route khác ở đây
   ];
