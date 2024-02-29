@@ -11,7 +11,7 @@ class SplashController extends GetxController{
     // TODO: implement onReady
     super.onReady();
     await homeController.getFilm(slug: "phim-bo");
-    Get.offAll(const HomeView());
+    Get.offAll( HomeView());
     
   }
 }

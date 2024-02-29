@@ -24,6 +24,7 @@ class HomeController extends GetxController {
   Rx<int>selectTab = Rx(0);
   Rx<bool>isFocusSlider = RxBool(false);
   Rx<bool>isFocusSeeAll = RxBool(false);
+  Rxn<bool>isSearch = Rxn(false);
 
   List<Map<String, dynamic>> categoryList = [
     // {"title":"Tất thể loại","slug":""},
@@ -51,8 +52,9 @@ class HomeController extends GetxController {
     categories.addAll(categoryList);
     pathFilm.value = "phim-bo";
      getFilm(slug: "phim-bo");
-    await getFilmByCategory(slug: "phim-bo");
-    // getFimCategory.refresh();
+     
+     getFilmByCategory(slug:"phim-bo");
+    getFimCategory.refresh();
     
     // getFimCategory.refresh();
   }
@@ -99,21 +101,12 @@ class HomeController extends GetxController {
           year: year);
           
       getFimCategory.refresh();
+      // print(">>>>>>>>>>>>>>Data: ${jsonEncode(getFimCategory.value[category['id']])}");
 
      
     }
      
   }
 
-  Future<void> watchNow({required String slug}) async {
-    await detail.getFilmDetail(slug: slug);
-    final data = detail.filmDetail.value?.pageProps?.data?.item;
-
-    Get.to(ChewieVideoPlayer(
-        slug: data?.slug ?? "",
-        videoUrl: data?.episodes?.first.serverData?.first.linkM3u8 ?? "",
-        fileName: data?.name ?? "",
-        episode: data?.episodes?.first.serverData?.first.name ?? ""));
-        
-  }
+ 
 }

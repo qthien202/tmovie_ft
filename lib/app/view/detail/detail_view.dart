@@ -16,28 +16,29 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'dart:html' as html;
 
 class DetailView extends StatelessWidget {
-  const DetailView({super.key, this.slug, this.name, });
-  final String? slug;
-  final String? name;
+  const DetailView({super.key,  });
+ 
   
 
   @override
   Widget build(BuildContext context) {
+    
+    
     final controller = Get.put(DetailController());
-    controller.getFilmDetail(slug: slug ?? "");
+    controller.getFilmDetail();
 
     return Visibility(
       visible: MediaQuery.of(context).size.width > 600,
       replacement: ResponsiveApp(
-        name: name,
-        slug: slug,
+        
+        
         
       ),
       child: Scaffold(
           extendBody: true,
           extendBodyBehindAppBar: true,
           backgroundColor: GlobalColor.backgroundColor,
-          appBar: AppBar(
+          appBar: MediaQuery.of(context).size.width<600?AppBar(
             leading: InkWell(
               onTap: () => Get.back(),
               child: Container(
@@ -74,19 +75,8 @@ class DetailView extends StatelessWidget {
             foregroundColor: Colors.white,
             elevation: 0.0,
             backgroundColor: GlobalColor.backgroundColor,
-          ),
-          // appBar: AppBar(
-          //   backgroundColor: GlobalColor.backgroundColor,
-          //   centerTitle: true,
-          //   title: Text(name??"--",
-          //   style: const TextStyle(
-          //     color: Colors.white,
-          //     fontSize: 16,
-          //     fontWeight: FontWeight.bold
-          //   ),
-          //   ),
-          //   foregroundColor: Colors.white,
-          // ),
+          ):null,
+         
           body: Obx(() {
             final data = controller.filmDetail.value?.pageProps?.data?.item;
             if (data == null) {
@@ -110,9 +100,10 @@ class DetailView extends StatelessWidget {
             return RefreshIndicator(
               backgroundColor: GlobalColor.backgroundColor,
               color: GlobalColor.primary,
-              onRefresh: () async => controller.getFilmDetail(slug: slug ?? ""),
+              onRefresh: () async => controller.getFilmDetail(),
               child: Center(
                 child: Container(
+                  margin: EdgeInsets.symmetric(vertical: 20),
                     color: GlobalColor.backgroundColor,
                     width: MediaQuery.of(context).size.width * .85,
                     child: ListView(
@@ -121,25 +112,30 @@ class DetailView extends StatelessWidget {
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            GlobalImage(
-                              imageUrl: data.posterUrl,
-                              width: MediaQuery.of(context).size.width * .4,
-                              height: MediaQuery.of(context).size.height * .5,
-                              boxFit: BoxFit.fill,
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: GlobalImage(
+                                imageUrl: data.posterUrl,
+                                width: MediaQuery.of(context).size.width * .4,
+                                height: MediaQuery.of(context).size.height * .5,
+                                boxFit: BoxFit.fill,
+                              ),
                             ),
                             SizedBox(
                               width: 50,
                             ),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Info(),
-                                const SizedBox(
-                                  height: 20,
-                                ),
-                                const InfoDetail(),
-                              ],
+                            Expanded(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Info(),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  const InfoDetail(),
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -152,10 +148,10 @@ class DetailView extends StatelessWidget {
                             const Text(
                               "Nội dung phim",
                               style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 16),
+                                  fontWeight: FontWeight.bold, fontSize: 20),
                             ),
                             const SizedBox(
-                              height: 10,
+                              height: 15,
                             ),
                             HtmlWidget("${data.content}")
                           ],
@@ -171,7 +167,7 @@ class DetailView extends StatelessWidget {
                               Text("Chọn server",
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 16)),
+                                      fontSize: 20)),
                               SizedBox(
                                 height: 10,
                               ),
@@ -194,15 +190,14 @@ class DetailView extends StatelessWidget {
 }
 
 class ResponsiveApp extends StatelessWidget {
-  const ResponsiveApp({super.key, this.slug, this.name, this.path});
+  const ResponsiveApp({super.key, this.slug, });
   final String? slug;
-  final String? name;
-  final String? path;
+  
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(DetailController());
-    controller.getFilmDetail(slug: slug ?? "");
+    controller.getFilmDetail();
 
     return WillPopScope(
       onWillPop: ()async{
@@ -239,7 +234,7 @@ class ResponsiveApp extends StatelessWidget {
             return RefreshIndicator(
               backgroundColor: GlobalColor.backgroundColor,
               color: GlobalColor.primary,
-              onRefresh: () async => controller.getFilmDetail(slug: slug ?? ""),
+              onRefresh: () async => controller.getFilmDetail(),
               child: CustomScrollView(
                 slivers: [
                   SliverAppBar(

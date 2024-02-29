@@ -14,7 +14,7 @@ class IndexView extends StatelessWidget {
     final controller = Get.put(IndexController());
     final List<Map<String, dynamic>> items = [
       {
-        "screen": const HomeView(),
+        "screen":  HomeView(),
         "icon": Icons.home_outlined,
         "title": "Trang chủ"
       },

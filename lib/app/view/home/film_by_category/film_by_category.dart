@@ -1,5 +1,5 @@
 import 'package:app_ft_movies/app/core/global_color.dart';
-import 'package:app_ft_movies/app/view/home/card_cinema/card_cinema.dart';
+import 'package:app_ft_movies/app/widgets/card_cinema/card_cinema.dart';
 import 'package:app_ft_movies/app/view/list_movie/list_movie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,7 +14,8 @@ class FilmByCategory extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(HomeController());
-    final int itemCount = controller.categories.length;
+    return Obx(() {
+      final int itemCount = controller.categories.length;
     
     return SliverList.separated(
       
@@ -45,12 +46,8 @@ class FilmByCategory extends StatelessWidget {
                           controller.isFocusSeeAll.value = hasFocus;
                         },
                         onPressed: () {
-                          Get.to(ListMovieView(
-                            category: controller.categories[ind]['slug']??"",
-                            slug:controller.pathFilm.value,
-                            country: controller.categories[ind]['country']??"",
-                            
-                          ));
+                          Get.toNamed("/loai-phim/${controller.pathFilm.value??""}?category=${controller.categories[ind]['slug']??""}&country=${controller.categories[ind]['country']??""}");
+                        
                         },
                         child: const Text(
                           "Xem thêm",
@@ -120,5 +117,6 @@ class FilmByCategory extends StatelessWidget {
       },
       separatorBuilder: (BuildContext context, int index) => const SizedBox(height: 10),
     );
+    });
   }
 }

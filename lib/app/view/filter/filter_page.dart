@@ -119,21 +119,12 @@ class _FilterPageState extends State<FilterPage> {
               }),
               onPressed: () {
                 if (widget.slug != null) {
-                  Get.to(ListMovieView(
-                    country: selectedCountry ?? "",
-                    year: selectedYear.toString(),
-                    category: selectedGenre ?? "",
-                    slug: widget.slug,
-                  ));
+                  Get.toNamed("/loai-phim/${widget.slug}?category=${selectedGenre??""}&country=${selectedCountry??""}&year=${selectedYear??""}");
                 } else {
                   if (selectedGenre == null) {
                     Get.snackbar("Thông báo", "Vui lòng chọn thể loại phim trước",backgroundColor: Colors.white);
                   } else {
-                    Get.to(MovieGenreview(
-                      slug: selectedGenre ?? "",
-                      country: selectedCountry ?? "",
-                      year: selectedYear.toString()
-                    ));
+                    Get.toNamed("/the-loai/${selectedGenre??""}?country=${selectedCountry??""}&year=${selectedYear??""}");
                   }
                 }
               },

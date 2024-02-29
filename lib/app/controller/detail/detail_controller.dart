@@ -27,14 +27,21 @@ class DetailController extends GetxController{
     selectIndexServer.value = 0;
   }
   
-  Future<GetFilmDetails?>getFilmDetail({required String slug})async{
-    filmDetail.value = null;
-    filmDetail.refresh();
-    selectIndexServer.value = 0;
-    filmDetail.value = await api.getFilmDetails(path: slug);
-    filmDetail.refresh();
-    return filmDetail.value;
-  }
+  Future<GetFilmDetails?> getFilmDetail() async {
+  filmDetail.value = null;
+  filmDetail.refresh();
+  
+  
+  final slug = Get.parameters['slug'];
+  filmDetail.value = await api.getFilmDetails(path: slug??"");
+  
+  
+  filmDetail.refresh();
+
+  
+  return filmDetail.value;
+}
+
 
 
   Future<void>createToken({ required String name, required String slug, required String thumbnail, required String originName, required String episode, required String description})async{

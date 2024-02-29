@@ -1,6 +1,6 @@
 import 'package:app_ft_movies/app/controller/home/home_controller.dart';
 import 'package:app_ft_movies/app/core/global_color.dart';
-import 'package:app_ft_movies/app/view/home/card_cinema/card_cinema.dart';
+import 'package:app_ft_movies/app/widgets/card_cinema/card_cinema.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

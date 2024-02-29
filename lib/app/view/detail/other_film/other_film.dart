@@ -1,7 +1,7 @@
 import 'package:app_ft_movies/app/controller/detail/detail_controller.dart';
 import 'package:app_ft_movies/app/controller/movie_genre/movie_genre_controller.dart';
 import 'package:app_ft_movies/app/core/global_color.dart';
-import 'package:app_ft_movies/app/view/home/card_cinema/card_cinema.dart';
+import 'package:app_ft_movies/app/widgets/card_cinema/card_cinema.dart';
 import 'package:app_ft_movies/app/view/movie_genre/movie_genre_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -17,16 +17,13 @@ class OtherFilmView extends StatelessWidget {
     final detailController = Get.put(DetailController());
     final GlobalKey<ScaffoldState> key = GlobalKey<ScaffoldState>();
     final controller = Get.put(MovieGenreController());
-    controller.getMovieGenre(
-        slug: detailController
-            .filmDetail.value?.pageProps?.data?.item?.category?.first.slug);
+    controller.getMovieGenre(slug: detailController.filmDetail.value?.pageProps?.data
+                            ?.item?.category?.first.slug);
 
     return RefreshIndicator(
         backgroundColor: GlobalColor.backgroundColor,
         color: GlobalColor.primary,
-        onRefresh: () async => controller.getMovieGenre(
-            slug: detailController
-                .filmDetail.value?.pageProps?.data?.item?.category?.first.slug),
+        onRefresh: () async => controller.getMovieGenre(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -40,10 +37,8 @@ class OtherFilmView extends StatelessWidget {
                   visible: MediaQuery.of(context).size.width<600,
                   child: TextButton(
                     onPressed: () {
-                      Get.to(MovieGenreview(
-                        slug: detailController.filmDetail.value?.pageProps?.data
-                            ?.item?.category?.first.slug,
-                      ));
+                      Get.toNamed("/the-loai/${detailController.filmDetail.value?.pageProps?.data
+                            ?.item?.category?.first.slug}");
                     },
                     child: const Text(
                       "Xem thêm",
@@ -83,13 +78,15 @@ class OtherFilmView extends StatelessWidget {
                             ),
                           ),
                         )),
-                    child: CardCinema(
-                      imageLink: items?.thumbUrl ?? "",
-                      nameProduct: items?.name,
-                      originName: items?.originName ?? "",
-                      slug: items?.slug ?? "",
-                      path: controller
-                          .movieGenre.value?.pageProps?.data?.typeList,
+                    child: InkWell(
+                      child: CardCinema(
+                        imageLink: items?.thumbUrl ?? "",
+                        nameProduct: items?.name,
+                        originName: items?.originName ?? "",
+                        slug: items?.slug ?? "",
+                        path: controller
+                            .movieGenre.value?.pageProps?.data?.typeList,
+                      ),
                     ),
                   );
                 },

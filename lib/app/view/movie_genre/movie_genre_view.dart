@@ -2,7 +2,7 @@ import 'package:app_ft_movies/app/controller/movie_genre/movie_genre_controller.
 import 'package:app_ft_movies/app/core/global_color.dart';
 import 'package:app_ft_movies/app/view/detail/detail_view.dart';
 import 'package:app_ft_movies/app/view/filter/filter_page.dart';
-import 'package:app_ft_movies/app/view/home/card_cinema/card_cinema.dart';
+import 'package:app_ft_movies/app/widgets/card_cinema/card_cinema.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
@@ -23,12 +23,12 @@ class MovieGenreview extends StatelessWidget {
   Widget build(BuildContext context) {
     final GlobalKey<ScaffoldState> key = GlobalKey<ScaffoldState>();
     final controller = Get.put(MovieGenreController());
-    controller.getMovieGenre(slug: slug, country: country, year: year);
+    controller.getMovieGenre();
     return RefreshIndicator(
       backgroundColor: GlobalColor.backgroundColor,
       color: GlobalColor.primary,
       onRefresh: () async =>
-          controller.getMovieGenre(slug: slug, country: country, year: year),
+          controller.getMovieGenre(),
       child: Scaffold(
         backgroundColor: GlobalColor.backgroundColor,
         appBar: AppBar(
@@ -173,8 +173,7 @@ class MovieGenreview extends StatelessWidget {
                                   print(
                                       ">>>>>>>>>>>>>${controller.selectIndex.value}");
                                   controller.movieGenre.value = null;
-                                  await controller.getMovieGenre(
-                                      slug: slug, country: country, year: year);
+                                  await controller.getMovieGenre();
                                 },
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(

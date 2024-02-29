@@ -57,11 +57,7 @@ class SliderCinema extends StatelessWidget {
                           )),
                     ),
                     child: InkWell(
-                      onTap: () => Get.to(DetailView(
-                        slug: data?.slug,
-                        name: data?.name,
-                        
-                      )),
+                      onTap: () => Get.toNamed('/chi-tiet/${data?.slug}'),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                              vertical: 10),
@@ -158,11 +154,7 @@ class ResponsiveApp extends StatelessWidget {
                   )
                 ),
                 child: InkWell(
-                  onTap: () => Get.to(DetailView(
-                    slug: data?.slug,
-                    name: data?.name,
-                    
-                  )),
+                  onTap: () =>Get.toNamed('/chi-tiet/${data?.slug}'),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                          vertical: 10),

@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:app_ft_movies/app/core/dependency_injections.dart';
 import 'package:app_ft_movies/app/core/global_color.dart';
+import 'package:app_ft_movies/app/core/routes.dart';
 import 'package:app_ft_movies/app/view/home/home_view.dart';
 import 'package:app_ft_movies/app/view/splash/splash.dart';
 import 'package:app_ft_movies/app/widgets/connect_wrap/connect_wrap_view.dart';
@@ -23,6 +24,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      getPages: Routes.routes,
+      // initialRoute: '/',
       scrollBehavior: MyCustomScrollBehavior(),
       debugShowCheckedModeBanner: false,
       title: 'TMOVIE',
@@ -47,7 +50,7 @@ class MyApp extends StatelessWidget {
     
         
       ),
-      home: const SplashView(),
+      
     );
   }
 }

@@ -12,13 +12,20 @@ class ListMovieController extends GetxController {
   RxBool isFocusPage = RxBool(false);
   RxBool isFocusMenu = RxBool(false);
   Future<GetFilmByCategory?> getListMovie(
-      {String? slug, String? category, String? country, String? year}) async {
+      ) async {
+
+    final path = Get.parameters['slug'];
+    final category = Get.parameters['category'];
+    final country = Get.parameters['country'];
+    final year = Get.parameters['year'];
     listMovie.value = await api.getFilmByCategory(
-        path: slug ?? "",
+        path: path??"",
         page: (selectPage.value ?? 0) + 1,
         category: category??"",
         country: country??"",
-        year: year??"");
+        year: year??""
+        
+        );
     for (var i = 0;
         i < (listMovie.value?.pageProps?.data?.items?.length ?? 0);
         i++) {

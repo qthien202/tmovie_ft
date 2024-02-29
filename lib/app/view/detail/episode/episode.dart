@@ -1,7 +1,6 @@
 import 'package:app_ft_movies/app/controller/detail/detail_controller.dart';
 import 'package:app_ft_movies/app/core/global_color.dart';
 import 'package:app_ft_movies/app/data/repository/get_film_details.dart';
-import 'package:app_ft_movies/app/widgets/global_web/global_web.dart';
 import 'package:app_ft_movies/app/widgets/video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

@@ -21,78 +21,40 @@ class InfoDetail extends StatelessWidget {
           const SizedBox(
             height: 10,
           ),
+          Text("Số tập : ${data?.episodeTotal}"),
+          
+          const SizedBox(
+            height: 10,
+          ),
+          Text("Ngôn ngữ : ${data?.lang}"),
+         
+          const SizedBox(
+            height: 10,
+          ),
+          Text("Quốc gia : ${data?.country?.first.name}"),
+          const SizedBox(
+            height: 10,
+          ),
+         
           Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text("Số tập :"),
-              const SizedBox(
-                width: 10,
-              ),
-              Text(data?.episodeTotal ?? "--")
-            ],
+            children: (data?.director ?? []).map((director) {
+              return Text(director==""?"Đạo diễn: không có thông tin":"Đạo diễn: $director, ");
+            }).toList(),
           ),
           const SizedBox(
             height: 10,
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text("Ngôn ngữ :"),
-              const SizedBox(
-                width: 10,
-              ),
-              Text(data?.lang ?? "--"),
-            ],
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text("Quốc gia :"),
-              const SizedBox(
-                width: 10,
-              ),
-              Text(data?.country?.first.name ?? "--"),
-            ],
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text("Đạo diễn :"),
-              const SizedBox(
-                width: 10,
-              ),
-              Row(
-                children: (data?.director ?? []).map((director) {
-                  return Text(director==""?"chưa biết":"$director, ");
-                }).toList(),
-              ),
-            ],
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.start,
-          //   children: [
-          //     Text("Diễn viên:"),
-          //     const SizedBox(
-          //       width: 10,
-          //     ),
-          //     Row(
-          //       children: (data?.actor?? []).map((actor) {
-          //         return Text(actor==""?"chưa biết":"$actor, ");
-          //       }).toList(),
-          //     ),
-          //   ],
-          // ),
           
           
+          Row(
+            children: (data?.actor ?? []).map((actor) {
+              return Text(actor==""?"không có thông tin":"$actor, ");
+            }).toList(),
+          ),
+          
+          const SizedBox(
+            height: 10,
+          ),
           Container(
             padding: EdgeInsets.symmetric(horizontal: 20,vertical: 10),
             decoration: BoxDecoration(

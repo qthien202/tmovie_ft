@@ -2,7 +2,7 @@ import 'package:app_ft_movies/app/controller/list_movie/list_movie_controller.da
 import 'package:app_ft_movies/app/core/global_color.dart';
 import 'package:app_ft_movies/app/view/detail/detail_view.dart';
 import 'package:app_ft_movies/app/view/filter/filter_page.dart';
-import 'package:app_ft_movies/app/view/home/card_cinema/card_cinema.dart';
+import 'package:app_ft_movies/app/widgets/card_cinema/card_cinema.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,8 +11,8 @@ import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ListMovieView extends StatelessWidget {
-  const ListMovieView({super.key,  this.slug,  this.country, this.category, this.year});
-  final String? slug;
+  const ListMovieView({super.key,   this.country, this.category, this.year});
+  
   
   final String? country;
   final String? category;
@@ -21,18 +21,18 @@ class ListMovieView extends StatelessWidget {
   Widget build(BuildContext context) {
     final GlobalKey<ScaffoldState> key = GlobalKey<ScaffoldState>();
     final controller = Get.put(ListMovieController());
-    controller.getListMovie(slug: slug,category: category??"",country: country??"",year: year??"");
+    controller.getListMovie();
      
    
       return RefreshIndicator(
         backgroundColor: GlobalColor.backgroundColor,
         color: GlobalColor.primary,
-        onRefresh: ()async=>controller.getListMovie(slug: slug,category: category??"",country: country??"",year: year??""),
+        onRefresh: ()async=>controller.getListMovie(),
         child: Scaffold(
          
           backgroundColor: GlobalColor.backgroundColor,
           appBar: AppBar(
-            
+            automaticallyImplyLeading: MediaQuery.of(context).size.width<600?true:false,
             backgroundColor: GlobalColor.backgroundColor,
             foregroundColor: Colors.white,
             title: Obx(() => Text(controller.listMovie.value?.pageProps?.data?.titlePage??""),),
@@ -43,7 +43,7 @@ class ListMovieView extends StatelessWidget {
                   print(">>>>>>>>>>>>>>>>>$hasFocus");
                 },
               onTap: (){
-                Get.to( FilterPage(slug: slug??""),transition: Transition.rightToLeft);
+                Get.to( FilterPage(slug: Get.parameters['slug']),transition: Transition.rightToLeft);
               },
               child:  Padding(
                 padding: EdgeInsets.symmetric(horizontal:8.0),
@@ -65,7 +65,7 @@ class ListMovieView extends StatelessWidget {
                   ),
                 ),
               ),
-            ),)
+                          ),)
             ],
           ),
           body: Center(
@@ -153,7 +153,7 @@ class ListMovieView extends StatelessWidget {
                               controller.selectPage.value = index;
                               print(">>>>>>>>>>>>>${controller.selectIndex.value}");
                               controller.listMovie.value=null;
-                              await controller.getListMovie(slug: slug,category: category,country: country);
+                              await controller.getListMovie();
                             },
                             child: Container(
                               padding:

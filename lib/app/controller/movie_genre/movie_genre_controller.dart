@@ -24,12 +24,22 @@ class MovieGenreController extends GetxController{
 
   
 
-  Future<GetFilmByCategory?>getMovieGenre({required String? slug,String? country, String? year})async{
-    
-    movieGenre.value = await api.getMovieGenre(path: slug??"", page: (selectIndex.value??0)+1,country: country,year: year);
+  Future<GetFilmByCategory?>getMovieGenre({String? slug})async{
+    if(slug!=null){
+      movieGenre.value = await api.getMovieGenre(path: slug, page: (selectIndex.value??0)+1,country: "",year: "");
     movieGenre.refresh();
     final double itemLength = (movieGenre.value?.pageProps?.data?.params?.pagination?.totalItems??0) / (movieGenre.value?.pageProps?.data?.params?.pagination?.totalItemsPerPage??0);
     totalPage.value = itemLength.round();
     return movieGenre.value;
+    }
+    
+    else{final category = Get.parameters['category'];
+    final country = Get.parameters['country'];
+    final year = Get.parameters['year'];
+    movieGenre.value = await api.getMovieGenre(path: category??"", page: (selectIndex.value??0)+1,country: country,year: year);
+    movieGenre.refresh();
+    final double itemLength = (movieGenre.value?.pageProps?.data?.params?.pagination?.totalItems??0) / (movieGenre.value?.pageProps?.data?.params?.pagination?.totalItemsPerPage??0);
+    totalPage.value = itemLength.round();
+    return movieGenre.value;}
   }
 }
