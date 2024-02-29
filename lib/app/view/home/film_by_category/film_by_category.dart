@@ -69,7 +69,7 @@ class FilmByCategory extends StatelessWidget {
                       shrinkWrap: false,
                       scrollDirection: Axis.horizontal,
                       
-                      itemCount: isLoading ? 5 : (controller.getFimCategory.value[controller.categories[ind]['id']]?.pageProps?.data?.items?.length ?? 0)>10?10:(controller.getFimCategory.value[controller.categories[ind]['id']]?.pageProps?.data?.items?.length ?? 0),
+                      itemCount: isLoading ? 6 : (controller.getFimCategory.value[controller.categories[ind]['id']]?.pageProps?.data?.items?.length ?? 0)>10?10:(controller.getFimCategory.value[controller.categories[ind]['id']]?.pageProps?.data?.items?.length ?? 0),
                       itemBuilder: (context, index) {
                         final data = items?[index];
                         return Visibility(

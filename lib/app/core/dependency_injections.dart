@@ -7,6 +7,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:get/get.dart'as GET;
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/foundation.dart';
 
 
 class DependencyInjections implements GET.Bindings {
@@ -20,7 +21,9 @@ class DependencyInjections implements GET.Bindings {
 
   Future<Dio> _dio() async {
     var dio = Dio();
-    dio.interceptors.add(CurlLoggerDioInterceptor(
+    
+    if(kDebugMode){
+      dio.interceptors.add(CurlLoggerDioInterceptor(
       printOnSuccess: true
     ));
     dio.interceptors.add(PrettyDioLogger(
@@ -31,6 +34,8 @@ class DependencyInjections implements GET.Bindings {
         error: true,
         compact: true,
         maxWidth: 90));
+    }
+    
 
 
       dio.interceptors.add(InterceptorsWrapper(
