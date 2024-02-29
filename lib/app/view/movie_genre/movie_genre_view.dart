@@ -32,50 +32,42 @@ class MovieGenreview extends StatelessWidget {
       child: Scaffold(
         backgroundColor: GlobalColor.backgroundColor,
         appBar: AppBar(
-          backgroundColor: GlobalColor.backgroundColor,
-          foregroundColor: Colors.white,
-          title: Obx(
-            () => Text(
-                controller.movieGenre.value?.pageProps?.data?.titlePage ?? ""),
-          ),
-          actions: [
-            Obx(
-              () => InkWell(
-                onHover: (hasFocus) {
+            automaticallyImplyLeading: MediaQuery.of(context).size.width<600?true:false,
+            backgroundColor: GlobalColor.backgroundColor,
+            foregroundColor: Colors.white,
+            title: Obx(() => Text(controller.movieGenre.value?.pageProps?.data?.titlePage??""),),
+            actions: [
+              Obx(() => InkWell(
+                onHover: (hasFocus){
                   controller.isFocusMenu.value = hasFocus;
                   print(">>>>>>>>>>>>>>>>>$hasFocus");
                 },
-                onTap: () {
-                  Get.to(const FilterPage(),
-                      transition: Transition.rightToLeft);
-                },
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 8.0),
-                  child: AnimatedContainer(
-                    duration: Duration(seconds: 200),
-                    curve: Curves.easeInOut,
-                    child: Transform.scale(
-                      scale: controller.isFocusMenu.value ? 1.2 : 1,
-                      child: Container(
-                        padding: EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                            border: Border.all(
-                                color: controller.isFocusMenu.value
-                                    ? Colors.white
-                                    : Colors.transparent,
-                                width: 2)),
-                        child: Icon(
-                          Icons.filter_alt_outlined,
-                          color: Colors.white,
-                        ),
+              onTap: (){
+                Get.to( FilterPage(slug: Get.parameters['slug']),transition: Transition.rightToLeft);
+              },
+              child:  Padding(
+                padding: EdgeInsets.symmetric(horizontal:8.0),
+                child: AnimatedContainer(
+                  duration: Duration(seconds: 200),
+                 curve: Curves.easeInOut, 
+                  child: Transform.scale(
+                    scale: controller.isFocusMenu.value?1.2:1,
+                    child: Container(
+                      padding: EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: controller.isFocusMenu.value?Colors.white:Colors.transparent,width: 2)
+                      ),
+                      child: Icon(
+                        Icons.filter_alt_outlined,
+                        color: Colors.white,
                       ),
                     ),
                   ),
                 ),
               ),
-            )
-          ],
-        ),
+                          ),)
+            ],
+          ),
         body: Center(
           child: Container(
             color: GlobalColor.backgroundColor,
