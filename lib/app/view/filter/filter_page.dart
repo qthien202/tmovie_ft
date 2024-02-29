@@ -119,12 +119,12 @@ class _FilterPageState extends State<FilterPage> {
               }),
               onPressed: () {
                 if (widget.slug != null) {
-                  Get.toNamed("/loai-phim/${widget.slug}?category=${selectedGenre??""}&country=${selectedCountry??""}&year=${selectedYear??""}");
+                  Get.toNamed("loai-phim/${widget.slug}?category=${selectedGenre??""}&country=${selectedCountry??""}&year=${selectedYear??""}");
                 } else {
                   if (selectedGenre == null) {
                     Get.snackbar("Thông báo", "Vui lòng chọn thể loại phim trước",backgroundColor: Colors.white);
                   } else {
-                    Get.toNamed("/the-loai/${selectedGenre??""}?country=${selectedCountry??""}&year=${selectedYear??""}");
+                    Get.toNamed("the-loai/${selectedGenre??""}?country=${selectedCountry??""}&year=${selectedYear??""}");
                   }
                 }
               },

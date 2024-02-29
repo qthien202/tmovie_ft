@@ -32,7 +32,7 @@ class _CardCinemaState extends State<CardCinema> {
     return InkWell(
       onTap: () {
         Get.back();
-        Get.toNamed('/chi-tiet/${widget.slug}');
+        Get.toNamed('chi-tiet/${widget.slug}');
 
 //        Navigator.of(context).push(
 //   MaterialPageRoute(

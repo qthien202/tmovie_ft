@@ -57,7 +57,7 @@ class SliderCinema extends StatelessWidget {
                           )),
                     ),
                     child: InkWell(
-                      onTap: () => Get.toNamed('/chi-tiet/${data?.slug}'),
+                      onTap: () => Get.toNamed('chi-tiet/${data?.slug}'),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                              vertical: 10),
