@@ -21,7 +21,7 @@ class SearchWidgetController extends GetxController{
   void onReady()async{
     super.onReady();
     // search.value = await api.getMovieGenre(path: "hanh-dong", page: 1, country: "", year: "2024");
-    await getSearch(page: 1);
+    
   }
   
 
