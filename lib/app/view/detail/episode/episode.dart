@@ -33,7 +33,7 @@ class Espisode extends StatelessWidget {
                 itemCount: data?.episodes?.length ?? 0,
                 itemBuilder: (context, index) {
                   final episode = data?.episodes?[index];
-                  print(">>>>>>>>>>>>${data?.episodes?.length}");
+                  
                   return InkWell(onHover: (hasFocus) {
                     controller.isFocusEp.value = hasFocus;
                     controller.selectIndex.value = index;

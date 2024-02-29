@@ -40,7 +40,7 @@ class ListMovieView extends StatelessWidget {
               Obx(() => InkWell(
                 onHover: (hasFocus){
                   controller.isFocusMenu.value = hasFocus;
-                  print(">>>>>>>>>>>>>>>>>$hasFocus");
+                  
                 },
               onTap: (){
                 Get.to( FilterPage(slug: Get.parameters['slug']),transition: Transition.rightToLeft);
@@ -151,7 +151,7 @@ class ListMovieView extends StatelessWidget {
                             },
                             onTap: () async{
                               controller.selectPage.value = index;
-                              print(">>>>>>>>>>>>>${controller.selectIndex.value}");
+                              
                               controller.listMovie.value=null;
                               await controller.getListMovie();
                             },

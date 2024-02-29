@@ -126,8 +126,7 @@ class OtherFilmView extends StatelessWidget {
                             onTap: () async {
                               detailController.scrollController.jumpTo(100);
                               controller.selectPage.value = index;
-                              print(
-                                  ">>>>>>>>>>>>>${controller.selectIndex.value}");
+                              
 
                               await controller.getMovieGenre(
                                   slug: detailController

@@ -162,8 +162,7 @@ class MovieGenreview extends StatelessWidget {
                                 },
                                 onTap: () async {
                                   controller.selectPage.value = index;
-                                  print(
-                                      ">>>>>>>>>>>>>${controller.selectIndex.value}");
+                                  
                                   controller.movieGenre.value = null;
                                   await controller.getMovieGenre();
                                 },

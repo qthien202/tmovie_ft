@@ -101,7 +101,7 @@ class HomeController extends GetxController {
           year: year);
           
       getFimCategory.refresh();
-      // print(">>>>>>>>>>>>>>Data: ${jsonEncode(getFimCategory.value[category['id']])}");
+      
 
      
     }

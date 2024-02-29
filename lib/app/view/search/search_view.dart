@@ -110,7 +110,7 @@ class SearchView extends StatelessWidget {
                             },
                             onTap: () async {
                               controller.selectIndex.value = index;
-                              print(">>>>>>>>>>>>>${controller.selectIndex.value}");
+                              
                               controller.search.value = null;
                               await controller.getSearch(page: index + 1);
                             },

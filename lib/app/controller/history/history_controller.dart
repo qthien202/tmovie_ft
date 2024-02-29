@@ -35,7 +35,7 @@ class HistoryController extends GetxController{
         
         if((limit.value)<(getHistoryData.value?.total??0)){
           isLoadmore.value = true;
-          print(">>>>>>>>>>>>>>>>>>>>>>>>>AAAAAAAAAAAAAAAAAA");
+          
           limit.value+=10;
           
           await getHistory();
