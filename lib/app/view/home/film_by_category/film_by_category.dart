@@ -46,7 +46,7 @@ class FilmByCategory extends StatelessWidget {
                           controller.isFocusSeeAll.value = hasFocus;
                         },
                         onPressed: () {
-                          Get.toNamed("loai-phim/${controller.pathFilm.value??""}?category=${controller.categories[ind]['slug']??""}&country=${controller.categories[ind]['country']??""}");
+                          Get.toNamed("/loai-phim/${controller.pathFilm.value??""}?category=${controller.categories[ind]['slug']??""}&country=${controller.categories[ind]['country']??""}");
                         
                         },
                         child: const Text(

@@ -37,7 +37,7 @@ class OtherFilmView extends StatelessWidget {
                   visible: MediaQuery.of(context).size.width<600,
                   child: TextButton(
                     onPressed: () {
-                      Get.toNamed("the-loai/${detailController.filmDetail.value?.pageProps?.data
+                      Get.toNamed("/the-loai/${detailController.filmDetail.value?.pageProps?.data
                             ?.item?.category?.first.slug}");
                     },
                     child: const Text(
