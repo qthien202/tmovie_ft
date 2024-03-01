@@ -5,7 +5,7 @@ import 'package:app_ft_movies/app/view/detail/episode/episode.dart';
 import 'package:app_ft_movies/app/view/detail/info/info.dart';
 import 'package:app_ft_movies/app/view/detail/info_details/info_details.dart';
 import 'package:app_ft_movies/app/view/detail/other_film/other_film.dart';
-import 'package:app_ft_movies/app/view/filter/filter_page.dart';
+import 'package:app_ft_movies/app/view/filter/filter_app.dart';
 import 'package:app_ft_movies/app/view/header/header_view.dart';
 import 'package:app_ft_movies/app/view/home/film_by_category/film_by_category.dart';
 import 'package:app_ft_movies/app/widgets/global_image.dart';
@@ -32,7 +32,7 @@ class DetailView extends StatelessWidget {
         replacement: const ResponsiveApp(),
         child: DefaultTabController(
           length: homeController.tabItem.length,
-          initialIndex: homeController.tabIndex.value,
+          initialIndex: homeController.tabIndex.value??0,
           child: Scaffold(
               extendBody: true,
               extendBodyBehindAppBar: true,
@@ -237,7 +237,7 @@ class ResponsiveApp extends StatelessWidget {
                     actions: [
                       InkWell(
                         onTap: () {
-                          Get.to(const FilterPage(),
+                          Get.to(const FilterApp(),
                               transition: Transition.rightToLeft);
                         },
                         child: Container(

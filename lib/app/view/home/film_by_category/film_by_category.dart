@@ -1,3 +1,4 @@
+import 'package:app_ft_movies/app/controller/filter/filter_controller.dart';
 import 'package:app_ft_movies/app/core/global_color.dart';
 import 'package:app_ft_movies/app/widgets/card_cinema/card_cinema.dart';
 import 'package:app_ft_movies/app/view/list_movie/list_movie.dart';
@@ -46,8 +47,11 @@ class FilmByCategory extends StatelessWidget {
                           controller.isFocusSeeAll.value = hasFocus;
                         },
                         onPressed: () {
-                          Get.toNamed("/loai-phim/${controller.pathFilm.value??""}?category=${controller.categories[ind]['slug']??""}&country=${controller.categories[ind]['country']??""}");
-                        
+                          
+                          final filter = Get.put(FilterController());
+                          filter.selectedGenre.value = controller.categories[ind]['slug']??"";
+                          filter.selectedCountry.value = controller.categories[ind]['country']??"";
+                          filter.getFilmFilter();
                         },
                         child: const Text(
                           "Xem thêm",

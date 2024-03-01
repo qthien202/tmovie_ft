@@ -1,3 +1,4 @@
+import 'package:app_ft_movies/app/controller/filter/filter_controller.dart';
 import 'package:app_ft_movies/app/controller/search/search_widget_controller.dart';
 import 'package:app_ft_movies/app/core/global_color.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,8 @@ class SearchWidget extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 16,vertical: 5),
       child: TextField(
         onSubmitted: (val)async{
+          
+          
           controller.isSearch.value=true;
           controller.textSearch.value = controller.keywordController.text;
           controller.selectIndex.value = 0;
@@ -22,11 +25,13 @@ class SearchWidget extends StatelessWidget {
           
           
         },
-        // onChanged: (val)async{
-        //   controller.selectIndex.value = 0;
-
-        //   await controller.getSearch();
-        // },
+        onChanged: (val)async{
+          controller.isSearch.value=true;
+          controller.textSearch.value = controller.keywordController.text;
+          controller.selectIndex.value = 0;
+          Get.toNamed('/');
+          await controller.getSearch();
+        },
         controller: controller.keywordController,
         readOnly: false,
         decoration: InputDecoration(

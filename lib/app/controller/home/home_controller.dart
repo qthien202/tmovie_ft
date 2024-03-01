@@ -18,7 +18,7 @@ class HomeController extends GetxController {
   RxBool isFocusTab = RxBool(false);
   RxBool isFocusInfo = RxBool(false);
   Rxn<int> activeIndex = Rxn();
-  Rx<int> tabIndex = Rx(0);
+  Rxn<int> tabIndex = Rxn(0);
   Rxn<String>pathFilm = Rxn();
   Rx<int>currentIndex = Rx(0);
   Rx<int>selectTab = Rx(0);

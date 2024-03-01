@@ -18,9 +18,11 @@ class SearchWidgetController extends GetxController{
   Rxn<String>textSearch = Rxn();
   // final  genre = Get.put(MovieGenreController());
 
-  void onReady()async{
-    super.onReady();
-    // search.value = await api.getMovieGenre(path: "hanh-dong", page: 1, country: "", year: "2024");
+  
+  void onStop()async{
+    
+    isSearch.value = false;
+    keywordController.text = "";
     
   }
   

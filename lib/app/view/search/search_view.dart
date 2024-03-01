@@ -1,6 +1,6 @@
 import 'package:app_ft_movies/app/controller/search/search_widget_controller.dart';
 import 'package:app_ft_movies/app/core/global_color.dart';
-import 'package:app_ft_movies/app/view/filter/filter_page.dart';
+import 'package:app_ft_movies/app/view/filter/filter_app.dart';
 import 'package:app_ft_movies/app/widgets/card_cinema/card_cinema.dart';
 import 'package:app_ft_movies/app/widgets/search_widget.dart';
 import 'package:flutter/material.dart';

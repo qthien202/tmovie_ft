@@ -1,7 +1,8 @@
+import 'package:app_ft_movies/app/controller/filter/filter_controller.dart';
 import 'package:app_ft_movies/app/controller/home/home_controller.dart';
 import 'package:app_ft_movies/app/controller/search/search_widget_controller.dart';
 import 'package:app_ft_movies/app/core/global_color.dart';
-import 'package:app_ft_movies/app/view/filter/filter_page.dart';
+import 'package:app_ft_movies/app/view/filter/filter_app.dart';
 import 'package:app_ft_movies/app/view/home/home_view.dart';
 import 'package:app_ft_movies/app/widgets/search_widget.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,7 @@ class HeaderPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(HomeController());
     final searchController = Get.put(SearchWidgetController());
+    final filterController = Get.put(FilterController());
     return SliverAppBar(
       pinned: false,
       centerTitle: false,
@@ -38,13 +40,13 @@ class HeaderPage extends StatelessWidget {
             ),
           ),
           Expanded(
-            flex: MediaQuery.of(context).size.width > 600 ? 2 : 1,
+            flex: MediaQuery.of(context).size.width > 600 ? 3 : 1,
             child: TabBar(
               tabAlignment: TabAlignment.start,
-              indicatorWeight: 1,
+              // indicatorWeight: 1,
               isScrollable: true,
               dividerColor: Colors.transparent,
-              indicatorColor: Colors.white,
+              indicatorColor: Colors.transparent,
               unselectedLabelColor: Colors.grey,
               unselectedLabelStyle: const TextStyle(
                 fontWeight: FontWeight.w900,
@@ -56,7 +58,8 @@ class HeaderPage extends StatelessWidget {
                 fontSize: 20,
               ),
               onTap: (ind) async {
-                searchController.isSearch.value = false;
+                searchController.onStop();
+                filterController.onStop();
                 controller.pathFilm.value = controller.tabItem[ind]['slug'];
                 controller.tabIndex.value = ind;
                 controller.scrollController.value?.jumpTo(0);
@@ -73,6 +76,7 @@ class HeaderPage extends StatelessWidget {
           ),
           MediaQuery.of(context).size.width >= 800
               ? const Expanded(
+                flex: 1,
                   child: Padding(
                   padding: EdgeInsets.all(8.0),
                   child: SearchWidget(),
@@ -85,7 +89,7 @@ class HeaderPage extends StatelessWidget {
       //   Visibility(
       //     visible: MediaQuery.of(context).size.width > 600,
       //     child: IconButton(
-      //         onPressed: () => Get.to(const FilterPage()),
+      //         onPressed: () => Get.to(const FilterApp()),
       //         icon: const Icon(
       //           Icons.filter_alt_outlined,
       //           color: Colors.white,
@@ -105,7 +109,7 @@ class HeaderPage extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                      onPressed: () => Get.to(const FilterPage()),
+                      onPressed: () => Get.to(const FilterApp()),
                       icon: const Icon(
                         Icons.filter_alt_outlined,
                         color: Colors.white,

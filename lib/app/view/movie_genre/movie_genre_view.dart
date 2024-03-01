@@ -1,7 +1,7 @@
 import 'package:app_ft_movies/app/controller/movie_genre/movie_genre_controller.dart';
 import 'package:app_ft_movies/app/core/global_color.dart';
 import 'package:app_ft_movies/app/view/detail/detail_view.dart';
-import 'package:app_ft_movies/app/view/filter/filter_page.dart';
+import 'package:app_ft_movies/app/view/filter/filter_app.dart';
 import 'package:app_ft_movies/app/widgets/card_cinema/card_cinema.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -43,7 +43,7 @@ class MovieGenreview extends StatelessWidget {
                   print(">>>>>>>>>>>>>>>>>$hasFocus");
                 },
               onTap: (){
-                Get.to( FilterPage(slug: Get.parameters['slug']),transition: Transition.rightToLeft);
+                Get.to( FilterApp(slug: Get.parameters['slug']),transition: Transition.rightToLeft);
               },
               child:  Padding(
                 padding: EdgeInsets.symmetric(horizontal:8.0),

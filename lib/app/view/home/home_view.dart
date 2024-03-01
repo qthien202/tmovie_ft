@@ -1,6 +1,8 @@
+import 'package:app_ft_movies/app/controller/filter/filter_controller.dart';
 import 'package:app_ft_movies/app/controller/home/home_controller.dart';
 import 'package:app_ft_movies/app/controller/search/search_widget_controller.dart';
 import 'package:app_ft_movies/app/core/global_color.dart';
+import 'package:app_ft_movies/app/view/filter/filter_app.dart';
 import 'package:app_ft_movies/app/view/filter/filter_page.dart';
 import 'package:app_ft_movies/app/view/header/header_view.dart';
 import 'package:app_ft_movies/app/view/history/history_view.dart';
@@ -8,6 +10,7 @@ import 'package:app_ft_movies/app/view/history/history_view.dart';
 import 'package:app_ft_movies/app/view/home/film_by_category/film_by_category.dart';
 
 import 'package:app_ft_movies/app/view/home/slider/slider_cinema.dart';
+import 'package:app_ft_movies/app/view/list_movie/list_movie.dart';
 import 'package:app_ft_movies/app/view/search/search_view.dart';
 import 'package:app_ft_movies/app/widgets/search_widget.dart';
 
@@ -23,8 +26,9 @@ class HomeView extends StatelessWidget {
   Widget build(BuildContext context) {
    
     final searchController = Get.put(SearchWidgetController());
+    final filterController = Get.put(FilterController());
     final controller = Get.put(HomeController());
-    ScrollController scrollController = ScrollController();
+    
     return GetBuilder<HomeController>(
       init: controller,
       builder: (controller) {
@@ -54,12 +58,26 @@ class HomeView extends StatelessWidget {
                         
                          color: GlobalColor.backgroundColor,
                     width: MediaQuery.of(context).size.width * .85,
-                        child: const SliderCinema())),
+                        child: Column(
+                          children: [
+                           SliderCinema(),
+                           const SizedBox(height: 20,),
+                            Obx(() => Visibility(
+                              visible: searchController.isSearch.value==false,
+                              child: const FilterPage()),)
+                          ],
+                        )
+                        )),
                     ),
                     Obx(
                       () => Visibility(
                         visible: searchController.isSearch.value == true,
-                        replacement: const FilmByCategory(),
+                        replacement: Visibility(
+                          visible: filterController.onFilter.value==true,
+                          replacement: const FilmByCategory(),
+                          child: const ListMovieView(),
+                          
+                          ),
                         child: const SearchView(),
                       ),
                     )

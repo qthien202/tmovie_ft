@@ -1,3 +1,4 @@
+import 'package:app_ft_movies/app/controller/home/home_controller.dart';
 import 'package:app_ft_movies/app/view/detail/detail_view.dart';
 import 'package:app_ft_movies/app/widgets/global_image.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +32,8 @@ class _CardCinemaState extends State<CardCinema> {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
+        final home = Get.put(HomeController());
+        home.tabIndex.value = null;
         Get.back();
         Get.toNamed('/chi-tiet/${widget.slug}');
 
