@@ -2,6 +2,7 @@ import 'package:app_ft_movies/app/controller/home/home_controller.dart';
 import 'package:app_ft_movies/app/controller/search/search_widget_controller.dart';
 import 'package:app_ft_movies/app/core/global_color.dart';
 import 'package:app_ft_movies/app/view/filter/filter_page.dart';
+import 'package:app_ft_movies/app/view/header/header_view.dart';
 import 'package:app_ft_movies/app/view/history/history_view.dart';
 
 import 'package:app_ft_movies/app/view/home/film_by_category/film_by_category.dart';
@@ -20,18 +21,7 @@ class HomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, dynamic>> tabItem = [
-      {"slug": "phim-bo", "title": "Phim bộ"},
-      {"slug": "phim-le", "title": "Phim lẻ"},
-      {"slug": "tv-shows", "title": "TV Shows"},
-      {"slug": "hoat-hinh", "title": "Hoạt hình"},
-      // {"slug": "phim-vietsub", "title": "Phim vietsub"},
-      // {"slug": "phim-thuyet-minh", "title": "Phim thuyết minh"},
-      // {"slug": "phim-long-tieng", "title": "Phim lồng tiếng"},
-      {"slug": "phim-bo-dang-chieu", "title": "Phim bộ đang chiếu"},
-      // {"slug": "phim-hoan-thanh", "title": "Phim trọn bộ"},
-      // {"slug": "phim-sap-chieu", "title": "Phim sắp chiếu"},
-    ];
+   
     final searchController = Get.put(SearchWidgetController());
     final controller = Get.put(HomeController());
     ScrollController scrollController = ScrollController();
@@ -39,7 +29,7 @@ class HomeView extends StatelessWidget {
       init: controller,
       builder: (controller) {
         return DefaultTabController(
-          length: tabItem.length,
+          length: controller.tabItem.length,
           initialIndex: controller.tabIndex.value ?? 0,
           child: Scaffold(
             extendBodyBehindAppBar: true,
@@ -49,126 +39,16 @@ class HomeView extends StatelessWidget {
                 color: GlobalColor.primary,
                 onRefresh: () async {
                   searchController.isSearch.value = false;
-                  scrollController.jumpTo(0);
+                  controller.scrollController.value?.jumpTo(0);
                   await controller.getFilm(
-                      slug: tabItem[controller.tabIndex.value ?? 0]['slug']);
+                      slug: controller.tabItem[controller.tabIndex.value ?? 0]['slug']);
                   controller.getFilmByCategory(
-                      slug: tabItem[controller.tabIndex.value ?? 0]['slug']);
+                      slug: controller.tabItem[controller.tabIndex.value ?? 0]['slug']);
                 },
                 child: CustomScrollView(
-                  controller: scrollController,
+                  controller: controller.scrollController.value,
                   slivers: [
-                    SliverAppBar(
-                      
-                      pinned:false,
-                      centerTitle: false,
-                      title: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Visibility(
-                            visible: MediaQuery.of(context).size.width>600,
-                            
-                            child: InkWell(
-                              onTap: ()=>Get.offAll(const HomeView()),
-                              child: Padding(
-                                padding: const EdgeInsets.only(right: 20),
-                                child: Text("TMOVIE",
-                                style: TextStyle(fontSize: 25,color: GlobalColor.primary,fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ),
-                          ),
-                          
-                          
-                          Expanded(
-                            flex: MediaQuery.of(context).size.width>600?2:1,
-                            child: TabBar(
-                            
-                              tabAlignment: TabAlignment.start,
-                              indicatorWeight: 1,
-                              isScrollable: true,
-                              dividerColor: Colors.transparent,
-                              indicatorColor: Colors.white,
-                              unselectedLabelColor: Colors.grey,
-                              unselectedLabelStyle: const TextStyle(
-                                fontWeight: FontWeight.w900,
-                                fontSize: 14,
-                              ),
-                              labelColor: Colors.white,
-                              labelStyle: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                              ),
-                              onTap: (ind) async {
-                                searchController.isSearch.value = false;
-                                controller.pathFilm.value =
-                                    tabItem[ind]['slug'];
-                                controller.tabIndex.value = ind;
-                                scrollController.jumpTo(0);
-                                await controller.getFilm(
-                                    slug: tabItem[ind]['slug']);
-                                controller.getFilmByCategory(
-                                    slug: tabItem[ind]['slug']);
-                              },
-                              tabs: List<Widget>.generate(tabItem.length,
-                                  (int index) {
-                                return Tab(
-                                  text: tabItem[index]["title"],
-                                );
-                              }),
-                            ),
-                          ),
-                          MediaQuery.of(context).size.width >= 800
-                              ? const Expanded(child: Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: SearchWidget(),
-                              ))
-                              : const SizedBox(),
-                        ],
-                      ),
-                                  
-                      actions: [
-                        Visibility(
-                          visible: MediaQuery.of(context).size.width>600,
-                          child: IconButton(
-                              onPressed: () => Get.to(const FilterPage()),
-                              icon: const Icon(
-                                Icons.filter_alt_outlined,
-                                color: Colors.white,
-                              )),
-                        )
-                      ],
-                      bottom: MediaQuery.of(context).size.width < 800
-                          ? PreferredSize(
-                              preferredSize: Size.fromHeight(56.0),
-                              child: Row(
-                                children: [
-                                  const Expanded(
-                                    child: Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: 5,vertical: 10),
-                                      child: SearchWidget(),
-                                    ),
-                                  ),
-                                  IconButton(
-                              onPressed: () => Get.to(const FilterPage()),
-                              icon: const Icon(
-                                Icons.filter_alt_outlined,
-                                color: Colors.white,
-                              )),
-                                  
-                                ],
-                              ),
-                            )
-                          : null,
-                      // elevation: 0.0,
-                      backgroundColor: GlobalColor.backgroundColor,
-                      // systemOverlayStyle: const SystemUiOverlayStyle(
-                      //     statusBarBrightness: Brightness.dark),
-                      // expandedHeight: MediaQuery.of(context).size.height * .8,
-                      // flexibleSpace: const FlexibleSpaceBar(
-                      //   background: SliderCinema(),
-                      // ),
-                    ),
+                      const HeaderPage(),
                      SliverToBoxAdapter(
                       child: Center(child: Container(
                         

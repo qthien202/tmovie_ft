@@ -26,6 +26,18 @@ class HomeController extends GetxController {
   Rx<bool>isFocusSeeAll = RxBool(false);
   Rxn<bool>isSearch = Rxn(false);
 
+   final List<Map<String, dynamic>> tabItem = [
+      {"slug": "phim-bo", "title": "Phim bộ"},
+      {"slug": "phim-le", "title": "Phim lẻ"},
+      {"slug": "tv-shows", "title": "TV Shows"},
+      {"slug": "hoat-hinh", "title": "Hoạt hình"},
+      // {"slug": "phim-vietsub", "title": "Phim vietsub"},
+      // {"slug": "phim-thuyet-minh", "title": "Phim thuyết minh"},
+      // {"slug": "phim-long-tieng", "title": "Phim lồng tiếng"},
+      {"slug": "phim-bo-dang-chieu", "title": "Phim bộ đang chiếu"},
+      // {"slug": "phim-hoan-thanh", "title": "Phim trọn bộ"},
+      // {"slug": "phim-sap-chieu", "title": "Phim sắp chiếu"},
+    ];
   List<Map<String, dynamic>> categoryList = [
     // {"title":"Tất thể loại","slug":""},
     {"id":"0","title": "Mới nhất",},

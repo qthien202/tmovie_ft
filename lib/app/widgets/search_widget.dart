@@ -17,7 +17,7 @@ class SearchWidget extends StatelessWidget {
           controller.isSearch.value=true;
           controller.textSearch.value = controller.keywordController.text;
           controller.selectIndex.value = 0;
-          
+          Get.toNamed('/');
           await controller.getSearch();
           
           

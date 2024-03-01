@@ -23,7 +23,7 @@ class MovieGenreController extends GetxController{
   }
 
   
-
+  
   Future<GetFilmByCategory?>getMovieGenre({String? slug})async{
     if(slug!=null){
       movieGenre.value = await api.getMovieGenre(path: slug, page: (selectIndex.value??0)+1,country: "",year: "");
