@@ -21,7 +21,7 @@ class ListMovieView extends StatelessWidget {
   Widget build(BuildContext context) {
     final GlobalKey<ScaffoldState> key = GlobalKey<ScaffoldState>();
     final controller = Get.put(ListMovieController());
-    controller.getListMovie();
+    
      
    
       return SliverList.list(
@@ -52,11 +52,7 @@ class ListMovieView extends StatelessWidget {
               //     ),
               //   );
               // }
-              if (data?.items?.isEmpty == true) {
-                return const Center(
-                  child: Text("Rất tiếc phim bạn tìm kiếm không tồn tại!"),
-                );
-              }
+             
               if (data?.items?.isEmpty == true) {
                     return const Padding(
                       padding: EdgeInsets.symmetric(vertical: 100),
