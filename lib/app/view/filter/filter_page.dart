@@ -149,9 +149,9 @@ class InMobile extends StatelessWidget {
     margin: const EdgeInsets.symmetric(vertical: 20),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          // const SizedBox(width: 10,),
+          const SizedBox(width: 5,),
           Container(
             alignment: Alignment.center,
             padding: const EdgeInsets.symmetric(horizontal: 10),
