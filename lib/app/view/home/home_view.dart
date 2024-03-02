@@ -32,27 +32,26 @@ class HomeView extends StatelessWidget {
     return GetBuilder<HomeController>(
       init: controller,
       builder: (controller) {
-        return DefaultTabController(
-          length: controller.tabItem.length,
-          initialIndex: controller.tabIndex.value ?? 0,
-          child: Scaffold(
-            
-            backgroundColor: GlobalColor.backgroundColor,
-            body: RefreshIndicator(
-                backgroundColor: GlobalColor.backgroundColor,
-                color: GlobalColor.primary,
-                onRefresh: () async {
-                  searchController.isSearch.value = false;
-                  controller.scrollController.value?.jumpTo(0);
-                  await controller.getFilm(
-                      slug: controller.tabItem[controller.tabIndex.value ?? 0]['slug']);
-                  controller.getFilmByCategory(
-                      slug: controller.tabItem[controller.tabIndex.value ?? 0]['slug']);
-                },
+        return Scaffold(
+          backgroundColor: GlobalColor.backgroundColor,
+          body: RefreshIndicator(
+              backgroundColor: GlobalColor.backgroundColor,
+              color: GlobalColor.primary,
+              onRefresh: () async {
+                searchController.isSearch.value = false;
+                controller.scrollController.value?.jumpTo(0);
+                await controller.getFilm(
+                    slug: controller.tabItem[controller.tabIndex.value ?? 0]['slug']);
+                controller.getFilmByCategory(
+                    slug: controller.tabItem[controller.tabIndex.value ?? 0]['slug']);
+              },
+              child: DefaultTabController(
+                 length: controller.tabItem.length,
+        initialIndex: controller.tabIndex.value ?? 0,
                 child: CustomScrollView(
                   controller: controller.scrollController.value,
                   slivers: [
-                      // const HeaderPage(),
+                      const HeaderPage(),
                      SliverToBoxAdapter(
                       child: Center(child: Container(
                         
@@ -82,8 +81,8 @@ class HomeView extends StatelessWidget {
                       ),
                     )
                   ],
-                )),
-          ),
+                ),
+              )),
         );
       },
     );
