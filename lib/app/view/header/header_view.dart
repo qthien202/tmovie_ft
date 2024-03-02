@@ -6,7 +6,7 @@ import 'package:app_ft_movies/app/widgets/search_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class HeaderPage extends StatelessWidget {
+class HeaderPage extends StatelessWidget implements PreferredSizeWidget {
   const HeaderPage({super.key, });
   
 
@@ -15,15 +15,15 @@ class HeaderPage extends StatelessWidget {
     final controller = Get.put(HomeController());
     final searchController = Get.put(SearchWidgetController());
     final filterController = Get.put(FilterController());
-    return SliverAppBar(
+    bool isMobile = MediaQuery.of(context).size.width<800;
+    return AppBar(
       automaticallyImplyLeading: false,
-      pinned: false,
       centerTitle: false,
       title: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Visibility(
-            visible: MediaQuery.of(context).size.width > 600,
+            visible: !isMobile,
             child: InkWell(
               onTap: () => Get.toNamed('/'),
               child: Padding(
@@ -39,7 +39,7 @@ class HeaderPage extends StatelessWidget {
             ),
           ),
           Expanded(
-            flex: MediaQuery.of(context).size.width > 600 ? 3 : 1,
+            flex: isMobile ? 3 : 1,
             child: TabBar(
               tabAlignment: TabAlignment.start,
               // indicatorWeight: 1,
@@ -73,7 +73,7 @@ class HeaderPage extends StatelessWidget {
               }),
             ),
           ),
-          MediaQuery.of(context).size.width >= 800
+          !isMobile
               ? const Expanded(
                 flex: 1,
                   child: Padding(
@@ -95,7 +95,7 @@ class HeaderPage extends StatelessWidget {
       //         )),
       //   )
       // ],
-      bottom: MediaQuery.of(context).size.width < 800
+      bottom: isMobile
           ? PreferredSize(
               preferredSize: Size.fromHeight(56.0),
               child: const Expanded(
@@ -112,5 +112,14 @@ class HeaderPage extends StatelessWidget {
       //   background: SliderCinema(),
       // ),
     );
+    
   }
+   @override
+ 
+  Size get preferredSize {
+ final MediaQueryData mediaQuery = MediaQueryData.fromWindow(WidgetsBinding.instance.window);
+    bool isMobile = mediaQuery.size.width < 800;
+  return isMobile ? Size.fromHeight(100.0) : Size.fromHeight(kToolbarHeight);
+}
+
 }

@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
-import 'dart:html' as html;
+
 
 class DetailView extends StatelessWidget {
   const DetailView({
@@ -30,7 +30,7 @@ class DetailView extends StatelessWidget {
           length: homeController.tabItem.length,
           initialIndex: homeController.tabIndex.value ?? 0,
           child: Scaffold(
-              
+              appBar: const HeaderPage(),
               backgroundColor: GlobalColor.backgroundColor,
               body: Obx(() {
                 final data = controller.filmDetail.value?.pageProps?.data?.item;
@@ -60,7 +60,7 @@ class DetailView extends StatelessWidget {
                   child: CustomScrollView(
                     controller: controller.scrollController,
                     slivers: [
-                      const HeaderPage(),
+                      
                       SliverToBoxAdapter(
                         child: Center(
                           child: Container(
@@ -180,7 +180,7 @@ class ResponsiveApp extends StatelessWidget {
       length: homeController.tabItem.length,
       initialIndex: homeController.tabIndex.value ?? 0,
       child: Scaffold(
-          
+          appBar: const HeaderPage(),
           backgroundColor: GlobalColor.backgroundColor,
           body: Obx(() {
             final data = controller.filmDetail.value?.pageProps?.data?.item;
@@ -199,7 +199,7 @@ class ResponsiveApp extends StatelessWidget {
               onRefresh: () async => controller.getFilmDetail(),
               child: CustomScrollView(
                 slivers: [
-                  const HeaderPage(),
+                  
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(

@@ -176,7 +176,7 @@ class InMobile extends StatelessWidget {
               }).toList(),
                onChanged: (value){
                 controller.selectedGenre.value = value;
-                print(">>>>>>>>>>>>${controller.selectedGenre.value}");
+                
                 controller.getFilmFilter();
                }
                

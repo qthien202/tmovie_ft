@@ -63,9 +63,9 @@ class HomeController extends GetxController {
     super.onReady();
     categories.addAll(categoryList);
     pathFilm.value = "phim-bo";
-     getFilm(slug: "phim-bo");
+    getFilm(slug: "phim-bo");
      
-     getFilmByCategory(slug:"phim-bo");
+    getFilmByCategory(slug:"phim-bo");
     getFimCategory.refresh();
     
     // getFimCategory.refresh();
