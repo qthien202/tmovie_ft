@@ -2,8 +2,6 @@ import 'package:app_ft_movies/app/controller/filter/filter_controller.dart';
 import 'package:app_ft_movies/app/controller/home/home_controller.dart';
 import 'package:app_ft_movies/app/controller/search/search_widget_controller.dart';
 import 'package:app_ft_movies/app/core/global_color.dart';
-import 'package:app_ft_movies/app/view/filter/filter_app.dart';
-import 'package:app_ft_movies/app/view/home/home_view.dart';
 import 'package:app_ft_movies/app/widgets/search_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -18,6 +16,7 @@ class HeaderPage extends StatelessWidget {
     final searchController = Get.put(SearchWidgetController());
     final filterController = Get.put(FilterController());
     return SliverAppBar(
+      automaticallyImplyLeading: false,
       pinned: false,
       centerTitle: false,
       title: Row(
@@ -99,22 +98,8 @@ class HeaderPage extends StatelessWidget {
       bottom: MediaQuery.of(context).size.width < 800
           ? PreferredSize(
               preferredSize: Size.fromHeight(56.0),
-              child: Row(
-                children: [
-                  const Expanded(
-                    child: Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-                      child: SearchWidget(),
-                    ),
-                  ),
-                  IconButton(
-                      onPressed: () => Get.to(const FilterApp()),
-                      icon: const Icon(
-                        Icons.filter_alt_outlined,
-                        color: Colors.white,
-                      )),
-                ],
+              child: const Expanded(
+                child: SearchWidget(),
               ),
             )
           : null,

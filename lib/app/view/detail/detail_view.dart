@@ -5,12 +5,8 @@ import 'package:app_ft_movies/app/view/detail/episode/episode.dart';
 import 'package:app_ft_movies/app/view/detail/info/info.dart';
 import 'package:app_ft_movies/app/view/detail/info_details/info_details.dart';
 import 'package:app_ft_movies/app/view/detail/other_film/other_film.dart';
-import 'package:app_ft_movies/app/view/filter/filter_app.dart';
 import 'package:app_ft_movies/app/view/header/header_view.dart';
-import 'package:app_ft_movies/app/view/home/film_by_category/film_by_category.dart';
 import 'package:app_ft_movies/app/widgets/global_image.dart';
-
-import 'package:app_ft_movies/app/widgets/video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -32,7 +28,7 @@ class DetailView extends StatelessWidget {
         replacement: const ResponsiveApp(),
         child: DefaultTabController(
           length: homeController.tabItem.length,
-          initialIndex: homeController.tabIndex.value??0,
+          initialIndex: homeController.tabIndex.value ?? 0,
           child: Scaffold(
               extendBody: true,
               extendBodyBehindAppBar: true,
@@ -179,28 +175,15 @@ class ResponsiveApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(DetailController());
     controller.getFilmDetail();
+    final homeController = Get.put(HomeController());
 
-    return WillPopScope(
-      onWillPop: () async {
-        controller.selectIndexServer.value = 0;
-        return true;
-      },
+    return DefaultTabController(
+      length: homeController.tabItem.length,
+      initialIndex: homeController.tabIndex.value ?? 0,
       child: Scaffold(
-          extendBody: true,
           extendBodyBehindAppBar: true,
+          extendBody: true,
           backgroundColor: GlobalColor.backgroundColor,
-          // appBar: AppBar(
-          //   backgroundColor: GlobalColor.backgroundColor,
-          //   centerTitle: true,
-          //   title: Text(name??"--",
-          //   style: const TextStyle(
-          //     color: Colors.white,
-          //     fontSize: 16,
-          //     fontWeight: FontWeight.bold
-          //   ),
-          //   ),
-          //   foregroundColor: Colors.white,
-          // ),
           body: Obx(() {
             final data = controller.filmDetail.value?.pageProps?.data?.item;
             if (data == null) {
@@ -218,67 +201,23 @@ class ResponsiveApp extends StatelessWidget {
               onRefresh: () async => controller.getFilmDetail(),
               child: CustomScrollView(
                 slivers: [
-                  SliverAppBar(
-                    pinned: true,
-                    leading: InkWell(
-                      onTap: () => Get.back(),
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 8.0),
-                        padding: const EdgeInsets.all(3),
-                        decoration: const BoxDecoration(
-                            shape: BoxShape.circle, color: Color(0xff252836)),
-                        child: const Icon(
-                          Icons.arrow_back,
-                          color: Colors.white,
-                          size: 20,
-                        ),
-                      ),
-                    ),
-                    actions: [
-                      InkWell(
-                        onTap: () {
-                          Get.to(const FilterApp(),
-                              transition: Transition.rightToLeft);
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 8.0),
-                          padding: const EdgeInsets.all(5),
-                          decoration: const BoxDecoration(
-                              shape: BoxShape.circle, color: Color(0xff252836)),
-                          child: const Icon(
-                            Icons.filter_alt_outlined,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ],
-                    centerTitle: true,
-                    foregroundColor: Colors.white,
-                    elevation: 0.0,
-                    backgroundColor: GlobalColor.backgroundColor,
-                    systemOverlayStyle: const SystemUiOverlayStyle(
-                        statusBarBrightness: Brightness.dark),
-                    expandedHeight: MediaQuery.of(context).size.height * .6,
-                    flexibleSpace: FlexibleSpaceBar(
-                        background: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        GlobalImage(
-                          imageUrl: data.thumbUrl ?? "",
-                          width: MediaQuery.of(context).size.width,
-                          height: MediaQuery.of(context).size.height * .6,
-                          boxFit: BoxFit.fill,
-                        ),
-                      ],
-                    )),
-                  ),
+                  const HeaderPage(),
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                          vertical: 2, horizontal: 15),
+                          vertical: 30, horizontal: 15),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(5),
+                            child: GlobalImage(
+                              imageUrl: data.thumbUrl ?? "",
+                              width: MediaQuery.of(context).size.width,
+                              height: MediaQuery.of(context).size.height * .6,
+                              boxFit: BoxFit.fill,
+                            ),
+                          ),
                           const Info(),
                           const SizedBox(
                             height: 10,

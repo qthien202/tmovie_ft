@@ -41,11 +41,10 @@ class OtherFilmView extends StatelessWidget {
                             ?.item?.category?.first.slug}");
                     },
                     child: const Text(
-                      "Xem thêm",
+                      "Xem thêm >",
                       style: TextStyle(
                           color: Colors.white,
-                          decoration: TextDecoration.underline,
-                          decorationColor: Colors.white),
+                          ),
                     ),
                   ),
                 )

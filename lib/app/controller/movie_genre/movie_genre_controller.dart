@@ -24,9 +24,9 @@ class MovieGenreController extends GetxController{
 
   
   
-  Future<GetFilmByCategory?>getMovieGenre({String? slug})async{
+  Future<GetFilmByCategory?>getMovieGenre({String? slug, String? countries, String? years})async{
     if(slug!=null){
-      movieGenre.value = await api.getMovieGenre(path: slug, page: (selectIndex.value??0)+1,country: "",year: "");
+      movieGenre.value = await api.getMovieGenre(path: slug, page: (selectIndex.value??0)+1,country: countries,year: years);
     movieGenre.refresh();
     final double itemLength = (movieGenre.value?.pageProps?.data?.params?.pagination?.totalItems??0) / (movieGenre.value?.pageProps?.data?.params?.pagination?.totalItemsPerPage??0);
     totalPage.value = itemLength.round();

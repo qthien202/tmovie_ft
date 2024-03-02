@@ -40,9 +40,13 @@ class FilmByCategory extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "${controller.categories[ind]['title']}",
+                          controller.categories[ind]['title'].toString().toUpperCase(),
                           style: const TextStyle(
-                              color: Colors.white, fontWeight: FontWeight.bold),
+                              color: Colors.white,
+                              fontSize: 18,
+                              // decoration: TextDecoration.underline,
+                              // decorationColor: Colors.white,
+                               fontWeight: FontWeight.bold),
                         ),
                         TextButton(
                           onHover: (hasFocus){
@@ -56,11 +60,9 @@ class FilmByCategory extends StatelessWidget {
                             filter.getFilmFilter();
                           },
                           child: const Text(
-                            "Xem thêm",
+                            "Xem thêm >",
                             style: TextStyle(
-                                color: Colors.white,
-                                decoration: TextDecoration.underline,
-                                decorationColor: Colors.white),
+                                color: Colors.white,),
                           ),
                         )
                       ],

@@ -2,8 +2,8 @@ import 'package:app_ft_movies/app/controller/filter/filter_controller.dart';
 import 'package:app_ft_movies/app/controller/home/home_controller.dart';
 import 'package:app_ft_movies/app/controller/list_movie/list_movie_controller.dart';
 import 'package:app_ft_movies/app/core/global_color.dart';
-import 'package:app_ft_movies/app/view/detail/detail_view.dart';
-import 'package:app_ft_movies/app/view/filter/filter_app.dart';
+
+
 import 'package:app_ft_movies/app/widgets/card_cinema/card_cinema.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +37,7 @@ class ListMovieView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Obx(() => Text("${controller.listMovie.value?.pageProps?.data?.titlePage??"--"}",style: const TextStyle(fontSize: 20,fontWeight: FontWeight.bold),)),
+                Obx(() => Text(controller.listMovie.value?.pageProps?.data?.titlePage.toString().toUpperCase()??"",style: const TextStyle(fontSize: 20,fontWeight: FontWeight.bold),)),
                 const SizedBox(height: 10,),
             Obx(() {
               final isLoading = controller.listMovie.value == null;

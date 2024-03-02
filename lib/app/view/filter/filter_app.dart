@@ -8,10 +8,10 @@ import 'package:app_ft_movies/app/view/movie_genre/movie_genre_view.dart';
 class FilterApp extends StatefulWidget {
   const FilterApp({
     Key? key,
-    this.slug,
+    
   }) : super(key: key);
 
-  final String? slug;
+ 
 
   @override
   _FilterAppState createState() => _FilterAppState();
@@ -118,15 +118,13 @@ class _FilterAppState extends State<FilterApp> {
                 isFocusButton=hasFocus;
               }),
               onPressed: () {
-                if (widget.slug != null) {
-                  Get.toNamed("/loai-phim/${widget.slug}?category=${selectedGenre??""}&country=${selectedCountry??""}&year=${selectedYear??""}");
-                } else {
+               
                   if (selectedGenre == null) {
                     Get.snackbar("Thông báo", "Vui lòng chọn thể loại phim trước",backgroundColor: Colors.white);
                   } else {
                     Get.toNamed("/the-loai/${selectedGenre??""}?country=${selectedCountry??""}&year=${selectedYear??""}");
                   }
-                }
+                
               },
               child:  Transform.scale(
                 scale: isFocusButton?1.2:1,

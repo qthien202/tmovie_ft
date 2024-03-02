@@ -2,7 +2,7 @@ import 'package:app_ft_movies/app/controller/filter/filter_controller.dart';
 import 'package:app_ft_movies/app/controller/home/home_controller.dart';
 import 'package:app_ft_movies/app/controller/search/search_widget_controller.dart';
 import 'package:app_ft_movies/app/core/global_color.dart';
-import 'package:app_ft_movies/app/view/filter/filter_app.dart';
+
 import 'package:app_ft_movies/app/view/filter/filter_page.dart';
 import 'package:app_ft_movies/app/view/header/header_view.dart';
 import 'package:app_ft_movies/app/view/history/history_view.dart';
@@ -57,7 +57,7 @@ class HomeView extends StatelessWidget {
                       child: Center(child: Container(
                         
                          color: GlobalColor.backgroundColor,
-                    width: MediaQuery.of(context).size.width * .85,
+                    width: MediaQuery.of(context).size.width<600?MediaQuery.of(context).size.width:MediaQuery.of(context).size.width * .85,
                         child: Column(
                           children: [
                            SliderCinema(),

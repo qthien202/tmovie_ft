@@ -139,19 +139,22 @@ class ResponsiveApp extends StatelessWidget {
                     .getFilmData.value?.pageProps?.data?.items?[index];
               return Visibility(
                 visible: !isLoading,
-                replacement: SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height * .5,
-                  child: Shimmer.fromColors(
-                              baseColor: Colors.grey,
-                              highlightColor: Colors.grey.shade600,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  
-                                  color: Colors.grey,
+                replacement: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height * .3,
+                    child: Shimmer.fromColors(
+                                baseColor: Colors.grey,
+                                highlightColor: Colors.grey.shade600,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    
+                                    color: Colors.grey,
+                                  ),
                                 ),
-                              ),
-                  )
+                    )
+                  ),
                 ),
                 child: InkWell(
                   onTap: () =>Get.toNamed('/chi-tiet/${data?.slug}'),

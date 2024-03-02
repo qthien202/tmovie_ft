@@ -15,6 +15,7 @@ class Espisode extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(DetailController());
+    bool isMobile = MediaQuery.of(context).size.width<600;
     return Obx(() {
       final data = controller.filmDetail.value?.pageProps?.data?.item;
       return WillPopScope(
@@ -65,56 +66,54 @@ class Espisode extends StatelessWidget {
             const SizedBox(
                       height: 15,
                     ),
-                    Obx(() => SizedBox(
-                      height: 45,
-                      child: ListView.separated(
-                        shrinkWrap: true,
-                        scrollDirection: Axis.horizontal,
-                        itemCount: data
-                                ?.episodes?[
-                                    controller.selectIndexServer.value ?? 0]
-                                .serverData
-                                ?.length ??
-                            0,
-                        itemBuilder: (context, ind) {
-                          final episode = data?.episodes?[controller.selectIndexServer.value??0].serverData?[ind];
-                          return InkWell(onTap: () async {
-                            controller.selectTab.value = ind;
-                            
-                              html.window.open(
-                                  episode?.linkEmbed ?? "", data?.name ?? "");
-                            
-                          }, child: Obx(() {
-                            return Container(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 15),
-                              decoration: BoxDecoration(
-                                  //  border: Border.all(color: GlobalColor.primary)
-                                  color: Color(0xff252836),
-                                  border: Border.all(
-                                      color: controller.selectTab.value == ind
-                                          ? GlobalColor.primary
-                                          : Colors.transparent,
-                                      width: 2)
-                                      ),
-                              child: Text(
-                                episode?.name != "Full"
-                                    ? "Tập ${episode?.name}"
-                                    : episode?.name ?? "",
-                                style: TextStyle(
+                    Obx(() => GridView.builder(
+                      shrinkWrap: true,
+                      
+                      itemCount: data
+                              ?.episodes?[
+                                  controller.selectIndexServer.value ?? 0]
+                              .serverData
+                              ?.length ??
+                          0,
+                      itemBuilder: (context, ind) {
+                        final episode = data?.episodes?[controller.selectIndexServer.value??0].serverData?[ind];
+                        return InkWell(onTap: () async {
+                          controller.selectTab.value = ind;
+                          
+                            html.window.open(
+                                episode?.linkEmbed ?? "", data?.name ?? "");
+                          
+                        }, child: Obx(() {
+                          return Container(
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                                //  border: Border.all(color: GlobalColor.primary)
+                                color: Color(0xff252836),
+                                border: Border.all(
                                     color: controller.selectTab.value == ind
                                         ? GlobalColor.primary
-                                        : Colors.white),
-                              ),
-                            );
-                          }));
-                        },
-                        separatorBuilder: (BuildContext context, int index) {
-                          return const SizedBox(
-                            width: 5,
+                                        : Colors.transparent,
+                                    width: 2)
+                                    ),
+                            child: Text(
+                              episode?.name != "Full"
+                                  ? "Tập ${episode?.name}"
+                                  : episode?.name ?? "",
+                              style: TextStyle(
+                                  color: controller.selectTab.value == ind
+                                      ? GlobalColor.primary
+                                      : Colors.white),
+                            ),
                           );
-                        },
-                      ),
+                        }));
+                      },
+                     
+                      gridDelegate:  SliverGridDelegateWithFixedCrossAxisCount(
+                    childAspectRatio: isMobile?13/8:13/3,
+                    crossAxisCount: isMobile?4:6,
+                    crossAxisSpacing: 5,
+                    mainAxisSpacing: 5,
+                  ),
                     ))
           ],
         ),

@@ -35,15 +35,12 @@ class MovieGenreview extends StatelessWidget {
             automaticallyImplyLeading: MediaQuery.of(context).size.width<600?true:false,
             backgroundColor: GlobalColor.backgroundColor,
             foregroundColor: Colors.white,
-            title: Obx(() => Text(controller.movieGenre.value?.pageProps?.data?.titlePage??""),),
+            title: Obx(() => Text("PHIM ${controller.movieGenre.value?.pageProps?.data?.titlePage.toString().toUpperCase()??""}"),),
             actions: [
               Obx(() => InkWell(
-                onHover: (hasFocus){
-                  controller.isFocusMenu.value = hasFocus;
-                  print(">>>>>>>>>>>>>>>>>$hasFocus");
-                },
+               
               onTap: (){
-                Get.to( FilterApp(slug: Get.parameters['slug']),transition: Transition.rightToLeft);
+                Get.to( const FilterApp(),transition: Transition.rightToLeft);
               },
               child:  Padding(
                 padding: EdgeInsets.symmetric(horizontal:8.0),
