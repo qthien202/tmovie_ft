@@ -61,8 +61,8 @@ class DetailView extends StatelessWidget {
                     controller: controller.scrollController,
                     slivers: [
                       const HeaderPage(),
-                     SliverList.list(children: [
-                      Center(
+                      SliverToBoxAdapter(
+                        child: Center(
                           child: Container(
                             margin: const EdgeInsets.symmetric(vertical: 30),
                             color: GlobalColor.backgroundColor,
@@ -152,7 +152,7 @@ class DetailView extends StatelessWidget {
                             ),
                           ),
                         ),
-                     ])
+                      )
                     ],
                   ),
                 );
