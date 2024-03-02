@@ -102,10 +102,10 @@ class SearchView extends StatelessWidget {
                       itemBuilder: (context, index) {
                         return Obx(() {
                           return InkWell(
-                            onHover: (value) {
-                              controller.isFocusPage.value = value;
-                              controller.selectIndex.value = index;
-                            },
+                            // onHover: (value) {
+                            //   controller.isFocusPage.value = value;
+                            //   controller.selectIndex.value = index;
+                            // },
                             onTap: () async {
                               controller.selectIndex.value = index;
                               
@@ -119,8 +119,7 @@ class SearchView extends StatelessWidget {
                                   //  border: Border.all(color: GlobalColor.primary)
                                   color: const Color(0xff252836),
                                   border: Border.all(
-                                      color: controller.selectIndex.value == index &&
-                                              controller.isFocusPage.value
+                                      color: controller.selectIndex.value == index 
                                           ? GlobalColor.primary
                                           : Colors.transparent)),
                               child: Text(

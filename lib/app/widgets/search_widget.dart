@@ -25,13 +25,13 @@ class SearchWidget extends StatelessWidget {
           
           
         },
-        onChanged: (val)async{
-          controller.isSearch.value=true;
-          controller.textSearch.value = controller.keywordController.text;
-          controller.selectIndex.value = 0;
-          Get.toNamed('/');
-          await controller.getSearch();
-        },
+        // onChanged: (val)async{
+        //   controller.isSearch.value=true;
+        //   controller.textSearch.value = controller.keywordController.text;
+        //   controller.selectIndex.value = 0;
+        //   Get.toNamed('/');
+        //   await controller.getSearch();
+        // },
         controller: controller.keywordController,
         readOnly: false,
         decoration: InputDecoration(

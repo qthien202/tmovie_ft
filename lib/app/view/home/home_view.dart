@@ -36,7 +36,7 @@ class HomeView extends StatelessWidget {
           length: controller.tabItem.length,
           initialIndex: controller.tabIndex.value ?? 0,
           child: Scaffold(
-            extendBodyBehindAppBar: true,
+            
             backgroundColor: GlobalColor.backgroundColor,
             body: RefreshIndicator(
                 backgroundColor: GlobalColor.backgroundColor,

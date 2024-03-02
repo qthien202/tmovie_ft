@@ -174,7 +174,7 @@ class ResponsiveApp extends StatelessWidget {
                           ),
                         ),
                         Positioned(
-                            top: 95,
+                            top: 120,
                             left: 15,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,

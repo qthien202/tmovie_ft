@@ -30,8 +30,7 @@ class DetailView extends StatelessWidget {
           length: homeController.tabItem.length,
           initialIndex: homeController.tabIndex.value ?? 0,
           child: Scaffold(
-              extendBody: true,
-              extendBodyBehindAppBar: true,
+              
               backgroundColor: GlobalColor.backgroundColor,
               body: Obx(() {
                 final data = controller.filmDetail.value?.pageProps?.data?.item;
@@ -181,8 +180,7 @@ class ResponsiveApp extends StatelessWidget {
       length: homeController.tabItem.length,
       initialIndex: homeController.tabIndex.value ?? 0,
       child: Scaffold(
-          extendBodyBehindAppBar: true,
-          extendBody: true,
+          
           backgroundColor: GlobalColor.backgroundColor,
           body: Obx(() {
             final data = controller.filmDetail.value?.pageProps?.data?.item;
