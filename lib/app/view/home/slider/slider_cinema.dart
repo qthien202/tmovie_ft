@@ -76,12 +76,32 @@ class SliderCinema extends StatelessWidget {
                             Positioned(
                                 top: MediaQuery.of(context).size.height * .32,
                                 left: 20,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(data?.name??"--",style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold),),
-                                    Text(data?.year.toString()??"--")
-                                  ],
+                                child: Container(
+                                  width: MediaQuery.of(context).size.width,
+                              decoration: BoxDecoration(
+                                boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withOpacity(
+                                                0.2),
+                                            // Màu của box shadow và độ mờ
+                                            spreadRadius:
+                                            5,
+                                            // Điều chỉnh bán kính mở rộng của box shadow
+                                            blurRadius:
+                                            10,
+                                            // Điều chỉnh độ mờ của box shadow
+                                            offset: Offset(0,
+                                                3), // Điều chỉnh độ dịch chuyển của box shadow
+                                          ),
+                                ]
+                              ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(data?.name??"--",style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold),),
+                                      Text(data?.year.toString()??"--")
+                                    ],
+                                  ),
                                 ))
                           ],
                         ),
@@ -176,12 +196,32 @@ class ResponsiveApp extends StatelessWidget {
                         Positioned(
                             top: 120,
                             left: 15,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(data?.name??"--",style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold),),
-                                Text(data?.year.toString()??"--")
-                              ],
+                            child: Container(
+                              width: MediaQuery.of(context).size.width,
+                              decoration: BoxDecoration(
+                                boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withOpacity(
+                                                0.2),
+                                            // Màu của box shadow và độ mờ
+                                            spreadRadius:
+                                            5,
+                                            // Điều chỉnh bán kính mở rộng của box shadow
+                                            blurRadius:
+                                            10,
+                                            // Điều chỉnh độ mờ của box shadow
+                                            offset: Offset(0,
+                                                3), // Điều chỉnh độ dịch chuyển của box shadow
+                                          ),
+                                ]
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(data?.name??"--",style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold),),
+                                  Text(data?.year.toString()??"--")
+                                ],
+                              ),
                             ))
                       ],
                     ),

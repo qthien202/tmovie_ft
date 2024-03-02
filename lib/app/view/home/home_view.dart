@@ -53,8 +53,8 @@ class HomeView extends StatelessWidget {
                   controller: controller.scrollController.value,
                   slivers: [
                       const HeaderPage(),
-                     SliverToBoxAdapter(
-                      child: Center(child: Container(
+                     SliverList.list(children: [
+                      Center(child: Container(
                         
                          color: GlobalColor.backgroundColor,
                     width: MediaQuery.of(context).size.width<600?MediaQuery.of(context).size.width:MediaQuery.of(context).size.width * .85,
@@ -68,7 +68,7 @@ class HomeView extends StatelessWidget {
                           ],
                         )
                         )),
-                    ),
+                     ]),
                     Obx(
                       () => Visibility(
                         visible: searchController.isSearch.value == true,
