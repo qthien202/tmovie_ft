@@ -10,7 +10,7 @@ class Routes {
   static final List<GetPage> routes = [
     
     GetPage(name: '/', page: () =>  HomeView()),
-    GetPage(name: '/chi-tiet/:slug', page: ()=>const DetailView()),
+    GetPage(name: '/chi-tiet/:slug', page: ()=> DetailView()),
     GetPage(name: '/the-loai/:category', page: ()=>const MovieGenreview()),
     
     

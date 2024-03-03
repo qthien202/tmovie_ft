@@ -14,16 +14,19 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 
 class DetailView extends StatelessWidget {
-  const DetailView({
+   DetailView({
     super.key,
   });
+  final controller = Get.put(DetailController());
+  final homeController = Get.put(HomeController());
+  
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(DetailController());
     controller.getFilmDetail();
-    return GetBuilder<HomeController>(builder: (homeController) {
-      return Visibility(
+    
+    
+    return Visibility(
         visible: MediaQuery.of(context).size.width > 600,
         replacement: const ResponsiveApp(),
         child: DefaultTabController(
@@ -159,7 +162,6 @@ class DetailView extends StatelessWidget {
               })),
         ),
       );
-    });
   }
 }
 

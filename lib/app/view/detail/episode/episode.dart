@@ -68,7 +68,7 @@ class Espisode extends StatelessWidget {
                     ),
                     Obx(() => GridView.builder(
                       shrinkWrap: true,
-                      
+                      physics: const NeverScrollableScrollPhysics(),
                       itemCount: data
                               ?.episodes?[
                                   controller.selectIndexServer.value ?? 0]

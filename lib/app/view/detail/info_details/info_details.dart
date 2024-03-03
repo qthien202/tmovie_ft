@@ -13,6 +13,8 @@ class InfoDetail extends StatelessWidget {
       final data = controller.filmDetail.value?.pageProps?.data?.item;
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        // shrinkWrap: true,
+        // physics: const NeverScrollableScrollPhysics(),
         children: [
           Text(
             "Thông tin phim",
@@ -22,12 +24,12 @@ class InfoDetail extends StatelessWidget {
             height: 10,
           ),
           Text("Số tập : ${data?.episodeTotal}"),
-          
+
           const SizedBox(
             height: 10,
           ),
           Text("Ngôn ngữ : ${data?.lang}"),
-         
+
           const SizedBox(
             height: 10,
           ),
@@ -35,30 +37,45 @@ class InfoDetail extends StatelessWidget {
           const SizedBox(
             height: 10,
           ),
-         
+
           Row(
             children: (data?.director ?? []).map((director) {
-              return Text(director==""?"Đạo diễn: không có thông tin":"Đạo diễn: $director, ");
+              return Text(director == ""
+                  ? "Đạo diễn : không có thông tin"
+                  : "Đạo diễn : $director, ");
             }).toList(),
           ),
           const SizedBox(
             height: 10,
           ),
-          
-          
+
           Row(
-            children: (data?.actor ?? []).map((actor) {
-              return Text(actor==""?"không có thông tin":"$actor, ");
-            }).toList(),
+            crossAxisAlignment: CrossAxisAlignment
+                .start, 
+            children: [
+              Text("Diễn viên :  "),
+              Expanded(
+                child: Wrap(
+                  children: (data?.actor ?? []).map((actor) {
+                    return Text(
+                      actor == "" ? "không có thông tin" : "$actor, ",
+                      overflow: TextOverflow.ellipsis,
+                    );
+                  }).toList(),
+                ),
+              ),
+            ],
           ),
-          
+
           const SizedBox(
             height: 10,
           ),
           Container(
+            width: 150,
+            alignment: Alignment.center,
             padding: EdgeInsets.symmetric(horizontal: 20,vertical: 10),
             decoration: BoxDecoration(
-              color: Colors.black,
+              color: Colors.blue,
               // borderRadius: BorderRadius.circular(5)
             ),
             child: Text(data?.episodeCurrent??""))
