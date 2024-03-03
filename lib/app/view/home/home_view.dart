@@ -60,7 +60,7 @@ class HomeView extends StatelessWidget {
                     width: MediaQuery.of(context).size.width<600?MediaQuery.of(context).size.width:MediaQuery.of(context).size.width * .85,
                         child: Column(
                           children: [
-                           SliderCinema(),
+                           const SliderCinema(),
                            const SizedBox(height: 20,),
                             Obx(() => Visibility(
                               visible: searchController.isSearch.value==false,

@@ -96,9 +96,9 @@ class HeaderPage extends StatelessWidget implements PreferredSizeWidget {
       //   )
       // ],
       bottom: isMobile
-          ? PreferredSize(
-              preferredSize: Size.fromHeight(56.0),
-              child: const Expanded(
+          ? const PreferredSize(
+              preferredSize: Size.fromHeight(60.0),
+              child: Expanded(
                 child: SearchWidget(),
               ),
             )
@@ -119,7 +119,7 @@ class HeaderPage extends StatelessWidget implements PreferredSizeWidget {
   Size get preferredSize {
  final MediaQueryData mediaQuery = MediaQueryData.fromWindow(WidgetsBinding.instance.window);
     bool isMobile = mediaQuery.size.width < 800;
-  return isMobile ? Size.fromHeight(100.0) : Size.fromHeight(kToolbarHeight);
+  return isMobile ? const Size.fromHeight(120.0) : const Size.fromHeight(kToolbarHeight);
 }
 
 }

@@ -16,7 +16,7 @@ class InfoDetail extends StatelessWidget {
         // shrinkWrap: true,
         // physics: const NeverScrollableScrollPhysics(),
         children: [
-          Text(
+          const Text(
             "Thông tin phim",
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
           ),
@@ -53,7 +53,7 @@ class InfoDetail extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment
                 .start, 
             children: [
-              Text("Diễn viên :  "),
+              const Text("Diễn viên :  "),
               Expanded(
                 child: Wrap(
                   children: (data?.actor ?? []).map((actor) {
@@ -67,18 +67,7 @@ class InfoDetail extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(
-            height: 10,
-          ),
-          Container(
-            width: 150,
-            alignment: Alignment.center,
-            padding: EdgeInsets.symmetric(horizontal: 20,vertical: 10),
-            decoration: BoxDecoration(
-              color: Colors.blue,
-              // borderRadius: BorderRadius.circular(5)
-            ),
-            child: Text(data?.episodeCurrent??""))
+          
         ],
       );
     });
