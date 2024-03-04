@@ -53,6 +53,8 @@ class DependencyInjections implements GET.Bindings {
             
             options.headers = {
               "Access-Control-Allow-Origin": "*",
+              "content-type": "application/x-www-form-urlencoded",
+              
               
 
               ...options.headers,
