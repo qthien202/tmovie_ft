@@ -2,7 +2,7 @@ name: Deploy Flutter web
 on:
   push:
     branches:
-      - dev-web-test
+      - dev-web-stable
 jobs:
   web-deploy:
     name: Deploy
