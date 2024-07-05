@@ -1,8 +1,8 @@
-import 'package:app_ft_movies/app/controller/search/search_widget_controller.dart';
-import 'package:app_ft_movies/app/core/global_color.dart';
-import 'package:app_ft_movies/app/view/filter/filter_page.dart';
-import 'package:app_ft_movies/app/view/home/card_cinema/card_cinema.dart';
-import 'package:app_ft_movies/app/widgets/search_widget.dart';
+import 'package:tmovie_app/app/controller/search/search_widget_controller.dart';
+import 'package:tmovie_app/app/core/global_color.dart';
+import 'package:tmovie_app/app/view/filter/filter_page.dart';
+import 'package:tmovie_app/app/view/home/card_cinema/card_cinema.dart';
+import 'package:tmovie_app/app/widgets/search_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
@@ -24,11 +24,11 @@ class SearchView extends StatelessWidget {
           title: const SearchWidget(),
           actions: [
             InkWell(
-              onTap: (){
-                Get.to(const FilterPage(),transition: Transition.rightToLeft);
+              onTap: () {
+                Get.to(const FilterPage(), transition: Transition.rightToLeft);
               },
               child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal:8.0),
+                padding: EdgeInsets.symmetric(horizontal: 8.0),
                 child: Icon(
                   Icons.menu,
                   color: Colors.white,
@@ -40,12 +40,11 @@ class SearchView extends StatelessWidget {
         backgroundColor: GlobalColor.backgroundColor,
         body: ListView(
           children: [
-            
             const SizedBox(
               height: 10,
             ),
             Obx(() {
-              final isLoading = controller.search.value==null;
+              final isLoading = controller.search.value == null;
               final data = controller.search.value?.pageProps?.data;
 
               // if (data?.items == null) {
@@ -65,25 +64,22 @@ class SearchView extends StatelessWidget {
                 padding: const EdgeInsets.all(5),
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
-                itemCount: isLoading?6:data?.items?.length ?? 0,
+                itemCount: isLoading ? 6 : data?.items?.length ?? 0,
                 itemBuilder: (context, index) {
                   final items = data?.items?[index];
                   return Visibility(
                     visible: !isLoading,
                     replacement: SizedBox(
-                     width: MediaQuery.of(context).size.width*.4,
-                     child: Shimmer.fromColors(
-                                baseColor: Colors.grey,
-                                highlightColor: Colors.grey.shade600,
-                                child: Container(
-                                  decoration: const BoxDecoration(
-                                    
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                    )
-                                
-                  ),
+                        width: MediaQuery.of(context).size.width * .4,
+                        child: Shimmer.fromColors(
+                          baseColor: Colors.grey,
+                          highlightColor: Colors.grey.shade600,
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              color: Colors.grey,
+                            ),
+                          ),
+                        )),
                     child: CardCinema(
                       imageLink: items?.thumbUrl ?? "",
                       nameProduct: items?.name,
@@ -125,7 +121,7 @@ class SearchView extends StatelessWidget {
                               print(
                                   ">>>>>>>>>>>>>${controller.selectIndex.value}");
                               controller.search.value = null;
-                              await controller.getSearch(page: index+1);
+                              await controller.getSearch(page: index + 1);
                             },
                             child: Container(
                               padding: const EdgeInsets.symmetric(

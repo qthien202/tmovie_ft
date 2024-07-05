@@ -1,5 +1,5 @@
-import 'package:app_ft_movies/app/data/apis/services.dart';
-import 'package:app_ft_movies/app/data/repository/get_film_by_category.dart';
+import 'package:tmovie_app/app/data/apis/services.dart';
+import 'package:tmovie_app/app/data/repository/get_film_by_category.dart';
 import 'package:get/get.dart';
 
 class ListMovieController extends GetxController {
@@ -14,9 +14,9 @@ class ListMovieController extends GetxController {
     listMovie.value = await api.getFilmByCategory(
         path: slug ?? "",
         page: (selectIndex.value ?? 0) + 1,
-        category: category??"",
-        country: country??"",
-        year: year??"");
+        category: category ?? "",
+        country: country ?? "",
+        year: year ?? "");
     for (var i = 0;
         i < (listMovie.value?.pageProps?.data?.items?.length ?? 0);
         i++) {
