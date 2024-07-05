@@ -1,27 +1,25 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:app_ft_movies/app/view/list_movie/list_movie.dart';
+import 'package:tmovie_app/app/view/list_movie/list_movie.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:app_ft_movies/app/core/global_color.dart';
-import 'package:app_ft_movies/app/view/movie_genre/movie_genre_view.dart';
+import 'package:tmovie_app/app/core/global_color.dart';
+import 'package:tmovie_app/app/view/movie_genre/movie_genre_view.dart';
 
 class FilterPage extends StatefulWidget {
   const FilterPage({
     Key? key,
-     this.slug,
+    this.slug,
   }) : super(key: key);
-   final String? slug;
+  final String? slug;
   @override
   _FilterPageState createState() => _FilterPageState();
-  
 }
 
 class _FilterPageState extends State<FilterPage> {
   String? selectedGenre;
   String? selectedCountry;
   int? selectedYear;
-  
 
   List<Map<String, dynamic>> drawerItems = [
     // {"title":"Tất thể loại","slug":""},
@@ -48,7 +46,7 @@ class _FilterPageState extends State<FilterPage> {
   ];
 
   List<Map<String, dynamic>> countries = [
-    {"name":"Tất cả quốc gia","slug":""},
+    {"name": "Tất cả quốc gia", "slug": ""},
     {"name": "Trung Quốc", "slug": "trung-quoc"},
     {"name": "Hàn Quốc", "slug": "han-quoc"},
     {"name": "Nhật Bản", "slug": "nhat-ban"},
@@ -82,13 +80,11 @@ class _FilterPageState extends State<FilterPage> {
 
   // Lấy năm hiện tại
 
-
 // Tạo danh sách các năm từ 2010 đến năm hiện tại
-List<Map<String, dynamic>> yearsList = List.generate(
-  DateTime.now().year - 2009, // Số lượng năm là hiện tại trừ 2010 + 1
-  (index) => {"year": 2010 + index}, // Tạo map cho mỗi năm
-);
-
+  List<Map<String, dynamic>> yearsList = List.generate(
+    DateTime.now().year - 2009, // Số lượng năm là hiện tại trừ 2010 + 1
+    (index) => {"year": 2010 + index}, // Tạo map cho mỗi năm
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -112,30 +108,28 @@ List<Map<String, dynamic>> yearsList = List.generate(
                 ),
               ),
               onPressed: () {
-               if(widget.slug!=null){
-                Get.to(ListMovieView(
-                  
-                  country: selectedCountry??"",
-                  year: selectedYear.toString()??"",
-                  category: selectedGenre ?? "",
-                  slug: widget.slug,
-                ));
-               }
-               else{
-                 if(selectedGenre==null){
-                  Get.snackbar("Thông báo", "Bạn cần chọn thể loại phim trước");
+                if (widget.slug != null) {
+                  Get.to(ListMovieView(
+                    country: selectedCountry ?? "",
+                    year: selectedYear.toString() ?? "",
+                    category: selectedGenre ?? "",
+                    slug: widget.slug,
+                  ));
+                } else {
+                  if (selectedGenre == null) {
+                    Get.snackbar(
+                        "Thông báo", "Bạn cần chọn thể loại phim trước");
+                  } else {
+                    Get.to(MovieGenreview(
+                      slug: selectedGenre ?? "",
+                      country: selectedCountry ?? "",
+                      year: selectedYear.toString() ?? "",
+                    ));
+                  }
                 }
-                else{
-                  Get.to(MovieGenreview(
-                   
-                  slug: selectedGenre ?? "",
-                  country: selectedCountry??"",
-                  year: selectedYear.toString()??"",
-                ));
-                }
-               }
               },
-              child: const Text("Duyệt phim", style: TextStyle(color: Colors.white)),
+              child: const Text("Duyệt phim",
+                  style: TextStyle(color: Colors.white)),
             ),
           )
         ],
@@ -144,19 +138,25 @@ List<Map<String, dynamic>> yearsList = List.generate(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const ListTile(
-            title: Text('Thể loại', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+            title: Text('Thể loại',
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white)),
           ),
           Expanded(
             child: buildFilterList(drawerItems, selectedGenre, (genre) {
               setState(() {
-                
                 selectedGenre = genre["slug"];
-                
               });
             }),
           ),
           const ListTile(
-            title: Text('Quốc gia', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+            title: Text('Quốc gia',
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white)),
           ),
           Expanded(
             child: buildFilterList(countries, selectedCountry, (country) {
@@ -166,7 +166,11 @@ List<Map<String, dynamic>> yearsList = List.generate(
             }),
           ),
           const ListTile(
-            title: Text('Năm', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+            title: Text('Năm',
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white)),
           ),
           Expanded(
             child: buildFilterList(yearsList, selectedYear, (year) {
@@ -180,7 +184,8 @@ List<Map<String, dynamic>> yearsList = List.generate(
     );
   }
 
-  Widget buildFilterList(List<Map<String, dynamic>> items, dynamic selectedItem, Function(Map<String, dynamic>) onTap) {
+  Widget buildFilterList(List<Map<String, dynamic>> items, dynamic selectedItem,
+      Function(Map<String, dynamic>) onTap) {
     return GridView.builder(
       scrollDirection: Axis.horizontal,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -199,7 +204,11 @@ List<Map<String, dynamic>> yearsList = List.generate(
           },
           child: buildFilterItem(
             text: item["title"] ?? item["name"] ?? item["year"].toString(),
-            isSelected: selectedItem!=null?((selectedItem == item["slug"] || selectedItem == item["year"] || selectedItem == item["name"])):false,
+            isSelected: selectedItem != null
+                ? ((selectedItem == item["slug"] ||
+                    selectedItem == item["year"] ||
+                    selectedItem == item["name"]))
+                : false,
           ),
         );
       },
@@ -207,29 +216,22 @@ List<Map<String, dynamic>> yearsList = List.generate(
   }
 
   Widget buildFilterItem({required String text, required bool isSelected}) {
-  
-  
-  return Center(
-    child: Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: isSelected ? const Color(0xff252836) : null,
-        
-        borderRadius: BorderRadius.circular(5),
-      ),
-      child: Text(
-        text,
-        textAlign: TextAlign.start,
-        style: TextStyle(
-          fontSize: 11,
-          color: !isSelected ? Colors.white : GlobalColor.primary,
-          
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xff252836) : null,
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Text(
+          text,
+          textAlign: TextAlign.start,
+          style: TextStyle(
+            fontSize: 11,
+            color: !isSelected ? Colors.white : GlobalColor.primary,
+          ),
         ),
       ),
-    ),
-  );
-}
-
-
-
+    );
+  }
 }

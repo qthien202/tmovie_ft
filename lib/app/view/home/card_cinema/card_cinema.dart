@@ -1,6 +1,6 @@
-import 'package:app_ft_movies/app/core/global_data.dart';
-import 'package:app_ft_movies/app/view/detail/detail_view.dart';
-import 'package:app_ft_movies/app/widgets/global_image.dart';
+import 'package:tmovie_app/app/core/global_data.dart';
+import 'package:tmovie_app/app/view/detail/detail_view.dart';
+import 'package:tmovie_app/app/widgets/global_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
@@ -50,7 +50,7 @@ class CardCinema extends StatelessWidget {
               // ),
               borderRadius: BorderRadius.circular(3),
               child: GlobalImage(
-                 imageUrl: imageLink??"",
+                imageUrl: imageLink ?? "",
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height * .25,
                 boxFit: BoxFit.fill,
@@ -80,7 +80,7 @@ class CardCinema extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 3),
               child: Text(
-                originName??"--",
+                originName ?? "--",
                 // textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

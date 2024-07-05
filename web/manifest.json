@@ -1,6 +1,6 @@
 {
-    "name": "app_ft_movies",
-    "short_name": "app_ft_movies",
+    "name": "tmovie_app",
+    "short_name": "tmovie_app",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

@@ -1,4 +1,4 @@
-import 'package:app_ft_movies/app/core/global_color.dart';
+import 'package:tmovie_app/app/core/global_color.dart';
 import 'package:flutter/material.dart';
 import 'package:better_player/better_player.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -59,7 +59,6 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
 
       _betterPlayerController = BetterPlayerController(
         BetterPlayerConfiguration(
-
           overlay: Padding(
             padding: const EdgeInsets.all(8),
             child: Text("${widget.fileName}-${widget.episode}"),
@@ -68,11 +67,9 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
           looping: false,
           aspectRatio: 16 / 9,
           fullScreenByDefault: true,
-
           controlsConfiguration: BetterPlayerControlsConfiguration(
             controlBarColor: Colors.transparent,
           ),
-
         ),
         betterPlayerDataSource: BetterPlayerDataSource(
           BetterPlayerDataSourceType.network,
@@ -82,9 +79,10 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
 
       // Listen to video player events
       _betterPlayerController.addEventsListener((event) {
-         if (event.betterPlayerEventType == BetterPlayerEventType.progress) {
+        if (event.betterPlayerEventType == BetterPlayerEventType.progress) {
           _savePosition();
-          print(">>>>>>>>>>>>>>${_betterPlayerController.videoPlayerController!.value.position.inSeconds}");
+          print(
+              ">>>>>>>>>>>>>>${_betterPlayerController.videoPlayerController!.value.position.inSeconds}");
         }
         if (event.betterPlayerEventType == BetterPlayerEventType.initialized) {
           // Video player initialized, seek to saved position if available
@@ -105,7 +103,8 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
   }
 
   void _savePosition() {
-    int positionInSeconds = _betterPlayerController.videoPlayerController!.value.position.inSeconds;
+    int positionInSeconds =
+        _betterPlayerController.videoPlayerController!.value.position.inSeconds;
     _prefs.setInt(_prefsKey, positionInSeconds);
   }
 }

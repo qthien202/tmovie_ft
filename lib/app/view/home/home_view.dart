@@ -1,9 +1,9 @@
-import 'package:app_ft_movies/app/controller/home/home_controller.dart';
-import 'package:app_ft_movies/app/core/global_color.dart';
+import 'package:tmovie_app/app/controller/home/home_controller.dart';
+import 'package:tmovie_app/app/core/global_color.dart';
 
-import 'package:app_ft_movies/app/view/home/film_by_category/film_by_category.dart';
+import 'package:tmovie_app/app/view/home/film_by_category/film_by_category.dart';
 
-import 'package:app_ft_movies/app/view/home/slider/slider_cinema.dart';
+import 'package:tmovie_app/app/view/home/slider/slider_cinema.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
