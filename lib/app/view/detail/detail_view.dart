@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'dart:html' as html;
 
 class DetailView extends StatelessWidget {
   const DetailView({super.key, this.slug, this.name});
@@ -130,25 +131,22 @@ class DetailView extends StatelessWidget {
                                   color: GlobalColor.primary),
                               child: InkWell(
                                 onTap: () async {
-                                  await controller.createToken(
-                                      name: data.name ?? "",
-                                      description: data.content ?? "",
-                                      originName: data.originName ?? "",
-                                      slug: data.slug ?? "",
-                                      thumbnail: data.thumbUrl ?? "",
-                                      episode: data.episodes?.first.serverData
-                                              ?.first.name ??
+                                  // await controller.createToken(
+                                  //     name: data.name ?? "",
+                                  //     description: data.content ?? "",
+                                  //     originName: data.originName ?? "",
+                                  //     slug: data.slug ?? "",
+                                  //     thumbnail: data.thumbUrl ?? "",
+                                  //     episode: data.episodes?.first.serverData
+                                  //             ?.first.name ??
+                                  //         "");
+                                  html.window.open(
+                                      data.episodes?.first.serverData?.first
+                                              .linkEmbed ??
+                                          "",
+                                      data.episodes?.first.serverData?.first
+                                              .filename ??
                                           "");
-                                  Get.to(ChewieVideoPlayer(
-                                    slug: data.slug ?? "",
-                                    fileName: data.name ?? "--",
-                                    episode: data.episodes?.first.serverData
-                                            ?.first.name ??
-                                        "",
-                                    videoUrl: data?.episodes?.first.serverData
-                                            ?.first.linkM3u8 ??
-                                        "",
-                                  ));
                                 },
                                 child: const Center(
                                     child: Row(
