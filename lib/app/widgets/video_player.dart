@@ -39,11 +39,7 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: GlobalColor.backgroundColor,
-     
-      body: Center(
-        child:  Chewie(controller: _chewieController)
-            
-      ),
+      body: Center(child: Chewie(controller: _chewieController)),
     );
   }
 
@@ -71,7 +67,7 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
             _videoPlayerController.play();
           });
         });
-        
+
       _chewieController = ChewieController(
         videoPlayerController: _videoPlayerController,
         fullScreenByDefault: true,

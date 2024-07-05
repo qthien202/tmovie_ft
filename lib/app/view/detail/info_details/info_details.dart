@@ -24,12 +24,10 @@ class InfoDetail extends StatelessWidget {
             height: 10,
           ),
           Text("Số tập : ${data?.episodeTotal}"),
-
           const SizedBox(
             height: 10,
           ),
           Text("Ngôn ngữ : ${data?.lang}"),
-
           const SizedBox(
             height: 10,
           ),
@@ -37,7 +35,6 @@ class InfoDetail extends StatelessWidget {
           const SizedBox(
             height: 10,
           ),
-
           Row(
             children: (data?.director ?? []).map((director) {
               return Text(director == ""
@@ -48,10 +45,8 @@ class InfoDetail extends StatelessWidget {
           const SizedBox(
             height: 10,
           ),
-
           Row(
-            crossAxisAlignment: CrossAxisAlignment
-                .start, 
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text("Diễn viên :  "),
               Expanded(
@@ -66,8 +61,6 @@ class InfoDetail extends StatelessWidget {
               ),
             ],
           ),
-
-          
         ],
       );
     });

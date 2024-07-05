@@ -1,6 +1,6 @@
 import 'package:app_ft_movies/app/controller/home/home_controller.dart';
 import 'package:app_ft_movies/app/core/global_color.dart';
-import 'package:app_ft_movies/app/core/global_data.dart';
+import 'package:app_ft_movies/app/core/app_constants.dart';
 import 'package:app_ft_movies/app/view/detail/detail_view.dart';
 import 'package:app_ft_movies/app/widgets/global_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -15,7 +15,7 @@ class SliderCinema extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(HomeController());
-    if(MediaQuery.of(context).size.width<600){
+    if (MediaQuery.of(context).size.width < 600) {
       return const ResponsiveApp();
     }
     return Obx(() {
@@ -41,11 +41,10 @@ class SliderCinema extends StatelessWidget {
                   return Visibility(
                     visible: !isLoading,
                     replacement: Padding(
-                     padding: const EdgeInsets.symmetric(
-                             vertical: 10),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
                       child: SizedBox(
-                         width: MediaQuery.of(context).size.width * .42,
-                                height: MediaQuery.of(context).size.height * .4,
+                          width: MediaQuery.of(context).size.width * .42,
+                          height: MediaQuery.of(context).size.height * .4,
                           child: Shimmer.fromColors(
                             baseColor: Colors.grey,
                             highlightColor: Colors.grey.shade600,
@@ -59,8 +58,7 @@ class SliderCinema extends StatelessWidget {
                     child: InkWell(
                       onTap: () => Get.toNamed('/chi-tiet/${data?.slug}'),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                             vertical: 10),
+                        padding: const EdgeInsets.symmetric(vertical: 10),
                         child: Stack(
                           alignment: Alignment.bottomCenter,
                           children: [
@@ -79,8 +77,13 @@ class SliderCinema extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(data?.name??"--",style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold),),
-                                    Text(data?.year.toString()??"--")
+                                    Text(
+                                      data?.name ?? "--",
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(data?.year.toString() ?? "--")
                                   ],
                                 ))
                           ],
@@ -129,38 +132,39 @@ class ResponsiveApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(HomeController());
     return Obx(() {
-      final isLoading = controller.getFilmData.value==null;
+      final isLoading = controller.getFilmData.value == null;
       return Column(
         children: [
           CarouselSlider.builder(
-            itemCount: isLoading?4:controller.getFilmData.value?.pageProps?.data?.items?.length ?? 0,
+            itemCount: isLoading
+                ? 4
+                : controller
+                        .getFilmData.value?.pageProps?.data?.items?.length ??
+                    0,
             itemBuilder: (context, index, realIndex) {
-              final data = controller
-                    .getFilmData.value?.pageProps?.data?.items?[index];
+              final data =
+                  controller.getFilmData.value?.pageProps?.data?.items?[index];
               return Visibility(
                 visible: !isLoading,
                 replacement: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   child: SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height * .3,
-                    child: Shimmer.fromColors(
-                                baseColor: Colors.grey,
-                                highlightColor: Colors.grey.shade600,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                    )
-                  ),
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height * .3,
+                      child: Shimmer.fromColors(
+                        baseColor: Colors.grey,
+                        highlightColor: Colors.grey.shade600,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.grey,
+                          ),
+                        ),
+                      )),
                 ),
                 child: InkWell(
-                  onTap: () =>Get.toNamed('/chi-tiet/${data?.slug}'),
+                  onTap: () => Get.toNamed('/chi-tiet/${data?.slug}'),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                         vertical: 10),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
                     child: Stack(
                       alignment: Alignment.bottomCenter,
                       children: [
@@ -179,8 +183,13 @@ class ResponsiveApp extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(data?.name??"--",style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold),),
-                                Text(data?.year.toString()??"--")
+                                Text(
+                                  data?.name ?? "--",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Text(data?.year.toString() ?? "--")
                               ],
                             ))
                       ],

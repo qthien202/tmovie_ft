@@ -2,7 +2,7 @@ import 'package:app_ft_movies/app/controller/home/home_controller.dart';
 import 'package:app_ft_movies/app/controller/list_movie/list_movie_controller.dart';
 import 'package:get/get.dart';
 
-class FilterController extends GetxController{
+class FilterController extends GetxController {
   List<Map<String, dynamic>> genres = [
     {"title": "Thể loại", "slug": ""},
     {"title": "Hành Động", "slug": "hanh-dong"},
@@ -27,7 +27,8 @@ class FilterController extends GetxController{
     {"title": "Học Đường", "slug": "hoc-duong"},
   ];
 
-  RxList<Map<String, dynamic>> genreList = RxList<Map<String, dynamic>>.from([]);
+  RxList<Map<String, dynamic>> genreList =
+      RxList<Map<String, dynamic>>.from([]);
 
   List<Map<String, dynamic>> countries = [
     {"name": "Quốc gia", "slug_country": ""},
@@ -62,8 +63,8 @@ class FilterController extends GetxController{
     {"name": "Ả Rập Xê Út", "slug_country": "arap-xe-ut"},
   ];
 
-  RxList<Map<String, dynamic>> countryList = RxList<Map<String, dynamic>>.from([]);
-
+  RxList<Map<String, dynamic>> countryList =
+      RxList<Map<String, dynamic>>.from([]);
 
   List<Map<String, dynamic>> years = List.generate(
     DateTime.now().year - 2009,
@@ -72,10 +73,10 @@ class FilterController extends GetxController{
 
   RxList<Map<String, dynamic>> yearList = RxList<Map<String, dynamic>>.from([]);
 
-  Rxn<String>selectedGenre = Rxn();
-  Rxn<String>selectedCountry = Rxn();
-  Rxn<String>selectedYear = Rxn();
-  Rxn<bool>onFilter = Rxn(false);
+  Rxn<String> selectedGenre = Rxn();
+  Rxn<String> selectedCountry = Rxn();
+  Rxn<String> selectedYear = Rxn();
+  Rxn<bool> onFilter = Rxn(false);
 
   @override
   void onReady() {
@@ -86,20 +87,22 @@ class FilterController extends GetxController{
     yearList.addAll(years);
   }
 
-  
-  void onStop(){
-    
+  void onStop() {
     onFilter.value = false;
     selectedGenre.value = null;
     selectedCountry.value = null;
     selectedYear.value = null;
   }
 
-  Future<void>getFilmFilter({int? page})async{
+  Future<void> getFilmFilter({int? page}) async {
     onFilter.value = true;
     final listMovie = Get.put(ListMovieController());
     final home = Get.put(HomeController());
-    await listMovie.getListMovie(path: home.pathFilm.value,category: selectedGenre.value??"",country: selectedCountry.value??"",year: selectedYear.value??"",page: page);
+    await listMovie.getListMovie(
+        path: home.pathFilm.value,
+        category: selectedGenre.value ?? "",
+        country: selectedCountry.value ?? "",
+        year: selectedYear.value ?? "",
+        page: page);
   }
-  
 }

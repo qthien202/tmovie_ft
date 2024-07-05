@@ -24,80 +24,69 @@ class HistoryView extends StatelessWidget {
       backgroundColor: GlobalColor.backgroundColor,
       body: ListView(
         controller: controller.scrollController,
-              children: [
-                const SizedBox(
-                  height: 10,
-                ),
-                Obx((){
-                  final isLoading = controller.getHistoryData.value==null;
-                   final data = controller.getHistoryData.value?.data;
-                  
-                  
-                  return GridView.builder(
-                    padding: const EdgeInsets.all(5),
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: isLoading?6:data?.length ?? 0,
-                  itemBuilder: (context, index) {
-                    final items = data?[index];
-                    return Visibility(
-                      visible: !isLoading ,
-                      replacement: SizedBox(
-                       width: MediaQuery.of(context).size.width*.4,
-                       child: Shimmer.fromColors(
-                                  baseColor: Colors.grey,
-                                  highlightColor: Colors.grey.shade600,
-                                  child: Container(
-                                    decoration: const BoxDecoration(
-                                      
-                                      
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                      )
-                                  
-                    ),
-                      child: CardCinema(
-                        imageLink: items?.thumbnailUrl?? "",
-                        nameProduct: items?.name,
-                        originName: items?.originName ?? "",
-                        slug: items?.slug ?? "",
-                      ),
-                    );
-                  },
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    childAspectRatio: 6 / 10,
-                    crossAxisCount: 6,
-                    crossAxisSpacing: 15,
-                    mainAxisSpacing: 20,
+        children: [
+          const SizedBox(
+            height: 10,
+          ),
+          Obx(() {
+            final isLoading = controller.getHistoryData.value == null;
+            final data = controller.getHistoryData.value?.data;
+
+            return GridView.builder(
+              padding: const EdgeInsets.all(5),
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: isLoading ? 6 : data?.length ?? 0,
+              itemBuilder: (context, index) {
+                final items = data?[index];
+                return Visibility(
+                  visible: !isLoading,
+                  replacement: SizedBox(
+                      width: MediaQuery.of(context).size.width * .4,
+                      child: Shimmer.fromColors(
+                        baseColor: Colors.grey,
+                        highlightColor: Colors.grey.shade600,
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.grey,
+                          ),
+                        ),
+                      )),
+                  child: CardCinema(
+                    imageLink: items?.thumbnailUrl ?? "",
+                    nameProduct: items?.name,
+                    originName: items?.originName ?? "",
+                    slug: items?.slug ?? "",
                   ),
                 );
-                }),
-                const SizedBox(
-                  height: 20,
-                ),
-                const SizedBox(height: 30,),
-                  Visibility(
-                    visible: controller.limit.value <
-                        (controller.getHistoryData.value?.total ??
-                            0) && controller.isLoadmore.value,
-                    replacement: const Center(),
-                    child: Center(
-                      child: CircularProgressIndicator(
-                      color: GlobalColor.primary,
-                      )
-                    ),
-                  ),
-                 
-              ],
-            ),
-           
-      
-      
-      
-      
-      
-      
+              },
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                childAspectRatio: 6 / 10,
+                crossAxisCount: 6,
+                crossAxisSpacing: 15,
+                mainAxisSpacing: 20,
+              ),
+            );
+          }),
+          const SizedBox(
+            height: 20,
+          ),
+          const SizedBox(
+            height: 30,
+          ),
+          Visibility(
+            visible: controller.limit.value <
+                    (controller.getHistoryData.value?.total ?? 0) &&
+                controller.isLoadmore.value,
+            replacement: const Center(),
+            child: Center(
+                child: CircularProgressIndicator(
+              color: GlobalColor.primary,
+            )),
+          ),
+        ],
+      ),
+
       // Obx((){
       //   if(controller.getHistoryData.value?.data.isEmpty==true){
       //     return Center(
@@ -117,7 +106,7 @@ class HistoryView extends StatelessWidget {
       //       children: [
       //         ListView.separated(
       //           physics: NeverScrollableScrollPhysics(),
-              
+
       //         shrinkWrap: true,
       //         itemCount: controller.getHistoryData.value?.data.length??0,
       //         itemBuilder: (context, index) {
@@ -191,11 +180,11 @@ class HistoryView extends StatelessWidget {
       //               ],
       //             ),
       //           );
-      //         }, separatorBuilder: (BuildContext context, int index) { 
+      //         }, separatorBuilder: (BuildContext context, int index) {
       //           return const SizedBox(height: 15,);
       //          },
       //         ),
-      //          
+      //
       //       ],
       //     ),
       //   ),
