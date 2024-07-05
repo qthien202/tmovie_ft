@@ -11,22 +11,25 @@ class SplashView extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(SplashController());
     return Scaffold(
-      backgroundColor: GlobalColor.backgroundColor,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Center(child: SvgPicture.asset("assets/images/logo.svg")),
-          const SizedBox(height: 5,),
-          CircularProgressIndicator(
-            color: GlobalColor.primary,
-            strokeWidth: 5,
-            backgroundColor: const Color(0xff252836),
-          ),
-          const SizedBox(height: 10,),
-          Text("Đang tải")
-        ],
-      )
-    );
+        backgroundColor: GlobalColor.backgroundColor,
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Center(child: SvgPicture.asset("assets/images/logo.svg")),
+            const SizedBox(
+              height: 5,
+            ),
+            CircularProgressIndicator(
+              color: GlobalColor.primary,
+              strokeWidth: 5,
+              backgroundColor: const Color(0xff252836),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Text("Đang tải")
+          ],
+        ));
   }
 }

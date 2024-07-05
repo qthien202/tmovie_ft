@@ -2,15 +2,13 @@ import 'package:flutter/material.dart';
 
 class GlobalColor {
   GlobalColor._();
- 
+
   static const Color _primary = Color(0xff13BDCA);
   static const Color _second = Colors.orange;
   static const Color container = Colors.white;
   // static const Color backgroundColor = Color(0xff1F1D2B);
   static const Color backgroundColor = Color(0xff1F1D2B);
   static const Color background2 = Color(0xff252836);
-
- 
 
   static MaterialColor primary = MaterialColor(
     _primary.value,
@@ -27,5 +25,4 @@ class GlobalColor {
       900: Color(_primary.value + (0xff000000)),
     },
   );
-
 }

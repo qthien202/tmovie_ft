@@ -5,15 +5,12 @@ import 'package:app_ft_movies/app/view/movie_genre/movie_genre_view.dart';
 import 'package:app_ft_movies/app/view/splash/splash.dart';
 import 'package:get/get.dart';
 
-
 class Routes {
   static final List<GetPage> routes = [
-    
-    GetPage(name: '/', page: () =>  HomeView()),
-    GetPage(name: '/chi-tiet/:slug', page: ()=> DetailView()),
-    GetPage(name: '/the-loai/:category', page: ()=>const MovieGenreview()),
-    
-    
+    GetPage(name: '/', page: () => HomeView()),
+    GetPage(name: '/chi-tiet/:slug', page: () => DetailView()),
+    GetPage(name: '/the-loai/:category', page: () => const MovieGenreview()),
+
     // Các route khác ở đây
   ];
 }

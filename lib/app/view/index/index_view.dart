@@ -13,11 +13,7 @@ class IndexView extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(IndexController());
     final List<Map<String, dynamic>> items = [
-      {
-        "screen":  HomeView(),
-        "icon": Icons.home_outlined,
-        "title": "Trang chủ"
-      },
+      {"screen": HomeView(), "icon": Icons.home_outlined, "title": "Trang chủ"},
       {
         "screen": const SearchView(),
         "icon": Icons.search_outlined,
@@ -31,12 +27,10 @@ class IndexView extends StatelessWidget {
     ];
 
     return Scaffold(
-      
       body: Obx(() {
         return Row(
           children: [
             NavigationRail(
-              
               useIndicator: false,
               indicatorColor: GlobalColor.primary,
               backgroundColor: GlobalColor.background2,
@@ -46,24 +40,24 @@ class IndexView extends StatelessWidget {
               unselectedLabelTextStyle: TextStyle(
                 color: Colors.white,
               ),
-              selectedIconTheme:
-                  IconThemeData(color: GlobalColor.primary),
+              selectedIconTheme: IconThemeData(color: GlobalColor.primary),
               extended: true,
               selectedIndex: controller.tabIndex.value ?? 0,
               onDestinationSelected: (int index) {
                 controller.tabIndex.value = index;
               },
-              
+
               // labelType: NavigationRailLabelType.all,
-              
+
               destinations: items.map((item) {
                 return NavigationRailDestination(
-
-                  icon: Icon(item['icon'],size: 25,),
+                  icon: Icon(
+                    item['icon'],
+                    size: 25,
+                  ),
                   label: Text(item['title']),
-                  
-                  
-                   // Đặt chiều rộng tối thiểu tại đây
+
+                  // Đặt chiều rộng tối thiểu tại đây
                 );
               }).toList(),
             ),

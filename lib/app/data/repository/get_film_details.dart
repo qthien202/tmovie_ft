@@ -3,23 +3,29 @@
 
 class GetFilmDetails {
   GetFilmDetails({
-      PageProps? pageProps, 
-      bool? nssp,}){
+    PageProps? pageProps,
+    bool? nssp,
+  }) {
     _pageProps = pageProps;
     _nssp = nssp;
-}
+  }
 
   GetFilmDetails.fromJson(dynamic json) {
-    _pageProps = json['pageProps'] != null ? PageProps.fromJson(json['pageProps']) : null;
+    _pageProps = json['pageProps'] != null
+        ? PageProps.fromJson(json['pageProps'])
+        : null;
     _nssp = json['__N_SSP'];
   }
   PageProps? _pageProps;
   bool? _nssp;
-GetFilmDetails copyWith({  PageProps? pageProps,
-  bool? nssp,
-}) => GetFilmDetails(  pageProps: pageProps ?? _pageProps,
-  nssp: nssp ?? _nssp,
-);
+  GetFilmDetails copyWith({
+    PageProps? pageProps,
+    bool? nssp,
+  }) =>
+      GetFilmDetails(
+        pageProps: pageProps ?? _pageProps,
+        nssp: nssp ?? _nssp,
+      );
   PageProps? get pageProps => _pageProps;
   bool? get nssp => _nssp;
 
@@ -31,24 +37,27 @@ GetFilmDetails copyWith({  PageProps? pageProps,
     map['__N_SSP'] = _nssp;
     return map;
   }
-
 }
 
 /// data : {"seoOnPage":{"og_type":"video.movie","titleHead":"Sếp Của Tôi Là Chú Lợn Nhỏ-My Piggy Boss (2024) [HD-Vietsub]","seoSchema":{"@context":"https://schema.org","@type":"TvSeries","name":"Sếp Của Tôi Là Chú Lợn Nhỏ-My Piggy Boss (2024) [HD-Vietsub]","dateModified":"2024-02-02T15:11:07.000Z","dateCreated":"2024-02-02T15:11:07.000Z","url":"https://ophim11.cc/phim/sep-cua-toi-la-chu-lon-nho","datePublished":"2024-02-02T15:11:07.000Z","image":"https://img.ophim11.cc/uploads/movies/sep-cua-toi-la-chu-lon-nho-thumb.jpg","director":"Ophim1.CC"},"descriptionHead":"Nhân viên cấp thấp, Dương Tiểu Châu, bất ngờ trở thành trợ lý cho tổng giám đốc Chu Khiếu Dương của công ty sản xuất đèn lồng, người phải đến làm việc mỗi sáng từ 6 giờ. Sau...","og_image":["movies/sep-cua-toi-la-chu-lon-nho-thumb.jpg","movies/sep-cua-toi-la-chu-lon-nho-thumb.jpg"],"updated_time":1706887981000,"og_url":"phim/sep-cua-toi-la-chu-lon-nho"},"breadCrumb":[{"name":"Phim Bộ","slug":"/danh-sach/phim-bo","position":2},{"name":"Trung Quốc","slug":"/quoc-gia/trung-quoc","position":3},{"name":"Hài Hước","slug":"/the-loai/hai-huoc","position":3},{"name":"Sếp Của Tôi Là Chú Lợn Nhỏ","isCurrent":true,"position":4}],"params":{"slug":"sep-cua-toi-la-chu-lon-nho"},"item":{"created":{"time":"2024-02-02T15:11:07.000Z"},"modified":{"time":"2024-02-02T15:33:01.000Z"},"_id":"65bca39bff05f1a47d01c0b7","name":"Sếp Của Tôi Là Chú Lợn Nhỏ","slug":"sep-cua-toi-la-chu-lon-nho","origin_name":"My Piggy Boss","content":"<p>Nhân viên cấp thấp, Dương Tiểu Châu, bất ngờ trở thành trợ lý cho tổng giám đốc Chu Khiếu Dương của công ty sản xuất đèn lồng, người phải đến làm việc mỗi sáng từ 6 giờ. Sau khi bị Chu Khiếu Dương sa thải vì làm việc chủ quan, Chu Khiếu Dương tình cờ nhặt được một con heo nhỏ dễ thương trong nhà vệ sinh. Khi thức dậy vào ngày thứ hai, con heo ban đầu nằm bên cạnh cô đã biến thành tổng giám đốc trần trụi! Hóa ra, mỗi khi mặt trời lặn, Chu Khiếu Dương biến thành một con heo nhỏ dễ thương, chỉ có nụ hôn của tình yêu thực sự mới có thể giải mã. Dương Tiểu Châu, người tốt bụng, chấp nhận nhiệm vụ từ mẹ của Chu Khiếu Dương và bắt đầu thử bắt đầu mối quan hệ tình cảm với Chu Khiếu Dương, mở đầu cho cuộc sống chung, cùng đối mặt với cạm bẫy cạnh tranh tàn ác trên thị trường kinh doanh, tình cảm giữa họ ngày càng phát triển lên.</p><p>&nbsp;</p>","type":"series","status":"completed","thumb_url":"sep-cua-toi-la-chu-lon-nho-thumb.jpg","poster_url":"sep-cua-toi-la-chu-lon-nho-poster.jpg","is_copyright":false,"sub_docquyen":false,"chieurap":false,"trailer_url":"","time":"1 phút/tập","episode_current":"Tập 8","episode_total":"12","quality":"HD","lang":"Vietsub","notify":"","showtimes":"","year":2024,"view":36,"actor":[""],"director":[""],"category":[{"id":"620a221de0fc277084dfd1c1","name":"Hài Hước","slug":"hai-huoc"}],"country":[{"id":"62093063196e9f4ab6b448b8","name":"Trung Quốc","slug":"trung-quoc"}],"episodes":[{"server_name":"Vietsub #1","server_data":[{"name":"1","slug":"1","filename":"Sếp Của Tôi Là Chú Lợn Nhỏ - Ep1","link_embed":"https://1080.opstream4.com/share/ea6c54218f131479af66a8711fe7d039","link_m3u8":"https://1080.opstream4.com/20240202/51127_2feb2168/index.m3u8"},{"name":"2","slug":"2","filename":"Sếp Của Tôi Là Chú Lợn Nhỏ - Ep2","link_embed":"https://1080.opstream4.com/share/9cf4935d321cc4fc0ec1d0cb5d6eacde","link_m3u8":"https://1080.opstream4.com/20240202/51128_9715d52a/index.m3u8"},{"name":"3","slug":"3","filename":"Sếp Của Tôi Là Chú Lợn Nhỏ - Ep3","link_embed":"https://1080.opstream4.com/share/d50ae67e7f3f633773391c240c9c15a6","link_m3u8":"https://1080.opstream4.com/20240202/51129_d4552cb9/index.m3u8"},{"name":"4","slug":"4","filename":"Sếp Của Tôi Là Chú Lợn Nhỏ - Ep4","link_embed":"https://1080.opstream4.com/share/32070b4f87eb2caa39b75932e9111c63","link_m3u8":"https://1080.opstream4.com/20240202/51130_bd74c849/index.m3u8"},{"name":"5","slug":"5","filename":"Sếp Của Tôi Là Chú Lợn Nhỏ - Ep5","link_embed":"https://1080.opstream4.com/share/8e504e37e73af0df311b900a2ee010ff","link_m3u8":"https://1080.opstream4.com/20240202/51132_d09c5242/index.m3u8"},{"name":"6","slug":"6","filename":"Sếp Của Tôi Là Chú Lợn Nhỏ - Ep6","link_embed":"https://1080.opstream4.com/share/f04332e7694b987e98c2840e9beaf9e2","link_m3u8":"https://1080.opstream4.com/20240202/51131_f0ef59ab/index.m3u8"},{"name":"7","slug":"7","filename":"Sếp Của Tôi Là Chú Lợn Nhỏ - Ep7","link_embed":"https://1080.opstream4.com/share/4b83ab1aa56735dcf18fe2184a776649","link_m3u8":"https://1080.opstream4.com/20240202/51133_e64df5b2/index.m3u8"},{"name":"8","slug":"8","filename":"Sếp Của Tôi Là Chú Lợn Nhỏ - Ep8","link_embed":"https://1080.opstream4.com/share/1091267c6322ddc546912c53feee9b59","link_m3u8":"https://1080.opstream4.com/20240202/51134_9356e7fa/index.m3u8"}]}]}}
 
 class PageProps {
   PageProps({
-      Data? data,}){
+    Data? data,
+  }) {
     _data = data;
-}
+  }
 
   PageProps.fromJson(dynamic json) {
     _data = json['data'] != null ? Data.fromJson(json['data']) : null;
   }
   Data? _data;
-PageProps copyWith({  Data? data,
-}) => PageProps(  data: data ?? _data,
-);
+  PageProps copyWith({
+    Data? data,
+  }) =>
+      PageProps(
+        data: data ?? _data,
+      );
   Data? get data => _data;
 
   Map<String, dynamic> toJson() {
@@ -58,7 +67,6 @@ PageProps copyWith({  Data? data,
     }
     return map;
   }
-
 }
 
 /// seoOnPage : {"og_type":"video.movie","titleHead":"Sếp Của Tôi Là Chú Lợn Nhỏ-My Piggy Boss (2024) [HD-Vietsub]","seoSchema":{"@context":"https://schema.org","@type":"TvSeries","name":"Sếp Của Tôi Là Chú Lợn Nhỏ-My Piggy Boss (2024) [HD-Vietsub]","dateModified":"2024-02-02T15:11:07.000Z","dateCreated":"2024-02-02T15:11:07.000Z","url":"https://ophim11.cc/phim/sep-cua-toi-la-chu-lon-nho","datePublished":"2024-02-02T15:11:07.000Z","image":"https://img.ophim11.cc/uploads/movies/sep-cua-toi-la-chu-lon-nho-thumb.jpg","director":"Ophim1.CC"},"descriptionHead":"Nhân viên cấp thấp, Dương Tiểu Châu, bất ngờ trở thành trợ lý cho tổng giám đốc Chu Khiếu Dương của công ty sản xuất đèn lồng, người phải đến làm việc mỗi sáng từ 6 giờ. Sau...","og_image":["movies/sep-cua-toi-la-chu-lon-nho-thumb.jpg","movies/sep-cua-toi-la-chu-lon-nho-thumb.jpg"],"updated_time":1706887981000,"og_url":"phim/sep-cua-toi-la-chu-lon-nho"}
@@ -68,18 +76,21 @@ PageProps copyWith({  Data? data,
 
 class Data {
   Data({
-      SeoOnPage? seoOnPage, 
-      List<BreadCrumb>? breadCrumb, 
-      Params? params, 
-      Item? item,}){
+    SeoOnPage? seoOnPage,
+    List<BreadCrumb>? breadCrumb,
+    Params? params,
+    Item? item,
+  }) {
     _seoOnPage = seoOnPage;
     _breadCrumb = breadCrumb;
     _params = params;
     _item = item;
-}
+  }
 
   Data.fromJson(dynamic json) {
-    _seoOnPage = json['seoOnPage'] != null ? SeoOnPage.fromJson(json['seoOnPage']) : null;
+    _seoOnPage = json['seoOnPage'] != null
+        ? SeoOnPage.fromJson(json['seoOnPage'])
+        : null;
     if (json['breadCrumb'] != null) {
       _breadCrumb = [];
       json['breadCrumb'].forEach((v) {
@@ -93,15 +104,18 @@ class Data {
   List<BreadCrumb>? _breadCrumb;
   Params? _params;
   Item? _item;
-Data copyWith({  SeoOnPage? seoOnPage,
-  List<BreadCrumb>? breadCrumb,
-  Params? params,
-  Item? item,
-}) => Data(  seoOnPage: seoOnPage ?? _seoOnPage,
-  breadCrumb: breadCrumb ?? _breadCrumb,
-  params: params ?? _params,
-  item: item ?? _item,
-);
+  Data copyWith({
+    SeoOnPage? seoOnPage,
+    List<BreadCrumb>? breadCrumb,
+    Params? params,
+    Item? item,
+  }) =>
+      Data(
+        seoOnPage: seoOnPage ?? _seoOnPage,
+        breadCrumb: breadCrumb ?? _breadCrumb,
+        params: params ?? _params,
+        item: item ?? _item,
+      );
   SeoOnPage? get seoOnPage => _seoOnPage;
   List<BreadCrumb>? get breadCrumb => _breadCrumb;
   Params? get params => _params;
@@ -123,7 +137,6 @@ Data copyWith({  SeoOnPage? seoOnPage,
     }
     return map;
   }
-
 }
 
 /// created : {"time":"2024-02-02T15:11:07.000Z"}
@@ -158,35 +171,36 @@ Data copyWith({  SeoOnPage? seoOnPage,
 
 class Item {
   Item({
-      Created? created, 
-      Modified? modified, 
-      String? id, 
-      String? name, 
-      String? slug, 
-      String? originName, 
-      String? content, 
-      String? type, 
-      String? status, 
-      String? thumbUrl, 
-      String? posterUrl, 
-      bool? isCopyright, 
-      bool? subDocquyen, 
-      bool? chieurap, 
-      String? trailerUrl, 
-      String? time, 
-      String? episodeCurrent, 
-      String? episodeTotal, 
-      String? quality, 
-      String? lang, 
-      String? notify, 
-      String? showtimes, 
-      num? year, 
-      num? view, 
-      List<String>? actor, 
-      List<String>? director, 
-      List<Category>? category, 
-      List<Country>? country, 
-      List<Episodes>? episodes,}){
+    Created? created,
+    Modified? modified,
+    String? id,
+    String? name,
+    String? slug,
+    String? originName,
+    String? content,
+    String? type,
+    String? status,
+    String? thumbUrl,
+    String? posterUrl,
+    bool? isCopyright,
+    bool? subDocquyen,
+    bool? chieurap,
+    String? trailerUrl,
+    String? time,
+    String? episodeCurrent,
+    String? episodeTotal,
+    String? quality,
+    String? lang,
+    String? notify,
+    String? showtimes,
+    num? year,
+    num? view,
+    List<String>? actor,
+    List<String>? director,
+    List<Category>? category,
+    List<Country>? country,
+    List<Episodes>? episodes,
+  }) {
     _created = created;
     _modified = modified;
     _id = id;
@@ -216,11 +230,13 @@ class Item {
     _category = category;
     _country = country;
     _episodes = episodes;
-}
+  }
 
   Item.fromJson(dynamic json) {
-    _created = json['created'] != null ? Created.fromJson(json['created']) : null;
-    _modified = json['modified'] != null ? Modified.fromJson(json['modified']) : null;
+    _created =
+        json['created'] != null ? Created.fromJson(json['created']) : null;
+    _modified =
+        json['modified'] != null ? Modified.fromJson(json['modified']) : null;
     _id = json['_id'];
     _name = json['name'];
     _slug = json['slug'];
@@ -293,65 +309,68 @@ class Item {
   List<Category>? _category;
   List<Country>? _country;
   List<Episodes>? _episodes;
-Item copyWith({  Created? created,
-  Modified? modified,
-  String? id,
-  String? name,
-  String? slug,
-  String? originName,
-  String? content,
-  String? type,
-  String? status,
-  String? thumbUrl,
-  String? posterUrl,
-  bool? isCopyright,
-  bool? subDocquyen,
-  bool? chieurap,
-  String? trailerUrl,
-  String? time,
-  String? episodeCurrent,
-  String? episodeTotal,
-  String? quality,
-  String? lang,
-  String? notify,
-  String? showtimes,
-  num? year,
-  num? view,
-  List<String>? actor,
-  List<String>? director,
-  List<Category>? category,
-  List<Country>? country,
-  List<Episodes>? episodes,
-}) => Item(  created: created ?? _created,
-  modified: modified ?? _modified,
-  id: id ?? _id,
-  name: name ?? _name,
-  slug: slug ?? _slug,
-  originName: originName ?? _originName,
-  content: content ?? _content,
-  type: type ?? _type,
-  status: status ?? _status,
-  thumbUrl: thumbUrl ?? _thumbUrl,
-  posterUrl: posterUrl ?? _posterUrl,
-  isCopyright: isCopyright ?? _isCopyright,
-  subDocquyen: subDocquyen ?? _subDocquyen,
-  chieurap: chieurap ?? _chieurap,
-  trailerUrl: trailerUrl ?? _trailerUrl,
-  time: time ?? _time,
-  episodeCurrent: episodeCurrent ?? _episodeCurrent,
-  episodeTotal: episodeTotal ?? _episodeTotal,
-  quality: quality ?? _quality,
-  lang: lang ?? _lang,
-  notify: notify ?? _notify,
-  showtimes: showtimes ?? _showtimes,
-  year: year ?? _year,
-  view: view ?? _view,
-  actor: actor ?? _actor,
-  director: director ?? _director,
-  category: category ?? _category,
-  country: country ?? _country,
-  episodes: episodes ?? _episodes,
-);
+  Item copyWith({
+    Created? created,
+    Modified? modified,
+    String? id,
+    String? name,
+    String? slug,
+    String? originName,
+    String? content,
+    String? type,
+    String? status,
+    String? thumbUrl,
+    String? posterUrl,
+    bool? isCopyright,
+    bool? subDocquyen,
+    bool? chieurap,
+    String? trailerUrl,
+    String? time,
+    String? episodeCurrent,
+    String? episodeTotal,
+    String? quality,
+    String? lang,
+    String? notify,
+    String? showtimes,
+    num? year,
+    num? view,
+    List<String>? actor,
+    List<String>? director,
+    List<Category>? category,
+    List<Country>? country,
+    List<Episodes>? episodes,
+  }) =>
+      Item(
+        created: created ?? _created,
+        modified: modified ?? _modified,
+        id: id ?? _id,
+        name: name ?? _name,
+        slug: slug ?? _slug,
+        originName: originName ?? _originName,
+        content: content ?? _content,
+        type: type ?? _type,
+        status: status ?? _status,
+        thumbUrl: thumbUrl ?? _thumbUrl,
+        posterUrl: posterUrl ?? _posterUrl,
+        isCopyright: isCopyright ?? _isCopyright,
+        subDocquyen: subDocquyen ?? _subDocquyen,
+        chieurap: chieurap ?? _chieurap,
+        trailerUrl: trailerUrl ?? _trailerUrl,
+        time: time ?? _time,
+        episodeCurrent: episodeCurrent ?? _episodeCurrent,
+        episodeTotal: episodeTotal ?? _episodeTotal,
+        quality: quality ?? _quality,
+        lang: lang ?? _lang,
+        notify: notify ?? _notify,
+        showtimes: showtimes ?? _showtimes,
+        year: year ?? _year,
+        view: view ?? _view,
+        actor: actor ?? _actor,
+        director: director ?? _director,
+        category: category ?? _category,
+        country: country ?? _country,
+        episodes: episodes ?? _episodes,
+      );
   Created? get created => _created;
   Modified? get modified => _modified;
   String? get id => _id;
@@ -425,7 +444,6 @@ Item copyWith({  Created? created,
     }
     return map;
   }
-
 }
 
 /// server_name : "Vietsub #1"
@@ -433,11 +451,12 @@ Item copyWith({  Created? created,
 
 class Episodes {
   Episodes({
-      String? serverName, 
-      List<ServerData>? serverData,}){
+    String? serverName,
+    List<ServerData>? serverData,
+  }) {
     _serverName = serverName;
     _serverData = serverData;
-}
+  }
 
   Episodes.fromJson(dynamic json) {
     _serverName = json['server_name'];
@@ -450,11 +469,14 @@ class Episodes {
   }
   String? _serverName;
   List<ServerData>? _serverData;
-Episodes copyWith({  String? serverName,
-  List<ServerData>? serverData,
-}) => Episodes(  serverName: serverName ?? _serverName,
-  serverData: serverData ?? _serverData,
-);
+  Episodes copyWith({
+    String? serverName,
+    List<ServerData>? serverData,
+  }) =>
+      Episodes(
+        serverName: serverName ?? _serverName,
+        serverData: serverData ?? _serverData,
+      );
   String? get serverName => _serverName;
   List<ServerData>? get serverData => _serverData;
 
@@ -466,7 +488,6 @@ Episodes copyWith({  String? serverName,
     }
     return map;
   }
-
 }
 
 /// name : "1"
@@ -477,17 +498,18 @@ Episodes copyWith({  String? serverName,
 
 class ServerData {
   ServerData({
-      String? name, 
-      String? slug, 
-      String? filename, 
-      String? linkEmbed, 
-      String? linkM3u8,}){
+    String? name,
+    String? slug,
+    String? filename,
+    String? linkEmbed,
+    String? linkM3u8,
+  }) {
     _name = name;
     _slug = slug;
     _filename = filename;
     _linkEmbed = linkEmbed;
     _linkM3u8 = linkM3u8;
-}
+  }
 
   ServerData.fromJson(dynamic json) {
     _name = json['name'];
@@ -501,17 +523,20 @@ class ServerData {
   String? _filename;
   String? _linkEmbed;
   String? _linkM3u8;
-ServerData copyWith({  String? name,
-  String? slug,
-  String? filename,
-  String? linkEmbed,
-  String? linkM3u8,
-}) => ServerData(  name: name ?? _name,
-  slug: slug ?? _slug,
-  filename: filename ?? _filename,
-  linkEmbed: linkEmbed ?? _linkEmbed,
-  linkM3u8: linkM3u8 ?? _linkM3u8,
-);
+  ServerData copyWith({
+    String? name,
+    String? slug,
+    String? filename,
+    String? linkEmbed,
+    String? linkM3u8,
+  }) =>
+      ServerData(
+        name: name ?? _name,
+        slug: slug ?? _slug,
+        filename: filename ?? _filename,
+        linkEmbed: linkEmbed ?? _linkEmbed,
+        linkM3u8: linkM3u8 ?? _linkM3u8,
+      );
   String? get name => _name;
   String? get slug => _slug;
   String? get filename => _filename;
@@ -527,7 +552,6 @@ ServerData copyWith({  String? name,
     map['link_m3u8'] = _linkM3u8;
     return map;
   }
-
 }
 
 /// id : "62093063196e9f4ab6b448b8"
@@ -536,13 +560,14 @@ ServerData copyWith({  String? name,
 
 class Country {
   Country({
-      String? id, 
-      String? name, 
-      String? slug,}){
+    String? id,
+    String? name,
+    String? slug,
+  }) {
     _id = id;
     _name = name;
     _slug = slug;
-}
+  }
 
   Country.fromJson(dynamic json) {
     _id = json['id'];
@@ -552,13 +577,16 @@ class Country {
   String? _id;
   String? _name;
   String? _slug;
-Country copyWith({  String? id,
-  String? name,
-  String? slug,
-}) => Country(  id: id ?? _id,
-  name: name ?? _name,
-  slug: slug ?? _slug,
-);
+  Country copyWith({
+    String? id,
+    String? name,
+    String? slug,
+  }) =>
+      Country(
+        id: id ?? _id,
+        name: name ?? _name,
+        slug: slug ?? _slug,
+      );
   String? get id => _id;
   String? get name => _name;
   String? get slug => _slug;
@@ -570,7 +598,6 @@ Country copyWith({  String? id,
     map['slug'] = _slug;
     return map;
   }
-
 }
 
 /// id : "620a221de0fc277084dfd1c1"
@@ -579,13 +606,14 @@ Country copyWith({  String? id,
 
 class Category {
   Category({
-      String? id, 
-      String? name, 
-      String? slug,}){
+    String? id,
+    String? name,
+    String? slug,
+  }) {
     _id = id;
     _name = name;
     _slug = slug;
-}
+  }
 
   Category.fromJson(dynamic json) {
     _id = json['id'];
@@ -595,13 +623,16 @@ class Category {
   String? _id;
   String? _name;
   String? _slug;
-Category copyWith({  String? id,
-  String? name,
-  String? slug,
-}) => Category(  id: id ?? _id,
-  name: name ?? _name,
-  slug: slug ?? _slug,
-);
+  Category copyWith({
+    String? id,
+    String? name,
+    String? slug,
+  }) =>
+      Category(
+        id: id ?? _id,
+        name: name ?? _name,
+        slug: slug ?? _slug,
+      );
   String? get id => _id;
   String? get name => _name;
   String? get slug => _slug;
@@ -613,24 +644,27 @@ Category copyWith({  String? id,
     map['slug'] = _slug;
     return map;
   }
-
 }
 
 /// time : "2024-02-02T15:33:01.000Z"
 
 class Modified {
   Modified({
-      String? time,}){
+    String? time,
+  }) {
     _time = time;
-}
+  }
 
   Modified.fromJson(dynamic json) {
     _time = json['time'];
   }
   String? _time;
-Modified copyWith({  String? time,
-}) => Modified(  time: time ?? _time,
-);
+  Modified copyWith({
+    String? time,
+  }) =>
+      Modified(
+        time: time ?? _time,
+      );
   String? get time => _time;
 
   Map<String, dynamic> toJson() {
@@ -638,24 +672,27 @@ Modified copyWith({  String? time,
     map['time'] = _time;
     return map;
   }
-
 }
 
 /// time : "2024-02-02T15:11:07.000Z"
 
 class Created {
   Created({
-      String? time,}){
+    String? time,
+  }) {
     _time = time;
-}
+  }
 
   Created.fromJson(dynamic json) {
     _time = json['time'];
   }
   String? _time;
-Created copyWith({  String? time,
-}) => Created(  time: time ?? _time,
-);
+  Created copyWith({
+    String? time,
+  }) =>
+      Created(
+        time: time ?? _time,
+      );
   String? get time => _time;
 
   Map<String, dynamic> toJson() {
@@ -663,24 +700,27 @@ Created copyWith({  String? time,
     map['time'] = _time;
     return map;
   }
-
 }
 
 /// slug : "sep-cua-toi-la-chu-lon-nho"
 
 class Params {
   Params({
-      String? slug,}){
+    String? slug,
+  }) {
     _slug = slug;
-}
+  }
 
   Params.fromJson(dynamic json) {
     _slug = json['slug'];
   }
   String? _slug;
-Params copyWith({  String? slug,
-}) => Params(  slug: slug ?? _slug,
-);
+  Params copyWith({
+    String? slug,
+  }) =>
+      Params(
+        slug: slug ?? _slug,
+      );
   String? get slug => _slug;
 
   Map<String, dynamic> toJson() {
@@ -688,7 +728,6 @@ Params copyWith({  String? slug,
     map['slug'] = _slug;
     return map;
   }
-
 }
 
 /// name : "Phim Bộ"
@@ -697,13 +736,14 @@ Params copyWith({  String? slug,
 
 class BreadCrumb {
   BreadCrumb({
-      String? name, 
-      String? slug, 
-      num? position,}){
+    String? name,
+    String? slug,
+    num? position,
+  }) {
     _name = name;
     _slug = slug;
     _position = position;
-}
+  }
 
   BreadCrumb.fromJson(dynamic json) {
     _name = json['name'];
@@ -713,13 +753,16 @@ class BreadCrumb {
   String? _name;
   String? _slug;
   num? _position;
-BreadCrumb copyWith({  String? name,
-  String? slug,
-  num? position,
-}) => BreadCrumb(  name: name ?? _name,
-  slug: slug ?? _slug,
-  position: position ?? _position,
-);
+  BreadCrumb copyWith({
+    String? name,
+    String? slug,
+    num? position,
+  }) =>
+      BreadCrumb(
+        name: name ?? _name,
+        slug: slug ?? _slug,
+        position: position ?? _position,
+      );
   String? get name => _name;
   String? get slug => _slug;
   num? get position => _position;
@@ -731,7 +774,6 @@ BreadCrumb copyWith({  String? name,
     map['position'] = _position;
     return map;
   }
-
 }
 
 /// og_type : "video.movie"
@@ -744,13 +786,14 @@ BreadCrumb copyWith({  String? name,
 
 class SeoOnPage {
   SeoOnPage({
-      String? ogType, 
-      String? titleHead, 
-      SeoSchema? seoSchema, 
-      String? descriptionHead, 
-      List<String>? ogImage, 
-      num? updatedTime, 
-      String? ogUrl,}){
+    String? ogType,
+    String? titleHead,
+    SeoSchema? seoSchema,
+    String? descriptionHead,
+    List<String>? ogImage,
+    num? updatedTime,
+    String? ogUrl,
+  }) {
     _ogType = ogType;
     _titleHead = titleHead;
     _seoSchema = seoSchema;
@@ -758,12 +801,14 @@ class SeoOnPage {
     _ogImage = ogImage;
     _updatedTime = updatedTime;
     _ogUrl = ogUrl;
-}
+  }
 
   SeoOnPage.fromJson(dynamic json) {
     _ogType = json['og_type'];
     _titleHead = json['titleHead'];
-    _seoSchema = json['seoSchema'] != null ? SeoSchema.fromJson(json['seoSchema']) : null;
+    _seoSchema = json['seoSchema'] != null
+        ? SeoSchema.fromJson(json['seoSchema'])
+        : null;
     _descriptionHead = json['descriptionHead'];
     _ogImage = json['og_image'] != null ? json['og_image'].cast<String>() : [];
     _updatedTime = json['updated_time'];
@@ -776,21 +821,24 @@ class SeoOnPage {
   List<String>? _ogImage;
   num? _updatedTime;
   String? _ogUrl;
-SeoOnPage copyWith({  String? ogType,
-  String? titleHead,
-  SeoSchema? seoSchema,
-  String? descriptionHead,
-  List<String>? ogImage,
-  num? updatedTime,
-  String? ogUrl,
-}) => SeoOnPage(  ogType: ogType ?? _ogType,
-  titleHead: titleHead ?? _titleHead,
-  seoSchema: seoSchema ?? _seoSchema,
-  descriptionHead: descriptionHead ?? _descriptionHead,
-  ogImage: ogImage ?? _ogImage,
-  updatedTime: updatedTime ?? _updatedTime,
-  ogUrl: ogUrl ?? _ogUrl,
-);
+  SeoOnPage copyWith({
+    String? ogType,
+    String? titleHead,
+    SeoSchema? seoSchema,
+    String? descriptionHead,
+    List<String>? ogImage,
+    num? updatedTime,
+    String? ogUrl,
+  }) =>
+      SeoOnPage(
+        ogType: ogType ?? _ogType,
+        titleHead: titleHead ?? _titleHead,
+        seoSchema: seoSchema ?? _seoSchema,
+        descriptionHead: descriptionHead ?? _descriptionHead,
+        ogImage: ogImage ?? _ogImage,
+        updatedTime: updatedTime ?? _updatedTime,
+        ogUrl: ogUrl ?? _ogUrl,
+      );
   String? get ogType => _ogType;
   String? get titleHead => _titleHead;
   SeoSchema? get seoSchema => _seoSchema;
@@ -812,7 +860,6 @@ SeoOnPage copyWith({  String? ogType,
     map['og_url'] = _ogUrl;
     return map;
   }
-
 }
 
 /// @context : "https://schema.org"
@@ -827,15 +874,16 @@ SeoOnPage copyWith({  String? ogType,
 
 class SeoSchema {
   SeoSchema({
-      String? context, 
-      String? type, 
-      String? name, 
-      String? dateModified, 
-      String? dateCreated, 
-      String? url, 
-      String? datePublished, 
-      String? image, 
-      String? director,}){
+    String? context,
+    String? type,
+    String? name,
+    String? dateModified,
+    String? dateCreated,
+    String? url,
+    String? datePublished,
+    String? image,
+    String? director,
+  }) {
     _context = context;
     _type = type;
     _name = name;
@@ -845,7 +893,7 @@ class SeoSchema {
     _datePublished = datePublished;
     _image = image;
     _director = director;
-}
+  }
 
   SeoSchema.fromJson(dynamic json) {
     _context = json['@context'];
@@ -867,25 +915,28 @@ class SeoSchema {
   String? _datePublished;
   String? _image;
   String? _director;
-SeoSchema copyWith({  String? context,
-  String? type,
-  String? name,
-  String? dateModified,
-  String? dateCreated,
-  String? url,
-  String? datePublished,
-  String? image,
-  String? director,
-}) => SeoSchema(  context: context ?? _context,
-  type: type ?? _type,
-  name: name ?? _name,
-  dateModified: dateModified ?? _dateModified,
-  dateCreated: dateCreated ?? _dateCreated,
-  url: url ?? _url,
-  datePublished: datePublished ?? _datePublished,
-  image: image ?? _image,
-  director: director ?? _director,
-);
+  SeoSchema copyWith({
+    String? context,
+    String? type,
+    String? name,
+    String? dateModified,
+    String? dateCreated,
+    String? url,
+    String? datePublished,
+    String? image,
+    String? director,
+  }) =>
+      SeoSchema(
+        context: context ?? _context,
+        type: type ?? _type,
+        name: name ?? _name,
+        dateModified: dateModified ?? _dateModified,
+        dateCreated: dateCreated ?? _dateCreated,
+        url: url ?? _url,
+        datePublished: datePublished ?? _datePublished,
+        image: image ?? _image,
+        director: director ?? _director,
+      );
   String? get context => _context;
   String? get type => _type;
   String? get name => _name;
@@ -909,5 +960,4 @@ SeoSchema copyWith({  String? context,
     map['director'] = _director;
     return map;
   }
-
 }
