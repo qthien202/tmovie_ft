@@ -17,8 +17,9 @@ class OtherFilmView extends StatelessWidget {
     final detailController = Get.put(DetailController());
     final GlobalKey<ScaffoldState> key = GlobalKey<ScaffoldState>();
     final controller = Get.put(MovieGenreController());
-    controller.getMovieGenre(slug: detailController.filmDetail.value?.pageProps?.data
-                            ?.item?.category?.first.slug);
+    controller.getMovieGenre(
+        slug: detailController
+            .filmDetail.value?.pageProps?.data?.item?.category?.first.slug);
 
     return RefreshIndicator(
         backgroundColor: GlobalColor.backgroundColor,
@@ -34,17 +35,17 @@ class OtherFilmView extends StatelessWidget {
                     style:
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 Visibility(
-                  visible: MediaQuery.of(context).size.width<600,
+                  visible: MediaQuery.of(context).size.width < 600,
                   child: TextButton(
                     onPressed: () {
-                      Get.toNamed("/the-loai/${detailController.filmDetail.value?.pageProps?.data
-                            ?.item?.category?.first.slug}");
+                      Get.toNamed(
+                          "/the-loai/${detailController.filmDetail.value?.pageProps?.data?.item?.category?.first.slug}");
                     },
                     child: const Text(
                       "Xem thêm >",
                       style: TextStyle(
-                          color: Colors.white,
-                          ),
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 )
@@ -61,7 +62,12 @@ class OtherFilmView extends StatelessWidget {
                 padding: const EdgeInsets.all(5),
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
-                itemCount: isLoading ? 16 :MediaQuery.of(context).size.width<600 && (data?.items?.length ?? 0) >= 9 ?9: data?.items?.length ?? 0,
+                itemCount: isLoading
+                    ? 16
+                    : MediaQuery.of(context).size.width < 600 &&
+                            (data?.items?.length ?? 0) >= 9
+                        ? 9
+                        : data?.items?.length ?? 0,
                 itemBuilder: (context, index) {
                   final items = data?.items?[index];
                   return Visibility(
@@ -125,7 +131,6 @@ class OtherFilmView extends StatelessWidget {
                             onTap: () async {
                               detailController.scrollController.jumpTo(100);
                               controller.selectPage.value = index;
-                              
 
                               await controller.getMovieGenre(
                                   slug: detailController

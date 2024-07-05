@@ -13,11 +13,7 @@ class MovieGenreview extends StatelessWidget {
   final String? country;
   final String? year;
   const MovieGenreview(
-      {super.key,
-       this.slug,
-      int? selectedYear,
-       this.country,
-       this.year});
+      {super.key, this.slug, int? selectedYear, this.country, this.year});
 
   @override
   Widget build(BuildContext context) {
@@ -27,48 +23,57 @@ class MovieGenreview extends StatelessWidget {
     return RefreshIndicator(
       backgroundColor: GlobalColor.backgroundColor,
       color: GlobalColor.primary,
-      onRefresh: () async =>
-          controller.getMovieGenre(),
+      onRefresh: () async => controller.getMovieGenre(),
       child: Scaffold(
         backgroundColor: GlobalColor.backgroundColor,
         appBar: AppBar(
-            automaticallyImplyLeading: MediaQuery.of(context).size.width<600?true:false,
-            backgroundColor: GlobalColor.backgroundColor,
-            foregroundColor: Colors.white,
-            title: Obx(() => Text("PHIM ${controller.movieGenre.value?.pageProps?.data?.titlePage.toString().toUpperCase()??""}"),),
-            actions: [
-              Obx(() => InkWell(
-               
-              onTap: (){
-                Get.to( const FilterApp(),transition: Transition.rightToLeft);
-              },
-              child:  Padding(
-                padding: EdgeInsets.symmetric(horizontal:8.0),
-                child: AnimatedContainer(
-                  duration: Duration(seconds: 200),
-                 curve: Curves.easeInOut, 
-                  child: Transform.scale(
-                    scale: controller.isFocusMenu.value?1.2:1,
-                    child: Container(
-                      padding: EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: controller.isFocusMenu.value?Colors.white:Colors.transparent,width: 2)
-                      ),
-                      child: Icon(
-                        Icons.filter_alt_outlined,
-                        color: Colors.white,
+          automaticallyImplyLeading:
+              MediaQuery.of(context).size.width < 600 ? true : false,
+          backgroundColor: GlobalColor.backgroundColor,
+          foregroundColor: Colors.white,
+          title: Obx(
+            () => Text(
+                "PHIM ${controller.movieGenre.value?.pageProps?.data?.titlePage.toString().toUpperCase() ?? ""}"),
+          ),
+          actions: [
+            Obx(
+              () => InkWell(
+                onTap: () {
+                  Get.to(const FilterApp(), transition: Transition.rightToLeft);
+                },
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8.0),
+                  child: AnimatedContainer(
+                    duration: Duration(seconds: 200),
+                    curve: Curves.easeInOut,
+                    child: Transform.scale(
+                      scale: controller.isFocusMenu.value ? 1.2 : 1,
+                      child: Container(
+                        padding: EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                            border: Border.all(
+                                color: controller.isFocusMenu.value
+                                    ? Colors.white
+                                    : Colors.transparent,
+                                width: 2)),
+                        child: Icon(
+                          Icons.filter_alt_outlined,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-                          ),)
-            ],
-          ),
+            )
+          ],
+        ),
         body: Center(
           child: Container(
             color: GlobalColor.backgroundColor,
-                    width: MediaQuery.of(context).size.width<600?MediaQuery.of(context).size.width:MediaQuery.of(context).size.width * .85,
+            width: MediaQuery.of(context).size.width < 600
+                ? MediaQuery.of(context).size.width
+                : MediaQuery.of(context).size.width * .85,
             child: ListView(
               children: [
                 const SizedBox(
@@ -77,7 +82,7 @@ class MovieGenreview extends StatelessWidget {
                 Obx(() {
                   final isLoading = controller.movieGenre.value == null;
                   final data = controller.movieGenre.value?.pageProps?.data;
-            
+
                   // if(data?.items==null){
                   //   return Center(
                   //     child: CircularProgressIndicator(
@@ -92,7 +97,7 @@ class MovieGenreview extends StatelessWidget {
                       child: Center(child: Text("Rất tiếc không có phim này!")),
                     );
                   }
-            
+
                   return GridView.builder(
                     padding: const EdgeInsets.all(5),
                     physics: const NeverScrollableScrollPhysics(),
@@ -118,20 +123,21 @@ class MovieGenreview extends StatelessWidget {
                           nameProduct: items?.name,
                           originName: items?.originName ?? "",
                           slug: items?.slug ?? "",
-                          path: controller.movieGenre.value?.pageProps?.data?.typeList,
+                          path: controller
+                              .movieGenre.value?.pageProps?.data?.typeList,
                         ),
                       );
                     },
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       childAspectRatio: MediaQuery.of(context).size.width < 600
-                      ? 13 / 33
-                      : 5 / 10,
-                  crossAxisCount:
-                      MediaQuery.of(context).size.width < 600 ? 3 : 6,
-                  crossAxisSpacing:
-                      MediaQuery.of(context).size.width < 600 ? 7 : 20,
-                  mainAxisSpacing:
-                      MediaQuery.of(context).size.width < 600 ? 7 : 25,
+                          ? 13 / 33
+                          : 5 / 10,
+                      crossAxisCount:
+                          MediaQuery.of(context).size.width < 600 ? 3 : 6,
+                      crossAxisSpacing:
+                          MediaQuery.of(context).size.width < 600 ? 7 : 20,
+                      mainAxisSpacing:
+                          MediaQuery.of(context).size.width < 600 ? 7 : 25,
                     ),
                   );
                 }),
@@ -142,8 +148,8 @@ class MovieGenreview extends StatelessWidget {
                   return Visibility(
                     visible: controller.totalPage.value != 0,
                     child: Padding(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 20),
                       child: SizedBox(
                         height: 40,
                         child: ListView.separated(
@@ -159,7 +165,7 @@ class MovieGenreview extends StatelessWidget {
                                 },
                                 onTap: () async {
                                   controller.selectPage.value = index;
-                                  
+
                                   controller.movieGenre.value = null;
                                   await controller.getMovieGenre();
                                 },
@@ -179,9 +185,10 @@ class MovieGenreview extends StatelessWidget {
                                     "${index + 1}",
                                     style: TextStyle(
                                         fontSize: 13,
-                                        color: controller.selectPage.value == index
-                                            ? GlobalColor.primary
-                                            : Colors.white),
+                                        color:
+                                            controller.selectPage.value == index
+                                                ? GlobalColor.primary
+                                                : Colors.white),
                                   ),
                                 ),
                               );

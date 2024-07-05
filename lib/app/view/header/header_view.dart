@@ -7,15 +7,16 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class HeaderPage extends StatelessWidget implements PreferredSizeWidget {
-  const HeaderPage({super.key, });
-  
+  const HeaderPage({
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(HomeController());
     final searchController = Get.put(SearchWidgetController());
     final filterController = Get.put(FilterController());
-    bool isMobile = MediaQuery.of(context).size.width<800;
+    bool isMobile = MediaQuery.of(context).size.width < 800;
     return AppBar(
       automaticallyImplyLeading: false,
       centerTitle: false,
@@ -64,9 +65,11 @@ class HeaderPage extends StatelessWidget implements PreferredSizeWidget {
                 controller.scrollController.value?.jumpTo(0);
                 Get.toNamed('/');
                 await controller.getFilm(slug: controller.tabItem[ind]['slug']);
-                controller.getFilmByCategory(slug: controller.tabItem[ind]['slug']);
+                controller.getFilmByCategory(
+                    slug: controller.tabItem[ind]['slug']);
               },
-              tabs: List<Widget>.generate(controller.tabItem.length ?? 0, (int index) {
+              tabs: List<Widget>.generate(controller.tabItem.length ?? 0,
+                  (int index) {
                 return Tab(
                   text: controller.tabItem[index]["title"],
                 );
@@ -75,11 +78,11 @@ class HeaderPage extends StatelessWidget implements PreferredSizeWidget {
           ),
           !isMobile
               ? const Expanded(
-                flex: 1,
+                  flex: 1,
                   child: Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: SearchWidget(),
-                ))
+                    padding: EdgeInsets.all(8.0),
+                    child: SearchWidget(),
+                  ))
               : const SizedBox(),
         ],
       ),
@@ -112,14 +115,15 @@ class HeaderPage extends StatelessWidget implements PreferredSizeWidget {
       //   background: SliderCinema(),
       // ),
     );
-    
   }
-   @override
- 
-  Size get preferredSize {
- final MediaQueryData mediaQuery = MediaQueryData.fromWindow(WidgetsBinding.instance.window);
-    bool isMobile = mediaQuery.size.width < 800;
-  return isMobile ? const Size.fromHeight(120.0) : const Size.fromHeight(kToolbarHeight);
-}
 
+  @override
+  Size get preferredSize {
+    final MediaQueryData mediaQuery =
+        MediaQueryData.fromWindow(WidgetsBinding.instance.window);
+    bool isMobile = mediaQuery.size.width < 800;
+    return isMobile
+        ? const Size.fromHeight(120.0)
+        : const Size.fromHeight(kToolbarHeight);
+  }
 }

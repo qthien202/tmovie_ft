@@ -24,20 +24,19 @@ class HomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-   
     final searchController = Get.put(SearchWidgetController());
     final filterController = Get.put(FilterController());
     final controller = Get.put(HomeController());
-    
+
     return GetBuilder<HomeController>(
       init: controller,
       builder: (controller) {
         return DefaultTabController(
-           length: controller.tabItem.length,
+          length: controller.tabItem.length,
           initialIndex: controller.tabIndex.value ?? 0,
           child: Scaffold(
             backgroundColor: GlobalColor.backgroundColor,
-            appBar:const HeaderPage(),
+            appBar: const HeaderPage(),
             body: RefreshIndicator(
                 backgroundColor: GlobalColor.backgroundColor,
                 color: GlobalColor.primary,
@@ -45,39 +44,46 @@ class HomeView extends StatelessWidget {
                   searchController.isSearch.value = false;
                   controller.scrollController.value?.jumpTo(0);
                   await controller.getFilm(
-                      slug: controller.tabItem[controller.tabIndex.value ?? 0]['slug']);
+                      slug: controller.tabItem[controller.tabIndex.value ?? 0]
+                          ['slug']);
                   controller.getFilmByCategory(
-                      slug: controller.tabItem[controller.tabIndex.value ?? 0]['slug']);
+                      slug: controller.tabItem[controller.tabIndex.value ?? 0]
+                          ['slug']);
                 },
                 child: CustomScrollView(
                   controller: controller.scrollController.value,
                   slivers: [
-                     
-                     SliverToBoxAdapter(
-                      child: Center(child: Container(
-                        
-                         color: GlobalColor.backgroundColor,
-                    width: MediaQuery.of(context).size.width<600?MediaQuery.of(context).size.width:MediaQuery.of(context).size.width * .85,
-                        child: Column(
-                          children: [
-                           const SliderCinema(),
-                           const SizedBox(height: 20,),
-                            Obx(() => Visibility(
-                              visible: searchController.isSearch.value==false,
-                              child: const FilterPage()),)
-                          ],
-                        )
-                        )),
+                    SliverToBoxAdapter(
+                      child: Center(
+                          child: Container(
+                              color: GlobalColor.backgroundColor,
+                              width: MediaQuery.of(context).size.width < 600
+                                  ? MediaQuery.of(context).size.width
+                                  : MediaQuery.of(context).size.width * .85,
+                              child: Column(
+                                children: [
+                                  const SliderCinema(),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  Obx(
+                                    () => Visibility(
+                                        visible:
+                                            searchController.isSearch.value ==
+                                                false,
+                                        child: const FilterPage()),
+                                  )
+                                ],
+                              ))),
                     ),
                     Obx(
                       () => Visibility(
                         visible: searchController.isSearch.value == true,
                         replacement: Visibility(
-                          visible: filterController.onFilter.value==true,
+                          visible: filterController.onFilter.value == true,
                           replacement: const FilmByCategory(),
                           child: const ListMovieView(),
-                          
-                          ),
+                        ),
                         child: const SearchView(),
                       ),
                     )

@@ -1,24 +1,28 @@
-
-
 class GetFilmByCategory {
   GetFilmByCategory({
-      PageProps? pageProps,
-      bool? nssp,}){
+    PageProps? pageProps,
+    bool? nssp,
+  }) {
     _pageProps = pageProps;
     _nssp = nssp;
-}
+  }
 
   GetFilmByCategory.fromJson(dynamic json) {
-    _pageProps = json['pageProps'] != null ? PageProps.fromJson(json['pageProps']) : null;
+    _pageProps = json['pageProps'] != null
+        ? PageProps.fromJson(json['pageProps'])
+        : null;
     _nssp = json['__N_SSP'];
   }
   PageProps? _pageProps;
   bool? _nssp;
-GetFilmByCategory copyWith({  PageProps? pageProps,
-  bool? nssp,
-}) => GetFilmByCategory(  pageProps: pageProps ?? _pageProps,
-  nssp: nssp ?? _nssp,
-);
+  GetFilmByCategory copyWith({
+    PageProps? pageProps,
+    bool? nssp,
+  }) =>
+      GetFilmByCategory(
+        pageProps: pageProps ?? _pageProps,
+        nssp: nssp ?? _nssp,
+      );
   PageProps? get pageProps => _pageProps;
   bool? get nssp => _nssp;
 
@@ -30,24 +34,25 @@ GetFilmByCategory copyWith({  PageProps? pageProps,
     map['__N_SSP'] = _nssp;
     return map;
   }
-
 }
-
-
 
 class PageProps {
   PageProps({
-      Data? data,}){
+    Data? data,
+  }) {
     _data = data;
-}
+  }
 
   PageProps.fromJson(dynamic json) {
     _data = json['data'] != null ? Data.fromJson(json['data']) : null;
   }
   Data? _data;
-PageProps copyWith({  Data? data,
-}) => PageProps(  data: data ?? _data,
-);
+  PageProps copyWith({
+    Data? data,
+  }) =>
+      PageProps(
+        data: data ?? _data,
+      );
   Data? get data => _data;
 
   Map<String, dynamic> toJson() {
@@ -57,21 +62,19 @@ PageProps copyWith({  Data? data,
     }
     return map;
   }
-
 }
-
-
 
 class Data {
   Data({
-      SeoOnPage? seoOnPage,
-      List<BreadCrumb>? breadCrumb,
-      dynamic titlePage,
-      List<Items>? items,
-      Params? params,
-      dynamic typeList,
-      dynamic appdomainfrontend,
-      dynamic appdomaincdnimage,}){
+    SeoOnPage? seoOnPage,
+    List<BreadCrumb>? breadCrumb,
+    dynamic titlePage,
+    List<Items>? items,
+    Params? params,
+    dynamic typeList,
+    dynamic appdomainfrontend,
+    dynamic appdomaincdnimage,
+  }) {
     _seoOnPage = seoOnPage;
     _breadCrumb = breadCrumb;
     _titlePage = titlePage;
@@ -80,10 +83,12 @@ class Data {
     _typeList = typeList;
     _appdomainfrontend = appdomainfrontend;
     _appdomaincdnimage = appdomaincdnimage;
-}
+  }
 
   Data.fromJson(dynamic json) {
-    _seoOnPage = json['seoOnPage'] != null ? SeoOnPage.fromJson(json['seoOnPage']) : null;
+    _seoOnPage = json['seoOnPage'] != null
+        ? SeoOnPage.fromJson(json['seoOnPage'])
+        : null;
     if (json['breadCrumb'] != null) {
       _breadCrumb = [];
       json['breadCrumb'].forEach((v) {
@@ -110,23 +115,26 @@ class Data {
   dynamic _typeList;
   dynamic _appdomainfrontend;
   dynamic _appdomaincdnimage;
-Data copyWith({  SeoOnPage? seoOnPage,
-  List<BreadCrumb>? breadCrumb,
-  dynamic titlePage,
-  List<Items>? items,
-  Params? params,
-  dynamic typeList,
-  dynamic appdomainfrontend,
-  dynamic appdomaincdnimage,
-}) => Data(  seoOnPage: seoOnPage ?? _seoOnPage,
-  breadCrumb: breadCrumb ?? _breadCrumb,
-  titlePage: titlePage ?? _titlePage,
-  items: items ?? _items,
-  params: params ?? _params,
-  typeList: typeList ?? _typeList,
-  appdomainfrontend: appdomainfrontend ?? _appdomainfrontend,
-  appdomaincdnimage: appdomaincdnimage ?? _appdomaincdnimage,
-);
+  Data copyWith({
+    SeoOnPage? seoOnPage,
+    List<BreadCrumb>? breadCrumb,
+    dynamic titlePage,
+    List<Items>? items,
+    Params? params,
+    dynamic typeList,
+    dynamic appdomainfrontend,
+    dynamic appdomaincdnimage,
+  }) =>
+      Data(
+        seoOnPage: seoOnPage ?? _seoOnPage,
+        breadCrumb: breadCrumb ?? _breadCrumb,
+        titlePage: titlePage ?? _titlePage,
+        items: items ?? _items,
+        params: params ?? _params,
+        typeList: typeList ?? _typeList,
+        appdomainfrontend: appdomainfrontend ?? _appdomainfrontend,
+        appdomaincdnimage: appdomaincdnimage ?? _appdomaincdnimage,
+      );
   SeoOnPage? get seoOnPage => _seoOnPage;
   List<BreadCrumb>? get breadCrumb => _breadCrumb;
   dynamic get titlePage => _titlePage;
@@ -156,7 +164,6 @@ Data copyWith({  SeoOnPage? seoOnPage,
     map['APP_DOMAIN_CDN_IMAGE'] = _appdomaincdnimage;
     return map;
   }
-
 }
 
 /// type_slug : "danh-sach"
@@ -170,14 +177,15 @@ Data copyWith({  SeoOnPage? seoOnPage,
 
 class Params {
   Params({
-      dynamic typeSlug,
-      List<String>? filterCategory,
-      List<String>? filterCountry,
-      dynamic filterYear,
-      dynamic filterType,
-      dynamic sortField,
-      dynamic sortType,
-      Pagination? pagination,}){
+    dynamic typeSlug,
+    List<String>? filterCategory,
+    List<String>? filterCountry,
+    dynamic filterYear,
+    dynamic filterType,
+    dynamic sortField,
+    dynamic sortType,
+    Pagination? pagination,
+  }) {
     _typeSlug = typeSlug;
     _filterCategory = filterCategory;
     _filterCountry = filterCountry;
@@ -186,17 +194,23 @@ class Params {
     _sortField = sortField;
     _sortType = sortType;
     _pagination = pagination;
-}
+  }
 
   Params.fromJson(dynamic json) {
     _typeSlug = json['type_slug'];
-    _filterCategory = json['filterCategory'] != null ? json['filterCategory'].cast<String>() : [];
-    _filterCountry = json['filterCountry'] != null ? json['filterCountry'].cast<String>() : [];
+    _filterCategory = json['filterCategory'] != null
+        ? json['filterCategory'].cast<String>()
+        : [];
+    _filterCountry = json['filterCountry'] != null
+        ? json['filterCountry'].cast<String>()
+        : [];
     _filterYear = json['filterYear'];
     _filterType = json['filterType'];
     _sortField = json['sortField'];
     _sortType = json['sortType'];
-    _pagination = json['pagination'] != null ? Pagination.fromJson(json['pagination']) : null;
+    _pagination = json['pagination'] != null
+        ? Pagination.fromJson(json['pagination'])
+        : null;
   }
   dynamic _typeSlug;
   List<String>? _filterCategory;
@@ -206,23 +220,26 @@ class Params {
   dynamic _sortField;
   dynamic _sortType;
   Pagination? _pagination;
-Params copyWith({  dynamic typeSlug,
-  List<String>? filterCategory,
-  List<String>? filterCountry,
-  dynamic filterYear,
-  dynamic filterType,
-  dynamic sortField,
-  dynamic sortType,
-  Pagination? pagination,
-}) => Params(  typeSlug: typeSlug ?? _typeSlug,
-  filterCategory: filterCategory ?? _filterCategory,
-  filterCountry: filterCountry ?? _filterCountry,
-  filterYear: filterYear ?? _filterYear,
-  filterType: filterType ?? _filterType,
-  sortField: sortField ?? _sortField,
-  sortType: sortType ?? _sortType,
-  pagination: pagination ?? _pagination,
-);
+  Params copyWith({
+    dynamic typeSlug,
+    List<String>? filterCategory,
+    List<String>? filterCountry,
+    dynamic filterYear,
+    dynamic filterType,
+    dynamic sortField,
+    dynamic sortType,
+    Pagination? pagination,
+  }) =>
+      Params(
+        typeSlug: typeSlug ?? _typeSlug,
+        filterCategory: filterCategory ?? _filterCategory,
+        filterCountry: filterCountry ?? _filterCountry,
+        filterYear: filterYear ?? _filterYear,
+        filterType: filterType ?? _filterType,
+        sortField: sortField ?? _sortField,
+        sortType: sortType ?? _sortType,
+        pagination: pagination ?? _pagination,
+      );
   dynamic get typeSlug => _typeSlug;
   List<String>? get filterCategory => _filterCategory;
   List<String>? get filterCountry => _filterCountry;
@@ -246,7 +263,6 @@ Params copyWith({  dynamic typeSlug,
     }
     return map;
   }
-
 }
 
 /// totalItems : 14698
@@ -256,15 +272,16 @@ Params copyWith({  dynamic typeSlug,
 
 class Pagination {
   Pagination({
-      num? totalItems,
-      num? totalItemsPerPage,
-      num? currentPage,
-      num? pageRanges,}){
+    num? totalItems,
+    num? totalItemsPerPage,
+    num? currentPage,
+    num? pageRanges,
+  }) {
     _totalItems = totalItems;
     _totalItemsPerPage = totalItemsPerPage;
     _currentPage = currentPage;
     _pageRanges = pageRanges;
-}
+  }
 
   Pagination.fromJson(dynamic json) {
     _totalItems = json['totalItems'];
@@ -276,15 +293,18 @@ class Pagination {
   num? _totalItemsPerPage;
   num? _currentPage;
   num? _pageRanges;
-Pagination copyWith({  num? totalItems,
-  num? totalItemsPerPage,
-  num? currentPage,
-  num? pageRanges,
-}) => Pagination(  totalItems: totalItems ?? _totalItems,
-  totalItemsPerPage: totalItemsPerPage ?? _totalItemsPerPage,
-  currentPage: currentPage ?? _currentPage,
-  pageRanges: pageRanges ?? _pageRanges,
-);
+  Pagination copyWith({
+    num? totalItems,
+    num? totalItemsPerPage,
+    num? currentPage,
+    num? pageRanges,
+  }) =>
+      Pagination(
+        totalItems: totalItems ?? _totalItems,
+        totalItemsPerPage: totalItemsPerPage ?? _totalItemsPerPage,
+        currentPage: currentPage ?? _currentPage,
+        pageRanges: pageRanges ?? _pageRanges,
+      );
   num? get totalItems => _totalItems;
   num? get totalItemsPerPage => _totalItemsPerPage;
   num? get currentPage => _currentPage;
@@ -298,7 +318,6 @@ Pagination copyWith({  num? totalItems,
     map['pageRanges'] = _pageRanges;
     return map;
   }
-
 }
 
 /// modified : {"time":"2024-02-02T20:50:36.000Z"}
@@ -321,23 +340,24 @@ Pagination copyWith({  num? totalItems,
 
 class Items {
   Items({
-      Modified? modified,
-      dynamic id,
-      dynamic name,
-      dynamic slug,
-      dynamic originName,
-      dynamic type,
-      dynamic thumbUrl,
-      dynamic posterUrl,
-      bool? subDocquyen,
-      bool? chieurap,
-      dynamic time,
-      dynamic episodeCurrent,
-      dynamic quality,
-      dynamic lang,
-      num? year,
-      List<Category>? category,
-      List<Country>? country,}){
+    Modified? modified,
+    dynamic id,
+    dynamic name,
+    dynamic slug,
+    dynamic originName,
+    dynamic type,
+    dynamic thumbUrl,
+    dynamic posterUrl,
+    bool? subDocquyen,
+    bool? chieurap,
+    dynamic time,
+    dynamic episodeCurrent,
+    dynamic quality,
+    dynamic lang,
+    num? year,
+    List<Category>? category,
+    List<Country>? country,
+  }) {
     _modified = modified;
     _id = id;
     _name = name;
@@ -355,10 +375,11 @@ class Items {
     _year = year;
     _category = category;
     _country = country;
-}
+  }
 
   Items.fromJson(dynamic json) {
-    _modified = json['modified'] != null ? Modified.fromJson(json['modified']) : null;
+    _modified =
+        json['modified'] != null ? Modified.fromJson(json['modified']) : null;
     _id = json['_id'];
     _name = json['name'];
     _slug = json['slug'];
@@ -403,41 +424,44 @@ class Items {
   num? _year;
   List<Category>? _category;
   List<Country>? _country;
-Items copyWith({  Modified? modified,
-  dynamic id,
-  dynamic name,
-  dynamic slug,
-  dynamic originName,
-  dynamic type,
-  dynamic thumbUrl,
-  dynamic posterUrl,
-  bool? subDocquyen,
-  bool? chieurap,
-  dynamic time,
-  dynamic episodeCurrent,
-  dynamic quality,
-  dynamic lang,
-  num? year,
-  List<Category>? category,
-  List<Country>? country,
-}) => Items(  modified: modified ?? _modified,
-  id: id ?? _id,
-  name: name ?? _name,
-  slug: slug ?? _slug,
-  originName: originName ?? _originName,
-  type: type ?? _type,
-  thumbUrl: thumbUrl ?? _thumbUrl,
-  posterUrl: posterUrl ?? _posterUrl,
-  subDocquyen: subDocquyen ?? _subDocquyen,
-  chieurap: chieurap ?? _chieurap,
-  time: time ?? _time,
-  episodeCurrent: episodeCurrent ?? _episodeCurrent,
-  quality: quality ?? _quality,
-  lang: lang ?? _lang,
-  year: year ?? _year,
-  category: category ?? _category,
-  country: country ?? _country,
-);
+  Items copyWith({
+    Modified? modified,
+    dynamic id,
+    dynamic name,
+    dynamic slug,
+    dynamic originName,
+    dynamic type,
+    dynamic thumbUrl,
+    dynamic posterUrl,
+    bool? subDocquyen,
+    bool? chieurap,
+    dynamic time,
+    dynamic episodeCurrent,
+    dynamic quality,
+    dynamic lang,
+    num? year,
+    List<Category>? category,
+    List<Country>? country,
+  }) =>
+      Items(
+        modified: modified ?? _modified,
+        id: id ?? _id,
+        name: name ?? _name,
+        slug: slug ?? _slug,
+        originName: originName ?? _originName,
+        type: type ?? _type,
+        thumbUrl: thumbUrl ?? _thumbUrl,
+        posterUrl: posterUrl ?? _posterUrl,
+        subDocquyen: subDocquyen ?? _subDocquyen,
+        chieurap: chieurap ?? _chieurap,
+        time: time ?? _time,
+        episodeCurrent: episodeCurrent ?? _episodeCurrent,
+        quality: quality ?? _quality,
+        lang: lang ?? _lang,
+        year: year ?? _year,
+        category: category ?? _category,
+        country: country ?? _country,
+      );
   Modified? get modified => _modified;
   dynamic get id => _id;
   dynamic get name => _name;
@@ -483,7 +507,6 @@ Items copyWith({  Modified? modified,
     }
     return map;
   }
-
 }
 
 /// id : "620a2318e0fc277084dfd77a"
@@ -492,13 +515,14 @@ Items copyWith({  Modified? modified,
 
 class Country {
   Country({
-      dynamic id,
-      dynamic name,
-      dynamic slug,}){
+    dynamic id,
+    dynamic name,
+    dynamic slug,
+  }) {
     _id = id;
     _name = name;
     _slug = slug;
-}
+  }
 
   Country.fromJson(dynamic json) {
     _id = json['id'];
@@ -508,13 +532,16 @@ class Country {
   dynamic _id;
   dynamic _name;
   dynamic _slug;
-Country copyWith({  dynamic id,
-  dynamic name,
-  dynamic slug,
-}) => Country(  id: id ?? _id,
-  name: name ?? _name,
-  slug: slug ?? _slug,
-);
+  Country copyWith({
+    dynamic id,
+    dynamic name,
+    dynamic slug,
+  }) =>
+      Country(
+        id: id ?? _id,
+        name: name ?? _name,
+        slug: slug ?? _slug,
+      );
   dynamic get id => _id;
   dynamic get name => _name;
   dynamic get slug => _slug;
@@ -526,7 +553,6 @@ Country copyWith({  dynamic id,
     map['slug'] = _slug;
     return map;
   }
-
 }
 
 /// id : "620e0e64d9648f114cde7728"
@@ -535,13 +561,14 @@ Country copyWith({  dynamic id,
 
 class Category {
   Category({
-      dynamic id,
-      dynamic name,
-      dynamic slug,}){
+    dynamic id,
+    dynamic name,
+    dynamic slug,
+  }) {
     _id = id;
     _name = name;
     _slug = slug;
-}
+  }
 
   Category.fromJson(dynamic json) {
     _id = json['id'];
@@ -551,13 +578,16 @@ class Category {
   dynamic _id;
   dynamic _name;
   dynamic _slug;
-Category copyWith({  dynamic id,
-  dynamic name,
-  dynamic slug,
-}) => Category(  id: id ?? _id,
-  name: name ?? _name,
-  slug: slug ?? _slug,
-);
+  Category copyWith({
+    dynamic id,
+    dynamic name,
+    dynamic slug,
+  }) =>
+      Category(
+        id: id ?? _id,
+        name: name ?? _name,
+        slug: slug ?? _slug,
+      );
   dynamic get id => _id;
   dynamic get name => _name;
   dynamic get slug => _slug;
@@ -569,24 +599,27 @@ Category copyWith({  dynamic id,
     map['slug'] = _slug;
     return map;
   }
-
 }
 
 /// time : "2024-02-02T20:50:36.000Z"
 
 class Modified {
   Modified({
-      dynamic time,}){
+    dynamic time,
+  }) {
     _time = time;
-}
+  }
 
   Modified.fromJson(dynamic json) {
     _time = json['time'];
   }
   dynamic _time;
-Modified copyWith({  dynamic time,
-}) => Modified(  time: time ?? _time,
-);
+  Modified copyWith({
+    dynamic time,
+  }) =>
+      Modified(
+        time: time ?? _time,
+      );
   dynamic get time => _time;
 
   Map<String, dynamic> toJson() {
@@ -594,7 +627,6 @@ Modified copyWith({  dynamic time,
     map['time'] = _time;
     return map;
   }
-
 }
 
 /// name : "Phim Lẻ"
@@ -604,15 +636,16 @@ Modified copyWith({  dynamic time,
 
 class BreadCrumb {
   BreadCrumb({
-      dynamic name,
-      dynamic slug,
-      bool? isCurrent,
-      num? position,}){
+    dynamic name,
+    dynamic slug,
+    bool? isCurrent,
+    num? position,
+  }) {
     _name = name;
     _slug = slug;
     _isCurrent = isCurrent;
     _position = position;
-}
+  }
 
   BreadCrumb.fromJson(dynamic json) {
     _name = json['name'];
@@ -624,15 +657,18 @@ class BreadCrumb {
   dynamic _slug;
   bool? _isCurrent;
   num? _position;
-BreadCrumb copyWith({  dynamic name,
-  dynamic slug,
-  bool? isCurrent,
-  num? position,
-}) => BreadCrumb(  name: name ?? _name,
-  slug: slug ?? _slug,
-  isCurrent: isCurrent ?? _isCurrent,
-  position: position ?? _position,
-);
+  BreadCrumb copyWith({
+    dynamic name,
+    dynamic slug,
+    bool? isCurrent,
+    num? position,
+  }) =>
+      BreadCrumb(
+        name: name ?? _name,
+        slug: slug ?? _slug,
+        isCurrent: isCurrent ?? _isCurrent,
+        position: position ?? _position,
+      );
   dynamic get name => _name;
   dynamic get slug => _slug;
   bool? get isCurrent => _isCurrent;
@@ -646,7 +682,6 @@ BreadCrumb copyWith({  dynamic name,
     map['position'] = _position;
     return map;
   }
-
 }
 
 /// og_type : "website"
@@ -657,17 +692,18 @@ BreadCrumb copyWith({  dynamic name,
 
 class SeoOnPage {
   SeoOnPage({
-      dynamic ogType,
-      dynamic titleHead,
-      dynamic descriptionHead,
-      List<String>? ogImage,
-      dynamic ogUrl,}){
+    dynamic ogType,
+    dynamic titleHead,
+    dynamic descriptionHead,
+    List<String>? ogImage,
+    dynamic ogUrl,
+  }) {
     _ogType = ogType;
     _titleHead = titleHead;
     _descriptionHead = descriptionHead;
     _ogImage = ogImage;
     _ogUrl = ogUrl;
-}
+  }
 
   SeoOnPage.fromJson(dynamic json) {
     _ogType = json['og_type'];
@@ -681,17 +717,20 @@ class SeoOnPage {
   dynamic _descriptionHead;
   List<String>? _ogImage;
   dynamic _ogUrl;
-SeoOnPage copyWith({  dynamic ogType,
-  dynamic titleHead,
-  dynamic descriptionHead,
-  List<String>? ogImage,
-  dynamic ogUrl,
-}) => SeoOnPage(  ogType: ogType ?? _ogType,
-  titleHead: titleHead ?? _titleHead,
-  descriptionHead: descriptionHead ?? _descriptionHead,
-  ogImage: ogImage ?? _ogImage,
-  ogUrl: ogUrl ?? _ogUrl,
-);
+  SeoOnPage copyWith({
+    dynamic ogType,
+    dynamic titleHead,
+    dynamic descriptionHead,
+    List<String>? ogImage,
+    dynamic ogUrl,
+  }) =>
+      SeoOnPage(
+        ogType: ogType ?? _ogType,
+        titleHead: titleHead ?? _titleHead,
+        descriptionHead: descriptionHead ?? _descriptionHead,
+        ogImage: ogImage ?? _ogImage,
+        ogUrl: ogUrl ?? _ogUrl,
+      );
   dynamic get ogType => _ogType;
   dynamic get titleHead => _titleHead;
   dynamic get descriptionHead => _descriptionHead;
@@ -707,5 +746,4 @@ SeoOnPage copyWith({  dynamic ogType,
     map['og_url'] = _ogUrl;
     return map;
   }
-
 }

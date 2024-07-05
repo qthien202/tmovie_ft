@@ -4,30 +4,33 @@
 
 import 'dart:convert';
 
-PostCreateTokenResponse postCreateTokenResponseFromJson(String str) => PostCreateTokenResponse.fromJson(json.decode(str));
+PostCreateTokenResponse postCreateTokenResponseFromJson(String str) =>
+    PostCreateTokenResponse.fromJson(json.decode(str));
 
-String postCreateTokenResponseToJson(PostCreateTokenResponse data) => json.encode(data.toJson());
+String postCreateTokenResponseToJson(PostCreateTokenResponse data) =>
+    json.encode(data.toJson());
 
 class PostCreateTokenResponse {
-    int status;
-    String message;
-    String token;
+  int status;
+  String message;
+  String token;
 
-    PostCreateTokenResponse({
-        required this.status,
-        required this.message,
-        required this.token,
-    });
+  PostCreateTokenResponse({
+    required this.status,
+    required this.message,
+    required this.token,
+  });
 
-    factory PostCreateTokenResponse.fromJson(Map<String, dynamic> json) => PostCreateTokenResponse(
+  factory PostCreateTokenResponse.fromJson(Map<String, dynamic> json) =>
+      PostCreateTokenResponse(
         status: json["status"],
         message: json["message"],
         token: json["token"],
-    );
+      );
 
-    Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson() => {
         "status": status,
         "message": message,
         "token": token,
-    };
+      };
 }

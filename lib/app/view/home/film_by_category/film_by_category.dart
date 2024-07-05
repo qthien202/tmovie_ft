@@ -85,7 +85,8 @@ class FilmByCategory extends StatelessWidget {
                                 : MediaQuery.of(context).size.height * .55,
                             child: Obx(() {
                               final isLoading =
-                                  controller.getFimCategory.value.isEmpty == true;
+                                  controller.getFimCategory.value.isEmpty ==
+                                      true;
                               final items = controller
                                   .getFimCategory
                                   .value[controller.categories[ind]['id']]
@@ -111,8 +112,8 @@ class FilmByCategory extends StatelessWidget {
                                         ? 10
                                         : (controller
                                                 .getFimCategory
-                                                .value[controller.categories[ind]
-                                                    ['id']]
+                                                .value[controller
+                                                    .categories[ind]['id']]
                                                 ?.pageProps
                                                 ?.data
                                                 ?.items
@@ -124,20 +125,24 @@ class FilmByCategory extends StatelessWidget {
                                     visible: !isLoading &&
                                         data?.category?.first.slug != "phim-18",
                                     replacement: Visibility(
-                                      visible:
-                                          data?.category?.first.slug != "phim-18",
+                                      visible: data?.category?.first.slug !=
+                                          "phim-18",
                                       child: Padding(
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 10, vertical: 10),
                                         child: SizedBox(
-                                          height:
-                                              MediaQuery.of(context).size.height *
-                                                  .5,
-                                          width: MediaQuery.of(context).size.width *
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              .5,
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
                                               .15,
                                           child: Shimmer.fromColors(
                                             baseColor: Colors.grey,
-                                            highlightColor: Colors.grey.shade600,
+                                            highlightColor:
+                                                Colors.grey.shade600,
                                             child: Container(
                                               decoration: const BoxDecoration(
                                                 color: Colors.grey,
@@ -157,8 +162,8 @@ class FilmByCategory extends StatelessWidget {
                                         slug: data?.slug,
                                         path: controller
                                                 .getFimCategory
-                                                .value[controller.categories[ind]
-                                                    ['id']]
+                                                .value[controller
+                                                    .categories[ind]['id']]
                                                 ?.pageProps
                                                 ?.data
                                                 ?.typeList ??
@@ -170,30 +175,36 @@ class FilmByCategory extends StatelessWidget {
                               );
                             }),
                           ),
-                        Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.arrow_back_ios,color: Colors.white,size: 25,),
-                            onPressed: () {
-                              pageController.previousPage(
-                                  duration: const Duration(milliseconds: 300),
-                                  curve: Curves.ease);
-                            },
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.arrow_back_ios,
+                                  color: Colors.white,
+                                  size: 25,
+                                ),
+                                onPressed: () {
+                                  pageController.previousPage(
+                                      duration:
+                                          const Duration(milliseconds: 300),
+                                      curve: Curves.ease);
+                                },
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.arrow_forward_ios,
+                                    color: Colors.white, size: 25),
+                                onPressed: () {
+                                  pageController.nextPage(
+                                      duration:
+                                          const Duration(milliseconds: 300),
+                                      curve: Curves.ease);
+                                },
+                              ),
+                            ],
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.arrow_forward_ios,color: Colors.white,size: 25),
-                            onPressed: () {
-                              pageController.nextPage(
-                                  duration: const Duration(milliseconds: 300),
-                                  curve: Curves.ease);
-                            },
-                          ),
-                        ],
-                                              ),
                         ],
                       ),
-                      
                     ],
                   ),
                 ),
