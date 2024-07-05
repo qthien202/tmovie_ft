@@ -8,10 +8,7 @@ import 'package:app_ft_movies/app/view/movie_genre/movie_genre_view.dart';
 class FilterApp extends StatefulWidget {
   const FilterApp({
     Key? key,
-    
   }) : super(key: key);
-
- 
 
   @override
   _FilterAppState createState() => _FilterAppState();
@@ -22,8 +19,8 @@ class _FilterAppState extends State<FilterApp> {
   String? selectedCountry;
   int? selectedYear;
   bool isFocusButton = false;
-  
-   List<int?> _currentIndices = [];
+
+  List<int?> _currentIndices = [];
 
   List<Map<String, dynamic>> drawerItems = [
     {"title": "Hành Động", "slug": "hanh-dong"},
@@ -108,27 +105,29 @@ class _FilterAppState extends State<FilterApp> {
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: GlobalColor.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                side: BorderSide(color: isFocusButton?Colors.white:Colors.transparent,width: 2)
-              ),
-              onHover: (hasFocus)=>setState(() {
-                isFocusButton=hasFocus;
+                  backgroundColor: GlobalColor.primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  side: BorderSide(
+                      color: isFocusButton ? Colors.white : Colors.transparent,
+                      width: 2)),
+              onHover: (hasFocus) => setState(() {
+                isFocusButton = hasFocus;
               }),
               onPressed: () {
-               
-                  if (selectedGenre == null) {
-                    Get.snackbar("Thông báo", "Vui lòng chọn thể loại phim trước",backgroundColor: Colors.white);
-                  } else {
-                    Get.toNamed("/the-loai/${selectedGenre??""}?country=${selectedCountry??""}&year=${selectedYear??""}");
-                  }
-                
+                if (selectedGenre == null) {
+                  Get.snackbar("Thông báo", "Vui lòng chọn thể loại phim trước",
+                      backgroundColor: Colors.white);
+                } else {
+                  Get.toNamed(
+                      "/the-loai/${selectedGenre ?? ""}?country=${selectedCountry ?? ""}&year=${selectedYear ?? ""}");
+                }
               },
-              child:  Transform.scale(
-                scale: isFocusButton?1.2:1,
-                child: Text("Duyệt phim", style: TextStyle(color: Colors.white))),
+              child: Transform.scale(
+                  scale: isFocusButton ? 1.2 : 1,
+                  child: Text("Duyệt phim",
+                      style: TextStyle(color: Colors.white))),
             ),
           )
         ],
@@ -136,44 +135,45 @@ class _FilterAppState extends State<FilterApp> {
       body: Column(
         children: [
           const ListTile(
-            title: Text('Thể loại', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+            title: Text('Thể loại',
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white)),
           ),
           Expanded(
-            child: buildFilterList(drawerItems, selectedGenre, (genre) {
-              setState(() {
-                
-                selectedGenre = genre["slug"];
-                
-              });
-              
-            },
-            0
-            
-            )
-          ),
+              child: buildFilterList(drawerItems, selectedGenre, (genre) {
+            setState(() {
+              selectedGenre = genre["slug"];
+            });
+          }, 0)),
           const ListTile(
-            title: Text('Quốc gia', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+            title: Text('Quốc gia',
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white)),
           ),
           Expanded(
             child: buildFilterList(countries, selectedCountry, (country) {
               setState(() {
                 selectedCountry = country["slug_country"];
               });
-            },
-            1
-            ),
+            }, 1),
           ),
           const ListTile(
-            title: Text('Năm', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+            title: Text('Năm',
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white)),
           ),
           Expanded(
             child: buildFilterList(yearsList, selectedYear, (year) {
               setState(() {
                 selectedYear = year["year"];
               });
-            },
-            2
-            ),
+            }, 2),
           ),
         ],
       ),
@@ -188,9 +188,9 @@ class _FilterAppState extends State<FilterApp> {
     });
   }
 
-  Widget buildFilterList(List<Map<String, dynamic>> items, dynamic selectedItem, Function(Map<String, dynamic>) onTap, int index) {
+  Widget buildFilterList(List<Map<String, dynamic>> items, dynamic selectedItem,
+      Function(Map<String, dynamic>) onTap, int index) {
     return GridView.builder(
-      
       scrollDirection: Axis.horizontal,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
@@ -210,7 +210,11 @@ class _FilterAppState extends State<FilterApp> {
           },
           child: buildFilterItem(
             text: item["title"] ?? item["name"] ?? item["year"].toString(),
-            isSelected: selectedItem != null ? (selectedItem == item["slug"] || selectedItem == item["year"] || selectedItem == item["name"]) : false,
+            isSelected: selectedItem != null
+                ? (selectedItem == item["slug"] ||
+                    selectedItem == item["year"] ||
+                    selectedItem == item["name"])
+                : false,
             isFocus: _currentIndices[index] == idx,
           ),
         );
@@ -218,13 +222,15 @@ class _FilterAppState extends State<FilterApp> {
     );
   }
 
-  Widget buildFilterItem({required String text, required bool isSelected, required bool isFocus}) {
+  Widget buildFilterItem(
+      {required String text, required bool isSelected, required bool isFocus}) {
     return Center(
       child: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           color: isSelected ? const Color(0xff252836) : null,
-          border: isFocus ? Border.all(color: GlobalColor.primary, width: 1) : null,
+          border:
+              isFocus ? Border.all(color: GlobalColor.primary, width: 1) : null,
           borderRadius: BorderRadius.circular(5),
         ),
         child: Text(

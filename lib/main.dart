@@ -10,11 +10,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await DependencyInjections().dependencies();
   runApp(const MyApp());
-  
 }
 
 class MyApp extends StatelessWidget {
@@ -24,34 +23,22 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      
       getPages: Routes.routes,
       // initialRoute: '/',
       scrollBehavior: MyCustomScrollBehavior(),
       debugShowCheckedModeBanner: false,
       title: 'TMOVIE',
       theme: ThemeData(
-        primaryColor: GlobalColor.backgroundColor,
-        useMaterial3: true,
-        indicatorColor: GlobalColor.primary,
-        progressIndicatorTheme: ProgressIndicatorThemeData(
-          // circularTrackColor: GlobalColor.primary,
-          color: GlobalColor.primary,
-        ),
-        textTheme: const TextTheme(
-          bodyText1:TextStyle(
-            color: Colors.white,
-            fontSize: 14
+          primaryColor: GlobalColor.backgroundColor,
+          useMaterial3: true,
+          indicatorColor: GlobalColor.primary,
+          progressIndicatorTheme: ProgressIndicatorThemeData(
+            // circularTrackColor: GlobalColor.primary,
+            color: GlobalColor.primary,
           ),
-          bodyText2:TextStyle(
-            color: Colors.white,
-            fontSize: 14
-          )  
-        )
-    
-        
-      ),
-      
+          textTheme: const TextTheme(
+              bodyText1: TextStyle(color: Colors.white, fontSize: 14),
+              bodyText2: TextStyle(color: Colors.white, fontSize: 14))),
     );
   }
 }
@@ -64,5 +51,3 @@ class MyCustomScrollBehavior extends MaterialScrollBehavior {
         PointerDeviceKind.mouse,
       };
 }
-
-
