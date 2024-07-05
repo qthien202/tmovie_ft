@@ -4,6 +4,7 @@ import 'package:tmovie_app/app/data/repository/get_film_details.dart';
 import 'package:tmovie_app/app/widgets/video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'dart:html' as html;
 
 class Espisode extends StatelessWidget {
   const Espisode({
@@ -25,19 +26,17 @@ class Espisode extends StatelessWidget {
             final episode = data?.episodes?.first.serverData?[index];
             return InkWell(onTap: () async {
               controller.selectTab.value = episode?.name;
-              await controller.createToken(
-                  name: data?.name ?? "",
-                  description: data?.content ?? "",
-                  originName: data?.originName ?? "",
-                  slug: data?.slug ?? "",
-                  thumbnail: data?.thumbUrl ?? "",
-                  episode: episode?.name ?? "");
-              Get.to(ChewieVideoPlayer(
-                slug: data?.slug ?? "",
-                fileName: data?.name ?? "",
-                episode: episode?.name ?? "",
-                videoUrl: episode?.linkM3u8 ?? "",
-              ));
+              // await controller.createToken(
+              //     name: data?.name ?? "",
+              //     description: data?.content ?? "",
+              //     originName: data?.originName ?? "",
+              //     slug: data?.slug ?? "",
+              //     thumbnail: data?.thumbUrl ?? "",
+              //     episode: episode?.name ?? "");
+              html.window.open(
+                episode?.linkEmbed ?? "",
+                episode?.filename ?? "",
+              );
             }, child: Obx(() {
               return Container(
                 padding:
