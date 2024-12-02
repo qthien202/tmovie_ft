@@ -25,11 +25,11 @@ class IndexView extends StatelessWidget {
         "icon": Icons.search_outlined,
         "title": "Tìm kiếm"
       },
-      {
-        "screen": const HistoryView(),
-        "icon": Icons.history_outlined,
-        "title": "Lịch sử"
-      },
+      // {
+      //   "screen": const HistoryView(),
+      //   "icon": Icons.history_outlined,
+      //   "title": "Lịch sử"
+      // },
     ];
     final GlobalKey<ScaffoldState> key = GlobalKey<ScaffoldState>();
     return Scaffold(

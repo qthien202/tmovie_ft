@@ -19,11 +19,16 @@ class Info extends StatelessWidget {
             Text(
               "${data?.name}  •  ${data?.quality}",
               maxLines: 2,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
             ),
             Text(
-                "${data?.year} • ${data?.category?.first.name} / ${data?.category?.last.name}"),
-            Text("${data?.time}")
+              "${data?.year} • ${data?.category?.first.name} / ${data?.category?.last.name}",
+              style: TextStyle(color: Colors.white),
+            ),
+            Text("${data?.time}", style: TextStyle(color: Colors.white))
           ],
         ),
       );

@@ -20,16 +20,14 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'TMOVIE',
       theme: ThemeData(
-          primaryColor: GlobalColor.backgroundColor,
-          useMaterial3: true,
-          indicatorColor: GlobalColor.primary,
-          progressIndicatorTheme: ProgressIndicatorThemeData(
-            // circularTrackColor: GlobalColor.primary,
-            color: GlobalColor.primary,
-          ),
-          textTheme: const TextTheme(
-              bodyText1: TextStyle(color: Colors.white, fontSize: 14),
-              bodyText2: TextStyle(color: Colors.white, fontSize: 14))),
+        primaryColor: GlobalColor.backgroundColor,
+        useMaterial3: true,
+        indicatorColor: GlobalColor.primary,
+        progressIndicatorTheme: ProgressIndicatorThemeData(
+          // circularTrackColor: GlobalColor.primary,
+          color: GlobalColor.primary,
+        ),
+      ),
       home: const SplashView(),
     );
   }

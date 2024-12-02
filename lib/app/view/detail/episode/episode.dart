@@ -25,13 +25,7 @@ class Espisode extends StatelessWidget {
             final episode = data?.episodes?.first.serverData?[index];
             return InkWell(onTap: () async {
               controller.selectTab.value = episode?.name;
-              await controller.createToken(
-                  name: data?.name ?? "",
-                  description: data?.content ?? "",
-                  originName: data?.originName ?? "",
-                  slug: data?.slug ?? "",
-                  thumbnail: data?.thumbUrl ?? "",
-                  episode: episode?.name ?? "");
+
               Get.to(ChewieVideoPlayer(
                 slug: data?.slug ?? "",
                 fileName: data?.name ?? "",
@@ -49,7 +43,8 @@ class Espisode extends StatelessWidget {
                         color: controller.selectTab.value == episode?.name
                             ? GlobalColor.primary
                             : Colors.transparent)),
-                child: Text("${episode?.name}"),
+                child: Text("${episode?.name}",
+                    style: TextStyle(color: Colors.white)),
               );
             }));
           },

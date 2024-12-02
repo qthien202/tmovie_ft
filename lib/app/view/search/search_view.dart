@@ -136,7 +136,8 @@ class SearchView extends StatelessWidget {
                                               : Colors.transparent)),
                               child: Text(
                                 "${index + 1}",
-                                style: const TextStyle(fontSize: 13),
+                                style: const TextStyle(
+                                    fontSize: 13, color: Colors.white),
                               ),
                             ),
                           );
