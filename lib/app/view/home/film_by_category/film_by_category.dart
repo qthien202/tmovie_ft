@@ -76,30 +76,11 @@ class FilmByCategory extends StatelessWidget {
                             0,
                     itemBuilder: (context, index) {
                       final data = items?[index];
-                      return Visibility(
-                        visible: !isLoading &&
-                            data?.category?.first.slug != "phim-18",
-                        replacement: Visibility(
-                          visible: data?.category?.first.slug != "phim-18",
-                          child: SizedBox(
-                            width: MediaQuery.of(context).size.width * .4,
-                            child: Shimmer.fromColors(
-                              baseColor: Colors.grey,
-                              highlightColor: Colors.grey.shade600,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        child: CardCinema(
-                          nameProduct: data?.name,
-                          imageLink: data?.thumbUrl,
-                          originName: data?.originName,
-                          slug: data?.slug,
-                        ),
+                      return CardCinema(
+                        nameProduct: data?.name,
+                        imageLink: data?.thumbUrl,
+                        originName: data?.originName,
+                        slug: data?.slug,
                       );
                     },
                     separatorBuilder: (BuildContext context, int index) =>

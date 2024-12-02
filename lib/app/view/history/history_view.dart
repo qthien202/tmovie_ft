@@ -3,7 +3,6 @@ import 'package:tmovie_app/app/core/global_color.dart';
 import 'package:tmovie_app/app/view/detail/detail_view.dart';
 import 'package:tmovie_app/app/widgets/global_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:get/get.dart';
 
 class HistoryView extends StatelessWidget {

@@ -87,7 +87,7 @@ class SliderCinema extends StatelessWidget {
                       "Trailer",
                   child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                          primary: GlobalColor.primary,
+                          backgroundColor: GlobalColor.primary,
                           shape: RoundedRectangleBorder(
                               // side: BorderSide(color: Colors.white),
                               borderRadius: BorderRadius.circular(25))),
@@ -121,7 +121,7 @@ class SliderCinema extends StatelessWidget {
                 ),
                 ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                        primary: Colors.transparent,
+                        backgroundColor: Colors.transparent,
                         shape: RoundedRectangleBorder(
                             side: const BorderSide(color: Colors.white),
                             borderRadius: BorderRadius.circular(25))),

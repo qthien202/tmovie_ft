@@ -8,7 +8,7 @@ import 'package:tmovie_app/app/widgets/global_webview.dart';
 import 'package:tmovie_app/app/widgets/video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'dart:html' as html;
+// import 'dart:html' as html;
 
 class HomeController extends GetxController {
   final Services api = Get.find();
@@ -102,15 +102,15 @@ class HomeController extends GetxController {
   Future<void> watchNow({required String slug}) async {
     await detail.getFilmDetail(slug: slug);
     final data = detail.filmDetail.value?.pageProps?.data?.item;
-    html.window.open(
-      data?.episodes?.first.serverData?.first.linkEmbed ?? "",
-      data?.episodes?.first.serverData?.first.filename ?? "",
-    );
+    // html.window.open(
+    //   data?.episodes?.first.serverData?.first.linkEmbed ?? "",
+    //   data?.episodes?.first.serverData?.first.filename ?? "",
+    // );
 
-    // Get.to(ChewieVideoPlayer(
-    //     slug: data?.slug ?? "",
-    //     videoUrl: data?.episodes?.first.serverData?.first.linkM3u8 ?? "",
-    //     fileName: data?.name ?? "",
-    //     episode: data?.episodes?.first.serverData?.first.name ?? ""));
+    Get.to(ChewieVideoPlayer(
+        slug: data?.slug ?? "",
+        videoUrl: data?.episodes?.first.serverData?.first.linkM3u8 ?? "",
+        fileName: data?.name ?? "",
+        episode: data?.episodes?.first.serverData?.first.name ?? ""));
   }
 }

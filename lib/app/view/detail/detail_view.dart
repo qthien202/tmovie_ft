@@ -1,3 +1,4 @@
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:tmovie_app/app/controller/detail/detail_controller.dart';
 import 'package:tmovie_app/app/core/global_color.dart';
 import 'package:tmovie_app/app/view/detail/episode/episode.dart';
@@ -9,7 +10,6 @@ import 'package:tmovie_app/app/widgets/video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 class DetailView extends StatelessWidget {
   const DetailView({super.key, this.slug, this.name});
@@ -130,15 +130,6 @@ class DetailView extends StatelessWidget {
                                   color: GlobalColor.primary),
                               child: InkWell(
                                 onTap: () async {
-                                  await controller.createToken(
-                                      name: data.name ?? "",
-                                      description: data.content ?? "",
-                                      originName: data.originName ?? "",
-                                      slug: data.slug ?? "",
-                                      thumbnail: data.thumbUrl ?? "",
-                                      episode: data.episodes?.first.serverData
-                                              ?.first.name ??
-                                          "");
                                   Get.to(ChewieVideoPlayer(
                                     slug: data.slug ?? "",
                                     fileName: data.name ?? "--",
@@ -165,7 +156,8 @@ class DetailView extends StatelessWidget {
                                       "Xem phim",
                                       style: TextStyle(
                                           fontSize: 15,
-                                          fontWeight: FontWeight.bold),
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white),
                                     ),
                                   ],
                                 )),

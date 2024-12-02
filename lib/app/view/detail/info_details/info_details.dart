@@ -15,7 +15,8 @@ class InfoDetail extends StatelessWidget {
         children: [
           Text(
             "Thông tin phim",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            style: TextStyle(
+                fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
           ),
           const SizedBox(
             height: 10,
@@ -23,11 +24,12 @@ class InfoDetail extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Text("Số tập :"),
+              Text("Số tập :", style: TextStyle(color: Colors.white)),
               const SizedBox(
                 width: 10,
               ),
-              Text(data?.episodeTotal ?? "--")
+              Text(data?.episodeTotal ?? "--",
+                  style: TextStyle(color: Colors.white))
             ],
           ),
           const SizedBox(
@@ -36,11 +38,11 @@ class InfoDetail extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Text("Ngôn ngữ :"),
+              Text("Ngôn ngữ :", style: TextStyle(color: Colors.white)),
               const SizedBox(
                 width: 10,
               ),
-              Text(data?.lang ?? "--"),
+              Text(data?.lang ?? "--", style: TextStyle(color: Colors.white)),
             ],
           ),
           const SizedBox(
@@ -49,11 +51,12 @@ class InfoDetail extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Text("Quốc gia :"),
+              Text("Quốc gia :", style: TextStyle(color: Colors.white)),
               const SizedBox(
                 width: 10,
               ),
-              Text(data?.country?.first.name ?? "--"),
+              Text(data?.country?.first.name ?? "--",
+                  style: TextStyle(color: Colors.white)),
             ],
           )
         ],

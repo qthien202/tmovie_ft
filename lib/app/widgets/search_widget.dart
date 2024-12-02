@@ -12,6 +12,7 @@ class SearchWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5),
       child: TextField(
+        style: TextStyle(color: Colors.white),
         onSubmitted: (val) async {
           controller.selectIndex.value = 0;
           await controller.getSearch();
