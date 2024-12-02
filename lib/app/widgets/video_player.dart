@@ -38,14 +38,14 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
     _prefsKey = "${widget.fileName}-${widget.episode}";
     _initializePlayer();
     setState(() {
-              isSeek = true;
-            });
-            Timer(Duration(seconds: 5), () {
-              setState(() {
-                isSeek = false;
-              });
-              print('After 5 seconds: isSeek = $isSeek');
-            });
+      isSeek = true;
+    });
+    Timer(Duration(seconds: 5), () {
+      setState(() {
+        isSeek = false;
+      });
+      print('After 5 seconds: isSeek = $isSeek');
+    });
   }
 
   @override
@@ -95,11 +95,8 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
                         ),
                         Expanded(
                           child: Slider(
-                            
                             value: _progress,
-                            
                             onChanged: (newValue) {
-                              
                               setState(() {
                                 _progress = newValue;
                               });
