@@ -7,11 +7,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await DependencyInjections().dependencies();
   runApp(const MyApp());
-  
 }
 
 class MyApp extends StatelessWidget {
@@ -22,37 +21,26 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Shortcuts(
       shortcuts: <LogicalKeySet, Intent>{
-                    LogicalKeySet(LogicalKeyboardKey.select):
-                        const ActivateIntent(),
-                  },
+        LogicalKeySet(LogicalKeyboardKey.select): const ActivateIntent(),
+      },
       child: GetMaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'TMOVIE',
         theme: ThemeData(
-          primaryColor: GlobalColor.backgroundColor,
-          useMaterial3: true,
-          indicatorColor: GlobalColor.primary,
-          progressIndicatorTheme: ProgressIndicatorThemeData(
-            // circularTrackColor: GlobalColor.primary,
-            color: GlobalColor.primary,
-          ),
-          textTheme: const TextTheme(
-            bodyText1:TextStyle(
-              color: Colors.white,
-              fontSize: 14
+            primaryColor: GlobalColor.backgroundColor,
+            useMaterial3: true,
+            indicatorColor: GlobalColor.primary,
+            progressIndicatorTheme: ProgressIndicatorThemeData(
+              // circularTrackColor: GlobalColor.primary,
+              color: GlobalColor.primary,
             ),
-            bodyText2:TextStyle(
-              color: Colors.white,
-              fontSize: 14
-            )  
-          )
-      
-          
-        ),
+            textTheme: const TextTheme(
+              bodyLarge: TextStyle(color: Colors.white),
+              bodySmall: TextStyle(color: Colors.white),
+              bodyMedium: TextStyle(color: Colors.white),
+            )),
         home: const SplashView(),
       ),
     );
   }
 }
-
-

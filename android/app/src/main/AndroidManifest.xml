@@ -2,7 +2,7 @@
     <application
         android:label="TMOVIE"
         android:name="${applicationName}"
-        android:icon="@drawable/banner"
+        android:icon="@mipmap/ic_launcher"
         android:banner="@drawable/banner"
         >
         <activity
