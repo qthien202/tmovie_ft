@@ -52,6 +52,8 @@ dependencies:
   # chewie: ^1.7.4
   connectivity_plus: ^5.0.2
   better_player: ^0.0.84
+  video_player: ^2.9.2
+  flick_video_player: ^0.9.0
 dependency_overrides:
   webview_flutter: ^4.0.1
   
