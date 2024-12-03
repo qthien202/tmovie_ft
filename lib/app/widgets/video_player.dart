@@ -73,19 +73,20 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
     _prefs = await SharedPreferences.getInstance();
     int? savedPosition = _prefs.getInt(_prefsKey);
 
-    _videoPlayerController = VideoPlayerController.network(widget.videoUrl);
+    _videoPlayerController = VideoPlayerController.networkUrl(
+        Uri.parse(widget.videoUrl ?? ""),
+        videoPlayerOptions: VideoPlayerOptions(allowBackgroundPlayback: false));
     await _videoPlayerController.initialize();
 
     if (savedPosition != null) {
       _videoPlayerController.seekTo(Duration(seconds: savedPosition));
     }
-    _videoPlayerController = VideoPlayerController.networkUrl(
-        Uri.parse(widget.videoUrl ?? ""),
-        videoPlayerOptions: VideoPlayerOptions(allowBackgroundPlayback: false));
+
     flickManager = FlickManager(
         videoPlayerController: _videoPlayerController,
         autoPlay: true,
         autoInitialize: true);
+
     setState(() {
       _isInitialized = true;
     });
