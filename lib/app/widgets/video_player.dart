@@ -51,6 +51,10 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
         child: _isInitialized
             ? FlickVideoPlayer(
                 flickManager: flickManager,
+                flickVideoWithControls: FlickVideoWithControls(
+                  videoFit: BoxFit.fill,
+                  controls: FlickLandscapeControls(),
+                ),
               )
             : const CircularProgressIndicator(),
       ),
@@ -77,7 +81,7 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
     }
     _videoPlayerController = VideoPlayerController.networkUrl(
         Uri.parse(widget.videoUrl ?? ""),
-        videoPlayerOptions: VideoPlayerOptions());
+        videoPlayerOptions: VideoPlayerOptions(allowBackgroundPlayback: false));
     flickManager = FlickManager(
         videoPlayerController: _videoPlayerController,
         autoPlay: true,
