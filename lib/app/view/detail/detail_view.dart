@@ -172,32 +172,16 @@ class DetailView extends StatelessWidget {
                         const SizedBox(
                           height: 10,
                         ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              "Nội dung phim",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 16),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            HtmlWidget("${data.content}")
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
                         Visibility(
                           visible: data.status != "trailer",
                           child: const Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text("Tập phim",
+                              Text("Chọn server",
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 16)),
+                                      fontSize: 16,
+                                      color: Colors.white)),
                               SizedBox(
                                 height: 10,
                               ),
@@ -205,6 +189,32 @@ class DetailView extends StatelessWidget {
                             ],
                           ),
                         ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Nội dung phim",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: Colors.white),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            HtmlWidget(
+                              "${data.content}",
+                              textStyle: TextStyle(color: Colors.white),
+                            )
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+
                         const SizedBox(
                           height: 10,
                         ),

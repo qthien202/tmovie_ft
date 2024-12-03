@@ -15,44 +15,113 @@ class Espisode extends StatelessWidget {
     final controller = Get.put(DetailController());
     return Obx(() {
       final data = controller.filmDetail.value?.pageProps?.data?.item;
-      return SizedBox(
-        height: 40,
-        child: ListView.separated(
-          shrinkWrap: true,
-          scrollDirection: Axis.horizontal,
-          itemCount: data?.episodes?.first.serverData?.length ?? 0,
-          itemBuilder: (context, index) {
-            final episode = data?.episodes?.first.serverData?[index];
-            return InkWell(onTap: () async {
-              controller.selectTab.value = episode?.name;
+      return WillPopScope(
+        onWillPop: () async {
+          controller.selectTabServer.value = 0;
+          return true;
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              height: 45,
+              child: ListView.separated(
+                shrinkWrap: true,
+                scrollDirection: Axis.horizontal,
+                itemCount: data?.episodes?.length ?? 0,
+                itemBuilder: (context, ind) {
+                  final episode = data?.episodes?[ind];
+                  print(">>>>>>>>>>>>${data?.episodes?.length}");
+                  return InkWell(onTap: () {
+                    // controller.isFocusSever.value = hasFocus;
+                    // controller.selectIndexServer.value = index;
+                    controller.selectTabServer.value = ind;
+                  },
+                      // onTap: () => print("a"),
+                      child: Obx(() {
+                    return Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 15),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(
+                              color: controller.selectTabServer.value == ind
+                                  ? GlobalColor.primary
+                                  : Color(0xff252836),
+                              width: 1.5),
+                          color: GlobalColor.background2),
+                      child: Text(
+                        data?.episodes?[ind].serverName ?? "",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    );
+                  }));
+                },
+                separatorBuilder: (BuildContext context, int index) {
+                  return const SizedBox(
+                    width: 20,
+                  );
+                },
+              ),
+            ),
+            const SizedBox(
+              height: 15,
+            ),
+            Obx(() => Wrap(
+                  spacing: 5,
+                  runSpacing: 10,
+                  children: data
+                          ?.episodes?[controller.selectTabServer.value ?? 0]
+                          .serverData
+                          ?.asMap()
+                          .entries
+                          .map((entry) {
+                        final episode = entry.value;
+                        final ind = entry.key;
+                        return InkWell(onFocusChange: (isFocus) {
+                          controller.selectTab.value = null;
+                          controller.isFocusEp.value = isFocus;
+                          controller.selectIndex.value = ind;
+                        }, onTap: () async {
+                          controller.selectTab.value = ind;
 
-              Get.to(ChewieVideoPlayer(
-                slug: data?.slug ?? "",
-                fileName: data?.name ?? "",
-                episode: episode?.name ?? "",
-                videoUrl: episode?.linkM3u8 ?? "",
-              ));
-            }, child: Obx(() {
-              return Container(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                decoration: BoxDecoration(
-                    //  border: Border.all(color: GlobalColor.primary)
-                    color: Color(0xff252836),
-                    border: Border.all(
-                        color: controller.selectTab.value == episode?.name
-                            ? GlobalColor.primary
-                            : Colors.transparent)),
-                child: Text("${episode?.name}",
-                    style: TextStyle(color: Colors.white)),
-              );
-            }));
-          },
-          separatorBuilder: (BuildContext context, int index) {
-            return const SizedBox(
-              width: 20,
-            );
-          },
+                          Get.to(ChewieVideoPlayer(
+                            videoUrl: episode.linkM3u8 ?? "",
+                            fileName: data.name ?? "",
+                            episode: episode.name ?? "",
+                            slug: data.slug ?? "",
+                          ));
+                        }, child: Obx(() {
+                          return Container(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 15),
+                            decoration: BoxDecoration(
+                              //  border: Border.all(color: GlobalColor.primary)
+
+                              borderRadius: BorderRadius.circular(5),
+                              border: Border.all(
+                                  color: controller.selectTab.value == ind
+                                      ? GlobalColor.primary
+                                      : Color(0xff252836),
+                                  width: 1.5),
+                              color: controller.isFocusEp.value &&
+                                      controller.selectIndex.value == ind
+                                  ? GlobalColor.primary
+                                  : Color(0xff252836),
+                            ),
+                            child: Text(
+                              episode.name != "Full"
+                                  ? "Tập ${episode.name}"
+                                  : episode.name ?? "",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          );
+                        }));
+                      }).toList() ??
+                      [],
+                ))
+          ],
         ),
       );
     });
