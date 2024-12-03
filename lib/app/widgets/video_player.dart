@@ -78,7 +78,10 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
     _videoPlayerController = VideoPlayerController.networkUrl(
         Uri.parse(widget.videoUrl ?? ""),
         videoPlayerOptions: VideoPlayerOptions());
-    flickManager = FlickManager(videoPlayerController: _videoPlayerController);
+    flickManager = FlickManager(
+        videoPlayerController: _videoPlayerController,
+        autoPlay: true,
+        autoInitialize: true);
     setState(() {
       _isInitialized = true;
     });
