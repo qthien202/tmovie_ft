@@ -1,7 +1,6 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:better_player/better_player.dart';
+import 'package:video_player/video_player.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
 
@@ -23,7 +22,7 @@ class ChewieVideoPlayer extends StatefulWidget {
 }
 
 class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
-  late BetterPlayerController _betterPlayerController;
+  late VideoPlayerController _controller;
   late SharedPreferences _prefs;
   late String _prefsKey;
 
@@ -41,10 +40,12 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
       isSeek = true;
     });
     Timer(Duration(seconds: 5), () {
-      setState(() {
-        isSeek = false;
-      });
-      print('After 5 seconds: isSeek = $isSeek');
+      if (mounted) {
+        setState(() {
+          isSeek = false;
+        });
+        print('After 5 seconds: isSeek = $isSeek');
+      }
     });
   }
 
@@ -66,18 +67,22 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
               isSeek = true;
             });
             Timer(Duration(seconds: 10), () {
-              setState(() {
-                isSeek = false;
-              });
-              print('After 5 seconds: isSeek = $isSeek');
+              if (mounted) {
+                setState(() {
+                  isSeek = false;
+                });
+                print('After 10 seconds: isSeek = $isSeek');
+              }
             });
+
+            _handleSeek(event.logicalKey);
           }
         },
         child: Scaffold(
           backgroundColor: Colors.black,
           body: Stack(
             children: [
-              BetterPlayer(controller: _betterPlayerController),
+              VideoPlayer(_controller),
               Visibility(
                 visible: isSeek == true,
                 child: Positioned(
@@ -85,7 +90,7 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
                   right: 0,
                   bottom: 0,
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
                     color: Colors.black.withOpacity(0.5),
                     child: Row(
                       children: [
@@ -123,7 +128,7 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
   @override
   void dispose() {
     super.dispose();
-    _betterPlayerController.dispose();
+    _controller.dispose();
   }
 
   void _initializePlayer() {
@@ -133,54 +138,28 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
       });
       int? savedPosition = _prefs.getInt(_prefsKey);
 
-      _betterPlayerController = BetterPlayerController(
-        BetterPlayerConfiguration(
-          overlay: Padding(
-            padding: const EdgeInsets.all(8),
-            child: Text("${widget.fileName}-${widget.episode}"),
-          ),
-          autoPlay: true,
-          looping: false,
-          controlsConfiguration: BetterPlayerControlsConfiguration(
-            controlBarColor: Colors.transparent,
-            enableProgressText: false,
-            enableFullscreen: false,
-            enableOverflowMenu: false,
-            enableSkips: false,
-            enablePlaybackSpeed: false,
-            enableProgressBar: false,
-            enablePlayPause: false,
-            enableMute: false,
-          ),
-        ),
-        betterPlayerDataSource: BetterPlayerDataSource(
-          BetterPlayerDataSourceType.network,
-          widget.videoUrl,
-        ),
-      );
+      _controller = VideoPlayerController.network(widget.videoUrl)
+        ..initialize().then((_) {
+          setState(() {});
+          _controller.setLooping(false);
+          _controller.play();
 
-      // Listen to video player events
-      _betterPlayerController.addEventsListener((event) {
-        if (event.betterPlayerEventType == BetterPlayerEventType.progress) {
-          _savePosition();
-          setState(() {
-            _progress = _betterPlayerController
-                    .videoPlayerController!.value.position.inSeconds /
-                _betterPlayerController
-                    .videoPlayerController!.value.duration!.inSeconds;
-            _currentTime = _formatDuration(
-                _betterPlayerController.videoPlayerController!.value.position);
-            _videoDuration = _formatDuration(
-                _betterPlayerController.videoPlayerController!.value.duration!);
-          });
-        }
-        if (event.betterPlayerEventType == BetterPlayerEventType.initialized) {
-          // Video player initialized, seek to saved position if available
           if (savedPosition != null) {
-            _betterPlayerController.seekTo(Duration(seconds: savedPosition));
+            _controller.seekTo(Duration(seconds: savedPosition));
           }
-        }
-      });
+
+          // Listen to video player events
+          _controller.addListener(() {
+            if (_controller.value.isPlaying) {
+              setState(() {
+                _progress = _controller.value.position.inSeconds /
+                    _controller.value.duration.inSeconds;
+                _currentTime = _formatDuration(_controller.value.position);
+                _videoDuration = _formatDuration(_controller.value.duration);
+              });
+            }
+          });
+        });
     });
   }
 
@@ -192,19 +171,16 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
   }
 
   void _savePosition() {
-    int positionInSeconds =
-        _betterPlayerController.videoPlayerController!.value.position.inSeconds;
+    int positionInSeconds = _controller.value.position.inSeconds;
     _prefs.setInt(_prefsKey, positionInSeconds);
   }
 
   void _onProgressChanged(double newValue) {
-    Duration? duration =
-        _betterPlayerController.videoPlayerController!.value.duration;
+    Duration? duration = _controller.value.duration;
 
     if (duration != null) {
       int newPositionInSeconds = (duration.inSeconds * newValue).round();
-      int currentPosInSeconds = _betterPlayerController
-          .videoPlayerController!.value.position.inSeconds;
+      int currentPosInSeconds = _controller.value.position.inSeconds;
 
       // Xác định chiều tua
       if (newPositionInSeconds > currentPosInSeconds) {
@@ -217,7 +193,7 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
           _progress = newProgress;
         });
 
-        _betterPlayerController.seekTo(Duration(seconds: seekToPosition));
+        _controller.seekTo(Duration(seconds: seekToPosition));
       } else {
         // Tua lại
         int seekToPosition =
@@ -228,12 +204,25 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
           _progress = newProgress;
         });
 
-        _betterPlayerController.seekTo(Duration(seconds: seekToPosition));
+        _controller.seekTo(Duration(seconds: seekToPosition));
       }
     }
   }
 
-  // Biến lưu trữ trạng thái phát trước đó
+  void _handleSeek(LogicalKeyboardKey key) {
+    Duration? duration = _controller.value.duration;
+    int currentPosInSeconds = _controller.value.position.inSeconds;
+
+    if (key == LogicalKeyboardKey.arrowRight) {
+      int seekToPosition =
+          (currentPosInSeconds + 10).clamp(0, duration!.inSeconds).toInt();
+      _controller.seekTo(Duration(seconds: seekToPosition));
+    } else if (key == LogicalKeyboardKey.arrowLeft) {
+      int seekToPosition =
+          (currentPosInSeconds - 10).clamp(0, duration!.inSeconds).toInt();
+      _controller.seekTo(Duration(seconds: seekToPosition));
+    }
+  }
 
   bool isHandlingKeyPress = false;
 
@@ -244,12 +233,12 @@ class _ChewieVideoPlayerState extends State<ChewieVideoPlayer> {
 
     isHandlingKeyPress = true;
 
-    bool isPlaying = _betterPlayerController.isPlaying()!;
+    bool isPlaying = _controller.value.isPlaying;
 
     if (isPlaying) {
-      _betterPlayerController.pause();
+      _controller.pause();
     } else {
-      _betterPlayerController.play();
+      _controller.play();
     }
 
     Future.delayed(Duration(milliseconds: 300), () {
