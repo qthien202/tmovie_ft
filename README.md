@@ -11,11 +11,7 @@
       <td width="1%"><img src="https://github.com/user-attachments/assets/8b22f485-96e5-4d2f-bf8b-e559fa8d8a6c"/></td>
        <td width="1%"><img src="https://github.com/user-attachments/assets/3977a62d-49ba-4676-a664-da53b46f51fe"/></td>
     </tr>
-    <tr>
-      <td width="1%"><img src="https://github.com/user-attachments/assets/bbaac9b2-a03e-4148-955b-cfd6c5693d8b"/></td>
-      <td width="1%"><img src="https://github.com/user-attachments/assets/ed962858-7d24-4681-bb01-1aa562ddae6c"/></td>
-       <td width="1%"><img src="https://github.com/user-attachments/assets/eaa2ee0a-53e1-4181-846a-8c7d3825c2b8"/></td>
-    </tr>
+   
   </tbody>
 </table>
 
