@@ -130,6 +130,8 @@ class SearchView extends StatelessWidget {
               height: 20,
             ),
             Obx(() {
+              final data =
+                  controller.search.value?.pageProps?.data?.params?.pagination;
               return Visibility(
                 visible: controller.totalPage.value != 0,
                 child: Padding(
@@ -137,53 +139,76 @@ class SearchView extends StatelessWidget {
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
                   child: SizedBox(
                     height: 40,
-                    child: ListView.separated(
-                      shrinkWrap: true,
-                      scrollDirection: Axis.horizontal,
-                      itemCount: controller.totalPage.value ?? 0,
-                      itemBuilder: (context, index) {
-                        return Obx(() {
-                          return InkWell(
-                            onFocusChange: (value) {
-                              controller.isFocusPage.value = value;
-                              controller.selectIndex.value = index;
-                            },
-                            onTap: () async {
-                              controller.selectIndex.value = index;
-                              print(
-                                  ">>>>>>>>>>>>>${controller.selectIndex.value}");
-                              controller.search.value = null;
-                              await controller.getSearch(page: index + 1);
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 15),
-                              decoration: BoxDecoration(
-                                  //  border: Border.all(color: GlobalColor.primary)
-                                  color: const Color(0xff252836),
-                                  border: Border.all(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Nút "Previous"
+                        IconButton(
+                          icon: Icon(Icons.arrow_back),
+                          onPressed: (data?.currentPage ?? 0) > 0
+                              ? () async {
+                                  await controller.getSearch(
+                                      page: controller.currentPage.value + 1);
+                                }
+                              : null, // Disable if it's the first page
+                        ),
+                        // Các số trang
+                        ListView.builder(
+                          shrinkWrap: true,
+                          scrollDirection: Axis.horizontal,
+                          itemCount: controller.totalPage.value,
+                          itemBuilder: (context, index) {
+                            return Obx(() {
+                              return InkWell(
+                                onFocusChange: (hasFocus) {
+                                  controller.isFocusPage.value = hasFocus;
+                                  controller.selectIndex.value = index;
+                                },
+                                onTap: () async {
+                                  controller.selectIndex.value = index;
+                                  await controller.getSearch(page: index + 1);
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 15),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xff252836),
+                                    border: Border.all(
                                       color: controller.selectIndex.value ==
                                                   index &&
                                               controller.isFocusPage.value
                                           ? GlobalColor.primary
-                                          : Colors.transparent)),
-                              child: Text(
-                                "${index + 1}",
-                                style: TextStyle(
-                                    fontSize: 13,
-                                    color: controller.selectPage.value == index
-                                        ? GlobalColor.primary
-                                        : Colors.white),
-                              ),
-                            ),
-                          );
-                        });
-                      },
-                      separatorBuilder: (BuildContext context, int index) {
-                        return const SizedBox(
-                          width: 20,
-                        );
-                      },
+                                          : Colors.transparent,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    "${index + 1}",
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color:
+                                          controller.selectPage.value == index
+                                              ? GlobalColor.primary
+                                              : Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            });
+                          },
+                        ),
+                        // Nút "Next"
+                        IconButton(
+                          icon: Icon(Icons.arrow_forward),
+                          onPressed: controller.currentPage.value <
+                                  (controller.totalPage.value ?? 0) - 1
+                              ? () async {
+                                  controller.currentPage.value++;
+                                  await controller.getSearch(
+                                      page: controller.currentPage.value + 1);
+                                }
+                              : null, // Disable if it's the last page
+                        ),
+                      ],
                     ),
                   ),
                 ),
