@@ -25,7 +25,7 @@ class GlobalImage extends StatelessWidget {
         ),
       ),
       child: CachedNetworkImage(
-        imageUrl: "${GlobalData.baseUrlImage}$imageUrl${GlobalData.keyImage}",
+        imageUrl: "${GlobalData.baseUrlImage}$imageUrl",
         height: height ?? 0,
         width: width ?? 0,
         fit: boxFit,

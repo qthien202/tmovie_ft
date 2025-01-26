@@ -14,39 +14,42 @@ class HomeController extends GetxController {
   Rxn<TabController> tabController = Rxn();
   Rxn<GetNewFilm> getNewFilmData = Rxn();
   Rx<Map<String, GetFilmByCategory>> getFimCategory = Rx({});
-  Rxn<GetFilmByCategory>getFilminHomeData = Rxn();
+  Rxn<GetFilmByCategory> getFilminHomeData = Rxn();
   Rxn<GetFilmByCategory> getFilmData = Rxn();
-  RxBool isFocusTab = RxBool(false);
+  RxBool isFocusTab = RxBool(true);
   RxBool isFocusInfo = RxBool(false);
   Rxn<int> activeIndex = Rxn();
   Rx<int> tabIndex = Rx(0);
-  Rxn<String>pathFilm = Rxn();
-  Rx<int>currentIndex = Rx(0);
-  Rx<int>selectTab = Rx(0);
-  Rx<bool>isFocusSlider = RxBool(false);
-  Rx<bool>isFocusSeeAll = RxBool(false);
+  Rxn<String> pathFilm = Rxn();
+  Rx<int> currentIndex = Rx(0);
+  Rx<int> selectTab = Rx(0);
+  Rx<bool> isFocusSlider = RxBool(false);
 
+  RxList<bool> isFocusSeeAll = RxList<bool>.filled(7, false, growable: true);
+
+  RxBool isFocusMenu = RxBool(false);
   List<Map<String, dynamic>> categoryList = [
     // {"title":"Tất thể loại","slug":""},
-    {"id":"0","title": "Mới nhất",},
-    {"id":"1","title": "Gia đình", "slug": "gia-dinh"},
-    {"id":"2","title": "Học đường", "slug": "hoc-duong"},
-    {"id":"3","title": "Tình cảm", "slug": "tinh-cam"},
-    {"id":"4","title": "Hàn Quốc", "country": "han-quoc"},
-    {"id":"5","title": "Trung Quốc", "country": "trung-quoc"},
-    {"id":"6","title": "Hành động", "slug": "hanh-dong"},
-    {"id":"7","title": "Cổ trang", "slug": "co-trang"},
-    {"id":"8","title": "Tâm lý", "slug": "tam-ly"},
-    {"id":"9","title": "Hình sự", "slug": "hinh-su"},
-    {"id":"10","title": "Viễn tưởng", "slug": "vien-tuong"},
-    {"id":"11","title": "Phiêu lưu", "slug": "phieu-luu"},
-    {"id":"12","title": "Khoa học", "slug": "khoa-hoc"},
-    
+    {
+      "id": "0",
+      "title": "Mới nhất",
+    },
+    {"id": "1", "title": "Gia đình", "slug": "gia-dinh"},
+    {"id": "2", "title": "Học đường", "slug": "hoc-duong"},
+    // {"id":"3","title": "Tình cảm", "slug": "tinh-cam"},
+    {"id": "4", "title": "Hàn Quốc", "country": "han-quoc"},
+    {"id": "5", "title": "Trung Quốc", "country": "trung-quoc"},
+    {"id": "6", "title": "Hành động", "slug": "hanh-dong"},
+    {"id": "7", "title": "Cổ trang", "slug": "co-trang"},
+    // {"id":"8","title": "Tâm lý", "slug": "tam-ly"},
+    // {"id":"9","title": "Hình sự", "slug": "hinh-su"},
+    // {"id":"10","title": "Viễn tưởng", "slug": "vien-tuong"},
+    // {"id":"11","title": "Phiêu lưu", "slug": "phieu-luu"},
+    // {"id":"12","title": "Khoa học", "slug": "khoa-hoc"},
   ];
   RxList<Map<String, dynamic>> categories = RxList();
   Rxn<ScrollController> scrollController = Rxn();
-  Rxn<int>indexSlider = Rxn(0);
-  
+  Rxn<int> indexSlider = Rxn(0);
 
   @override
   void onReady() async {
@@ -54,17 +57,18 @@ class HomeController extends GetxController {
     super.onReady();
     categories.addAll(categoryList);
     pathFilm.value = "phim-bo";
-     getFilm(slug: "phim-bo");
-   
+    getFilm(slug: "phim-bo");
+    await getFilmByCategory(slug: "phim-bo");
+
     // getFimCategory.refresh();
-    
+
     // getFimCategory.refresh();
   }
+
   @override
-  void refresh()async{
+  void refresh() async {
     super.refresh();
     // await getFilmByCategory(slug: "phim-bo");
-
   }
 
   Future<GetNewFilm?> getNewFilm() async {
@@ -85,29 +89,24 @@ class HomeController extends GetxController {
     // getFilmByCategory(slug: slug);
   }
 
-  // Future<void> getFilmByCategory(
-  //     {required String slug,
-  //     String? category,
-  //     String? country,
-  //     String? year}) async {
-  //   for (var category in categories) {
-  //     getFimCategory.value.remove(category['id']) ;
-      
+  Future<void> getFilmByCategory(
+      {required String slug,
+      String? category,
+      String? country,
+      String? year}) async {
+    for (var category in categories) {
+      getFimCategory.value.remove(category['id']);
 
+      getFimCategory.value[category['id']] = await api.getFilmByCategory(
+          path: slug,
+          page: 1,
+          category: category['slug'] ?? "",
+          country: category['country'] ?? "",
+          year: year);
 
-  //     getFimCategory.value[category['id']] = await api.getFilmByCategory(
-  //         path: slug,
-  //         page: 1,
-  //         category: category['slug']??"",
-  //         country: category['country']??"",
-  //         year: year);
-          
-  //     getFimCategory.refresh();
-
-     
-  //   }
-     
-  // }
+      getFimCategory.refresh();
+    }
+  }
 
   // Future<GetFilmByCategory?>getFilmInHome({required String path,String? category,
   //     String? country,
@@ -126,6 +125,5 @@ class HomeController extends GetxController {
         videoUrl: data?.episodes?.first.serverData?.first.linkM3u8 ?? "",
         fileName: data?.name ?? "",
         episode: data?.episodes?.first.serverData?.first.name ?? ""));
-        
   }
 }

@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 
 class SearchWidget extends StatelessWidget {
   final Widget? toPage;
-  const SearchWidget({super.key,  this.toPage});
+  const SearchWidget({super.key, this.toPage});
 
   @override
   Widget build(BuildContext context) {
@@ -12,11 +12,11 @@ class SearchWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5),
       child: TextField(
-        onSubmitted: (val)async{
+        onSubmitted: (val) async {
           controller.selectIndex.value = 0;
           await controller.getSearch();
         },
-        onChanged: (val)async{
+        onChanged: (val) async {
           controller.selectIndex.value = 0;
 
           await controller.getSearch();
@@ -26,35 +26,28 @@ class SearchWidget extends StatelessWidget {
         decoration: InputDecoration(
           hintText: 'Nhập phim bạn cần tìm',
           hintStyle: const TextStyle(
+              color: Colors.grey, fontWeight: FontWeight.w300, fontSize: 14),
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+          suffixIcon: const Icon(
+            Icons.search,
             color: Colors.grey,
-            fontWeight: FontWeight.w300,
-            fontSize: 14
+            size: 20,
           ),
-          contentPadding: const EdgeInsets.symmetric(vertical: 10,horizontal: 20),
-          suffixIcon: const Icon(Icons.search,color: Colors.grey,size: 20,),
           filled: true,
           fillColor: const Color(0xff252836),
           border: OutlineInputBorder(
-      
-            borderRadius: BorderRadius.circular(20),
-            borderSide: const BorderSide(
-                color: Colors.transparent
-            ),
-      
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: Colors.transparent),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20),
-            borderSide: const BorderSide(
-                color: Colors.transparent
-            ),
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: Colors.transparent),
           ),
-          enabledBorder:  OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20),
-            borderSide: const BorderSide(
-                color: Colors.transparent
-            ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: Colors.transparent),
           ),
-      
         ),
       ),
     );

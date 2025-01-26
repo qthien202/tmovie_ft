@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
               bodySmall: TextStyle(color: Colors.white),
               bodyMedium: TextStyle(color: Colors.white),
             )),
-        home: const SplashView(),
+        home: const HomeView(),
       ),
     );
   }

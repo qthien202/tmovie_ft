@@ -1,6 +1,7 @@
 import 'package:app_ft_movies/app/controller/home/home_controller.dart';
 import 'package:app_ft_movies/app/core/global_color.dart';
 import 'package:app_ft_movies/app/view/home/card_cinema/card_cinema.dart';
+import 'package:app_ft_movies/app/view/home/card_cinema/card_thumbnail.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -33,7 +34,7 @@ class MostPopular extends StatelessWidget {
               itemCount: controller.getNewFilmData.value?.items.length??0,
               itemBuilder: (context,index){
                 final data = controller.getNewFilmData.value?.items[index];
-                return CardCinema(
+                return CardThumbnail(
                   nameProduct: data?.name,
                   imageLink:data?.thumbUrl,
                   originName: data?.originName,
