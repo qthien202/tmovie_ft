@@ -3,6 +3,7 @@ import 'package:app_ft_movies/app/core/global_color.dart';
 import 'package:app_ft_movies/app/view/detail/detail_view.dart';
 import 'package:app_ft_movies/app/view/filter/filter_page.dart';
 import 'package:app_ft_movies/app/view/home/card_cinema/card_cinema.dart';
+import 'package:app_ft_movies/app/view/home/card_cinema/card_thumbnail.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -106,7 +107,7 @@ class ListMovieView extends StatelessWidget {
                       )
                                   
                     ),
-                      child: CardCinema(
+                      child: CardThumbnail(
                         imageLink: items?.thumbUrl ?? "",
                         nameProduct: items?.name,
                         originName: items?.originName ?? "",

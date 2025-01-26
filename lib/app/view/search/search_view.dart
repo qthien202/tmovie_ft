@@ -2,6 +2,7 @@ import 'package:app_ft_movies/app/controller/search/search_widget_controller.dar
 import 'package:app_ft_movies/app/core/global_color.dart';
 import 'package:app_ft_movies/app/view/filter/filter_page.dart';
 import 'package:app_ft_movies/app/view/home/card_cinema/card_cinema.dart';
+import 'package:app_ft_movies/app/view/home/card_cinema/card_thumbnail.dart';
 import 'package:app_ft_movies/app/widgets/search_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -19,34 +20,41 @@ class SearchView extends StatelessWidget {
       onRefresh: () async => controller.onReady(),
       child: Scaffold(
         appBar: AppBar(
-          
-          centerTitle: false,
+          foregroundColor: Colors.white,
+          centerTitle: true,
           backgroundColor: GlobalColor.backgroundColor,
           title: Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: const SearchWidget(),
+            child: SizedBox(
+                width: MediaQuery.of(context).size.width * .4,
+                child: const SearchWidget()),
           ),
           actions: [
-           Obx(() => InkWell(
-                  onFocusChange: (hasFocus){
-                    controller.isFocusMenu.value = hasFocus;
-                    print(">>>>>>>>>>>>>>>>>$hasFocus");
-                  },
-                onTap: (){
-                  Get.to( const FilterPage(),transition: Transition.rightToLeft);
+            Obx(
+              () => InkWell(
+                onFocusChange: (hasFocus) {
+                  controller.isFocusMenu.value = hasFocus;
+                  print(">>>>>>>>>>>>>>>>>$hasFocus");
                 },
-                child:  Padding(
-                  padding: EdgeInsets.symmetric(horizontal:8.0),
+                onTap: () {
+                  Get.to(const FilterPage(),
+                      transition: Transition.rightToLeft);
+                },
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8.0),
                   child: AnimatedContainer(
                     duration: Duration(seconds: 200),
-                   curve: Curves.easeInOut, 
+                    curve: Curves.easeInOut,
                     child: Transform.scale(
-                      scale: controller.isFocusMenu.value?1.2:1,
+                      scale: controller.isFocusMenu.value ? 1.2 : 1,
                       child: Container(
                         padding: EdgeInsets.all(5),
                         decoration: BoxDecoration(
-                          border: Border.all(color: controller.isFocusMenu.value?Colors.white:Colors.transparent,width: 2)
-                        ),
+                            border: Border.all(
+                                color: controller.isFocusMenu.value
+                                    ? Colors.white
+                                    : Colors.transparent,
+                                width: 2)),
                         child: Icon(
                           Icons.menu,
                           color: Colors.white,
@@ -55,18 +63,18 @@ class SearchView extends StatelessWidget {
                     ),
                   ),
                 ),
-              ),)
+              ),
+            )
           ],
         ),
         backgroundColor: GlobalColor.backgroundColor,
         body: ListView(
           children: [
-            
             const SizedBox(
               height: 10,
             ),
             Obx(() {
-              final isLoading = controller.search.value==null;
+              final isLoading = controller.search.value == null;
               final data = controller.search.value?.pageProps?.data;
 
               // if (data?.items == null) {
@@ -86,26 +94,23 @@ class SearchView extends StatelessWidget {
                 padding: const EdgeInsets.all(5),
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
-                itemCount: isLoading?16:data?.items?.length ?? 0,
+                itemCount: isLoading ? 16 : data?.items?.length ?? 0,
                 itemBuilder: (context, index) {
                   final items = data?.items?[index];
                   return Visibility(
                     visible: !isLoading,
                     replacement: SizedBox(
-                     width: MediaQuery.of(context).size.width*.4,
-                     child: Shimmer.fromColors(
-                                baseColor: Colors.grey,
-                                highlightColor: Colors.grey.shade600,
-                                child: Container(
-                                  decoration: const BoxDecoration(
-                                    
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                    )
-                                
-                  ),
-                    child: CardCinema(
+                        width: MediaQuery.of(context).size.width * .4,
+                        child: Shimmer.fromColors(
+                          baseColor: Colors.grey,
+                          highlightColor: Colors.grey.shade600,
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              color: Colors.grey,
+                            ),
+                          ),
+                        )),
+                    child: CardThumbnail(
                       imageLink: items?.thumbUrl ?? "",
                       nameProduct: items?.name,
                       originName: items?.originName ?? "",
@@ -115,70 +120,75 @@ class SearchView extends StatelessWidget {
                 },
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   childAspectRatio: 6 / 13,
-              crossAxisCount: 5,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 5,
+                  crossAxisCount: 5,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 5,
                 ),
               );
             }),
             const SizedBox(
               height: 20,
             ),
-            Obx((){
-            
-            
-            
-            return Visibility(
-            visible: controller.totalPage.value!=0,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 20),
-              child: SizedBox(
-                height: 40,
-                child: ListView.separated(
-                  shrinkWrap: true,
-                  scrollDirection: Axis.horizontal,
-                  itemCount: controller.totalPage.value??0,
-                  itemBuilder: (context, index) {
-                    return Obx(() {
-                      return InkWell(
-                        onFocusChange: (value) {
-                            controller.isFocusPage.value=value;
-                            controller.selectIndex.value = index;
-                          },
-                        onTap: () async{
-                          controller.selectIndex.value = index;
+            Obx(() {
+              return Visibility(
+                visible: controller.totalPage.value != 0,
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+                  child: SizedBox(
+                    height: 40,
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      scrollDirection: Axis.horizontal,
+                      itemCount: controller.totalPage.value ?? 0,
+                      itemBuilder: (context, index) {
+                        return Obx(() {
+                          return InkWell(
+                            onFocusChange: (value) {
+                              controller.isFocusPage.value = value;
+                              controller.selectIndex.value = index;
+                            },
+                            onTap: () async {
+                              controller.selectIndex.value = index;
                               print(
                                   ">>>>>>>>>>>>>${controller.selectIndex.value}");
                               controller.search.value = null;
-                              await controller.getSearch(page: index+1);
-                        },
-                        child: Container(
-                            padding:
-                                const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                            decoration: BoxDecoration(
-                                //  border: Border.all(color: GlobalColor.primary)
-                                color: const Color(0xff252836),
-                                border: Border.all(
-                                    color: controller.selectIndex.value == index && controller.isFocusPage.value
+                              await controller.getSearch(page: index + 1);
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 15),
+                              decoration: BoxDecoration(
+                                  //  border: Border.all(color: GlobalColor.primary)
+                                  color: const Color(0xff252836),
+                                  border: Border.all(
+                                      color: controller.selectIndex.value ==
+                                                  index &&
+                                              controller.isFocusPage.value
+                                          ? GlobalColor.primary
+                                          : Colors.transparent)),
+                              child: Text(
+                                "${index + 1}",
+                                style: TextStyle(
+                                    fontSize: 13,
+                                    color: controller.selectPage.value == index
                                         ? GlobalColor.primary
-                                        : Colors.transparent)),
-                            child: Text("${index + 1}",style: TextStyle(fontSize: 13,color: controller.selectPage.value == index 
-                                        ? GlobalColor.primary
-                                        : Colors.white),),
-                          ),
-                      );
-                    });
-                  },
-                  separatorBuilder: (BuildContext context, int index) {
-                    return const SizedBox(
-                      width: 20,
-                    );
-                  },
+                                        : Colors.white),
+                              ),
+                            ),
+                          );
+                        });
+                      },
+                      separatorBuilder: (BuildContext context, int index) {
+                        return const SizedBox(
+                          width: 20,
+                        );
+                      },
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          );
-          })
+              );
+            })
           ],
         ),
       ),

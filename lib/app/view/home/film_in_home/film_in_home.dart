@@ -20,74 +20,82 @@ class FilmInHome extends StatelessWidget {
 
       return Column(
         children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Mới nhất",
-                          style: TextStyle(
-                              color: Colors.white, fontWeight: FontWeight.bold),
-                        ),
-                        TextButton(
-                          onFocusChange: (hasFocus){
-                            controller.isFocusSeeAll.value = hasFocus;
-                          },
-                          onPressed: () {
-                            Get.to(ListMovieView(
-                              
-                              slug:controller.pathFilm.value,
-                              
-                              
-                            ));
-                          },
-                          child: Text(
-                            "Xem thêm",
-                            style: TextStyle(
-                                color: Colors.white,
-                                decoration: TextDecoration.underline,
-                                decorationColor: Colors.white),
-                          ),
-                        )
-                      ],
-                    ),
-              ),
-          GridView.builder(
-            padding: const EdgeInsets.all(5),
-            physics: const NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            itemCount: isLoading ? 16 : data?.items?.length ?? 0,
-            itemBuilder: (context, index) {
-              final items = data?.items?[index];
-              return Visibility(
-                visible: !isLoading,
-                replacement: SizedBox(
-                    width: MediaQuery.of(context).size.width * .4,
-                    child: Shimmer.fromColors(
-                      baseColor: Colors.grey,
-                      highlightColor: Colors.grey.shade600,
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          color: Colors.grey,
-                        ),
-                      ),
-                    )),
-                child: CardCinema(
-                  imageLink: items?.thumbUrl ?? "",
-                  nameProduct: items?.name,
-                  originName: items?.originName ?? "",
-                  slug: items?.slug ?? "",
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                  onFocusChange: (hasFocus){
+                    // controller.isFocusSeeAll.value = hasFocus;
+                  },
+                  onPressed: () {  },
+                  child: Text(
+                    "Mới nhất",
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
                 ),
-              );
-            },
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              childAspectRatio: 6 / 13,
-              crossAxisCount: 5,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 5,
+                TextButton(
+                  onFocusChange: (hasFocus){
+                    // controller.isFocusSeeAll.value = hasFocus;
+                  },
+                  onPressed: () {
+                    Get.to(ListMovieView(
+
+                      slug:controller.pathFilm.value,
+
+
+                    ));
+                  },
+                  child: Text(
+                    "Xem thêm",
+                    style: TextStyle(
+                        color: Colors.white,
+                        decoration: TextDecoration.underline,
+                        decorationColor: Colors.white),
+                  ),
+                )
+              ],
             ),
           ),
+          SizedBox(
+            height:140,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              separatorBuilder: (context, index) => const SizedBox(width: 20,),
+
+              // physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: isLoading ? 16 : data?.items?.length ?? 0,
+              itemBuilder: (context, index) {
+                final items = data?.items?[index];
+                return Visibility(
+                  visible: !isLoading,
+                  replacement: SizedBox(
+                      width: MediaQuery.of(context).size.width*.2,
+                      height: 20,
+                      child: Shimmer.fromColors(
+                        baseColor: Colors.grey,
+                        highlightColor: Colors.grey.shade600,
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.grey,
+                          ),
+                        ),
+                      )),
+                  child: CardCinema(
+                    imageLink: items?.posterUrl ?? "",
+                    nameProduct: items?.name,
+                    // originName: items?.originName ?? "",
+                    // slug: items?.slug ?? "",
+                  ),
+                );
+              },
+
+            ),
+          ),
+
         ],
       );
     });

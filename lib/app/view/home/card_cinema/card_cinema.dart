@@ -59,16 +59,23 @@ class _CardCinemaState extends State<CardCinema> {
           child: Container(
             // height: MediaQuery.of(context).size.height*.5,
             // padding: EdgeInsets.symmetric(vertical: 20),
-            width: MediaQuery.of(context).size.width * .15,
-            color: GlobalColor.backgroundColor,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: Colors.transparent
+
+            ),
+            width: MediaQuery.of(context).size.width * .18,
+
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Container(
+
                   decoration: BoxDecoration(
+            color: Colors.transparent,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: isFocus?Colors.white:Colors.transparent,width: 2.5),
+                    border: Border.all(color: isFocus?Colors.white:Colors.transparent,width: isFocus?2.5:0),
                      boxShadow: isFocus
                           ? [
                               BoxShadow(
@@ -84,21 +91,21 @@ class _CardCinemaState extends State<CardCinema> {
                     borderRadius: BorderRadius.circular(8),
                     child: GlobalImage(
                         imageUrl:widget.imageLink??"",
-                      width: MediaQuery.of(context).size.width*.2,
-                      height: MediaQuery.of(context).size.height * .45,
+                      width: MediaQuery.of(context).size.width*.15,
+                      height: MediaQuery.of(context).size.height * .16,
                       boxFit: BoxFit.fill,
                     ),
                   ),
                 ),
-                
+
                 // Image.network(
                 //   widget.badgesLink??"",
-                
+
                 //   height: 10,
                 //   fit: BoxFit.cover,
                 // ),
                 Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5),
+                                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2),
                                 child: Text(
                 widget.nameProduct ?? '--',
                 // textAlign: TextAlign.center,
@@ -111,20 +118,20 @@ class _CardCinemaState extends State<CardCinema> {
                     color: Colors.white),
                                 ),
                               ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 3),
-                                child: Text(
-                widget.originName??"--",
-                // textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                    height: 1.5,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 10,
-                    color: Colors.white),
-                                ),
-                              )
+                //               Padding(
+                //                 padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 3),
+                //                 child: Text(
+                // widget.originName??"--",
+                // // textAlign: TextAlign.center,
+                // maxLines: 1,
+                // overflow: TextOverflow.ellipsis,
+                // style: const TextStyle(
+                //     height: 1.5,
+                //     fontWeight: FontWeight.bold,
+                //     fontSize: 10,
+                //     color: Colors.white),
+                //                 ),
+                //               )
               ],
             ),
           ),
