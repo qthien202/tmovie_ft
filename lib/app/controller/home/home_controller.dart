@@ -24,6 +24,7 @@ class HomeController extends GetxController {
   Rx<int> currentIndex = Rx(0);
   Rx<int> selectTab = Rx(0);
   Rx<bool> isFocusSlider = RxBool(false);
+  RxBool isFocus = RxBool(false);
 
   RxList<bool> isFocusSeeAll = RxList<bool>.filled(7, false, growable: true);
 

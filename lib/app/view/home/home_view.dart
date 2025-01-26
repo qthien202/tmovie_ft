@@ -66,6 +66,7 @@ class _HomeViewState extends State<HomeView> {
               slivers: [
                 SliverAppBar(
                   // pinned: true,
+
                   centerTitle: false,
 
                   title: Shortcuts(
