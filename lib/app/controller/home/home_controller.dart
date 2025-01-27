@@ -36,10 +36,10 @@ class HomeController extends GetxController {
       "title": "Mới nhất",
     },
     {"id": "1", "title": "Gia đình", "slug": "gia-dinh"},
-    {"id": "2", "title": "Học đường", "slug": "hoc-duong"},
-    // {"id":"3","title": "Tình cảm", "slug": "tinh-cam"},
+    // {"id": "2", "title": "Học đường", "slug": "hoc-duong"},
+    {"id": "3", "title": "Tình cảm", "slug": "tinh-cam"},
     {"id": "4", "title": "Hàn Quốc", "country": "han-quoc"},
-    {"id": "5", "title": "Trung Quốc", "country": "trung-quoc"},
+    // {"id": "5", "title": "Trung Quốc", "country": "trung-quoc"},
     {"id": "6", "title": "Hành động", "slug": "hanh-dong"},
     {"id": "7", "title": "Cổ trang", "slug": "co-trang"},
     // {"id":"8","title": "Tâm lý", "slug": "tam-ly"},
@@ -51,6 +51,7 @@ class HomeController extends GetxController {
   RxList<Map<String, dynamic>> categories = RxList();
   Rxn<ScrollController> scrollController = Rxn();
   Rxn<int> indexSlider = Rxn(0);
+  Rxn<int> indexCategory = Rxn(0);
 
   @override
   void onReady() async {

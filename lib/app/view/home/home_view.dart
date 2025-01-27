@@ -189,7 +189,7 @@ class _HomeViewState extends State<HomeView> {
                             ],
                           ))),
                   elevation: 0.0,
-                  backgroundColor: GlobalColor.backgroundColor,
+                  backgroundColor: Colors.black,
                   expandedHeight: MediaQuery.of(context).size.height,
                   flexibleSpace: const FlexibleSpaceBar(
                     collapseMode: CollapseMode.pin,
@@ -199,7 +199,7 @@ class _HomeViewState extends State<HomeView> {
                 ),
               ],
             ),
-            const Positioned.fill(top: 350, child: FilmByCategory())
+            const Positioned.fill(top: 370, child: FilmByCategory())
           ],
         ),
       ),

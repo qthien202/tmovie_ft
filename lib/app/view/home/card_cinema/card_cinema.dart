@@ -34,106 +34,99 @@ class _CardCinemaState extends State<CardCinema> {
   Widget build(BuildContext context) {
     return Shortcuts(
       shortcuts: <LogicalKeySet, Intent>{
-          LogicalKeySet(LogicalKeyboardKey.select): const ActivateIntent(),
-        },
+        LogicalKeySet(LogicalKeyboardKey.select): const ActivateIntent(),
+      },
       child: InkWell(
-        
-        
         onTap: () {
-         Get.to(DetailView(
-          slug: widget.slug,
-          name: widget.nameProduct,
-        ));
-         
+          Get.to(DetailView(
+            slug: widget.slug,
+            name: widget.nameProduct,
+          ));
         },
-        onFocusChange: (hasFocus){
+        onFocusChange: (hasFocus) {
           setState(() {
             isFocus = hasFocus;
           });
         },
-        child: AnimatedContainer(
-          color: Colors.transparent,
-          duration: Duration(milliseconds: 200),
-        curve: Curves.easeInOut,
-        transform: isFocus ? Matrix4.diagonal3Values(1.05, 1.05, 1) : Matrix4.identity(),
-          child: Container(
-            // height: MediaQuery.of(context).size.height*.5,
-            // padding: EdgeInsets.symmetric(vertical: 20),
-            decoration: BoxDecoration(
+        child: Container(
+          // height: MediaQuery.of(context).size.height*.5,
+          // padding: EdgeInsets.symmetric(vertical: 20),
+          decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
-              color: Colors.transparent
+              color: Colors.transparent),
+          width: MediaQuery.of(context).size.width * .18,
 
-            ),
-            width: MediaQuery.of(context).size.width * .18,
-
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Container(
-
-                  decoration: BoxDecoration(
-            color: Colors.transparent,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: isFocus?Colors.white:Colors.transparent,width: isFocus?2.5:0),
-                     boxShadow: isFocus
-                          ? [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5), // Màu của boxShadow
-                                spreadRadius: 1, // Bán kính lan rộng của boxShadow
-                                blurRadius: 5, // Độ mờ của boxShadow
-                                offset: const Offset(0, 2), // Độ dịch chuyển của boxShadow
-                              ),
-                            ]
-                          : [],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: GlobalImage(
-                        imageUrl:widget.imageLink??"",
-                      width: MediaQuery.of(context).size.width*.15,
-                      height: MediaQuery.of(context).size.height * .16,
-                      boxFit: BoxFit.fill,
-                    ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                      color: isFocus ? Colors.white : Colors.transparent,
+                      width: isFocus ? 2.5 : 0),
+                  boxShadow: isFocus
+                      ? [
+                          BoxShadow(
+                            color: Colors.grey
+                                .withOpacity(0.5), // Màu của boxShadow
+                            spreadRadius: 1, // Bán kính lan rộng của boxShadow
+                            blurRadius: 5, // Độ mờ của boxShadow
+                            offset: const Offset(
+                                0, 2), // Độ dịch chuyển của boxShadow
+                          ),
+                        ]
+                      : [],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: GlobalImage(
+                    imageUrl: widget.imageLink ?? "",
+                    width: MediaQuery.of(context).size.width * .15,
+                    height: MediaQuery.of(context).size.height * .16,
+                    boxFit: BoxFit.fill,
                   ),
                 ),
+              ),
 
-                // Image.network(
-                //   widget.badgesLink??"",
+              // Image.network(
+              //   widget.badgesLink??"",
 
-                //   height: 10,
-                //   fit: BoxFit.cover,
-                // ),
-                Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2),
-                                child: Text(
-                widget.nameProduct ?? '--',
-                // textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                    height: 1.5,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    color: Colors.white),
-                                ),
-                              ),
-                //               Padding(
-                //                 padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 3),
-                //                 child: Text(
-                // widget.originName??"--",
-                // // textAlign: TextAlign.center,
-                // maxLines: 1,
-                // overflow: TextOverflow.ellipsis,
-                // style: const TextStyle(
-                //     height: 1.5,
-                //     fontWeight: FontWeight.bold,
-                //     fontSize: 10,
-                //     color: Colors.white),
-                //                 ),
-                //               )
-              ],
-            ),
+              //   height: 10,
+              //   fit: BoxFit.cover,
+              // ),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2),
+                child: Text(
+                  widget.nameProduct ?? '--',
+                  // textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                      height: 1.5,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: Colors.white),
+                ),
+              ),
+              //               Padding(
+              //                 padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 3),
+              //                 child: Text(
+              // widget.originName??"--",
+              // // textAlign: TextAlign.center,
+              // maxLines: 1,
+              // overflow: TextOverflow.ellipsis,
+              // style: const TextStyle(
+              //     height: 1.5,
+              //     fontWeight: FontWeight.bold,
+              //     fontSize: 10,
+              //     color: Colors.white),
+              //                 ),
+              //               )
+            ],
           ),
         ),
       ),

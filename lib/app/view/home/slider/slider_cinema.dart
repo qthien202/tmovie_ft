@@ -44,30 +44,19 @@ class SliderCinema extends StatelessWidget {
                     ),
                   ),
                 ),
-                child: Container(
+                child: GlobalImage(
+                  imageUrl: "${item?.posterUrl}",
+                  boxFit: BoxFit.cover, // Hiển thị ảnh đúng tỷ lệ
                   width: screenWidth,
-                  height: screenHeight,
-                  decoration: BoxDecoration(
-                      border: Border.all(
-                          color: controller.isFocusSlider.value &&
-                                  controller.selectTab.value == index
-                              ? GlobalColor.primary
-                              : Colors.transparent,
-                          width: 3)),
-                  child: GlobalImage(
-                    imageUrl: "${item?.posterUrl}",
-                    boxFit: BoxFit.cover, // Hiển thị ảnh đúng tỷ lệ
-                    width: screenWidth,
-                    height:
-                        screenHeight, // Thiết lập chiều cao tối thiểu cho banner
-                  ),
+                  height:
+                      screenHeight, // Thiết lập chiều cao tối thiểu cho banner
                 ),
               );
             },
             options: CarouselOptions(
               aspectRatio: 22 / 10, // Tỷ lệ ứng với tỷ lệ màn hình TV
               autoPlay: true,
-              autoPlayInterval: const Duration(seconds: 10),
+              autoPlayInterval: const Duration(seconds: 30),
               viewportFraction: 1,
               onPageChanged: (index, reason) {
                 controller.activeIndex.value = index;
