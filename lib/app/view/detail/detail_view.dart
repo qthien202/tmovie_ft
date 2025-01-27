@@ -14,12 +14,14 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
-
 class DetailView extends StatelessWidget {
-  const DetailView({super.key, this.slug, this.name, });
+  const DetailView({
+    super.key,
+    this.slug,
+    this.name,
+  });
   final String? slug;
   final String? name;
-  
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +33,6 @@ class DetailView extends StatelessWidget {
         extendBodyBehindAppBar: true,
         backgroundColor: GlobalColor.backgroundColor,
         appBar: AppBar(
-          
           leading: InkWell(
             onTap: () => Get.back(),
             child: Container(
@@ -49,8 +50,7 @@ class DetailView extends StatelessWidget {
           actions: [
             InkWell(
               onTap: () {
-                Get.to(const FilterPage(),
-                    transition: Transition.rightToLeft);
+                Get.to(const FilterPage(), transition: Transition.rightToLeft);
               },
               child: Container(
                 margin: EdgeInsets.symmetric(horizontal: 8.0),
@@ -68,7 +68,6 @@ class DetailView extends StatelessWidget {
           foregroundColor: Colors.white,
           elevation: 0.0,
           backgroundColor: GlobalColor.backgroundColor,
-          
         ),
         // appBar: AppBar(
         //   backgroundColor: GlobalColor.backgroundColor,
@@ -95,9 +94,10 @@ class DetailView extends StatelessWidget {
                     backgroundColor: GlobalColor.primary,
                     color: Colors.white,
                   ),
-                  const SizedBox(height: 10,),
+                  const SizedBox(
+                    height: 10,
+                  ),
                   Text("Đang tải")
-                  
                 ],
               ),
             );
@@ -111,21 +111,18 @@ class DetailView extends StatelessWidget {
                   color: GlobalColor.backgroundColor,
                   width: MediaQuery.of(context).size.width * .85,
                   child: ListView(
-                    
                     children: [
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          
-                          
                           Expanded(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 InkWell(
-                                  onTap: ()=>print("aaa"),
-                                  child: const Info()),
+                                    onTap: () => print("aaa"),
+                                    child: const Info()),
                                 const SizedBox(
                                   height: 20,
                                 ),
@@ -137,11 +134,14 @@ class DetailView extends StatelessWidget {
                             width: 50,
                           ),
                           Expanded(
-                            child: GlobalImage(
-                              imageUrl: data.posterUrl,
-                              width: MediaQuery.of(context).size.width * .5,
-                              height: MediaQuery.of(context).size.height * .5,
-                              boxFit: BoxFit.fill,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: GlobalImage(
+                                imageUrl: data.posterUrl,
+                                width: MediaQuery.of(context).size.width * .5,
+                                height: MediaQuery.of(context).size.height * .5,
+                                boxFit: BoxFit.fill,
+                              ),
                             ),
                           ),
                         ],
@@ -173,20 +173,17 @@ class DetailView extends StatelessWidget {
                           children: [
                             Text("Chọn server",
                                 style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16)),
+                                    fontWeight: FontWeight.bold, fontSize: 16)),
                             SizedBox(
                               height: 10,
                             ),
                             Espisode(),
-                            
                           ],
                         ),
                       ),
-                       const SizedBox(
-                              height: 30,
-                            ),
-                            
+                      const SizedBox(
+                        height: 30,
+                      ),
                     ],
                   )),
             ),
@@ -194,4 +191,3 @@ class DetailView extends StatelessWidget {
         }));
   }
 }
-
