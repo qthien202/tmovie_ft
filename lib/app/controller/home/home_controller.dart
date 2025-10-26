@@ -1,52 +1,116 @@
-import 'package:app_ft_movies/app/data/apis/services.dart';
-import 'package:app_ft_movies/app/data/repository/get_film_by_category.dart';
-import 'package:app_ft_movies/app/data/repository/get_new_film.dart';
-import 'package:get/get.dart';
+import 'dart:convert';
 
-class HomeController extends GetxController { 
+import 'package:tmovie_app/app/controller/detail/detail_controller.dart';
+import 'package:tmovie_app/app/data/apis/services.dart';
+import 'package:tmovie_app/app/data/repository/get_film_by_category.dart';
+import 'package:tmovie_app/app/data/repository/get_new_film.dart';
+import 'package:tmovie_app/app/widgets/global_webview.dart';
+import 'package:tmovie_app/app/widgets/video_player.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+// import 'dart:html' as html;
+
+class HomeController extends GetxController {
   final Services api = Get.find();
-  
-  Rxn<GetNewFilm>getNewFilmData = Rxn();
-  Rxn<GetFilmByCategory>phimBo = Rxn();
-  Rxn<GetFilmByCategory>phimLe = Rxn();
-  Rxn<GetFilmByCategory>shows = Rxn();
-  Rxn<GetFilmByCategory>hoatHinh = Rxn();
-  Rxn<GetFilmByCategory>vietSub = Rxn();
-  Rxn<GetFilmByCategory>thuyetMinh = Rxn();
-  Rxn<GetFilmByCategory>longTieng = Rxn();
-  Rxn<GetFilmByCategory>dangChieu = Rxn();
-  Rxn<GetFilmByCategory>tronBo = Rxn();
-  Rxn<GetFilmByCategory>sapChieu = Rxn();
-  
-  Rxn<int>activeIndex = Rxn();
+  final detail = Get.put(DetailController());
+  Rxn<TabController> tabController = Rxn();
+  Rxn<GetNewFilm> getNewFilmData = Rxn();
+  Rx<Map<String, GetFilmByCategory>> getFimCategory = Rx({});
+  Rxn<GetFilmByCategory> getFilmData = Rxn();
+
+  Rxn<int> activeIndex = Rxn();
+  Rxn<int> tabIndex = Rxn();
+  Rxn<String> pathFilm = Rxn();
+
+  List<Map<String, dynamic>> categoryList = [
+    // {"title":"Tất thể loại","slug":""},
+    {
+      "id": "0",
+      "title": "Mới nhất",
+    },
+    {"id": "1", "title": "Gia đình", "slug": "gia-dinh"},
+    {"id": "2", "title": "Học đường", "slug": "hoc-duong"},
+    {"id": "3", "title": "Tình cảm", "slug": "tinh-cam"},
+    {"id": "4", "title": "Hàn Quốc", "country": "han-quoc"},
+    {"id": "5", "title": "Trung Quốc", "country": "trung-quoc"},
+    {"id": "6", "title": "Hành động", "slug": "hanh-dong"},
+    {"id": "7", "title": "Cổ trang", "slug": "co-trang"},
+    {"id": "8", "title": "Tâm lý", "slug": "tam-ly"},
+    {"id": "9", "title": "Hình sự", "slug": "hinh-su"},
+    {"id": "10", "title": "Viễn tưởng", "slug": "vien-tuong"},
+    {"id": "11", "title": "Phiêu lưu", "slug": "phieu-luu"},
+    {"id": "12", "title": "Khoa học", "slug": "khoa-hoc"},
+  ];
+  RxList<Map<String, dynamic>> categories = RxList();
+  Rxn<ScrollController> scrollController = Rxn();
 
   @override
-  void onReady() async{
+  void onReady() async {
     // TODO: implement onReady
     super.onReady();
-    await getNewFilm();
-    await getFilmByCategory();
+
+    pathFilm.value = "phim-bo";
+    getFilm(slug: "phim-bo");
+    await getFilmByCategory(slug: "phim-bo");
+
+    // getFimCategory.refresh();
   }
 
-  Future<GetNewFilm?>getNewFilm()async{
+  @override
+  void refresh() async {
+    super.refresh();
+    await getFilmByCategory(slug: "phim-bo");
+  }
+
+  Future<GetNewFilm?> getNewFilm() async {
     getNewFilmData.value = await api.getNewFilm();
     return getNewFilmData.value;
   }
 
-  Future<void>getFilmByCategory()async{
-    phimLe.value = await api.getFilmByCategory(path: "phim-le", page: 1);
-    phimBo.value = await api.getFilmByCategory(path: "phim-bo", page: 1);
-    shows.value = await api.getFilmByCategory(path: "tv-shows", page: 1);
-    hoatHinh.value = await api.getFilmByCategory(path: "hoat-hinh", page: 1);
-    vietSub.value = await api.getFilmByCategory(path: "phim-vietsub", page: 1);
-    thuyetMinh.value = await api.getFilmByCategory(path: "phim-thuyet-minh", page: 1);
-    longTieng.value = await api.getFilmByCategory(path: "phim-long-tieng", page: 1);
-    dangChieu.value = await api.getFilmByCategory(path: "phim-bo-dang-chieu", page: 1);
-    tronBo.value = await api.getFilmByCategory(path: "phim-hoan-thanh", page: 1);
-    sapChieu.value = await api.getFilmByCategory(path: "phim-sap-chieu", page: 1);
+  Future<void> getFilm(
+      {required String slug,
+      String? category,
+      String? country,
+      String? year}) async {
+    getFilmData.value = null;
 
-
-
+    getFilmData.value = await api.getFilmByCategory(
+        path: slug, page: 1, category: category, country: country, year: year);
+    getFilmData.refresh();
+    // getFilmByCategory(slug: slug);
   }
 
+  Future<void> getFilmByCategory(
+      {required String slug,
+      String? category,
+      String? country,
+      String? year}) async {
+    for (var category in categoryList) {
+      getFimCategory.value.remove(category['id']);
+
+      getFimCategory.value[category['id']] = await api.getFilmByCategory(
+          path: slug,
+          page: 1,
+          category: category['slug'] ?? "",
+          country: category['country'] ?? "",
+          year: year);
+
+      getFimCategory.refresh();
+    }
+  }
+
+  Future<void> watchNow({required String slug}) async {
+    await detail.getFilmDetail(slug: slug);
+    final data = detail.filmDetail.value?.pageProps?.data?.item;
+    // html.window.open(
+    //   data?.episodes?.first.serverData?.first.linkEmbed ?? "",
+    //   data?.episodes?.first.serverData?.first.filename ?? "",
+    // );
+
+    Get.to(ChewieVideoPlayer(
+        slug: data?.slug ?? "",
+        videoUrl: data?.episodes?.first.serverData?.first.linkM3u8 ?? "",
+        fileName: data?.name ?? "",
+        episode: data?.episodes?.first.serverData?.first.name ?? ""));
+  }
 }
