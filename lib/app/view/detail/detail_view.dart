@@ -1,13 +1,15 @@
-import 'package:app_ft_movies/app/controller/detail/detail_controller.dart';
-import 'package:app_ft_movies/app/core/global_color.dart';
-import 'package:app_ft_movies/app/view/detail/espisode/espisode.dart';
-import 'package:app_ft_movies/app/view/detail/info/info.dart';
-import 'package:app_ft_movies/app/view/detail/info_details/info_details.dart';
-import 'package:app_ft_movies/app/widgets/global_image.dart';
-import 'package:app_ft_movies/app/widgets/video_player.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:tmovie_app/app/controller/detail/detail_controller.dart';
+import 'package:tmovie_app/app/core/global_color.dart';
+import 'package:tmovie_app/app/view/detail/episode/episode.dart';
+import 'package:tmovie_app/app/view/detail/info/info.dart';
+import 'package:tmovie_app/app/view/detail/info_details/info_details.dart';
+import 'package:tmovie_app/app/view/filter/filter_page.dart';
+import 'package:tmovie_app/app/widgets/global_image.dart';
+import 'package:tmovie_app/app/widgets/video_player.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 
 class DetailView extends StatelessWidget {
   const DetailView({super.key, this.slug, this.name});
@@ -17,108 +19,212 @@ class DetailView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(DetailController());
-    controller.getFilmDetail(slug: slug??"");
-    
-      return RefreshIndicator(
+    controller.getFilmDetail(slug: slug ?? "");
+
+    return Scaffold(
+        extendBody: true,
+        extendBodyBehindAppBar: true,
         backgroundColor: GlobalColor.backgroundColor,
-        onRefresh: ()async=>controller.getFilmDetail(slug: slug??""),
-        child: Scaffold(
-        backgroundColor: GlobalColor.backgroundColor,
-        appBar: AppBar(
-          backgroundColor: GlobalColor.backgroundColor,
-          centerTitle: true,
-          title: Text(name??"--",
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.bold
-          ),
-          ),
-          foregroundColor: Colors.white,
-        ),
-        body: Obx((){
+        // appBar: AppBar(
+        //   backgroundColor: GlobalColor.backgroundColor,
+        //   centerTitle: true,
+        //   title: Text(name??"--",
+        //   style: const TextStyle(
+        //     color: Colors.white,
+        //     fontSize: 16,
+        //     fontWeight: FontWeight.bold
+        //   ),
+        //   ),
+        //   foregroundColor: Colors.white,
+        // ),
+        body: Obx(() {
           final data = controller.filmDetail.value?.pageProps?.data?.item;
-          if(data==null){
-                  return Center(
-                    child: CircularProgressIndicator(
-                      strokeWidth: 5,
-                      backgroundColor: GlobalColor.primary,
+          if (data == null) {
+            return Center(
+              child: CircularProgressIndicator(
+                strokeWidth: 5,
+                backgroundColor: GlobalColor.primary,
+                color: Colors.white,
+              ),
+            );
+          }
+          return RefreshIndicator(
+            backgroundColor: GlobalColor.backgroundColor,
+            color: GlobalColor.primary,
+            onRefresh: () async => controller.getFilmDetail(slug: slug ?? ""),
+            child: CustomScrollView(
+              slivers: [
+                SliverAppBar(
+                  pinned: true,
+                  leading: InkWell(
+                    onTap: () => Get.back(),
+                    child: Container(
+                      margin: EdgeInsets.symmetric(horizontal: 8.0),
+                      padding: EdgeInsets.all(3),
+                      decoration: BoxDecoration(
+                          shape: BoxShape.circle, color: Color(0xff252836)),
+                      child: Icon(
+                        Icons.arrow_back,
+                        color: Colors.white,
+                        size: 20,
+                      ),
                     ),
-                  );
-                }
-          return ListView(
-          children: [
-            GlobalImage(
-              imageUrl:data?.thumbUrl??"",
-              width: MediaQuery.of(context).size.width*.4,
-              height: 300,
-              // fit: BoxFit.fill,
-            ),
-            const SizedBox(height: 15,),
-            const Info(),
-            const SizedBox(height: 15,),
-            Visibility(
-              visible: data.status!="trailer",
-            
-              child: Container(
-                padding: EdgeInsets.symmetric(vertical: 10),
-                margin: EdgeInsets.symmetric(vertical: 10,horizontal: 30),
-                
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(30),
-                  color: GlobalColor.primary
-                ),
-                child: InkWell(
-                  onTap: (){
-                    Get.to(ChewieVideoPlayer(fileName: data.name??"--",episode: data.episodes?.first.serverData?.first.name??"",videoUrl: data?.episodes?.first.serverData?.first.linkM3u8??"",));
-                  },
-                  child: Center(child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  ),
+                  actions: [
+                    InkWell(
+                      onTap: () {
+                        Get.to(const FilterPage(),
+                            transition: Transition.rightToLeft);
+                      },
+                      child: Container(
+                        margin: EdgeInsets.symmetric(horizontal: 8.0),
+                        padding: EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle, color: Color(0xff252836)),
+                        child: Icon(
+                          Icons.menu,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                  centerTitle: true,
+                  foregroundColor: Colors.white,
+                  elevation: 0.0,
+                  backgroundColor: GlobalColor.backgroundColor,
+                  systemOverlayStyle: const SystemUiOverlayStyle(
+                      statusBarBrightness: Brightness.dark),
+                  expandedHeight: MediaQuery.of(context).size.height * .6,
+                  flexibleSpace: FlexibleSpaceBar(
+                      background: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.play_arrow,color: Colors.white,),
-                      const SizedBox(width: 10,),
-                      Text("Xem phim",style: TextStyle(fontSize: 15,fontWeight: FontWeight.bold),),
+                      GlobalImage(
+                        imageUrl: data.thumbUrl ?? "",
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height * .6,
+                        boxFit: BoxFit.fill,
+                      ),
                     ],
                   )),
                 ),
-              ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 2, horizontal: 15),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Info(),
+                        // const SizedBox(height: 20,),
+                        Visibility(
+                          visible: data.status != "trailer",
+                          child: Center(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 12,
+                              ),
+                              width: MediaQuery.of(context).size.width * .95,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5),
+                                  color: GlobalColor.primary),
+                              child: InkWell(
+                                onTap: () async {
+                                  Get.to(ChewieVideoPlayer(
+                                    slug: data.slug ?? "",
+                                    fileName: data.name ?? "--",
+                                    episode: data.episodes?.first.serverData
+                                            ?.first.name ??
+                                        "",
+                                    videoUrl: data?.episodes?.first.serverData
+                                            ?.first.linkM3u8 ??
+                                        "",
+                                  ));
+                                },
+                                child: const Center(
+                                    child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.play_arrow,
+                                      color: Colors.white,
+                                    ),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(
+                                      "Xem phim",
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white),
+                                    ),
+                                  ],
+                                )),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        const InfoDetail(),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Visibility(
+                          visible: data.status != "trailer",
+                          child: const Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Chọn server",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: Colors.white)),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Espisode(),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Nội dung phim",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: Colors.white),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            HtmlWidget(
+                              "${data.content}",
+                              textStyle: TextStyle(color: Colors.white),
+                            )
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+
+                        const SizedBox(
+                          height: 10,
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              ],
             ),
-            const InfoDetail(),
-            Visibility(
-              visible: data.status!="trailer",
-              replacement: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text("Trạng thái : phim sắp chiếu"),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: const Text("Tập phim",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16)),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal:8.0),
-                child: const Espisode(),
-              ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("Nội dung phim",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16),),
-                  const SizedBox(height: 10,),
-                  HtmlWidget("${data?.content}")
-                ],
-              ),
-            )
-          ],
-        );
-        })
-            ),
-      );
+          );
+        }));
   }
 }

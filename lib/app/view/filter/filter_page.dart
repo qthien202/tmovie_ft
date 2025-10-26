@@ -1,9 +1,17 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:tmovie_app/app/view/list_movie/list_movie.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:app_ft_movies/app/core/global_color.dart';
-import 'package:app_ft_movies/app/view/movie_genre/movie_genre_view.dart';
+
+import 'package:tmovie_app/app/core/global_color.dart';
+import 'package:tmovie_app/app/view/movie_genre/movie_genre_view.dart';
 
 class FilterPage extends StatefulWidget {
+  const FilterPage({
+    Key? key,
+    this.slug,
+  }) : super(key: key);
+  final String? slug;
   @override
   _FilterPageState createState() => _FilterPageState();
 }
@@ -12,9 +20,9 @@ class _FilterPageState extends State<FilterPage> {
   String? selectedGenre;
   String? selectedCountry;
   int? selectedYear;
-  String? titlePage;
 
   List<Map<String, dynamic>> drawerItems = [
+    // {"title":"Tất thể loại","slug":""},
     {"title": "Hành Động", "slug": "hanh-dong"},
     {"title": "Tình Cảm", "slug": "tinh-cam"},
     {"title": "Hài Hước", "slug": "hai-huoc"},
@@ -38,6 +46,7 @@ class _FilterPageState extends State<FilterPage> {
   ];
 
   List<Map<String, dynamic>> countries = [
+    {"name": "Tất cả quốc gia", "slug": ""},
     {"name": "Trung Quốc", "slug": "trung-quoc"},
     {"name": "Hàn Quốc", "slug": "han-quoc"},
     {"name": "Nhật Bản", "slug": "nhat-ban"},
@@ -69,23 +78,13 @@ class _FilterPageState extends State<FilterPage> {
     {"name": "Ả Rập Xê Út", "slug": "arap-xe-ut"},
   ];
 
-  List<Map<String, dynamic>> yearsList = [
-    {"year": 2010},
-    {"year": 2011},
-    {"year": 2012},
-    {"year": 2013},
-    {"year": 2014},
-    {"year": 2015},
-    {"year": 2016},
-    {"year": 2017},
-    {"year": 2018},
-    {"year": 2019},
-    {"year": 2020},
-    {"year": 2021},
-    {"year": 2022},
-    {"year": 2023},
-    {"year": 2024},
-  ];
+  // Lấy năm hiện tại
+
+// Tạo danh sách các năm từ 2010 đến năm hiện tại
+  List<Map<String, dynamic>> yearsList = List.generate(
+    DateTime.now().year - 2009, // Số lượng năm là hiện tại trừ 2010 + 1
+    (index) => {"year": 2010 + index}, // Tạo map cho mỗi năm
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +94,7 @@ class _FilterPageState extends State<FilterPage> {
         backgroundColor: GlobalColor.backgroundColor,
         foregroundColor: Colors.white,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => Get.back(),
         ),
         actions: [
@@ -109,19 +108,28 @@ class _FilterPageState extends State<FilterPage> {
                 ),
               ),
               onPressed: () {
-                if(selectedGenre==null){
-                  Get.snackbar("Thông báo", "Bạn cần chọn thể loại phim trước");
-                }
-                else{
-                  Get.to(MovieGenreview(
-                    titlePage: titlePage??"",
-                  slug: selectedGenre ?? "",
-                  country: selectedCountry??"",
-                  year: selectedYear.toString(),
-                ));
+                if (widget.slug != null) {
+                  Get.to(ListMovieView(
+                    country: selectedCountry ?? "",
+                    year: selectedYear.toString() ?? "",
+                    category: selectedGenre ?? "",
+                    slug: widget.slug,
+                  ));
+                } else {
+                  if (selectedGenre == null) {
+                    Get.snackbar(
+                        "Thông báo", "Bạn cần chọn thể loại phim trước");
+                  } else {
+                    Get.to(MovieGenreview(
+                      slug: selectedGenre ?? "",
+                      country: selectedCountry ?? "",
+                      year: selectedYear.toString() ?? "",
+                    ));
+                  }
                 }
               },
-              child: Text("Duyệt phim", style: TextStyle(color: Colors.white)),
+              child: const Text("Duyệt phim",
+                  style: TextStyle(color: Colors.white)),
             ),
           )
         ],
@@ -129,20 +137,26 @@ class _FilterPageState extends State<FilterPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          ListTile(
-            title: Text('Thể loại', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+          const ListTile(
+            title: Text('Thể loại',
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white)),
           ),
           Expanded(
             child: buildFilterList(drawerItems, selectedGenre, (genre) {
               setState(() {
-                titlePage = genre['title'];
                 selectedGenre = genre["slug"];
-                
               });
             }),
           ),
-          ListTile(
-            title: Text('Quốc gia', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+          const ListTile(
+            title: Text('Quốc gia',
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white)),
           ),
           Expanded(
             child: buildFilterList(countries, selectedCountry, (country) {
@@ -151,8 +165,12 @@ class _FilterPageState extends State<FilterPage> {
               });
             }),
           ),
-          ListTile(
-            title: Text('Năm', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+          const ListTile(
+            title: Text('Năm',
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white)),
           ),
           Expanded(
             child: buildFilterList(yearsList, selectedYear, (year) {
@@ -166,15 +184,16 @@ class _FilterPageState extends State<FilterPage> {
     );
   }
 
-  Widget buildFilterList(List<Map<String, dynamic>> items, dynamic selectedItem, Function(Map<String, dynamic>) onTap) {
+  Widget buildFilterList(List<Map<String, dynamic>> items, dynamic selectedItem,
+      Function(Map<String, dynamic>) onTap) {
     return GridView.builder(
       scrollDirection: Axis.horizontal,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
         // mainAxisExtent: 3,
-        crossAxisSpacing: 20,
-        mainAxisSpacing: 20,
-        childAspectRatio: 10 / 30,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        childAspectRatio: 15 / 30,
       ),
       itemCount: items.length,
       itemBuilder: (context, index) {
@@ -185,7 +204,11 @@ class _FilterPageState extends State<FilterPage> {
           },
           child: buildFilterItem(
             text: item["title"] ?? item["name"] ?? item["year"].toString(),
-            isSelected: selectedItem!=null?((selectedItem == item["slug"] || selectedItem == item["year"] || selectedItem == item["name"])):false,
+            isSelected: selectedItem != null
+                ? ((selectedItem == item["slug"] ||
+                    selectedItem == item["year"] ||
+                    selectedItem == item["name"]))
+                : false,
           ),
         );
       },
@@ -193,29 +216,22 @@ class _FilterPageState extends State<FilterPage> {
   }
 
   Widget buildFilterItem({required String text, required bool isSelected}) {
-  
-  
-  return Center(
-    child: Container(
-      padding: EdgeInsets.all(5),
-      decoration: BoxDecoration(
-        color: isSelected ? Color(0xff252836) : null,
-        border: isSelected ? Border.all(color: GlobalColor.primary) : null,
-        borderRadius: BorderRadius.circular(5),
-      ),
-      child: Text(
-        text,
-        textAlign: TextAlign.start,
-        style: TextStyle(
-          fontSize: 11,
-          color: !isSelected ? Colors.white : GlobalColor.primary,
-          
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xff252836) : null,
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Text(
+          text,
+          textAlign: TextAlign.start,
+          style: TextStyle(
+            fontSize: 11,
+            color: !isSelected ? Colors.white : GlobalColor.primary,
+          ),
         ),
       ),
-    ),
-  );
-}
-
-
-
+    );
+  }
 }
