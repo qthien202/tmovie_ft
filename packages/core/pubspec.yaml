@@ -1,0 +1,41 @@
+name: core
+description: Shared core package for TMovie apps
+publish_to: 'none'
+version: 1.0.0
+
+resolution: workspace
+
+environment:
+  sdk: '>=3.8.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  flutter_riverpod: ^2.6.1
+
+  dio: ^5.9.1
+  retrofit: ^4.9.2
+  pretty_dio_logger: ^1.4.0
+
+  json_annotation: ^4.9.0
+
+  shared_preferences: ^2.5.4
+
+  cached_network_image: ^3.4.1
+  shimmer: ^3.0.0
+  flutter_svg: ^2.2.3
+  connectivity_plus: ^7.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  build_runner: ^2.11.0
+  retrofit_generator: ^10.2.1
+  json_serializable: ^6.9.4
+
+flutter:
+  assets:
+    - assets/images/
+    - assets/icons/
