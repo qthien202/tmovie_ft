@@ -13,7 +13,7 @@ class FilmGrid extends StatelessWidget {
     required this.films,
     this.onFilmTap,
     this.crossAxisCount = 3,
-    this.childAspectRatio = 0.5,
+    this.childAspectRatio = 0.55,
   });
 
   @override
@@ -21,18 +21,39 @@ class FilmGrid extends StatelessWidget {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.zero,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: crossAxisCount,
         childAspectRatio: childAspectRatio,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 16,
       ),
       itemCount: films.length,
       itemBuilder: (context, index) {
         final film = films[index];
         return FilmCard(film: film, onTap: () => onFilmTap?.call(film));
       },
+    );
+  }
+
+  /// Sliver version for use in CustomScrollView
+  static Widget asSliver({
+    required List<FilmItem> films,
+    void Function(FilmItem film)? onFilmTap,
+    int crossAxisCount = 3,
+    double childAspectRatio = 0.55,
+  }) {
+    return SliverGrid(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: crossAxisCount,
+        childAspectRatio: childAspectRatio,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 16,
+      ),
+      delegate: SliverChildBuilderDelegate((context, index) {
+        final film = films[index];
+        return FilmCard(film: film, onTap: () => onFilmTap?.call(film));
+      }, childCount: films.length),
     );
   }
 }

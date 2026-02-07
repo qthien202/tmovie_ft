@@ -159,13 +159,25 @@ class FilmListNotifier extends StateNotifier<FilmListState> {
 }
 
 final paginatedFilmsProvider = StateNotifierProvider.family
-    .autoDispose<FilmListNotifier, FilmListState, String>((ref, typeSlug) {
+    .autoDispose<FilmListNotifier, FilmListState, String>((ref, slug) {
       final repo = ref.watch(filmRepositoryProvider);
-      return FilmListNotifier(repo, typeSlug, PaginatedSource.type);
+      return FilmListNotifier(repo, slug, PaginatedSource.type);
     });
 
 final paginatedGenreFilmsProvider = StateNotifierProvider.family
-    .autoDispose<FilmListNotifier, FilmListState, String>((ref, genreSlug) {
+    .autoDispose<FilmListNotifier, FilmListState, String>((ref, slug) {
       final repo = ref.watch(filmRepositoryProvider);
-      return FilmListNotifier(repo, genreSlug, PaginatedSource.genre);
+      return FilmListNotifier(repo, slug, PaginatedSource.genre);
+    });
+
+final paginatedCountryFilmsProvider = StateNotifierProvider.family
+    .autoDispose<FilmListNotifier, FilmListState, String>((ref, slug) {
+      final repo = ref.watch(filmRepositoryProvider);
+      return FilmListNotifier(repo, slug, PaginatedSource.country);
+    });
+
+final paginatedSearchFilmsProvider = StateNotifierProvider.family
+    .autoDispose<FilmListNotifier, FilmListState, String>((ref, keyword) {
+      final repo = ref.watch(filmRepositoryProvider);
+      return FilmListNotifier(repo, keyword, PaginatedSource.search);
     });

@@ -223,12 +223,7 @@ class _DetailPageState extends ConsumerState<DetailPage>
     return Stack(
       fit: StackFit.expand,
       children: [
-        AppImage(
-          imageUrl: film.fullPosterUrl.isNotEmpty
-              ? film.fullPosterUrl
-              : film.fullThumbUrl,
-          boxFit: BoxFit.cover,
-        ),
+        AppImage(imageUrl: film.fullPosterUrl, boxFit: BoxFit.cover),
         Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -267,7 +262,7 @@ class _DetailPageState extends ConsumerState<DetailPage>
             child: ClipRRect(
               borderRadius: BorderRadius.circular(15),
               child: AppImage(
-                imageUrl: film.fullPosterUrl,
+                imageUrl: film.fullThumbUrl,
                 boxFit: BoxFit.cover,
               ),
             ),
@@ -369,9 +364,9 @@ class _DetailPageState extends ConsumerState<DetailPage>
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
                   child: AppImage(
-                    imageUrl: film.fullPosterUrl,
-                    width: 45,
-                    height: 60,
+                    imageUrl: film.fullThumbUrl,
+                    width: 50,
+                    height: 50,
                     boxFit: BoxFit.cover,
                   ),
                 ),
