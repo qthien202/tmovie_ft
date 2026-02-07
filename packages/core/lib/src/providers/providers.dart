@@ -95,11 +95,14 @@ class FilmListState {
   }
 }
 
+enum PaginatedSource { type, genre, country, search }
+
 class FilmListNotifier extends StateNotifier<FilmListState> {
   final FilmRepository _repository;
-  final String _typeSlug;
+  final String _slug;
+  final PaginatedSource _source;
 
-  FilmListNotifier(this._repository, this._typeSlug)
+  FilmListNotifier(this._repository, this._slug, this._source)
     : super(FilmListState(items: [])) {
     loadFirstPage();
   }
@@ -107,7 +110,7 @@ class FilmListNotifier extends StateNotifier<FilmListState> {
   Future<void> loadFirstPage() async {
     state = state.copyWith(isLoading: true, page: 1, items: []);
     try {
-      final response = await _repository.getFilmsByType(_typeSlug, page: 1);
+      final response = await _fetchData(1);
       final items = response.data?.items ?? [];
       state = state.copyWith(
         items: items,
@@ -124,10 +127,7 @@ class FilmListNotifier extends StateNotifier<FilmListState> {
     state = state.copyWith(isLoading: true);
     try {
       final nextPage = state.page + 1;
-      final response = await _repository.getFilmsByType(
-        _typeSlug,
-        page: nextPage,
-      );
+      final response = await _fetchData(nextPage);
       final newItems = response.data?.items ?? [];
       if (newItems.isEmpty) {
         state = state.copyWith(isLoading: false, hasMore: false);
@@ -143,10 +143,29 @@ class FilmListNotifier extends StateNotifier<FilmListState> {
       state = state.copyWith(isLoading: false, error: e);
     }
   }
+
+  Future<FilmListResponse> _fetchData(int page) {
+    switch (_source) {
+      case PaginatedSource.type:
+        return _repository.getFilmsByType(_slug, page: page);
+      case PaginatedSource.genre:
+        return _repository.getFilmsByGenre(_slug, page: page);
+      case PaginatedSource.country:
+        return _repository.getFilmsByCountry(_slug, page: page);
+      case PaginatedSource.search:
+        return _repository.searchFilms(_slug, page: page);
+    }
+  }
 }
 
 final paginatedFilmsProvider = StateNotifierProvider.family
     .autoDispose<FilmListNotifier, FilmListState, String>((ref, typeSlug) {
       final repo = ref.watch(filmRepositoryProvider);
-      return FilmListNotifier(repo, typeSlug);
+      return FilmListNotifier(repo, typeSlug, PaginatedSource.type);
+    });
+
+final paginatedGenreFilmsProvider = StateNotifierProvider.family
+    .autoDispose<FilmListNotifier, FilmListState, String>((ref, genreSlug) {
+      final repo = ref.watch(filmRepositoryProvider);
+      return FilmListNotifier(repo, genreSlug, PaginatedSource.genre);
     });

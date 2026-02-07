@@ -10,88 +10,111 @@ class FilmInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Tên phim chính
           Text(
             film.name ?? '',
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 22,
+              fontSize: 28,
               fontWeight: FontWeight.bold,
+              letterSpacing: -0.5,
             ),
           ),
           if (film.originName != null && film.originName!.isNotEmpty) ...[
             const SizedBox(height: 4),
             Text(
               film.originName!,
-              style: TextStyle(color: Colors.grey[400], fontSize: 14),
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.5),
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 8,
-            runSpacing: 6,
-            children: [
-              if (film.year != null) _InfoChip(label: '${film.year}'),
-              if (film.quality != null) _InfoChip(label: film.quality!),
-              if (film.lang != null) _InfoChip(label: film.lang!),
-              if (film.time != null && film.time!.isNotEmpty)
-                _InfoChip(label: film.time!),
-              if (film.episodeCurrent != null)
-                _InfoChip(label: film.episodeCurrent!),
-            ],
+          const SizedBox(height: 20),
+
+          // Chips thông tin kiểu Glassmorphism
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                if (film.year != null) _GlassChip(label: '${film.year}'),
+                if (film.quality != null) _GlassChip(label: film.quality!),
+                if (film.lang != null) _GlassChip(label: film.lang!),
+                if (film.time != null && film.time!.isNotEmpty)
+                  _GlassChip(label: film.time!),
+                if (film.episodeCurrent != null)
+                  _GlassChip(label: film.episodeCurrent!),
+              ],
+            ),
           ),
-          if (film.category != null && film.category!.isNotEmpty) ...[
-            const SizedBox(height: 12),
+          const SizedBox(height: 20),
+
+          // Thể loại
+          if (film.category != null && film.category!.isNotEmpty)
             Wrap(
-              spacing: 6,
-              runSpacing: 6,
+              spacing: 8,
+              runSpacing: 8,
               children: film.category!.map((cat) {
-                return Chip(
-                  label: Text(
-                    cat.name ?? '',
-                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                return Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
                   ),
-                  backgroundColor: AppColors.surfaceColor,
-                  side: BorderSide.none,
-                  padding: EdgeInsets.zero,
-                  visualDensity: VisualDensity.compact,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: AppColors.primary.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Text(
+                    cat.name ?? '',
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 );
               }).toList(),
             ),
-          ],
-          if (film.director != null && film.director!.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            Text(
-              'Đạo diễn: ${film.director!.join(", ")}',
-              style: TextStyle(color: Colors.grey[400], fontSize: 13),
-            ),
-          ],
-          if (film.actor != null && film.actor!.isNotEmpty) ...[
-            const SizedBox(height: 6),
-            Text(
-              'Diễn viên: ${film.actor!.join(", ")}',
-              style: TextStyle(color: Colors.grey[400], fontSize: 13),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
+
+          const SizedBox(height: 24),
+
+          // Meta info (Đạo diễn, Diễn viên)
+          _MetaRow(
+            label: 'Đạo diễn',
+            value: film.director?.join(", ") ?? 'Đang cập nhật',
+          ),
+          const SizedBox(height: 8),
+          _MetaRow(
+            label: 'Diễn viên',
+            value: film.actor?.join(", ") ?? 'Đang cập nhật',
+          ),
+
           if (film.content != null && film.content!.isNotEmpty) ...[
-            const SizedBox(height: 16),
+            const SizedBox(height: 32),
             const Text(
-              'Nội dung',
+              'Nội dung phim',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 16,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             HtmlWidget(
               film.content!,
-              textStyle: TextStyle(color: Colors.grey[300], fontSize: 13),
+              textStyle: TextStyle(
+                color: Colors.white.withValues(alpha: 0.7),
+                fontSize: 15,
+                height: 1.6,
+              ),
             ),
           ],
         ],
@@ -100,22 +123,63 @@ class FilmInfo extends StatelessWidget {
   }
 }
 
-class _InfoChip extends StatelessWidget {
+class _GlassChip extends StatelessWidget {
   final String label;
-  const _InfoChip({required this.label});
+  const _GlassChip({required this.label});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      margin: const EdgeInsets.only(right: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        color: AppColors.surfaceColor,
-        borderRadius: BorderRadius.circular(6),
+        color: Colors.white.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
       ),
       child: Text(
         label,
-        style: const TextStyle(color: Colors.white, fontSize: 12),
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+        ),
       ),
+    );
+  }
+}
+
+class _MetaRow extends StatelessWidget {
+  final String label;
+  final String value;
+  const _MetaRow({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 80,
+          child: Text(
+            '$label:',
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.4),
+              fontSize: 14,
+            ),
+          ),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
