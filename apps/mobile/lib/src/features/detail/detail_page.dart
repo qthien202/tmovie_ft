@@ -167,7 +167,7 @@ class _DetailPageState extends ConsumerState<DetailPage>
             ],
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const FilmDetailSkeleton(),
         error: (e, s) => Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

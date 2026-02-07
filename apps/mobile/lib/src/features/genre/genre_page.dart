@@ -12,7 +12,11 @@ class GenrePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final filmListState = ref.watch(paginatedGenreFilmsProvider(slug));
+    final filmListState = ref.watch(
+      paginatedFilmsProvider(
+        FilmFilterParams(slug: slug, source: PaginatedSource.genre),
+      ),
+    );
     final items = filmListState.items;
     final backdropUrl = items.isNotEmpty ? items.first.fullThumbUrl : null;
 
@@ -48,7 +52,14 @@ class GenrePage extends ConsumerWidget {
                 if (notification.metrics.pixels >=
                     notification.metrics.maxScrollExtent - 400) {
                   ref
-                      .read(paginatedGenreFilmsProvider(slug).notifier)
+                      .read(
+                        paginatedFilmsProvider(
+                          FilmFilterParams(
+                            slug: slug,
+                            source: PaginatedSource.genre,
+                          ),
+                        ).notifier,
+                      )
                       .loadMore();
                 }
               }
@@ -95,13 +106,23 @@ class GenrePage extends ConsumerWidget {
 
                 if (items.isEmpty && filmListState.isLoading)
                   const SliverFillRemaining(
-                    child: Center(child: CircularProgressIndicator()),
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(16, 24, 16, 0),
+                      child: FilmGridSkeleton(),
+                    ),
                   )
                 else if (items.isEmpty && filmListState.error != null)
                   SliverFillRemaining(
                     child: _ErrorView(
                       onRetry: () => ref
-                          .read(paginatedGenreFilmsProvider(slug).notifier)
+                          .read(
+                            paginatedFilmsProvider(
+                              FilmFilterParams(
+                                slug: slug,
+                                source: PaginatedSource.genre,
+                              ),
+                            ).notifier,
+                          )
                           .loadFirstPage(),
                     ),
                   )
@@ -124,8 +145,11 @@ class GenrePage extends ConsumerWidget {
                   if (filmListState.isLoading)
                     const SliverToBoxAdapter(
                       child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 24),
-                        child: Center(child: CircularProgressIndicator()),
+                        padding: EdgeInsets.symmetric(
+                          vertical: 24,
+                          horizontal: 16,
+                        ),
+                        child: FilmGridSkeleton(count: 3),
                       ),
                     ),
                   const SliverToBoxAdapter(child: SizedBox(height: 50)),

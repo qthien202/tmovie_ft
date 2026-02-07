@@ -77,10 +77,7 @@ class CategorySection extends ConsumerWidget {
                 ),
               );
             },
-            loading: () => const SizedBox(
-              height: 220,
-              child: Center(child: CircularProgressIndicator()),
-            ),
+            loading: () => const FilmSectionSkeleton(),
             error: (_, _) => const SizedBox(height: 220),
           ),
         ],

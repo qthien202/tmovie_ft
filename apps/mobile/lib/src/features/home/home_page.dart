@@ -34,9 +34,42 @@ class _HomePageState extends ConsumerState<HomePage>
 
   @override
   Widget build(BuildContext context) {
-    // Sử dụng provider phim mới cập nhật làm phim nổi bật cho Carousel
-    final featuredFilmsAsync = ref.watch(
-      filmsByTypeProvider((typeSlug: 'phim-moi-cap-nhat', page: 1)),
+    // Lấy phim mới nhất + phim hot rồi trộn lại
+    final latestAsync = ref.watch(
+      filmsByTypeProvider((
+        typeSlug: 'phim-moi-cap-nhat',
+        page: 1,
+        sortField: null,
+        year: null,
+      )),
+    );
+    final hotAsync = ref.watch(
+      filmsByTypeProvider((
+        typeSlug: 'phim-moi-cap-nhat',
+        page: 1,
+        sortField: 'view',
+        year: DateTime.now().year,
+      )),
+    );
+
+    // Trộn 2 danh sách: hot trước, mới nhất sau, loại trùng
+    final featuredFilmsAsync = latestAsync.when(
+      data: (latestRes) => hotAsync.when(
+        data: (hotRes) {
+          final hotItems = hotRes.data?.items ?? [];
+          final latestItems = latestRes.data?.items ?? [];
+          final hotSlugs = hotItems.map((e) => e.slug).toSet();
+          final merged = [
+            ...hotItems,
+            ...latestItems.where((item) => !hotSlugs.contains(item.slug)),
+          ];
+          return AsyncValue.data(merged);
+        },
+        loading: () => AsyncValue.data(latestRes.data?.items ?? <FilmItem>[]),
+        error: (_, _) => AsyncValue.data(latestRes.data?.items ?? <FilmItem>[]),
+      ),
+      loading: () => const AsyncValue<List<FilmItem>>.loading(),
+      error: (e, s) => AsyncValue<List<FilmItem>>.error(e, s),
     );
     final topPadding = MediaQuery.paddingOf(context).top;
 
@@ -114,8 +147,8 @@ class _HomePageState extends ConsumerState<HomePage>
                                 child: SingleChildScrollView(
                                   physics: const NeverScrollableScrollPhysics(),
                                   child: featuredFilmsAsync.when(
-                                    data: (res) => FilmCarousel(
-                                      films: res.data?.items ?? [],
+                                    data: (films) => FilmCarousel(
+                                      films: films,
                                       autoPlay: !innerBoxIsScrolled,
                                       onActiveFilmChanged: (film) {
                                         if (mounted) {
@@ -126,9 +159,8 @@ class _HomePageState extends ConsumerState<HomePage>
                                         }
                                       },
                                     ),
-                                    loading: () => const Center(
-                                      child: CircularProgressIndicator(),
-                                    ),
+                                    loading: () =>
+                                        const FilmCarouselSkeleton(),
                                     error: (e, s) => const SizedBox(),
                                   ),
                                 ),
@@ -257,4 +289,5 @@ class _HomePageState extends ConsumerState<HomePage>
       ),
     );
   }
+
 }
