@@ -21,7 +21,7 @@ class FilmGrid extends StatelessWidget {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: crossAxisCount,
         childAspectRatio: childAspectRatio,
@@ -31,10 +31,7 @@ class FilmGrid extends StatelessWidget {
       itemCount: films.length,
       itemBuilder: (context, index) {
         final film = films[index];
-        return FilmCard(
-          film: film,
-          onTap: () => onFilmTap?.call(film),
-        );
+        return FilmCard(film: film, onTap: () => onFilmTap?.call(film));
       },
     );
   }

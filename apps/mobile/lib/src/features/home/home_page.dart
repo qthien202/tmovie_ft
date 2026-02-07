@@ -1,8 +1,9 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
 import 'widgets/film_carousel.dart';
+import 'widgets/home_tab_view.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -11,13 +12,18 @@ class HomePage extends ConsumerStatefulWidget {
   ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderStateMixin {
+class _HomePageState extends ConsumerState<HomePage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  String? _currentBackdropUrl;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: AppConstants.filmTypes.length, vsync: this);
+    _tabController = TabController(
+      length: AppConstants.filmTypes.length,
+      vsync: this,
+    );
   }
 
   @override
@@ -28,131 +34,226 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    return NestedScrollView(
-      headerSliverBuilder: (context, innerBoxIsScrolled) {
-        return [
-          SliverAppBar(
-            floating: true,
-            snap: true,
-            backgroundColor: AppColors.backgroundColor,
-            title: Text(
-              'TMOVIE',
-              style: TextStyle(
-                color: AppColors.primary,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+    // Sử dụng provider phim mới cập nhật làm phim nổi bật cho Carousel
+    final featuredFilmsAsync = ref.watch(
+      filmsByTypeProvider((typeSlug: 'phim-moi-cap-nhat', page: 1)),
+    );
+    final topPadding = MediaQuery.paddingOf(context).top;
+
+    return Scaffold(
+      backgroundColor: AppColors.backgroundColor,
+      body: Stack(
+        children: [
+          // Dynamic Blurred Background
+          Positioned.fill(
+            child: _currentBackdropUrl != null
+                ? AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 800),
+                    child: AppImage(
+                      key: ValueKey(_currentBackdropUrl),
+                      imageUrl: _currentBackdropUrl!,
+                      boxFit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
+                    ),
+                  )
+                : const SizedBox(),
+          ),
+          Positioned.fill(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+              child: Container(color: Colors.black.withValues(alpha: 0.15)),
             ),
-            bottom: TabBar(
+          ),
+
+          // Main Content
+          NestedScrollView(
+            headerSliverBuilder: (context, innerBoxIsScrolled) {
+              return [
+                SliverOverlapAbsorber(
+                  handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
+                    context,
+                  ),
+                  sliver: SliverAppBar(
+                    expandedHeight: MediaQuery.of(context).size.height * 0.75,
+                    pinned: true,
+                    stretch: true,
+                    primary: false,
+                    backgroundColor: Colors.transparent,
+                    elevation: 0,
+                    toolbarHeight: 0,
+                    flexibleSpace: FlexibleSpaceBar(
+                      stretchModes: const [
+                        StretchMode.zoomBackground,
+                        StretchMode.blurBackground,
+                      ],
+                      background: LayoutBuilder(
+                        builder: (context, constraints) {
+                          final expandedHeight =
+                              MediaQuery.of(context).size.height * 0.75;
+                          final collapsedHeight = 60.5 + topPadding;
+
+                          final double t =
+                              ((constraints.maxHeight - collapsedHeight) /
+                                      (expandedHeight - collapsedHeight))
+                                  .clamp(0.0, 1.0);
+
+                          // Carousel sẽ biến mất HOÀN TOÀN trước khi Header thu vào trạng thái Sticky
+                          // t = 1.0 (mở), t = 0.0 (đóng)
+                          // Ở đây t > 0.4 Carousel mới hiện, dưới 0.4 là mờ hẳn.
+                          final opacity = ((t - 0.4) / 0.6).clamp(0.0, 1.0);
+
+                          return Opacity(
+                            opacity: opacity,
+                            child: Container(
+                              padding: EdgeInsets.only(
+                                top: topPadding,
+                                bottom: 85,
+                              ),
+                              child: Center(
+                                child: SingleChildScrollView(
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  child: featuredFilmsAsync.when(
+                                    data: (res) => FilmCarousel(
+                                      films: res.data?.items ?? [],
+                                      autoPlay: !innerBoxIsScrolled,
+                                      onActiveFilmChanged: (film) {
+                                        if (mounted) {
+                                          setState(() {
+                                            _currentBackdropUrl =
+                                                film.fullThumbUrl;
+                                          });
+                                        }
+                                      },
+                                    ),
+                                    loading: () => const Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                    error: (e, s) => const SizedBox(),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    bottom: PreferredSize(
+                      preferredSize: Size.fromHeight(60 + topPadding + 0.5),
+                      child: ClipRRect(
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(
+                            sigmaX: innerBoxIsScrolled ? 40 : 0,
+                            sigmaY: innerBoxIsScrolled ? 40 : 0,
+                          ),
+                          child: Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              // Nền sáng hơn, trong suốt hơn để giữ vẻ sang trọng của Glassmorphism
+                              color: innerBoxIsScrolled
+                                  ? Colors.black.withValues(alpha: 0.3)
+                                  : Colors.transparent,
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: innerBoxIsScrolled
+                                      ? Colors.white.withValues(alpha: 0.1)
+                                      : Colors.transparent,
+                                  width: 0.5,
+                                ),
+                              ),
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                SizedBox(height: topPadding),
+                                Container(
+                                  height: 60,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 8,
+                                  ),
+                                  child: TabBar(
+                                    controller: _tabController,
+                                    isScrollable: true,
+                                    tabAlignment: TabAlignment.start,
+                                    indicatorSize: TabBarIndicatorSize.tab,
+                                    indicator: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                      color: Colors.white.withValues(
+                                        alpha: 0.15,
+                                      ),
+                                      border: Border.all(
+                                        color: Colors.white.withValues(
+                                          alpha: 0.3,
+                                        ),
+                                        width: 1,
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.white.withValues(
+                                            alpha: 0.1,
+                                          ),
+                                          blurRadius: 15,
+                                          spreadRadius: 1,
+                                        ),
+                                      ],
+                                    ),
+                                    dividerColor: Colors.transparent,
+                                    labelColor: Colors.white,
+                                    unselectedLabelColor: Colors.white
+                                        .withValues(alpha: 0.5),
+                                    labelStyle: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    padding: const EdgeInsets.all(4),
+                                    tabs: AppConstants.filmTypes.map((type) {
+                                      return Tab(
+                                        height: 36,
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 16,
+                                          ),
+                                          child: Text(type['title']!),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ];
+            },
+            body: TabBarView(
               controller: _tabController,
-              isScrollable: true,
-              indicatorColor: AppColors.primary,
-              labelColor: Colors.white,
-              unselectedLabelColor: Colors.grey,
-              tabAlignment: TabAlignment.start,
-              tabs: AppConstants.filmTypes.map((type) {
-                return Tab(text: type['title']);
+              children: AppConstants.filmTypes.map((type) {
+                return Builder(
+                  builder: (context) {
+                    return CustomScrollView(
+                      slivers: [
+                        SliverOverlapInjector(
+                          handle:
+                              NestedScrollView.sliverOverlapAbsorberHandleFor(
+                                context,
+                              ),
+                        ),
+                        SliverToBoxAdapter(
+                          child: FilmTypeTab(typeSlug: type['slug']!),
+                        ),
+                      ],
+                    );
+                  },
+                );
               }).toList(),
             ),
           ),
-        ];
-      },
-      body: TabBarView(
-        controller: _tabController,
-        children: AppConstants.filmTypes.map((type) {
-          return _FilmTypeTab(typeSlug: type['slug']!);
-        }).toList(),
-      ),
-    );
-  }
-}
-
-class _FilmTypeTab extends ConsumerStatefulWidget {
-  final String typeSlug;
-  const _FilmTypeTab({required this.typeSlug});
-
-  @override
-  ConsumerState<_FilmTypeTab> createState() => _FilmTypeTabState();
-}
-
-class _FilmTypeTabState extends ConsumerState<_FilmTypeTab>
-    with AutomaticKeepAliveClientMixin {
-  @override
-  bool get wantKeepAlive => true;
-
-  @override
-  Widget build(BuildContext context) {
-    super.build(context);
-    final filmsAsync = ref.watch(
-      filmsByTypeProvider((typeSlug: widget.typeSlug, page: 1)),
-    );
-
-    return filmsAsync.when(
-      data: (response) {
-        final items = response.data?.items ?? [];
-        if (items.isEmpty) {
-          return const Center(
-            child: Text('Không có phim', style: TextStyle(color: Colors.white)),
-          );
-        }
-        return RefreshIndicator(
-          onRefresh: () async {
-            ref.invalidate(filmsByTypeProvider((typeSlug: widget.typeSlug, page: 1)));
-          },
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: Column(
-              children: [
-                FilmCarousel(films: items.take(6).toList()),
-                const SizedBox(height: 16),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Danh sách',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () => context.push(
-                          '/film-list/${widget.typeSlug}',
-                          extra: {'title': widget.typeSlug},
-                        ),
-                        child: Text('Xem thêm', style: TextStyle(color: AppColors.primary)),
-                      ),
-                    ],
-                  ),
-                ),
-                FilmGrid(
-                  films: items,
-                  onFilmTap: (film) => context.push('/detail/${film.slug}'),
-                ),
-                const SizedBox(height: 80),
-              ],
-            ),
-          ),
-        );
-      },
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('Có lỗi xảy ra', style: TextStyle(color: Colors.white)),
-            const SizedBox(height: 8),
-            ElevatedButton(
-              onPressed: () => ref.invalidate(
-                filmsByTypeProvider((typeSlug: widget.typeSlug, page: 1)),
-              ),
-              child: const Text('Thử lại'),
-            ),
-          ],
-        ),
+        ],
       ),
     );
   }
