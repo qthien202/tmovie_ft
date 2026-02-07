@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
+import 'package:core/core.dart';
 
 class PlayerPage extends StatefulWidget {
   final String videoUrl;
@@ -94,7 +95,11 @@ class _PlayerPageState extends State<PlayerPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.error_outline, color: Colors.white, size: 48),
+                  const Icon(
+                    Icons.error_outline,
+                    color: Colors.white,
+                    size: 48,
+                  ),
                   const SizedBox(height: 16),
                   const Text(
                     'Không thể phát video này',
@@ -114,8 +119,8 @@ class _PlayerPageState extends State<PlayerPage> {
               ),
             )
           : _chewieController != null
-              ? Chewie(controller: _chewieController!)
-              : const Center(child: CircularProgressIndicator()),
+          ? Chewie(controller: _chewieController!)
+          : const ShimmerLoading(),
     );
   }
 }

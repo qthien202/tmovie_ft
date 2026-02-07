@@ -26,16 +26,14 @@ class _SplashPageState extends State<SplashPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              'TMOVIE',
-              style: TextStyle(
-                color: AppColors.primary,
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
+            Shimmer.fromColors(
+              baseColor: AppColors.primary,
+              highlightColor: Colors.white,
+              child: const Text(
+                'TMOVIE',
+                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
               ),
             ),
-            const SizedBox(height: 20),
-            CircularProgressIndicator(color: AppColors.primary),
           ],
         ),
       ),

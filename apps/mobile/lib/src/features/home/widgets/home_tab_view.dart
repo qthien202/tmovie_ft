@@ -78,7 +78,7 @@ class FilmSection extends ConsumerWidget {
     final filmsAsync = ref.watch(
       isGenre
           ? filmsByGenreProvider((slug: slug, page: 1))
-          : filmsByTypeProvider((typeSlug: slug, page: 1)),
+          : filmsByTypeProvider((typeSlug: slug, page: 1, sortField: null, year: null)),
     );
 
     return Container(
@@ -101,11 +101,7 @@ class FilmSection extends ConsumerWidget {
                 ),
                 const Spacer(),
                 GestureDetector(
-                  onTap: () => context.push(
-                    isGenre
-                        ? '/genre/$slug?title=$title'
-                        : '/film-list/$slug?title=$title',
-                  ),
+                  onTap: () => context.push('/film-list/$slug?title=$title'),
                   child: Icon(
                     Icons.chevron_right_rounded,
                     color: Colors.white.withValues(alpha: 0.4),
@@ -139,7 +135,7 @@ class FilmSection extends ConsumerWidget {
                   },
                 );
               },
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => const FilmSectionSkeleton(),
               error: (e, s) => const SizedBox(),
             ),
           ),
@@ -155,43 +151,27 @@ class PaginatedGridView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final filmListState = ref.watch(paginatedFilmsProvider(typeSlug));
-
-    if (filmListState.items.isEmpty && filmListState.isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (filmListState.error != null && filmListState.items.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('Có lỗi xảy ra', style: TextStyle(color: Colors.white)),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () => ref
-                  .read(paginatedFilmsProvider(typeSlug).notifier)
-                  .loadFirstPage(),
-              child: const Text('Thử lại'),
-            ),
-          ],
-        ),
-      );
-    }
-
-    final items = filmListState.items;
-    if (items.isEmpty) {
-      return const Center(
-        child: Text('Không có phim', style: TextStyle(color: Colors.white)),
-      );
-    }
+    final filmListState = ref.watch(
+      paginatedFilmsProvider(
+        FilmFilterParams(slug: typeSlug, source: PaginatedSource.type),
+      ),
+    );
 
     return NotificationListener<ScrollNotification>(
       onNotification: (notification) {
         if (notification is ScrollEndNotification) {
           if (notification.metrics.pixels >=
               notification.metrics.maxScrollExtent - 400) {
-            ref.read(paginatedFilmsProvider(typeSlug).notifier).loadMore();
+            ref
+                .read(
+                  paginatedFilmsProvider(
+                    FilmFilterParams(
+                      slug: typeSlug,
+                      source: PaginatedSource.type,
+                    ),
+                  ).notifier,
+                )
+                .loadMore();
           }
         }
         return false;
@@ -223,10 +203,16 @@ class PaginatedGridView extends ConsumerWidget {
                 ),
                 const Spacer(),
                 TextButton(
-                  onPressed: () => context.push(
-                    '/film-list/$typeSlug',
-                    extra: {'title': typeSlug},
-                  ),
+                  onPressed: () {
+                    final title = typeSlug == 'phim-bo'
+                        ? 'Phim Bộ'
+                        : typeSlug == 'phim-le'
+                        ? 'Phim Lẻ'
+                        : typeSlug == 'tv-shows'
+                        ? 'TV Shows'
+                        : 'Danh sách phim';
+                    context.push('/film-list/$typeSlug?title=$title');
+                  },
                   child: Row(
                     children: [
                       Text(
@@ -248,16 +234,59 @@ class PaginatedGridView extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 16),
-          FilmGrid(
-            films: items,
-            childAspectRatio: 0.6,
-            onFilmTap: (film) => context.push('/detail/${film.slug}'),
-          ),
-          if (filmListState.isLoading)
+          if (filmListState.items.isEmpty && filmListState.isLoading)
             const Padding(
-              padding: EdgeInsets.symmetric(vertical: 24),
-              child: Center(child: CircularProgressIndicator()),
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: FilmGridSkeleton(),
+            )
+          else if (filmListState.error != null && filmListState.items.isEmpty)
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'Có lỗi xảy ra',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => ref
+                        .read(
+                          paginatedFilmsProvider(
+                            FilmFilterParams(
+                              slug: typeSlug,
+                              source: PaginatedSource.type,
+                            ),
+                          ).notifier,
+                        )
+                        .loadFirstPage(),
+                    child: const Text('Thử lại'),
+                  ),
+                ],
+              ),
+            )
+          else if (filmListState.items.isEmpty)
+            const Center(
+              child: Text(
+                'Không có phim',
+                style: TextStyle(color: Colors.white),
+              ),
+            )
+          else ...[
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: FilmGrid(
+                films: filmListState.items,
+                childAspectRatio: 0.6,
+                onFilmTap: (film) => context.push('/detail/${film.slug}'),
+              ),
             ),
+            if (filmListState.isLoading)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                child: FilmGridSkeleton(count: 3),
+              ),
+          ],
           const SizedBox(height: 100),
         ],
       ),

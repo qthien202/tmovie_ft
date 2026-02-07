@@ -14,6 +14,10 @@ abstract class ApiService {
   Future<FilmListResponse> getFilmsByType({
     @Path('type_slug') required String typeSlug,
     @Query('page') int page = 1,
+    @Query('category') String? category,
+    @Query('country') String? country,
+    @Query('year') int? year,
+    @Query('sort_field') String? sortField,
   });
 
   @GET('/phim/{slug}')
@@ -31,11 +35,17 @@ abstract class ApiService {
   Future<FilmListResponse> getFilmsByGenre({
     @Path('slug') required String slug,
     @Query('page') int page = 1,
+    @Query('country') String? country,
+    @Query('year') int? year,
+    @Query('sort_field') String? sortField,
   });
 
   @GET('/quoc-gia/{slug}')
   Future<FilmListResponse> getFilmsByCountry({
     @Path('slug') required String slug,
     @Query('page') int page = 1,
+    @Query('category') String? category,
+    @Query('year') int? year,
+    @Query('sort_field') String? sortField,
   });
 }

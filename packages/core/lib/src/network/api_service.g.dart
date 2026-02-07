@@ -25,9 +25,20 @@ class _ApiService implements ApiService {
   Future<FilmListResponse> getFilmsByType({
     required String typeSlug,
     int page = 1,
+    String? category,
+    String? country,
+    int? year,
+    String? sortField,
   }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{r'page': page};
+    final queryParameters = <String, dynamic>{
+      r'page': page,
+      r'category': category,
+      r'country': country,
+      r'year': year,
+      r'sort_field': sortField,
+    };
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<FilmListResponse>(
@@ -115,9 +126,18 @@ class _ApiService implements ApiService {
   Future<FilmListResponse> getFilmsByGenre({
     required String slug,
     int page = 1,
+    String? country,
+    int? year,
+    String? sortField,
   }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{r'page': page};
+    final queryParameters = <String, dynamic>{
+      r'page': page,
+      r'country': country,
+      r'year': year,
+      r'sort_field': sortField,
+    };
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<FilmListResponse>(
@@ -145,9 +165,18 @@ class _ApiService implements ApiService {
   Future<FilmListResponse> getFilmsByCountry({
     required String slug,
     int page = 1,
+    String? category,
+    int? year,
+    String? sortField,
   }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{r'page': page};
+    final queryParameters = <String, dynamic>{
+      r'page': page,
+      r'category': category,
+      r'year': year,
+      r'sort_field': sortField,
+    };
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<FilmListResponse>(

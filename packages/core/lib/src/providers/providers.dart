@@ -28,13 +28,18 @@ final historyRepositoryProvider = Provider<HistoryRepository>((ref) {
 
 // --- Data providers ---
 
-final filmsByTypeProvider = FutureProvider.family
-    .autoDispose<FilmListResponse, ({String typeSlug, int page})>((
+final filmsByTypeProvider =
+    FutureProvider.family<FilmListResponse, ({String typeSlug, int page, String? sortField, int? year})>((
       ref,
       params,
     ) {
       final repo = ref.watch(filmRepositoryProvider);
-      return repo.getFilmsByType(params.typeSlug, page: params.page);
+      return repo.getFilmsByType(
+        params.typeSlug,
+        page: params.page,
+        sortField: params.sortField,
+        year: params.year,
+      );
     });
 
 final filmDetailProvider = FutureProvider.family
@@ -97,12 +102,44 @@ class FilmListState {
 
 enum PaginatedSource { type, genre, country, search }
 
+class FilmFilterParams {
+  final String slug;
+  final PaginatedSource source;
+  final String? category;
+  final String? country;
+  final int? year;
+  final String? sortField;
+
+  const FilmFilterParams({
+    required this.slug,
+    required this.source,
+    this.category,
+    this.country,
+    this.year,
+    this.sortField,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is FilmFilterParams &&
+          slug == other.slug &&
+          source == other.source &&
+          category == other.category &&
+          country == other.country &&
+          year == other.year &&
+          sortField == other.sortField;
+
+  @override
+  int get hashCode =>
+      Object.hash(slug, source, category, country, year, sortField);
+}
+
 class FilmListNotifier extends StateNotifier<FilmListState> {
   final FilmRepository _repository;
-  final String _slug;
-  final PaginatedSource _source;
+  final FilmFilterParams _params;
 
-  FilmListNotifier(this._repository, this._slug, this._source)
+  FilmListNotifier(this._repository, this._params)
     : super(FilmListState(items: [])) {
     loadFirstPage();
   }
@@ -145,39 +182,52 @@ class FilmListNotifier extends StateNotifier<FilmListState> {
   }
 
   Future<FilmListResponse> _fetchData(int page) {
-    switch (_source) {
+    switch (_params.source) {
       case PaginatedSource.type:
-        return _repository.getFilmsByType(_slug, page: page);
+        return _repository.getFilmsByType(
+          _params.slug,
+          page: page,
+          category: _params.category,
+          country: _params.country,
+          year: _params.year,
+          sortField: _params.sortField,
+        );
       case PaginatedSource.genre:
-        return _repository.getFilmsByGenre(_slug, page: page);
+        return _repository.getFilmsByGenre(
+          _params.slug,
+          page: page,
+          country: _params.country,
+          year: _params.year,
+          sortField: _params.sortField,
+        );
       case PaginatedSource.country:
-        return _repository.getFilmsByCountry(_slug, page: page);
+        return _repository.getFilmsByCountry(
+          _params.slug,
+          page: page,
+          category: _params.category,
+          year: _params.year,
+          sortField: _params.sortField,
+        );
       case PaginatedSource.search:
-        return _repository.searchFilms(_slug, page: page);
+        return _repository.searchFilms(_params.slug, page: page);
     }
   }
 }
 
 final paginatedFilmsProvider = StateNotifierProvider.family
-    .autoDispose<FilmListNotifier, FilmListState, String>((ref, slug) {
+    .autoDispose<FilmListNotifier, FilmListState, FilmFilterParams>((
+      ref,
+      params,
+    ) {
       final repo = ref.watch(filmRepositoryProvider);
-      return FilmListNotifier(repo, slug, PaginatedSource.type);
-    });
-
-final paginatedGenreFilmsProvider = StateNotifierProvider.family
-    .autoDispose<FilmListNotifier, FilmListState, String>((ref, slug) {
-      final repo = ref.watch(filmRepositoryProvider);
-      return FilmListNotifier(repo, slug, PaginatedSource.genre);
-    });
-
-final paginatedCountryFilmsProvider = StateNotifierProvider.family
-    .autoDispose<FilmListNotifier, FilmListState, String>((ref, slug) {
-      final repo = ref.watch(filmRepositoryProvider);
-      return FilmListNotifier(repo, slug, PaginatedSource.country);
+      return FilmListNotifier(repo, params);
     });
 
 final paginatedSearchFilmsProvider = StateNotifierProvider.family
     .autoDispose<FilmListNotifier, FilmListState, String>((ref, keyword) {
       final repo = ref.watch(filmRepositoryProvider);
-      return FilmListNotifier(repo, keyword, PaginatedSource.search);
+      return FilmListNotifier(
+        repo,
+        FilmFilterParams(slug: keyword, source: PaginatedSource.search),
+      );
     });
