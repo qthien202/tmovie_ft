@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -12,10 +13,9 @@ class SearchPage extends ConsumerStatefulWidget {
 }
 
 class _SearchPageState extends ConsumerState<SearchPage> {
-  final _controller = TextEditingController();
+  final TextEditingController _controller = TextEditingController();
   Timer? _debounce;
   String _keyword = '';
-  int _currentPage = 1;
 
   @override
   void dispose() {
@@ -25,141 +25,197 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   }
 
   void _onSearchChanged(String value) {
-    _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 500), () {
-      if (value.trim().isNotEmpty) {
-        setState(() {
-          _keyword = value.trim();
-          _currentPage = 1;
-        });
-      }
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 600), () {
+      setState(() {
+        _keyword = value.trim();
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: TextField(
-                controller: _controller,
-                onChanged: _onSearchChanged,
-                style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  hintText: 'Tìm kiếm phim...',
-                  hintStyle: TextStyle(color: Colors.grey[500]),
-                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                  suffixIcon: _controller.text.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.clear, color: Colors.grey),
-                          onPressed: () {
-                            _controller.clear();
-                            setState(() {
-                              _keyword = '';
-                              _currentPage = 1;
-                            });
-                          },
-                        )
-                      : null,
-                  filled: true,
-                  fillColor: AppColors.surfaceColor,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
+      backgroundColor: Colors.black,
+      body: Stack(
+        children: [
+          // Background Glow
+          Positioned(
+            top: -100,
+            right: -100,
+            child: ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: 80, sigmaY: 80),
+              child: Container(
+                width: 300,
+                height: 300,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                ),
+              ),
+            ),
+          ),
+
+          SafeArea(
+            child: Column(
+              children: [
+                _buildSearchHeader(),
+                Expanded(
+                  child: _keyword.isEmpty
+                      ? _buildEmptyState()
+                      : _SearchList(keyword: _keyword),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchHeader() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                child: Container(
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.05),
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.1),
+                    ),
+                  ),
+                  child: TextField(
+                    controller: _controller,
+                    onChanged: _onSearchChanged,
+                    autofocus: true,
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                    decoration: InputDecoration(
+                      hintText: 'Tên phim, diễn viên...',
+                      hintStyle: const TextStyle(color: Colors.white38),
+                      prefixIcon: const Icon(
+                        Icons.search_rounded,
+                        color: Colors.white70,
+                      ),
+                      suffixIcon: _controller.text.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(
+                                Icons.close_rounded,
+                                color: Colors.white70,
+                              ),
+                              onPressed: () {
+                                _controller.clear();
+                                _onSearchChanged('');
+                              },
+                            )
+                          : null,
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
                   ),
                 ),
               ),
             ),
-            Expanded(
-              child: _keyword.isEmpty
-                  ? const Center(
-                      child: Text(
-                        'Nhập từ khóa để tìm kiếm',
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    )
-                  : _SearchResults(
-                      keyword: _keyword,
-                      page: _currentPage,
-                      onPageChanged: (page) {
-                        setState(() => _currentPage = page);
-                      },
-                    ),
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(width: 12),
+          TextButton(
+            onPressed: () => context.pop(),
+            child: const Text('Hủy', style: TextStyle(color: Colors.white70)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.movie_filter_outlined,
+            size: 80,
+            color: Colors.white.withValues(alpha: 0.1),
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            'Khám phá hàng ngàn bộ phim',
+            style: TextStyle(color: Colors.white38, fontSize: 16),
+          ),
+        ],
       ),
     );
   }
 }
 
-class _SearchResults extends ConsumerWidget {
+class _SearchList extends ConsumerWidget {
   final String keyword;
-  final int page;
-  final ValueChanged<int> onPageChanged;
-
-  const _SearchResults({
-    required this.keyword,
-    required this.page,
-    required this.onPageChanged,
-  });
+  const _SearchList({required this.keyword});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final searchAsync = ref.watch(
-      searchFilmsProvider((keyword: keyword, page: page)),
-    );
+    final searchState = ref.watch(paginatedSearchFilmsProvider(keyword));
 
-    return searchAsync.when(
-      data: (response) {
-        final items = response.data?.items ?? [];
-        if (items.isEmpty) {
-          return const Center(
-            child: Text(
-              'Không tìm thấy phim',
-              style: TextStyle(color: Colors.white),
-            ),
-          );
-        }
-        final pagination = response.data?.params?.pagination;
-        final totalPages = pagination?.totalPages ?? 1;
+    if (searchState.items.isEmpty && searchState.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
-        return Column(
-          children: [
-            Expanded(
-              child: FilmGrid(
-                films: items,
-                onFilmTap: (film) => context.push('/detail/${film.slug}'),
-              ),
-            ),
-            if (totalPages > 1)
-              PaginationBar(
-                currentPage: page,
-                totalPages: totalPages,
-                onPageChanged: onPageChanged,
-              ),
-          ],
-        );
-      },
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, _) => Center(
+    if (searchState.items.isEmpty && !searchState.isLoading) {
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('Có lỗi xảy ra', style: TextStyle(color: Colors.white)),
-            const SizedBox(height: 8),
-            ElevatedButton(
-              onPressed: () => ref.invalidate(
-                searchFilmsProvider((keyword: keyword, page: page)),
-              ),
-              child: const Text('Thử lại'),
+            const Icon(
+              Icons.search_off_rounded,
+              size: 60,
+              color: Colors.white24,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Không tìm thấy "$keyword"',
+              style: const TextStyle(color: Colors.white54),
             ),
           ],
         ),
+      );
+    }
+
+    return NotificationListener<ScrollNotification>(
+      onNotification: (notification) {
+        if (notification is ScrollEndNotification) {
+          if (notification.metrics.pixels >=
+              notification.metrics.maxScrollExtent - 400) {
+            ref.read(paginatedSearchFilmsProvider(keyword).notifier).loadMore();
+          }
+        }
+        return false;
+      },
+      child: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: FilmGrid.asSliver(
+              films: searchState.items,
+              onFilmTap: (film) => context.push('/detail/${film.slug}'),
+            ),
+          ),
+          if (searchState.isLoading)
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 20),
+                child: Center(child: CircularProgressIndicator()),
+              ),
+            ),
+          const SliverToBoxAdapter(child: SizedBox(height: 50)),
+        ],
       ),
     );
   }
