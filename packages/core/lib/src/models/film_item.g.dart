@@ -27,6 +27,12 @@ FilmItem _$FilmItemFromJson(Map<String, dynamic> json) => FilmItem(
   country: (json['country'] as List<dynamic>?)
       ?.map((e) => FilmCountry.fromJson(e as Map<String, dynamic>))
       .toList(),
+  tmdb: json['tmdb'] == null
+      ? null
+      : TmdbInfo.fromJson(json['tmdb'] as Map<String, dynamic>),
+  imdb: json['imdb'] == null
+      ? null
+      : ImdbInfo.fromJson(json['imdb'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$FilmItemToJson(FilmItem instance) => <String, dynamic>{
@@ -46,4 +52,6 @@ Map<String, dynamic> _$FilmItemToJson(FilmItem instance) => <String, dynamic>{
   'year': instance.year,
   'category': instance.category,
   'country': instance.country,
+  'tmdb': instance.tmdb,
+  'imdb': instance.imdb,
 };

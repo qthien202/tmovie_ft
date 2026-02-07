@@ -3,6 +3,8 @@ import 'package:retrofit/retrofit.dart';
 import '../constants/api_constants.dart';
 import '../models/film_list_response.dart';
 import '../models/film_detail_response.dart';
+import '../models/film_people_response.dart';
+import '../models/film_images_response.dart';
 
 part 'api_service.g.dart';
 
@@ -47,5 +49,15 @@ abstract class ApiService {
     @Query('category') String? category,
     @Query('year') int? year,
     @Query('sort_field') String? sortField,
+  });
+
+  @GET('/phim/{slug}/peoples')
+  Future<FilmPeopleResponse> getFilmPeoples({
+    @Path('slug') required String slug,
+  });
+
+  @GET('/phim/{slug}/images')
+  Future<FilmImagesResponse> getFilmImages({
+    @Path('slug') required String slug,
   });
 }

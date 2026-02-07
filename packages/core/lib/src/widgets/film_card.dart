@@ -38,6 +38,44 @@ class FilmCard extends StatelessWidget {
                       width: double.infinity,
                       height: double.infinity,
                     ),
+                    if (film.tmdb?.voteAverage != null &&
+                        film.tmdb!.voteAverage! > 0)
+                      Positioned(
+                        top: 8,
+                        left: 8,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.6),
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(
+                              color: const Color(0xffFFD700).withValues(alpha: 0.3),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.star_rounded,
+                                color: Color(0xffFFD700),
+                                size: 12,
+                              ),
+                              const SizedBox(width: 2),
+                              Text(
+                                film.tmdb!.voteAverage!.toStringAsFixed(1),
+                                style: const TextStyle(
+                                  color: Color(0xffFFD700),
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     if (film.episodeCurrent != null)
                       Positioned(
                         top: 8,

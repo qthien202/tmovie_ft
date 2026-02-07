@@ -17,6 +17,8 @@ export 'src/models/film_item.dart';
 export 'src/models/film_detail.dart';
 export 'src/models/film_list_response.dart';
 export 'src/models/film_detail_response.dart';
+export 'src/models/film_people_response.dart';
+export 'src/models/film_images_response.dart';
 export 'src/models/watch_history_entry.dart';
 
 // Network

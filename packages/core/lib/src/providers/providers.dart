@@ -9,6 +9,8 @@ import '../repositories/history_repository_impl.dart';
 import '../models/film_list_response.dart';
 import '../models/film_item.dart';
 import '../models/film_detail_response.dart';
+import '../models/film_people_response.dart';
+import '../models/film_images_response.dart';
 
 // --- Singleton providers ---
 
@@ -52,6 +54,18 @@ final searchFilmsProvider = FutureProvider.family
     .autoDispose<FilmListResponse, ({String keyword, int page})>((ref, params) {
       final repo = ref.watch(filmRepositoryProvider);
       return repo.searchFilms(params.keyword, page: params.page);
+    });
+
+final filmPeoplesProvider = FutureProvider.family
+    .autoDispose<FilmPeopleResponse, String>((ref, slug) {
+      final repo = ref.watch(filmRepositoryProvider);
+      return repo.getFilmPeoples(slug);
+    });
+
+final filmImagesProvider = FutureProvider.family
+    .autoDispose<FilmImagesResponse, String>((ref, slug) {
+      final repo = ref.watch(filmRepositoryProvider);
+      return repo.getFilmImages(slug);
     });
 
 final filmsByGenreProvider = FutureProvider.family

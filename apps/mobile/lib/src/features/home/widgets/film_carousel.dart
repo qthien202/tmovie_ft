@@ -185,12 +185,50 @@ class _FilmInfoSection extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          // Tags: Quality • Lang • Episode • Year
+          // Tags: TMDB/IMDB • Quality • Lang • Episode • Year
           Wrap(
             alignment: WrapAlignment.center,
             spacing: 8,
             runSpacing: 8,
             children: [
+              if (film.tmdb?.voteAverage != null &&
+                  film.tmdb!.voteAverage! > 0)
+                _TagItem(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.star_rounded, color: Color(0xffFFD700), size: 14),
+                      const SizedBox(width: 4),
+                      Text(
+                        'TMDB ${film.tmdb!.voteAverage!.toStringAsFixed(1)}',
+                        style: const TextStyle(
+                          color: Color(0xffFFD700),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              if (film.imdb?.voteAverage != null &&
+                  film.imdb!.voteAverage! > 0)
+                _TagItem(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.star_rounded, color: Color(0xffFFD700), size: 14),
+                      const SizedBox(width: 4),
+                      Text(
+                        'IMDB ${film.imdb!.voteAverage!.toStringAsFixed(1)}',
+                        style: const TextStyle(
+                          color: Color(0xffFFD700),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               _TagItem(
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
