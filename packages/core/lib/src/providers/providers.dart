@@ -277,7 +277,7 @@ final paginatedSearchFilmsProvider = StateNotifierProvider.family
       );
     });
 
-final watchHistoryProvider = FutureProvider<List<WatchHistoryEntry>>((ref) {
+final watchHistoryProvider = FutureProvider.autoDispose<List<WatchHistoryEntry>>((ref) {
   final repo = ref.watch(historyRepositoryProvider);
   return repo.getHistory();
 });

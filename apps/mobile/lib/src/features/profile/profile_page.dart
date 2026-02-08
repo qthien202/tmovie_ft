@@ -33,19 +33,18 @@ class ProfilePage extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Avatar placeholder
             Container(
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: Colors.white.withOpacity(0.2),
                   width: 2,
                 ),
               ),
               child: CircleAvatar(
                 radius: 50,
-                backgroundColor: Colors.white.withValues(alpha: 0.1),
+                backgroundColor: Colors.white.withOpacity(0.1),
                 child: const Icon(
                   Icons.person_rounded,
                   size: 50,
@@ -66,7 +65,7 @@ class ProfilePage extends ConsumerWidget {
             Text(
               'Lịch sử xem & phim yêu thích trên mọi thiết bị',
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.5),
+                color: Colors.white.withOpacity(0.5),
                 fontSize: 14,
               ),
             ),
@@ -92,308 +91,402 @@ class ProfilePage extends ConsumerWidget {
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
-          // 1. Header with Google Avatar
           SliverToBoxAdapter(
-            child: SizedBox(
-              height: 320,
-              child: Stack(
-                children: [
-                  // Ambient Background Glow
-                  Positioned(
-                    top: -100,
-                    right: -50,
-                    child: ImageFiltered(
-                      imageFilter: ImageFilter.blur(sigmaX: 80, sigmaY: 80),
+            child: Column(
+              children: [
+                // 1. Header & Card
+                Stack(
+                  children: [
+                    Container(
+                      height: 220,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            AppColors.primaryValue.withOpacity(0.15),
+                            Colors.black,
+                          ],
+                        ),
+                      ),
+                      child: user.photoURL != null
+                          ? Opacity(
+                              opacity: 0.2,
+                              child: Image.network(
+                                user.photoURL!,
+                                fit: BoxFit.cover,
+                              ),
+                            )
+                          : null,
+                    ),
+                    Positioned.fill(
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                        child: Container(color: Colors.black.withOpacity(0.2)),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 50, 20, 0),
                       child: Container(
-                        width: 300,
-                        height: 300,
+                        padding: const EdgeInsets.symmetric(vertical: 20),
                         decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppColors.primary.withValues(alpha: 0.15),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  // Profile Info
-                  Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const SizedBox(height: 40),
-                        // Avatar with ring
-                        Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: AppColors.primary.withValues(alpha: 0.5),
-                              width: 2,
-                            ),
-                          ),
-                          child: CircleAvatar(
-                            radius: 50,
-                            backgroundColor: Colors.white.withValues(
-                              alpha: 0.1,
-                            ),
-                            backgroundImage: user.photoURL != null
-                                ? NetworkImage(user.photoURL!)
-                                : null,
-                            child: user.photoURL == null
-                                ? const Icon(
-                                    Icons.person_rounded,
-                                    size: 50,
-                                    color: Colors.white70,
-                                  )
-                                : null,
+                          color: Colors.white.withOpacity(0.06),
+                          borderRadius: BorderRadius.circular(28),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.08),
+                            width: 1,
                           ),
                         ),
-                        const SizedBox(height: 16),
-                        Text(
-                          user.displayName ?? 'Người dùng',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        if (user.email != null)
-                          Text(
-                            user.email!,
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.5),
-                              fontSize: 13,
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // 2. Watch History Section
-          SliverToBoxAdapter(
-            child: historyAsync.when(
-              data: (history) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
-                        children: [
-                          const Text(
-                            'LỊCH SỬ XEM',
-                            style: TextStyle(
-                              color: Colors.white54,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 1.5,
-                            ),
-                          ),
-                          const Spacer(),
-                          if (history.isNotEmpty)
-                            GestureDetector(
-                              onTap: () => context.push('/history'),
-                              child: Text(
-                                'Xem tất cả',
-                                style: TextStyle(
-                                  color: AppColors.primaryValue,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                        child: Column(
+                          children: [
+                            _buildAvatar(user),
+                            const SizedBox(height: 12),
+                            Text(
+                              user.displayName ?? 'Thành viên',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    if (history.isEmpty)
-                      _buildEmptySection(
-                        icon: Icons.history_rounded,
-                        text: 'Bạn chưa xem bộ phim nào',
-                      )
-                    else
-                      SizedBox(
-                        height: 180,
-                        child: ListView.separated(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          scrollDirection: Axis.horizontal,
-                          physics: const BouncingScrollPhysics(),
-                          itemCount: history.length,
-                          separatorBuilder: (_, __) =>
-                              const SizedBox(width: 12),
-                          itemBuilder: (context, index) {
-                            final item = history[index];
-                            return _HistoryCard(item: item);
-                          },
-                        ),
-                      ),
-                  ],
-                );
-              },
-              loading: () => Column(
-                children: [
-                  const _SectionHeaderPlaceholder(title: 'LỊCH SỬ XEM'),
-                  const SizedBox(height: 16),
-                  const _HistorySkeleton(),
-                ],
-              ),
-              error: (_, __) => Column(
-                children: [
-                  const _SectionHeaderPlaceholder(title: 'LỊCH SỬ XEM'),
-                  const SizedBox(height: 16),
-                  _buildEmptySection(
-                    icon: Icons.history_rounded,
-                    text: 'Bạn chưa xem bộ phim nào',
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // 3. Favorites Section
-          SliverToBoxAdapter(
-            child: favoritesAsync.when(
-              data: (favorites) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 32),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
-                        children: [
-                          const Text(
-                            'PHIM YÊU THÍCH',
-                            style: TextStyle(
-                              color: Colors.white54,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 1.5,
-                            ),
-                          ),
-                          const Spacer(),
-                          if (favorites.isNotEmpty)
-                            GestureDetector(
-                              onTap: () => context.push('/favorites'),
-                              child: Text(
-                                'Xem tất cả',
-                                style: TextStyle(
-                                  color: AppColors.primaryValue,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            Text(
+                              user.email ?? '',
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.4),
+                                fontSize: 13,
                               ),
                             ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    if (favorites.isEmpty)
-                      _buildEmptySection(
-                        icon: Icons.favorite_border_rounded,
-                        text: 'Chưa có phim yêu thích',
-                      )
-                    else
-                      SizedBox(
-                        height: 180,
-                        child: ListView.separated(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          scrollDirection: Axis.horizontal,
-                          physics: const BouncingScrollPhysics(),
-                          itemCount: favorites.length,
-                          separatorBuilder: (_, __) =>
-                              const SizedBox(width: 12),
-                          itemBuilder: (context, index) {
-                            final item = favorites[index];
-                            return _HistoryCard(item: item);
-                          },
+                            const SizedBox(height: 20),
+                            _buildStatsRow(historyAsync, favoritesAsync),
+                          ],
                         ),
                       ),
+                    ),
                   ],
-                );
-              },
-              loading: () => const Column(
-                children: [
-                  SizedBox(height: 32),
-                  _SectionHeaderPlaceholder(title: 'PHIM YÊU THÍCH'),
-                  SizedBox(height: 16),
-                  _HistorySkeleton(),
-                ],
-              ),
-              error: (_, __) => Column(
-                children: [
-                  const SizedBox(height: 32),
-                  const _SectionHeaderPlaceholder(title: 'PHIM YÊU THÍCH'),
-                  const SizedBox(height: 16),
-                  _buildEmptySection(
-                    icon: Icons.favorite_border_rounded,
-                    text: 'Chưa có phim yêu thích',
-                  ),
-                ],
-              ),
-            ),
-          ),
+                ),
 
-          // 4. Menu Options & Logout
-          SliverPadding(
-            padding: const EdgeInsets.all(16),
-            sliver: SliverList(
-              delegate: SliverChildListDelegate([
-                const SizedBox(height: 24),
-                _MenuTile(
-                  icon: Icons.settings_outlined,
-                  label: 'Cài đặt tài khoản',
-                  onTap: () => _showSettingsSheet(context, ref),
+                // 2. History Section
+                historyAsync.when(
+                  data: (history) => _buildSection(
+                    title: 'VỪA XEM GẦN ĐÂY',
+                    onSeeAll: history.isNotEmpty
+                        ? () => context.push('/history')
+                        : null,
+                    child: history.isEmpty
+                        ? _buildEmptySection(
+                            icon: Icons.history_rounded,
+                            text: 'Chưa có lịch sử xem',
+                          )
+                        : SizedBox(
+                            height: 180,
+                            child: ListView.separated(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                              ),
+                              scrollDirection: Axis.horizontal,
+                              itemCount: history.length,
+                              separatorBuilder: (_, __) =>
+                                  const SizedBox(width: 12),
+                              itemBuilder: (context, index) =>
+                                  _HistoryCard(item: history[index]),
+                            ),
+                          ),
+                  ),
+                  loading: () => const _HistorySkeleton(),
+                  error: (_, __) => const SizedBox.shrink(),
                 ),
-                _MenuTile(
-                  icon: Icons.help_outline_rounded,
-                  label: 'Trợ giúp & Phản hồi',
-                  onTap: () => _showHelpSheet(context),
+
+                // 3. Favorites Section
+                favoritesAsync.when(
+                  data: (favorites) => _buildSection(
+                    title: 'DANH SÁCH YÊU THÍCH',
+                    onSeeAll: favorites.isNotEmpty
+                        ? () => context.push('/favorites')
+                        : null,
+                    child: favorites.isEmpty
+                        ? _buildEmptySection(
+                            icon: Icons.favorite_border_rounded,
+                            text: 'Chưa có phim yêu thích',
+                          )
+                        : SizedBox(
+                            height: 180,
+                            child: ListView.separated(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                              ),
+                              scrollDirection: Axis.horizontal,
+                              itemCount: favorites.length,
+                              separatorBuilder: (_, __) =>
+                                  const SizedBox(width: 12),
+                              itemBuilder: (context, index) =>
+                                  _HistoryCard(item: favorites[index]),
+                            ),
+                          ),
+                  ),
+                  loading: () => const _HistorySkeleton(),
+                  error: (_, __) => const SizedBox.shrink(),
                 ),
-                const SizedBox(height: 40),
-                // Logout Button
-                Center(
-                  child: TextButton.icon(
-                    onPressed: () {
-                      _showLogoutDialog(context, ref);
-                    },
-                    icon: const Icon(
-                      Icons.logout_rounded,
-                      color: Colors.redAccent,
-                    ),
-                    label: const Text(
-                      'Đăng xuất',
-                      style: TextStyle(
-                        color: Colors.redAccent,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 16,
-                      ),
-                      backgroundColor: Colors.redAccent.withValues(alpha: 0.1),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        side: BorderSide(
-                          color: Colors.redAccent.withValues(alpha: 0.2),
+
+                // 4. Menu Section
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 24, 20, 100),
+                  child: Column(
+                    children: [
+                      _buildMenuContainer([
+                        _MenuTileV2(
+                          icon: Icons.settings_rounded,
+                          label: 'Cài đặt tài khoản',
+                          color: Colors.blueAccent,
+                          onTap: () => _showSettingsSheet(context, ref),
                         ),
-                      ),
-                    ),
+                        _MenuTileV2(
+                          icon: Icons.notifications_rounded,
+                          label: 'Thông báo & Tin nhắn',
+                          color: Colors.orangeAccent,
+                          onTap: () {},
+                        ),
+                      ]),
+                      const SizedBox(height: 12),
+                      _buildMenuContainer([
+                        _MenuTileV2(
+                          icon: Icons.help_center_rounded,
+                          label: 'Trung tâm trợ giúp',
+                          color: Colors.greenAccent,
+                          onTap: () => _showHelpSheet(context),
+                        ),
+                        _MenuTileV2(
+                          icon: Icons.security_rounded,
+                          label: 'Quyền riêng tư',
+                          color: Colors.purpleAccent,
+                          onTap: () {},
+                        ),
+                      ]),
+                      const SizedBox(height: 32),
+                      _buildLogoutButton(context, ref),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 100),
-              ]),
+              ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildAvatar(dynamic user) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Container(
+          width: 80,
+          height: 80,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: SweepGradient(
+              colors: [
+                AppColors.primaryValue,
+                AppColors.primaryValue.withOpacity(0.2),
+                AppColors.primaryValue,
+              ],
+            ),
+          ),
+        ),
+        CircleAvatar(
+          radius: 36,
+          backgroundColor: const Color(0xff080808),
+          child: CircleAvatar(
+            radius: 33,
+            backgroundImage: user.photoURL != null
+                ? NetworkImage(user.photoURL!)
+                : null,
+            child: user.photoURL == null
+                ? const Icon(
+                    Icons.person_rounded,
+                    size: 32,
+                    color: Colors.white54,
+                  )
+                : null,
+          ),
+        ),
+        Positioned(
+          bottom: 0,
+          right: 0,
+          child: Container(
+            padding: const EdgeInsets.all(3),
+            decoration: BoxDecoration(
+              color: AppColors.primaryValue,
+              shape: BoxShape.circle,
+              border: Border.all(color: const Color(0xff080808), width: 2),
+            ),
+            child: const Icon(
+              Icons.star_rounded,
+              color: Colors.white,
+              size: 12,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatsRow(
+    AsyncValue<List<WatchHistoryEntry>> historyAsync,
+    AsyncValue<List<WatchHistoryEntry>> favoritesAsync,
+  ) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        _buildStatItem(
+          'Đã xem',
+          historyAsync.valueOrNull?.length.toString() ?? '0',
+        ),
+        _buildStatDivider(),
+        _buildStatItem(
+          'Yêu thích',
+          favoritesAsync.valueOrNull?.length.toString() ?? '0',
+        ),
+        _buildStatDivider(),
+        _buildStatItem('Cấp độ', 'Pro'),
+      ],
+    );
+  }
+
+  Widget _buildStatItem(String label, String value) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 17,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: TextStyle(
+            color: Colors.white.withOpacity(0.4),
+            fontSize: 10,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatDivider() {
+    return Container(
+      height: 20,
+      width: 1,
+      color: Colors.white.withOpacity(0.1),
+    );
+  }
+
+  Widget _buildSection({
+    required String title,
+    VoidCallback? onSeeAll,
+    required Widget child,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 12),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Row(
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  color: Colors.white60,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.1,
+                ),
+              ),
+              const Spacer(),
+              if (onSeeAll != null)
+                GestureDetector(
+                  onTap: onSeeAll,
+                  child: Text(
+                    'Tất cả',
+                    style: TextStyle(
+                      color: AppColors.primaryValue.withOpacity(0.8),
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 6),
+        child,
+      ],
+    );
+  }
+
+  Widget _buildEmptySection({required IconData icon, required String text}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.white.withOpacity(0.15), size: 18),
+          const SizedBox(width: 8),
+          Text(
+            text,
+            style: const TextStyle(color: Colors.white24, fontSize: 13),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMenuContainer(List<Widget> children) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.04),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withOpacity(0.06)),
+      ),
+      child: Column(children: children),
+    );
+  }
+
+  Widget _buildLogoutButton(BuildContext context, WidgetRef ref) {
+    return Center(
+      child: GestureDetector(
+        onTap: () => _showLogoutDialog(context, ref),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+          decoration: BoxDecoration(
+            color: Colors.redAccent.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.redAccent.withOpacity(0.2)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.logout_rounded,
+                color: Colors.redAccent.withOpacity(0.8),
+                size: 20,
+              ),
+              const SizedBox(width: 12),
+              const Text(
+                'Đăng xuất tài khoản',
+                style: TextStyle(
+                  color: Colors.redAccent,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -451,12 +544,15 @@ class ProfilePage extends ConsumerWidget {
                   context,
                   ref,
                   title: 'Xóa phim yêu thích?',
-                  message: 'Toàn bộ danh sách phim yêu thích sẽ bị xóa vĩnh viễn.',
+                  message:
+                      'Toàn bộ danh sách phim yêu thích sẽ bị xóa vĩnh viễn.',
                   onConfirm: () {
                     ref.read(favoritesRepositoryProvider).clearFavorites();
                     ref.invalidate(favoritesProvider);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Đã xóa danh sách yêu thích')),
+                      const SnackBar(
+                        content: Text('Đã xóa danh sách yêu thích'),
+                      ),
                     );
                   },
                 );
@@ -496,16 +592,12 @@ class ProfilePage extends ConsumerWidget {
             _MenuTile(
               icon: Icons.telegram_rounded,
               label: 'Tham gia nhóm Telegram hỗ trợ',
-              onTap: () {
-                Navigator.pop(context);
-              },
+              onTap: () => Navigator.pop(context),
             ),
             _MenuTile(
               icon: Icons.bug_report_rounded,
               label: 'Báo lỗi hệ thống',
-              onTap: () {
-                Navigator.pop(context);
-              },
+              onTap: () => Navigator.pop(context),
             ),
             const SizedBox(height: 16),
             const Center(
@@ -517,29 +609,6 @@ class ProfilePage extends ConsumerWidget {
             const SizedBox(height: 12),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildEmptySection({required IconData icon, required String text}) {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(32),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: Colors.white.withValues(alpha: 0.2), size: 40),
-          const SizedBox(height: 12),
-          Text(
-            text,
-            style: const TextStyle(color: Colors.white38, fontSize: 13),
-          ),
-        ],
       ),
     );
   }
@@ -559,16 +628,16 @@ class ProfilePage extends ConsumerWidget {
           backgroundColor: const Color(0xff161616),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
-            side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+            side: BorderSide(color: Colors.white.withOpacity(0.1)),
           ),
           title: Text(
             title,
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          content: Text(
-            message,
-            style: const TextStyle(color: Colors.white70),
-          ),
+          content: Text(message, style: const TextStyle(color: Colors.white70)),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -602,7 +671,7 @@ class ProfilePage extends ConsumerWidget {
           backgroundColor: const Color(0xff161616),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
-            side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+            side: BorderSide(color: Colors.white.withOpacity(0.1)),
           ),
           title: const Text(
             'Đăng xuất?',
@@ -632,6 +701,53 @@ class ProfilePage extends ConsumerWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MenuTileV2 extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final Color color;
+
+  const _MenuTileV2({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: ListTile(
+        onTap: onTap,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        leading: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Icon(icon, color: color, size: 22),
+        ),
+        title: Text(
+          label,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        trailing: const Icon(
+          Icons.chevron_right_rounded,
+          color: Colors.white24,
+          size: 22,
         ),
       ),
     );
@@ -735,10 +851,10 @@ class _MenuTile extends StatelessWidget {
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: ListTile(
             onTap: onTap,
-            tileColor: Colors.white.withValues(alpha: 0.05),
+            tileColor: Colors.white.withOpacity(0.05),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
-              side: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
+              side: BorderSide(color: Colors.white.withOpacity(0.08)),
             ),
             leading: Icon(icon, color: AppColors.primaryValue),
             title: Text(
@@ -772,35 +888,7 @@ class _HistorySkeleton extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         itemCount: 3,
         separatorBuilder: (_, __) => const SizedBox(width: 12),
-        itemBuilder: (context, index) {
-          return const FilmCardSkeleton();
-        },
-      ),
-    );
-  }
-}
-
-class _SectionHeaderPlaceholder extends StatelessWidget {
-  final String title;
-  const _SectionHeaderPlaceholder({required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              color: Colors.white54,
-              fontSize: 12,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 1.5,
-            ),
-          ),
-          const Spacer(),
-        ],
+        itemBuilder: (context, index) => const FilmCardSkeleton(),
       ),
     );
   }
