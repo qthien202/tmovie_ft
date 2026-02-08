@@ -58,7 +58,7 @@ class _FilmCarouselState extends State<FilmCarousel> {
                     boxShadow: [
                       if (isCenter)
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.8),
+                          color: AppColors.primaryValue.withValues(alpha: 0.3),
                           blurRadius: 25,
                           spreadRadius: 1,
                         ),
@@ -69,7 +69,7 @@ class _FilmCarouselState extends State<FilmCarousel> {
                     child: AspectRatio(
                       aspectRatio: 2 / 3,
                       child: AppImage(
-                        imageUrl: film.fullPosterUrl,
+                        imageUrl: film.fullThumbUrl,
                         boxFit: BoxFit.cover,
                       ),
                     ),
@@ -191,13 +191,16 @@ class _FilmInfoSection extends StatelessWidget {
             spacing: 8,
             runSpacing: 8,
             children: [
-              if (film.tmdb?.voteAverage != null &&
-                  film.tmdb!.voteAverage! > 0)
+              if (film.tmdb?.voteAverage != null && film.tmdb!.voteAverage! > 0)
                 _TagItem(
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.star_rounded, color: Color(0xffFFD700), size: 14),
+                      const Icon(
+                        Icons.star_rounded,
+                        color: Color(0xffFFD700),
+                        size: 14,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         'TMDB ${film.tmdb!.voteAverage!.toStringAsFixed(1)}',
@@ -210,13 +213,16 @@ class _FilmInfoSection extends StatelessWidget {
                     ],
                   ),
                 ),
-              if (film.imdb?.voteAverage != null &&
-                  film.imdb!.voteAverage! > 0)
+              if (film.imdb?.voteAverage != null && film.imdb!.voteAverage! > 0)
                 _TagItem(
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.star_rounded, color: Color(0xffFFD700), size: 14),
+                      const Icon(
+                        Icons.star_rounded,
+                        color: Color(0xffFFD700),
+                        size: 14,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         'IMDB ${film.imdb!.voteAverage!.toStringAsFixed(1)}',

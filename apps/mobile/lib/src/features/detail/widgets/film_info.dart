@@ -49,16 +49,10 @@ class FilmInfo extends ConsumerWidget {
               children: [
                 if (film.tmdb?.voteAverage != null &&
                     film.tmdb!.voteAverage! > 0)
-                  _RatingChip(
-                    label: 'TMDB',
-                    score: film.tmdb!.voteAverage!,
-                  ),
+                  _RatingChip(label: 'TMDB', score: film.tmdb!.voteAverage!),
                 if (film.imdb?.voteAverage != null &&
                     film.imdb!.voteAverage! > 0)
-                  _RatingChip(
-                    label: 'IMDB',
-                    score: film.imdb!.voteAverage!,
-                  ),
+                  _RatingChip(label: 'IMDB', score: film.imdb!.voteAverage!),
                 if (film.year != null) _GlassChip(label: '${film.year}'),
                 if (film.quality != null) _GlassChip(label: film.quality!),
                 if (film.lang != null) _GlassChip(label: film.lang!),
@@ -162,33 +156,13 @@ class FilmInfo extends ConsumerWidget {
             error: (_, __) => _buildFallbackMeta(),
           ),
 
-          if (film.content != null && film.content!.isNotEmpty) ...[
-            const SizedBox(height: 32),
-            const Text(
-              'Nội dung phim',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 12),
-            HtmlWidget(
-              film.content!,
-              textStyle: TextStyle(
-                color: Colors.white.withValues(alpha: 0.7),
-                fontSize: 15,
-                height: 1.6,
-              ),
-            ),
-          ],
-
           // Image Gallery Section
           imagesAsync.when(
             data: (res) {
               final images = res.data?.images ?? [];
-              final backdrops =
-                  images.where((img) => img.type == 'backdrop').toList();
+              final backdrops = images
+                  .where((img) => img.type == 'backdrop')
+                  .toList();
               final backdropBaseUrl =
                   res.data?.imageSizes?.backdrop?.w780 ?? '';
 
@@ -242,6 +216,27 @@ class FilmInfo extends ConsumerWidget {
             loading: () => const SizedBox(),
             error: (_, __) => const SizedBox(),
           ),
+
+          if (film.content != null && film.content!.isNotEmpty) ...[
+            const SizedBox(height: 32),
+            const Text(
+              'Nội dung phim',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 12),
+            HtmlWidget(
+              film.content!,
+              textStyle: TextStyle(
+                color: Colors.white.withValues(alpha: 0.7),
+                fontSize: 15,
+                height: 1.6,
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -275,10 +270,7 @@ class FilmInfo extends ConsumerWidget {
           child: InteractiveViewer(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: AppImage(
-                imageUrl: imageUrl,
-                boxFit: BoxFit.contain,
-              ),
+              child: AppImage(imageUrl: imageUrl, boxFit: BoxFit.contain),
             ),
           ),
         ),
