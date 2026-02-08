@@ -25,11 +25,18 @@ export 'src/models/watch_history_entry.dart';
 export 'src/network/dio_provider.dart';
 export 'src/network/api_service.dart';
 
+// Services
+export 'src/services/auth_service.dart';
+
 // Repositories
 export 'src/repositories/film_repository.dart';
 export 'src/repositories/film_repository_impl.dart';
 export 'src/repositories/history_repository.dart';
 export 'src/repositories/history_repository_impl.dart';
+export 'src/repositories/favorites_repository.dart';
+export 'src/repositories/local_favorites_repository.dart';
+export 'src/repositories/firestore_history_repository.dart';
+export 'src/repositories/firestore_favorites_repository.dart';
 
 // Providers
 export 'src/providers/providers.dart';

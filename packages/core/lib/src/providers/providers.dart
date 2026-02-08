@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../network/dio_provider.dart';
 import '../network/api_service.dart';
@@ -6,11 +7,17 @@ import '../repositories/film_repository.dart';
 import '../repositories/film_repository_impl.dart';
 import '../repositories/history_repository.dart';
 import '../repositories/history_repository_impl.dart';
+import '../repositories/favorites_repository.dart';
+import '../repositories/local_favorites_repository.dart';
+import '../repositories/firestore_history_repository.dart';
+import '../repositories/firestore_favorites_repository.dart';
+import '../services/auth_service.dart';
 import '../models/film_list_response.dart';
 import '../models/film_item.dart';
 import '../models/film_detail_response.dart';
 import '../models/film_people_response.dart';
 import '../models/film_images_response.dart';
+import '../models/watch_history_entry.dart';
 
 // --- Singleton providers ---
 
@@ -24,17 +31,41 @@ final filmRepositoryProvider = Provider<FilmRepository>((ref) {
   return FilmRepositoryImpl(ref.watch(apiServiceProvider));
 });
 
+final authServiceProvider = Provider<AuthService>((ref) => AuthService());
+
+final authStateProvider = StreamProvider<User?>((ref) {
+  return ref.watch(authServiceProvider).authStateChanges;
+});
+
 final historyRepositoryProvider = Provider<HistoryRepository>((ref) {
+  final user = ref.watch(authStateProvider).value;
+  if (user != null) return FirestoreHistoryRepository(user.uid);
   return HistoryRepositoryImpl();
+});
+
+final favoritesRepositoryProvider = Provider<FavoritesRepository>((ref) {
+  final user = ref.watch(authStateProvider).value;
+  if (user != null) return FirestoreFavoritesRepository(user.uid);
+  return LocalFavoritesRepository();
+});
+
+final favoritesProvider = FutureProvider.autoDispose<List<WatchHistoryEntry>>((ref) {
+  final repo = ref.watch(favoritesRepositoryProvider);
+  return repo.getFavorites();
+});
+
+final isFavoriteProvider = FutureProvider.family.autoDispose<bool, String>((ref, slug) {
+  final repo = ref.watch(favoritesRepositoryProvider);
+  return repo.isFavorite(slug);
 });
 
 // --- Data providers ---
 
 final filmsByTypeProvider =
-    FutureProvider.family<FilmListResponse, ({String typeSlug, int page, String? sortField, int? year})>((
-      ref,
-      params,
-    ) {
+    FutureProvider.family<
+      FilmListResponse,
+      ({String typeSlug, int page, String? sortField, int? year})
+    >((ref, params) {
       final repo = ref.watch(filmRepositoryProvider);
       return repo.getFilmsByType(
         params.typeSlug,
@@ -245,3 +276,8 @@ final paginatedSearchFilmsProvider = StateNotifierProvider.family
         FilmFilterParams(slug: keyword, source: PaginatedSource.search),
       );
     });
+
+final watchHistoryProvider = FutureProvider<List<WatchHistoryEntry>>((ref) {
+  final repo = ref.watch(historyRepositoryProvider);
+  return repo.getHistory();
+});

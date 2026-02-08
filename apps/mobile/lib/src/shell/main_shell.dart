@@ -16,13 +16,8 @@ class _MainShellState extends State<MainShell> {
 
   static const _tabs = [
     {'route': '/home', 'icon': Icons.home_rounded, 'label': 'Trang chủ'},
-    {
-      'route': '/phim-le',
-      'icon': Icons.movie_filter_rounded,
-      'label': 'Phim lẻ',
-    },
-    {'route': '/phim-bo', 'icon': Icons.tv_rounded, 'label': 'Phim bộ'},
     {'route': '/search', 'icon': Icons.search_rounded, 'label': 'Tìm kiếm'},
+    {'route': '/profile', 'icon': Icons.person_rounded, 'label': 'Cá nhân'},
   ];
 
   @override
@@ -55,13 +50,7 @@ class _MainShellState extends State<MainShell> {
                     onTap: () {
                       setState(() => _selectedIndex = index);
                       final route = _tabs[index]['route'] as String;
-                      // Nếu là phim lẻ/bộ mà chưa có route riêng thì dùng home hoặc xử lý sau
-                      // Hiện tại cứ cho qua home
-                      if (route.startsWith('/phim')) {
-                        context.go('/home'); // Demo: vẫn ở home
-                      } else {
-                        context.go(route);
-                      }
+                      context.go(route);
                     },
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 300),
