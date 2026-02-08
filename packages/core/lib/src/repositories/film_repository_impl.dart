@@ -12,12 +12,15 @@ class FilmRepositoryImpl implements FilmRepository {
 
   FilmRepositoryImpl(this._apiService);
 
-  FilmListResponse _filterAdultContent(FilmListResponse response) {
+  FilmListResponse _filterContent(FilmListResponse response) {
     final items = response.data?.items;
     if (items == null) return response;
     final filtered = items.where((item) {
       final categories = item.category ?? [];
-      return !categories.any((c) => _blockedCategorySlugs.contains(c.slug));
+      final isAdult =
+          categories.any((c) => _blockedCategorySlugs.contains(c.slug));
+      final isTrailer = item.episodeCurrent?.toLowerCase() == 'trailer';
+      return !isAdult && !isTrailer;
     }).toList();
     if (filtered.length == items.length) return response;
     return FilmListResponse(
@@ -48,7 +51,7 @@ class FilmRepositoryImpl implements FilmRepository {
       year: year,
       sortField: sortField,
     );
-    return _filterAdultContent(response);
+    return _filterContent(response);
   }
 
   @override
@@ -59,7 +62,7 @@ class FilmRepositoryImpl implements FilmRepository {
   Future<FilmListResponse> searchFilms(String keyword, {int page = 1}) async {
     final response =
         await _apiService.searchFilms(keyword: keyword, page: page);
-    return _filterAdultContent(response);
+    return _filterContent(response);
   }
 
   @override
@@ -77,7 +80,7 @@ class FilmRepositoryImpl implements FilmRepository {
       year: year,
       sortField: sortField,
     );
-    return _filterAdultContent(response);
+    return _filterContent(response);
   }
 
   @override
@@ -95,7 +98,7 @@ class FilmRepositoryImpl implements FilmRepository {
       year: year,
       sortField: sortField,
     );
-    return _filterAdultContent(response);
+    return _filterContent(response);
   }
 
   @override
