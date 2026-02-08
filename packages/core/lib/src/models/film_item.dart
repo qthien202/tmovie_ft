@@ -1,6 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'category.dart';
 import 'country.dart';
+import 'film_detail.dart';
 
 part 'film_item.g.dart';
 
@@ -28,6 +29,8 @@ class FilmItem {
   final int? year;
   final List<FilmCategory>? category;
   final List<FilmCountry>? country;
+  final TmdbInfo? tmdb;
+  final ImdbInfo? imdb;
 
   const FilmItem({
     this.id,
@@ -46,6 +49,8 @@ class FilmItem {
     this.year,
     this.category,
     this.country,
+    this.tmdb,
+    this.imdb,
   });
 
   String get fullThumbUrl {

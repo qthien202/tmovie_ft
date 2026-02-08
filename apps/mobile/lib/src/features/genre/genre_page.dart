@@ -1,85 +1,211 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
 
-class GenrePage extends ConsumerStatefulWidget {
+class GenrePage extends ConsumerWidget {
   final String slug;
   final String title;
 
-  const GenrePage({
-    super.key,
-    required this.slug,
-    required this.title,
-  });
+  const GenrePage({super.key, required this.slug, required this.title});
 
   @override
-  ConsumerState<GenrePage> createState() => _GenrePageState();
-}
-
-class _GenrePageState extends ConsumerState<GenrePage> {
-  int _currentPage = 1;
-
-  @override
-  Widget build(BuildContext context) {
-    final filmsAsync = ref.watch(
-      filmsByGenreProvider((slug: widget.slug, page: _currentPage)),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final filmListState = ref.watch(
+      paginatedFilmsProvider(
+        FilmFilterParams(slug: slug, source: PaginatedSource.genre),
+      ),
     );
+    final items = filmListState.items;
+    final backdropUrl = items.isNotEmpty ? items.first.fullThumbUrl : null;
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: AppColors.backgroundColor,
-        title: Text(
-          widget.title.isNotEmpty ? widget.title : widget.slug,
-          style: const TextStyle(color: Colors.white),
-        ),
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
-      body: filmsAsync.when(
-        data: (response) {
-          final items = response.data?.items ?? [];
-          if (items.isEmpty) {
-            return const Center(
-              child: Text('Không có phim', style: TextStyle(color: Colors.white)),
-            );
-          }
-          final pagination = response.data?.params?.pagination;
-          final totalPages = pagination?.totalPages ?? 1;
+      body: Stack(
+        children: [
+          // 1. Dynamic Blurred Background
+          if (backdropUrl != null)
+            Positioned.fill(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 500),
+                child: AppImage(
+                  key: ValueKey(backdropUrl),
+                  imageUrl: backdropUrl,
+                  boxFit: BoxFit.cover,
+                  width: double.infinity,
+                  height: double.infinity,
+                ),
+              ),
+            ),
+          Positioned.fill(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
+              child: Container(color: Colors.black.withValues(alpha: 0.7)),
+            ),
+          ),
 
-          return Column(
-            children: [
-              Expanded(
-                child: FilmGrid(
-                  films: items,
-                  onFilmTap: (film) => context.push('/detail/${film.slug}'),
+          // 2. Main Content with Infinite Scroll
+          NotificationListener<ScrollNotification>(
+            onNotification: (notification) {
+              if (notification is ScrollEndNotification) {
+                if (notification.metrics.pixels >=
+                    notification.metrics.maxScrollExtent - 400) {
+                  ref
+                      .read(
+                        paginatedFilmsProvider(
+                          FilmFilterParams(
+                            slug: slug,
+                            source: PaginatedSource.genre,
+                          ),
+                        ).notifier,
+                      )
+                      .loadMore();
+                }
+              }
+              return false;
+            },
+            child: CustomScrollView(
+              physics: const BouncingScrollPhysics(),
+              slivers: [
+                // Glassmorphism sticky header
+                SliverAppBar(
+                  pinned: true,
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  centerTitle: true,
+                  leading: const _AppBackButton(),
+                  title: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.05),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.1),
+                          ),
+                        ),
+                        child: Text(
+                          title.isNotEmpty ? title : slug,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
+
+                if (items.isEmpty && filmListState.isLoading)
+                  const SliverFillRemaining(
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(16, 24, 16, 0),
+                      child: FilmGridSkeleton(),
+                    ),
+                  )
+                else if (items.isEmpty && filmListState.error != null)
+                  SliverFillRemaining(
+                    child: _ErrorView(
+                      onRetry: () => ref
+                          .read(
+                            paginatedFilmsProvider(
+                              FilmFilterParams(
+                                slug: slug,
+                                source: PaginatedSource.genre,
+                              ),
+                            ).notifier,
+                          )
+                          .loadFirstPage(),
+                    ),
+                  )
+                else if (items.isEmpty)
+                  const SliverFillRemaining(
+                    child: Center(
+                      child: Text(
+                        'Không có phim',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  )
+                else ...[
+                  SliverToBoxAdapter(
+                    child: FilmGrid(
+                      films: items,
+                      onFilmTap: (film) => context.push('/detail/${film.slug}'),
+                    ),
+                  ),
+                  if (filmListState.isLoading)
+                    const SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 24,
+                          horizontal: 16,
+                        ),
+                        child: FilmGridSkeleton(count: 3),
+                      ),
+                    ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 50)),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ErrorView extends StatelessWidget {
+  final VoidCallback onRetry;
+  const _ErrorView({required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text('Có lỗi xảy ra', style: TextStyle(color: Colors.white)),
+          const SizedBox(height: 16),
+          ElevatedButton(onPressed: onRetry, child: const Text('Thử lại')),
+        ],
+      ),
+    );
+  }
+}
+
+class _AppBackButton extends StatelessWidget {
+  const _AppBackButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ClipOval(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+            ),
+            child: IconButton(
+              icon: const Icon(
+                Icons.arrow_back_rounded,
+                color: Colors.white,
+                size: 20,
               ),
-              if (totalPages > 1)
-                PaginationBar(
-                  currentPage: _currentPage,
-                  totalPages: totalPages,
-                  onPageChanged: (page) {
-                    setState(() => _currentPage = page);
-                  },
-                ),
-            ],
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text('Có lỗi xảy ra', style: TextStyle(color: Colors.white)),
-              const SizedBox(height: 8),
-              ElevatedButton(
-                onPressed: () => ref.invalidate(
-                  filmsByGenreProvider((slug: widget.slug, page: _currentPage)),
-                ),
-                child: const Text('Thử lại'),
-              ),
-            ],
+              onPressed: () => context.pop(),
+            ),
           ),
         ),
       ),

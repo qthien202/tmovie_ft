@@ -12,7 +12,11 @@ class HistoryRepositoryImpl implements HistoryRepository {
     final prefs = await SharedPreferences.getInstance();
     final jsonList = prefs.getStringList(_historyKey) ?? [];
     return jsonList
-        .map((e) => WatchHistoryEntry.fromJson(json.decode(e) as Map<String, dynamic>))
+        .map(
+          (e) => WatchHistoryEntry.fromJson(
+            json.decode(e) as Map<String, dynamic>,
+          ),
+        )
         .toList();
   }
 
@@ -32,14 +36,27 @@ class HistoryRepositoryImpl implements HistoryRepository {
   }
 
   @override
-  Future<void> savePlaybackPosition(String filmSlug, String episodeSlug, int positionSeconds) async {
+  Future<void> savePlaybackPosition(
+    String filmSlug,
+    String episodeSlug,
+    int positionSeconds,
+  ) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('$_positionPrefix${filmSlug}_$episodeSlug', positionSeconds);
+    await prefs.setInt(
+      '$_positionPrefix${filmSlug}_$episodeSlug',
+      positionSeconds,
+    );
   }
 
   @override
   Future<int?> getPlaybackPosition(String filmSlug, String episodeSlug) async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getInt('$_positionPrefix${filmSlug}_$episodeSlug');
+  }
+
+  @override
+  Future<void> clearHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_historyKey);
   }
 }

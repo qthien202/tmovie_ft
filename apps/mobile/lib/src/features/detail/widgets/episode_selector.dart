@@ -6,12 +6,14 @@ class EpisodeSelector extends StatefulWidget {
   final List<Episode> episodes;
   final String filmName;
   final String slug;
+  final void Function(ServerData episode)? onEpisodeTap;
 
   const EpisodeSelector({
     super.key,
     required this.episodes,
     required this.filmName,
     required this.slug,
+    this.onEpisodeTap,
   });
 
   @override
@@ -34,81 +36,114 @@ class _EpisodeSelectorState extends State<EpisodeSelector> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 20),
-          const Text(
-            'Danh sách tập',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          if (servers.length > 1) ...[
-            const SizedBox(height: 8),
-            SizedBox(
-              height: 36,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: servers.length,
-                separatorBuilder: (_, _) => const SizedBox(width: 8),
-                itemBuilder: (context, index) {
-                  final isSelected = index == _selectedServer;
-                  return ChoiceChip(
-                    label: Text(
-                      servers[index].serverName ?? 'Server ${index + 1}',
-                      style: TextStyle(
-                        color: isSelected ? Colors.white : Colors.grey,
-                        fontSize: 12,
-                      ),
-                    ),
-                    selected: isSelected,
-                    selectedColor: AppColors.primary,
-                    backgroundColor: AppColors.surfaceColor,
-                    side: BorderSide.none,
-                    onSelected: (_) => setState(() => _selectedServer = index),
-                  );
-                },
-              ),
-            ),
-          ],
           const SizedBox(height: 12),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: episodes.map((ep) {
+          // Tiêu đề và Server Selector
+          Row(
+            children: [
+              const Text(
+                'Danh sách tập',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const Spacer(),
+              if (servers.length > 1) _buildServerDropdown(servers),
+            ],
+          ),
+
+          const SizedBox(height: 20),
+
+          // Episode Grid
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            padding: EdgeInsets.zero,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 4,
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 10,
+              childAspectRatio: 2.2,
+            ),
+            itemCount: episodes.length,
+            itemBuilder: (context, index) {
+              final ep = episodes[index];
               final videoUrl = ep.linkM3u8 ?? ep.linkEmbed ?? '';
-              return SizedBox(
-                width: 70,
-                height: 40,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.surfaceColor,
-                    padding: EdgeInsets.zero,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+
+              return InkWell(
+                onTap: videoUrl.isEmpty
+                    ? null
+                    : () {
+                        widget.onEpisodeTap?.call(ep);
+                        context.push(
+                          '/player',
+                          extra: {
+                            'videoUrl': videoUrl,
+                            'filmName': widget.filmName,
+                            'episode': ep.name ?? '',
+                            'slug': widget.slug,
+                            'episodes': widget.episodes,
+                          },
+                        );
+                      },
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.05),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.15),
                     ),
                   ),
-                  onPressed: videoUrl.isEmpty
-                      ? null
-                      : () => context.push(
-                            '/player',
-                            extra: {
-                              'videoUrl': videoUrl,
-                              'filmName': widget.filmName,
-                              'episode': ep.name ?? '',
-                              'slug': widget.slug,
-                            },
-                          ),
                   child: Text(
                     ep.name ?? '',
-                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                    style: TextStyle(
+                      color: videoUrl.isEmpty ? Colors.white30 : Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ),
               );
-            }).toList(),
+            },
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildServerDropdown(List<Episode> servers) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<int>(
+          value: _selectedServer,
+          dropdownColor: Colors.grey[900],
+          icon: const Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: Colors.white70,
+          ),
+          items: List.generate(servers.length, (index) {
+            return DropdownMenuItem(
+              value: index,
+              child: Text(
+                servers[index].serverName ?? 'Server ${index + 1}',
+                style: const TextStyle(color: Colors.white, fontSize: 13),
+              ),
+            );
+          }),
+          onChanged: (val) {
+            if (val != null) setState(() => _selectedServer = val);
+          },
+        ),
       ),
     );
   }

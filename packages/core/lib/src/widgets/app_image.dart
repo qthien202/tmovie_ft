@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
@@ -22,6 +23,19 @@ class AppImage extends StatelessWidget {
   Widget build(BuildContext context) {
     if (imageUrl.isEmpty) {
       return _placeholder();
+    }
+
+    if (imageUrl.startsWith('/')) {
+      final fileChild = Image.file(
+        File(imageUrl),
+        fit: boxFit,
+        width: width,
+        height: height,
+        errorBuilder: (context, error, stackTrace) => _placeholder(),
+      );
+      return borderRadius != null
+          ? ClipRRect(borderRadius: borderRadius!, child: fileChild)
+          : fileChild;
     }
 
     final child = CachedNetworkImage(

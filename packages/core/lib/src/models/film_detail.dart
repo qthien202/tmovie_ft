@@ -36,6 +36,8 @@ class FilmDetail {
   final List<FilmCategory>? category;
   final List<FilmCountry>? country;
   final List<Episode>? episodes;
+  final TmdbInfo? tmdb;
+  final ImdbInfo? imdb;
 
   const FilmDetail({
     this.id,
@@ -60,6 +62,8 @@ class FilmDetail {
     this.category,
     this.country,
     this.episodes,
+    this.tmdb,
+    this.imdb,
   });
 
   String get fullThumbUrl {
@@ -76,4 +80,34 @@ class FilmDetail {
 
   factory FilmDetail.fromJson(Map<String, dynamic> json) => _$FilmDetailFromJson(json);
   Map<String, dynamic> toJson() => _$FilmDetailToJson(this);
+}
+
+@JsonSerializable()
+class TmdbInfo {
+  final String? type;
+  final String? id;
+  final int? season;
+  @JsonKey(name: 'vote_average')
+  final double? voteAverage;
+  @JsonKey(name: 'vote_count')
+  final int? voteCount;
+
+  const TmdbInfo({this.type, this.id, this.season, this.voteAverage, this.voteCount});
+
+  factory TmdbInfo.fromJson(Map<String, dynamic> json) => _$TmdbInfoFromJson(json);
+  Map<String, dynamic> toJson() => _$TmdbInfoToJson(this);
+}
+
+@JsonSerializable()
+class ImdbInfo {
+  final String? id;
+  @JsonKey(name: 'vote_average')
+  final double? voteAverage;
+  @JsonKey(name: 'vote_count')
+  final int? voteCount;
+
+  const ImdbInfo({this.id, this.voteAverage, this.voteCount});
+
+  factory ImdbInfo.fromJson(Map<String, dynamic> json) => _$ImdbInfoFromJson(json);
+  Map<String, dynamic> toJson() => _$ImdbInfoToJson(this);
 }

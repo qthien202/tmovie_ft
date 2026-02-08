@@ -8,4 +8,9 @@ class RouteNames {
   static const player = 'player';
   static const filmList = 'filmList';
   static const genre = 'genre';
+  static const profile = 'profile';
+  static const onboarding = 'onboarding';
+  static const login = 'login';
+  static const watchHistory = 'watchHistory';
+  static const favorites = 'favorites';
 }

@@ -37,6 +37,12 @@ FilmDetail _$FilmDetailFromJson(Map<String, dynamic> json) => FilmDetail(
   episodes: (json['episodes'] as List<dynamic>?)
       ?.map((e) => Episode.fromJson(e as Map<String, dynamic>))
       .toList(),
+  tmdb: json['tmdb'] == null
+      ? null
+      : TmdbInfo.fromJson(json['tmdb'] as Map<String, dynamic>),
+  imdb: json['imdb'] == null
+      ? null
+      : ImdbInfo.fromJson(json['imdb'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$FilmDetailToJson(FilmDetail instance) =>
@@ -63,4 +69,34 @@ Map<String, dynamic> _$FilmDetailToJson(FilmDetail instance) =>
       'category': instance.category,
       'country': instance.country,
       'episodes': instance.episodes,
+      'tmdb': instance.tmdb,
+      'imdb': instance.imdb,
     };
+
+TmdbInfo _$TmdbInfoFromJson(Map<String, dynamic> json) => TmdbInfo(
+  type: json['type'] as String?,
+  id: json['id'] as String?,
+  season: (json['season'] as num?)?.toInt(),
+  voteAverage: (json['vote_average'] as num?)?.toDouble(),
+  voteCount: (json['vote_count'] as num?)?.toInt(),
+);
+
+Map<String, dynamic> _$TmdbInfoToJson(TmdbInfo instance) => <String, dynamic>{
+  'type': instance.type,
+  'id': instance.id,
+  'season': instance.season,
+  'vote_average': instance.voteAverage,
+  'vote_count': instance.voteCount,
+};
+
+ImdbInfo _$ImdbInfoFromJson(Map<String, dynamic> json) => ImdbInfo(
+  id: json['id'] as String?,
+  voteAverage: (json['vote_average'] as num?)?.toDouble(),
+  voteCount: (json['vote_count'] as num?)?.toInt(),
+);
+
+Map<String, dynamic> _$ImdbInfoToJson(ImdbInfo instance) => <String, dynamic>{
+  'id': instance.id,
+  'vote_average': instance.voteAverage,
+  'vote_count': instance.voteCount,
+};
