@@ -48,7 +48,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.689830026078-ev3ikjj7l1io2n8tknuqgpj44dal126p</string>
+				<string>YOUR_REVERSED_CLIENT_ID</string>
 			</array>
 		</dict>
 	</array>

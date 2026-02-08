@@ -1,23 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Download this file from Firebase Console:
+  Project Settings → Your Apps → iOS → Download GoogleService-Info.plist
+  Then rename to GoogleService-Info.plist
+-->
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>689830026078-ev3ikjj7l1io2n8tknuqgpj44dal126p.apps.googleusercontent.com</string>
+	<string>YOUR_IOS_CLIENT_ID.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.689830026078-ev3ikjj7l1io2n8tknuqgpj44dal126p</string>
+	<string>com.googleusercontent.apps.YOUR_IOS_CLIENT_ID</string>
 	<key>API_KEY</key>
-	<string>AIzaSyALHhaupPjQrXSkL5PwS6kXmvh9dTiPmiM</string>
+	<string>YOUR_IOS_API_KEY</string>
 	<key>GCM_SENDER_ID</key>
-	<string>689830026078</string>
+	<string>YOUR_PROJECT_NUMBER</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.thientech.mobile</string>
 	<key>PROJECT_ID</key>
-	<string>tmovie-2ead2</string>
+	<string>YOUR_PROJECT_ID</string>
 	<key>STORAGE_BUCKET</key>
-	<string>tmovie-2ead2.firebasestorage.app</string>
+	<string>YOUR_PROJECT_ID.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -29,6 +34,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:689830026078:ios:30a687e7f3d3b3d582cdcf</string>
+	<string>YOUR_IOS_APP_ID</string>
 </dict>
 </plist>
