@@ -311,7 +311,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               setState(() {});
               _onSearchChanged(val);
             },
-            autofocus: true,
+            autofocus: false,
             style: const TextStyle(color: Colors.white, fontSize: 15),
             decoration: InputDecoration(
               hintText: 'Nhập tên phim, diễn viên...',
