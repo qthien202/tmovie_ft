@@ -1,86 +1,102 @@
-# TMovie
+# <img src="apps/mobile/assets/app_icon.png" width="40" vertical-align="middle"> TMovie - Premium Cinema Experience
 
-Ứng dụng xem phim online hỗ trợ **Mobile** (iOS/Android) và **Android TV**.
+[![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
+[![Riverpod](https://img.shields.io/badge/Riverpod-02569B?style=for-the-badge&logo=riverpod&logoColor=white)](https://riverpod.dev)
+[![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
-## Screenshots
+**TMovie** is a high-end online movie streaming application, delivering a premium cinema experience directly to your mobile devices (iOS/Android) and Android TV. Built with a modern, smooth design philosophy centered around the user.
 
-<table width="100%">
-  <tbody>
-    <tr>
-      <td width="1%"><img src="https://github.com/user-attachments/assets/386219d4-56bd-4eb8-bd85-76fffda7388d"/></td>
-      <td width="1%"><img src="https://github.com/user-attachments/assets/05613dc3-f1e0-43ab-af07-5dead8661e9a"/></td>
-       <td width="1%"><img src="https://github.com/user-attachments/assets/4ba8dcf9-4f92-4bd6-91c2-b37eb25a5507"/></td>
-    </tr>
-    <tr>
-      <td width="1%"><img src="https://github.com/user-attachments/assets/3597f03e-3fc3-4183-82eb-4dba8cae101e"/></td>
-      <td width="1%"><img src="https://github.com/user-attachments/assets/8b22f485-96e5-4d2f-bf8b-e559fa8d8a6c"/></td>
-       <td width="1%"><img src="https://github.com/user-attachments/assets/eaa2ee0a-53e1-4181-846a-8c7d3825c2b8"/></td>
-    </tr>
-  </tbody>
-</table>
+---
 
-## Tech Stack
+## ✨ Premium Features
 
-| Concern          | Package                              |
-|------------------|--------------------------------------|
-| State Management | `flutter_riverpod`                   |
-| Networking       | `dio` + `retrofit`                   |
-| Navigation       | `go_router`                          |
-| Monorepo         | `melos` 7.x (Dart Pub Workspaces)   |
-| Video            | `video_player` + `chewie`            |
-| Models           | `json_serializable`                  |
+- 🎨 **Glassmorphism UI**: Modern design with luxury frosted glass effects, providing a high-end and sophisticated feel.
+- 🎬 **Cinematic Video Player**: 100% custom controller, supporting 10s seek, episode selection, and server switching directly while watching.
+- 🔗 **Cloud Sync**: One-tap Google Sign-In to save watch history and favorite movie lists across all devices via Firestore.
+- ⚡ **Exceptional Performance**: Built on Flutter with Riverpod State Management for instant response speeds.
+- 📺 **Multi-platform Support**: Unified experience from compact mobile screens to sharp 4K TV displays.
 
-## Project Structure
+---
 
-```
+## 📸 Screenshots
+
+| <img src="screenshots/onboarding.png" width="220" /><br><sub><b>Onboarding</b></sub> | <img src="screenshots/login.png" width="220" /><br><sub><b>Google Login</b></sub> | <img src="screenshots/home.png" width="220" /><br><sub><b>Home Screen</b></sub> |
+| :---: | :---: | :---: |
+| <img src="screenshots/search.png" width="220" /><br><sub><b>Search & Filter</b></sub> | <img src="screenshots/detail_info.png" width="220" /><br><sub><b>Movie Info</b></sub> | <img src="screenshots/detail_cast.png" width="220" /><br><sub><b>Cast & Crew</b></sub> |
+| <img src="screenshots/detail_episodes.png" width="220" /><br><sub><b>Episodes List</b></sub> | | |
+
+---
+
+## 🛠 Tech Stack
+
+| App Layer | Technology |
+| :--- | :--- |
+| **State Management** | `flutter_riverpod` (v2.6+) |
+| **Networking** | `dio` + `retrofit` |
+| **Navigation** | `go_router` |
+| **Video Engine** | `video_player` + `chewie` (Customized) |
+| **Backend** | `Firebase Auth` + `Cloud Firestore` |
+| **Monorepo** | `Melos` |
+
+---
+
+## 📂 Project Structure
+
+```text
 tmovie_ft/
 ├── apps/
-│   ├── mobile/          # iOS + Android app
-│   └── tv/              # Android TV app (Leanback)
+│   ├── mobile/          # 📱 iOS & Android Application
+│   └── tv/              # 📺 Android TV Application (Leanback)
 ├── packages/
-│   └── core/            # Shared: models, API, providers, widgets
-└── docs/                # Documentation
+│   └── core/            # 📦 Shared: models, API, providers, widgets
+└── screenshots/         # 🖼 App Screenshot Gallery
 ```
 
-## Getting Started
+---
 
-### Prerequisites
+## 🚀 Getting Started
 
+### System Requirements
 - Flutter SDK >= 3.38.0
 - Dart SDK >= 3.8.0
 - Melos (`dart pub global activate melos`)
 
-### Setup
+### Setup Steps
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/qthien202/tmovie_ft.git
+   cd tmovie_ft
+   ```
 
-```bash
-# Clone
-git clone https://github.com/qthien202/tmovie_ft.git
-cd tmovie_ft
+2. **Initialize dependencies:**
+   ```bash
+   melos bootstrap
+   ```
 
-# Bootstrap (resolve dependencies)
-melos bootstrap
+3. **Auto-generate code (Models/Retrofit):**
+   ```bash
+   melos run build_runner
+   ```
 
-# Generate code (models, retrofit)
-melos run build_runner
+4. **Run the application:**
+   ```bash
+   # Mobile
+   cd apps/mobile && flutter run
 
-# Analyze
-melos run analyze
-```
+   # TV
+   cd apps/tv && flutter run
+   ```
 
-### Run
+---
 
-```bash
-# Mobile
-cd apps/mobile
-flutter run
+## 📖 Documentation
+- 🏗 [System Architecture](docs/architecture.md)
+- 🔌 [API Details (OPhim)](docs/api.md)
+- 📝 [Feature List](docs/features.md)
 
-# TV (Android TV emulator)
-cd apps/tv
-flutter run
-```
+---
 
-## Documentation
-
-- [Architecture](docs/architecture.md) - Project structure, patterns, tech stack
-- [API](docs/api.md) - OPhim V1 API endpoints and response models
-- [Features](docs/features.md) - Feature list for mobile and TV
+<p align="center">
+  Made with ❤️ by <b>TMovie Team</b>
+</p>
