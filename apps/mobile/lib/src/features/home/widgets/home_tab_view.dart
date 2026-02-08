@@ -78,7 +78,12 @@ class FilmSection extends ConsumerWidget {
     final filmsAsync = ref.watch(
       isGenre
           ? filmsByGenreProvider((slug: slug, page: 1))
-          : filmsByTypeProvider((typeSlug: slug, page: 1, sortField: null, year: null)),
+          : filmsByTypeProvider((
+              typeSlug: slug,
+              page: 1,
+              sortField: null,
+              year: null,
+            )),
     );
 
     return Container(
@@ -135,7 +140,15 @@ class FilmSection extends ConsumerWidget {
                   },
                 );
               },
-              loading: () => const FilmSectionSkeleton(),
+              loading: () => ListView.separated(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                scrollDirection: Axis.horizontal,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: 4,
+                separatorBuilder: (context, index) => const SizedBox(width: 14),
+                itemBuilder: (context, index) =>
+                    const SizedBox(width: 145, child: FilmCardSkeleton()),
+              ),
               error: (e, s) => const SizedBox(),
             ),
           ),

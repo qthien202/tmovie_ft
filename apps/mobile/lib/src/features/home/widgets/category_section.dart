@@ -77,7 +77,18 @@ class CategorySection extends ConsumerWidget {
                 ),
               );
             },
-            loading: () => const FilmSectionSkeleton(),
+            loading: () => SizedBox(
+              height: 220,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: 4,
+                separatorBuilder: (_, _) => const SizedBox(width: 14),
+                itemBuilder: (context, index) =>
+                    const SizedBox(width: 145, child: FilmCardSkeleton()),
+              ),
+            ),
             error: (_, _) => const SizedBox(height: 220),
           ),
         ],
