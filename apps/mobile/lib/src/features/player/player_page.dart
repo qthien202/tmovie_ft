@@ -43,6 +43,9 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
   // Custom Controls State
   bool _controlsVisible = true;
   Timer? _hideTimer;
+  BoxFit _videoFit = BoxFit.contain;
+
+  bool _initialized = false;
 
   @override
   void initState() {
@@ -50,16 +53,22 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
     WidgetsBinding.instance.addObserver(this);
     _currentVideoUrl = widget.videoUrl;
     _currentEpisodeName = widget.episode;
-
     _findCurrentIndices();
-
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ]);
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-    _initializePlayer();
     _startHideTimer();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_initialized) {
+      _initialized = true;
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.landscapeRight,
+      ]);
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+      _initializePlayer();
+    }
   }
 
   @override
@@ -110,7 +119,7 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
         autoPlay: true,
         allowFullScreen: false,
         allowMuting: true,
-        showControls: false, // Hide default controls
+        showControls: false,
         startAt: savedPosition != null && savedPosition > 0
             ? Duration(seconds: savedPosition)
             : null,
@@ -213,6 +222,19 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
     });
   }
 
+  Future<void> _exitPlayer() async {
+    // First unlock all orientations so iOS allows the transition
+    await SystemChrome.setPreferredOrientations(DeviceOrientation.values);
+    // Then lock to portrait
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    await Future.delayed(const Duration(milliseconds: 300));
+    if (mounted) Navigator.of(context).pop();
+  }
+
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
@@ -229,11 +251,6 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
       }
     }
 
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     _chewieController?.dispose();
     _videoController?.dispose();
     super.dispose();
@@ -241,7 +258,12 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _exitPlayer();
+      },
+      child: Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
         children: [
@@ -250,7 +272,14 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
             child: _hasError
                 ? _buildErrorView()
                 : _chewieController != null
-                ? Chewie(controller: _chewieController!)
+                ? FittedBox(
+                    fit: _videoFit,
+                    child: SizedBox(
+                      width: _videoController!.value.size.width,
+                      height: _videoController!.value.size.height,
+                      child: Chewie(controller: _chewieController!),
+                    ),
+                  )
                 : const Center(
                     child: CircularProgressIndicator(
                       color: AppColors.primaryValue,
@@ -274,6 +303,7 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
           if (_showPlaylist) _buildPlaylistOverlay(),
         ],
       ),
+    ),
     );
   }
 
@@ -315,7 +345,7 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
                   color: Colors.white,
                   size: 22,
                 ),
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: _exitPlayer,
               ),
               const SizedBox(width: 8),
               Expanded(
@@ -459,10 +489,44 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
                     style: const TextStyle(color: Colors.white54, fontSize: 12),
                   ),
                   const Spacer(),
-                  const Icon(
-                    Icons.fullscreen_rounded,
-                    color: Colors.white,
-                    size: 24,
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _videoFit = _videoFit == BoxFit.contain
+                            ? BoxFit.cover
+                            : _videoFit == BoxFit.cover
+                                ? BoxFit.fill
+                                : BoxFit.contain;
+                      });
+                      _startHideTimer();
+                    },
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          _videoFit == BoxFit.contain
+                              ? Icons.fit_screen_rounded
+                              : _videoFit == BoxFit.cover
+                                  ? Icons.crop_free_rounded
+                                  : Icons.aspect_ratio_rounded,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          _videoFit == BoxFit.contain
+                              ? 'VỪA'
+                              : _videoFit == BoxFit.cover
+                                  ? 'PHÓNG'
+                                  : 'GIÃN',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -502,7 +566,7 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
             ),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: _exitPlayer,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryValue,
               ),
