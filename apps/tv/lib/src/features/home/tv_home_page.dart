@@ -19,7 +19,7 @@ class _TvHomePageState extends ConsumerState<TvHomePage> {
   Widget build(BuildContext context) {
     final typeSlug = AppConstants.filmTypes[_selectedTypeIndex]['slug']!;
     final filmsAsync = ref.watch(
-      filmsByTypeProvider((typeSlug: typeSlug, page: 1)),
+      filmsByTypeProvider((typeSlug: typeSlug, page: 1, sortField: null, year: null)),
     );
 
     return Scaffold(
@@ -198,7 +198,7 @@ class _TvHomePageState extends ConsumerState<TvHomePage> {
               error: (_, _) => Center(
                 child: ElevatedButton(
                   onPressed: () => ref.invalidate(
-                    filmsByTypeProvider((typeSlug: typeSlug, page: 1)),
+                    filmsByTypeProvider((typeSlug: typeSlug, page: 1, sortField: null, year: null)),
                   ),
                   child: const Text('Thử lại'),
                 ),
