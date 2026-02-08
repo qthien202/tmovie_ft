@@ -79,7 +79,50 @@ tmovie_ft/
    melos run build_runner
    ```
 
-4. **Run the application:**
+4. **Configure Firebase (required):**
+
+   This project uses Firebase for Google Sign-In and cloud sync. You need to create your own Firebase project:
+
+   **Step 1**: Go to [Firebase Console](https://console.firebase.google.com) → Create a new project
+
+   **Step 2**: Add your apps to the Firebase project:
+   - **Android**: Add Android app with package name `com.thientech.mobile` (or your own)
+   - **iOS**: Add iOS app with bundle ID `com.thientech.mobile` (or your own)
+
+   **Step 3**: Download and place config files:
+   ```text
+   apps/mobile/android/app/google-services.json    ← from Firebase (Android)
+   apps/mobile/ios/Runner/GoogleService-Info.plist  ← from Firebase (iOS)
+   ```
+   > See `.example` files in these directories for reference.
+
+   **Step 4**: Create `apps/mobile/lib/firebase_options.dart` from the template:
+   ```bash
+   cp apps/mobile/lib/firebase_options.dart.example apps/mobile/lib/firebase_options.dart
+   ```
+   Then replace the placeholder values with your Firebase project config (found in Firebase Console → Project Settings).
+
+   **Step 5** (iOS only): Update `REVERSED_CLIENT_ID` in `apps/mobile/ios/Runner/Info.plist`:
+   - Open your downloaded `GoogleService-Info.plist`, find the `REVERSED_CLIENT_ID` value
+   - Replace `YOUR_REVERSED_CLIENT_ID` in `Info.plist` with that value
+
+   **Step 6**: Enable Firebase services:
+   - **Authentication** → Sign-in method → Enable **Google**
+   - **Cloud Firestore** → Create database → Start in **test mode**
+
+   **Firestore Security Rules** (recommended for production):
+   ```javascript
+   rules_version = '2';
+   service cloud.firestore {
+     match /databases/{database}/documents {
+       match /users/{userId}/{document=**} {
+         allow read, write: if request.auth != null && request.auth.uid == userId;
+       }
+     }
+   }
+   ```
+
+5. **Run the application:**
    ```bash
    # Mobile
    cd apps/mobile && flutter run

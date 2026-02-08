@@ -52,3 +52,9 @@ app.*.map.json
 **/pubspec_overrides.yaml
 .claude
 .agent
+
+# Firebase config (contains API keys - each contributor uses their own)
+**/google-services.json
+**/GoogleService-Info.plist
+**/firebase_options.dart
+json/
