@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "689830026078",
+    "project_id": "tmovie-2ead2",
+    "storage_bucket": "tmovie-2ead2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:689830026078:android:ceb8a20ef7f17d9182cdcf",
+        "android_client_info": {
+          "package_name": "com.thientech.mobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "689830026078-kh1qnbfu1ecbfcmr1ge51kvgo8oc8v8l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDiODUUQaVpfZusDQWZohUOeeby9Lo_6JQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "689830026078-kh1qnbfu1ecbfcmr1ge51kvgo8oc8v8l.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "689830026078-ev3ikjj7l1io2n8tknuqgpj44dal126p.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.thientech.mobile"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
