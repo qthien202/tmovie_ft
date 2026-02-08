@@ -49,24 +49,56 @@ class _DetailPageState extends ConsumerState<DetailPage>
     super.dispose();
   }
 
-  void _onPlayTap(FilmDetail film) {
-    if (film.episodes != null &&
-        film.episodes!.isNotEmpty &&
-        film.episodes!.first.serverData != null &&
-        film.episodes!.first.serverData!.isNotEmpty) {
-      final ep = film.episodes!.first.serverData!.first;
-      final videoUrl = ep.linkM3u8 ?? ep.linkEmbed ?? '';
-      if (videoUrl.isNotEmpty) {
-        context.push(
-          '/player',
-          extra: {
-            'videoUrl': videoUrl,
-            'filmName': film.name ?? '',
-            'episode': ep.name ?? '',
-            'slug': film.slug ?? '',
-          },
-        );
+  String? _findVideoUrl(FilmDetail film) {
+    final episodes = film.episodes;
+    if (episodes == null || episodes.isEmpty) return null;
+    for (final episode in episodes) {
+      final serverData = episode.serverData;
+      if (serverData == null) continue;
+      for (final data in serverData) {
+        final url = data.linkM3u8 ?? data.linkEmbed;
+        if (url != null && url.isNotEmpty) return url;
       }
+    }
+    return null;
+  }
+
+  void _onPlayTap(FilmDetail film) {
+    final videoUrl = _findVideoUrl(film);
+    if (videoUrl != null) {
+      final ep = film.episodes!.first.serverData!.first;
+
+      // Lưu lịch sử xem
+      final repo = ref.read(historyRepositoryProvider);
+      repo.addHistory(
+        WatchHistoryEntry(
+          slug: film.slug ?? '',
+          name: film.name ?? '',
+          originName: film.originName,
+          thumbUrl: film.fullThumbUrl,
+          episode: ep.name,
+          timestamp: DateTime.now().millisecondsSinceEpoch,
+        ),
+      );
+      ref.invalidate(watchHistoryProvider);
+
+      context.push(
+        '/player',
+        extra: {
+          'videoUrl': videoUrl,
+          'filmName': film.name ?? '',
+          'episode': ep.name ?? '',
+          'slug': film.slug ?? '',
+          'episodes': film.episodes ?? [],
+        },
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Phim này chưa có link phát'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
     }
   }
 
@@ -130,6 +162,7 @@ class _DetailPageState extends ConsumerState<DetailPage>
                     elevation: 0,
                     leadingWidth: 70,
                     leading: _buildGlassBackButton(),
+                    actions: [_buildFavoriteButton(film)],
                     flexibleSpace: FlexibleSpaceBar(
                       stretchModes: const [
                         StretchMode.zoomBackground,
@@ -155,6 +188,23 @@ class _DetailPageState extends ConsumerState<DetailPage>
                                 episodes: film.episodes ?? [],
                                 filmName: film.name ?? '',
                                 slug: film.slug ?? '',
+                                onEpisodeTap: (ep) {
+                                  final repo = ref.read(
+                                    historyRepositoryProvider,
+                                  );
+                                  repo.addHistory(
+                                    WatchHistoryEntry(
+                                      slug: film.slug ?? '',
+                                      name: film.name ?? '',
+                                      originName: film.originName,
+                                      thumbUrl: film.fullThumbUrl,
+                                      episode: ep.name,
+                                      timestamp:
+                                          DateTime.now().millisecondsSinceEpoch,
+                                    ),
+                                  );
+                                  ref.invalidate(watchHistoryProvider);
+                                },
                               ),
                       ),
                     ),
@@ -163,7 +213,7 @@ class _DetailPageState extends ConsumerState<DetailPage>
               ),
 
               // 3. Floating Interactive CTA
-              _buildStickyCTA(film),
+              if (_findVideoUrl(film) != null) _buildStickyCTA(film),
             ],
           );
         },
@@ -211,6 +261,78 @@ class _DetailPageState extends ConsumerState<DetailPage>
                   size: 20,
                 ),
                 onPressed: () => context.pop(),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFavoriteButton(FilmDetail film) {
+    final slug = film.slug ?? '';
+    final isFavAsync = ref.watch(isFavoriteProvider(slug));
+
+    return Padding(
+      padding: const EdgeInsets.only(right: 16),
+      child: Center(
+        child: GestureDetector(
+          onTap: () async {
+            final isFav = isFavAsync.valueOrNull ?? false;
+            final repo = ref.read(favoritesRepositoryProvider);
+            if (isFav) {
+              await repo.removeFavorite(slug);
+            } else {
+              await repo.addFavorite(
+                WatchHistoryEntry(
+                  slug: slug,
+                  name: film.name ?? '',
+                  originName: film.originName,
+                  thumbUrl: film.fullThumbUrl,
+                  timestamp: DateTime.now().millisecondsSinceEpoch,
+                ),
+              );
+            }
+            ref.invalidate(isFavoriteProvider(slug));
+            ref.invalidate(favoritesProvider);
+          },
+          child: ClipOval(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.2),
+                  ),
+                ),
+                child: Center(
+                  child: isFavAsync.when(
+                    data: (isFav) => Icon(
+                      isFav
+                          ? Icons.favorite_rounded
+                          : Icons.favorite_border_rounded,
+                      color: isFav ? Colors.redAccent : Colors.white,
+                      size: 20,
+                    ),
+                    loading: () => const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white54,
+                      ),
+                    ),
+                    error: (_, __) => const Icon(
+                      Icons.favorite_border_rounded,
+                      color: Colors.white54,
+                      size: 20,
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
@@ -268,7 +390,8 @@ class _DetailPageState extends ConsumerState<DetailPage>
             ),
           ),
         ),
-        Positioned(right: 20, bottom: 110, child: _buildPlayButton(film)),
+        if (_findVideoUrl(film) != null)
+          Positioned(right: 20, bottom: 110, child: _buildPlayButton(film)),
       ],
     );
   }

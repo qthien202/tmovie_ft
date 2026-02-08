@@ -6,12 +6,14 @@ class EpisodeSelector extends StatefulWidget {
   final List<Episode> episodes;
   final String filmName;
   final String slug;
+  final void Function(ServerData episode)? onEpisodeTap;
 
   const EpisodeSelector({
     super.key,
     required this.episodes,
     required this.filmName,
     required this.slug,
+    this.onEpisodeTap,
   });
 
   @override
@@ -72,15 +74,19 @@ class _EpisodeSelectorState extends State<EpisodeSelector> {
               return InkWell(
                 onTap: videoUrl.isEmpty
                     ? null
-                    : () => context.push(
-                        '/player',
-                        extra: {
-                          'videoUrl': videoUrl,
-                          'filmName': widget.filmName,
-                          'episode': ep.name ?? '',
-                          'slug': widget.slug,
-                        },
-                      ),
+                    : () {
+                        widget.onEpisodeTap?.call(ep);
+                        context.push(
+                          '/player',
+                          extra: {
+                            'videoUrl': videoUrl,
+                            'filmName': widget.filmName,
+                            'episode': ep.name ?? '',
+                            'slug': widget.slug,
+                            'episodes': widget.episodes,
+                          },
+                        );
+                      },
                 borderRadius: BorderRadius.circular(10),
                 child: Container(
                   alignment: Alignment.center,
