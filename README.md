@@ -102,9 +102,9 @@ tmovie_ft/
    ```
    Then replace the placeholder values with your Firebase project config (found in Firebase Console → Project Settings).
 
-   **Step 5** (iOS only): Update `REVERSED_CLIENT_ID` in `apps/mobile/ios/Runner/Info.plist`:
+   **Step 5** (iOS only): Update `CFBundleURLSchemes` in `apps/mobile/ios/Runner/Info.plist`:
    - Open your downloaded `GoogleService-Info.plist`, find the `REVERSED_CLIENT_ID` value
-   - Replace `YOUR_REVERSED_CLIENT_ID` in `Info.plist` with that value
+   - Replace the existing `com.googleusercontent.apps.xxx` value in `Info.plist` → `CFBundleURLSchemes` with your reversed client ID
 
    **Step 6**: Enable Firebase services:
    - **Authentication** → Sign-in method → Enable **Google**
