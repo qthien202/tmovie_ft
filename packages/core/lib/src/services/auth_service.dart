@@ -1,20 +1,9 @@
-import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  late final GoogleSignIn _googleSignIn;
-
-  AuthService() {
-    _googleSignIn = GoogleSignIn(
-      clientId: Platform.isIOS
-          ? '689830026078-ev3ikjj7l1io2n8tknuqgpj44dal126p.apps.googleusercontent.com'
-          : null,
-      serverClientId:
-          '689830026078-kh1qnbfu1ecbfcmr1ge51kvgo8oc8v8l.apps.googleusercontent.com',
-    );
-  }
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   Stream<User?> get authStateChanges => _auth.authStateChanges().map((user) {
         print('Auth state changed: ${user?.email ?? "null"}');
