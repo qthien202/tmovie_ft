@@ -1,16 +1,26 @@
-# mobile
+# <img src="assets/app_icon.png" width="40" vertical-align="middle"> TMovie Mobile - iOS & Android
 
-A new Flutter project.
+TMovie mobile version, focusing on a smooth entertainment experience, luxury interface, and intelligent synchronization features.
 
-## Getting Started
+## 📱 Key Features
+- **Premium UI**: Utilizing modern Glassmorphism and Blur effects.
+- **Cinematic Player**: Custom video player with ultra-fast episode and server switching.
+- **Biometric/Sync**: Data synchronization via Firebase, supporting Google Sign-In.
+- **Search & Filter**: Deep movie filtering by year, country, and genre.
 
-This project is a starting point for a Flutter application.
+## 🏗 Core Tech Stack
+- **Framework**: Flutter 3.x
+- **State**: Riverpod 2.x
+- **Navigation**: GoRouter
+- **Video**: Chewie + Video Player (Custom)
 
-A few resources to get you started if this is your first Flutter project:
+## 🛠 Running the App
+From the project root:
+```bash
+melos bootstrap
+cd apps/mobile
+flutter run
+```
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+---
+*Part of the [TMovie Core](../../README.md) project*
