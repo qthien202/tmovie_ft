@@ -19,22 +19,19 @@ class _OnboardingPageState extends State<OnboardingPage> {
       'title': 'Khám phá thế giới điện ảnh',
       'description':
           'Hàng ngàn bộ phim bom tấn và phim bộ hấp dẫn đang chờ đợi bạn khám phá.',
-      'image':
-          '/Users/quangthien/.gemini/antigravity/brain/c9034663-b258-430c-a294-fbeebc0a6a39/onboarding_1_cinema_fixed_1770512567366.png',
+      'image': 'assets/onboarding/onboarding_1.png',
     },
     {
       'title': 'Trải nghiệm hình ảnh 4K',
       'description':
           'Tận hưởng chất lượng hình ảnh sắc nét, âm thanh sống động như tại rạp chiếu phim.',
-      'image':
-          '/Users/quangthien/.gemini/antigravity/brain/c9034663-b258-430c-a294-fbeebc0a6a39/onboarding_2_4k_quality_1770512535216.png',
+      'image': 'assets/onboarding/onboarding_2.png',
     },
     {
       'title': 'Đồng bộ mọi thiết bị',
       'description':
           'Lưu lại lịch sử xem và danh sách yêu thích để tiếp tục xem trên bất kỳ thiết bị nào.',
-      'image':
-          '/Users/quangthien/.gemini/antigravity/brain/c9034663-b258-430c-a294-fbeebc0a6a39/onboarding_3_sync_devices_1770512549355.png',
+      'image': 'assets/onboarding/onboarding_3.png',
     },
   ];
 
@@ -53,9 +50,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
               return Stack(
                 fit: StackFit.expand,
                 children: [
-                  AppImage(
-                    imageUrl: _onboardingData[index]['image']!,
-                    boxFit: BoxFit.cover,
+                  Image.asset(
+                    _onboardingData[index]['image']!,
+                    fit: BoxFit.cover,
                   ),
                   Container(
                     decoration: BoxDecoration(
