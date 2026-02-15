@@ -18,6 +18,9 @@ import '../models/film_detail_response.dart';
 import '../models/film_people_response.dart';
 import '../models/film_images_response.dart';
 import '../models/watch_history_entry.dart';
+import '../models/tmdb_season_response.dart';
+import '../network/tmdb_service.dart';
+import '../services/update_service.dart';
 
 // --- Singleton providers ---
 
@@ -97,6 +100,21 @@ final filmImagesProvider = FutureProvider.family
     .autoDispose<FilmImagesResponse, String>((ref, slug) {
       final repo = ref.watch(filmRepositoryProvider);
       return repo.getFilmImages(slug);
+    });
+
+// --- TMDB providers ---
+
+final tmdbServiceProvider = Provider<TmdbService>((ref) {
+  return TmdbService(ref.watch(dioProvider));
+});
+
+final tmdbSeasonProvider = FutureProvider.family
+    .autoDispose<TmdbSeasonResponse, ({String tmdbId, int season})>((ref, params) {
+      final service = ref.watch(tmdbServiceProvider);
+      return service.getSeasonDetails(
+        tmdbId: params.tmdbId,
+        seasonNumber: params.season,
+      );
     });
 
 final filmsByGenreProvider = FutureProvider.family
@@ -280,4 +298,14 @@ final paginatedSearchFilmsProvider = StateNotifierProvider.family
 final watchHistoryProvider = FutureProvider.autoDispose<List<WatchHistoryEntry>>((ref) {
   final repo = ref.watch(historyRepositoryProvider);
   return repo.getHistory();
+});
+
+// --- Update providers ---
+
+final updateServiceProvider = Provider<UpdateService>((ref) {
+  return UpdateService(
+    ref.watch(dioProvider),
+    githubOwner: 'qthien202',
+    githubRepo: 'tmovie_ft',
+  );
 });

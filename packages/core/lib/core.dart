@@ -20,13 +20,17 @@ export 'src/models/film_detail_response.dart';
 export 'src/models/film_people_response.dart';
 export 'src/models/film_images_response.dart';
 export 'src/models/watch_history_entry.dart';
+export 'src/models/tmdb_season_response.dart';
+export 'src/models/app_update_info.dart';
 
 // Network
 export 'src/network/dio_provider.dart';
 export 'src/network/api_service.dart';
+export 'src/network/tmdb_service.dart';
 
 // Services
 export 'src/services/auth_service.dart';
+export 'src/services/update_service.dart';
 
 // Repositories
 export 'src/repositories/film_repository.dart';
