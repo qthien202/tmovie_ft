@@ -1,12 +1,20 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
 
+import '../../shared/tv_design_system.dart';
+import '../../shared/widgets/tv_film_card.dart';
+import '../../shared/widgets/tv_focus_button.dart';
+import '../../shared/widgets/tv_focus_wrapper.dart';
+
 class TvSearchPage extends ConsumerStatefulWidget {
-  const TvSearchPage({super.key});
+  final String? initialGenre;
+
+  const TvSearchPage({super.key, this.initialGenre});
 
   @override
   ConsumerState<TvSearchPage> createState() => _TvSearchPageState();
@@ -16,6 +24,47 @@ class _TvSearchPageState extends ConsumerState<TvSearchPage> {
   final _controller = TextEditingController();
   Timer? _debounce;
   String _keyword = '';
+
+  // Filter state
+  String? _selectedGenre;
+  String? _selectedCountry;
+  int? _selectedYear;
+
+  static const _genres = [
+    {'label': 'Hành Động', 'slug': 'hanh-dong'},
+    {'label': 'Tình Cảm', 'slug': 'tinh-cam'},
+    {'label': 'Kinh Dị', 'slug': 'kinh-di'},
+    {'label': 'Hài Hước', 'slug': 'hai-huoc'},
+    {'label': 'Viễn Tưởng', 'slug': 'vien-tuong'},
+    {'label': 'Hoạt Hình', 'slug': 'hoat-hinh'},
+    {'label': 'Phiêu Lưu', 'slug': 'phieu-luu'},
+    {'label': 'Cổ Trang', 'slug': 'co-trang'},
+    {'label': 'Tâm Lý', 'slug': 'tam-ly'},
+  ];
+
+  static const _countries = [
+    {'label': 'Trung Quốc', 'slug': 'trung-quoc'},
+    {'label': 'Hàn Quốc', 'slug': 'han-quoc'},
+    {'label': 'Âu Mỹ', 'slug': 'au-my'},
+    {'label': 'Nhật Bản', 'slug': 'nhat-ban'},
+    {'label': 'Thái Lan', 'slug': 'thai-lan'},
+    {'label': 'Việt Nam', 'slug': 'viet-nam'},
+  ];
+
+  bool get _hasFilters =>
+      _selectedGenre != null ||
+      _selectedCountry != null ||
+      _selectedYear != null;
+
+  bool get _useSearch => _keyword.isNotEmpty && !_hasFilters;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialGenre != null) {
+      _selectedGenre = widget.initialGenre;
+    }
+  }
 
   @override
   void dispose() {
@@ -27,154 +76,463 @@ class _TvSearchPageState extends ConsumerState<TvSearchPage> {
   void _onSearchChanged(String value) {
     _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 600), () {
-      if (value.trim().isNotEmpty) {
-        setState(() => _keyword = value.trim());
-      }
+      setState(() => _keyword = value.trim());
+    });
+  }
+
+  void _clearFilters() {
+    setState(() {
+      _selectedGenre = null;
+      _selectedCountry = null;
+      _selectedYear = null;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Row(
-              children: [
-                IconButton(
-                  onPressed: () => context.pop(),
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+      backgroundColor: TvDesignSystem.background,
+      body: Focus(
+        skipTraversal: true,
+        canRequestFocus: false,
+        onKeyEvent: (node, event) {
+          if (event is KeyDownEvent &&
+              (event.logicalKey == LogicalKeyboardKey.goBack ||
+                  event.logicalKey == LogicalKeyboardKey.escape ||
+                  event.logicalKey == LogicalKeyboardKey.backspace)) {
+            context.pop();
+            return KeyEventResult.handled;
+          }
+          return KeyEventResult.ignored;
+        },
+        child: FocusTraversalGroup(
+          policy: ReadingOrderTraversalPolicy(),
+          child: Stack(
+            children: [
+              // Subtle gradient background
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      TvDesignSystem.surface.withValues(alpha: 0.5),
+                      TvDesignSystem.background,
+                    ],
+                    stops: const [0.0, 0.3],
+                  ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
+              ),
+              Column(
+                children: [
+                  // Search bar
+                  _buildSearchBar(),
+
+                  // Filter chips
+                  _buildFilterRow(),
+
+                  // Results
+                  Expanded(
+                    child: (!_hasFilters && _keyword.isEmpty)
+                        ? Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.search_rounded,
+                                  color: Colors.white.withValues(alpha: 0.12),
+                                  size: 80,
+                                ),
+                                const SizedBox(height: 24),
+                                Text(
+                                  'Nhập từ khóa hoặc chọn bộ lọc để tìm kiếm',
+                                  style: TvDesignSystem.titleLarge.copyWith(
+                                    color: Colors.white.withValues(alpha: 0.3),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : _useSearch
+                        ? _TvPaginatedSearchResults(keyword: _keyword)
+                        : _TvPaginatedFilterResults(
+                            genre: _selectedGenre,
+                            country: _selectedCountry,
+                            year: _selectedYear,
+                            keyword: _keyword.isNotEmpty ? _keyword : null,
+                          ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        TvDesignSystem.overscanMargin,
+        TvDesignSystem.overscanMargin,
+        TvDesignSystem.overscanMargin,
+        0,
+      ),
+      child: Row(
+        children: [
+          TvFocusButton(
+            icon: Icons.arrow_back_rounded,
+            onPressed: () => context.pop(),
+          ),
+          const SizedBox(width: 24),
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(TvDesignSystem.radiusMd),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.06),
+                    borderRadius: BorderRadius.circular(
+                      TvDesignSystem.radiusMd,
+                    ),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.1),
+                    ),
+                  ),
                   child: TextField(
                     controller: _controller,
-                    autofocus: true,
+                    autofocus: false,
                     onChanged: _onSearchChanged,
-                    style: const TextStyle(color: Colors.white, fontSize: 18),
+                    style: TvDesignSystem.titleLarge,
                     decoration: InputDecoration(
                       hintText: 'Tìm kiếm phim...',
-                      hintStyle: TextStyle(color: Colors.grey[500]),
-                      filled: true,
-                      fillColor: AppColors.surfaceColor,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide.none,
+                      hintStyle: TvDesignSystem.titleLarge.copyWith(
+                        color: Colors.white.withValues(alpha: 0.3),
                       ),
+                      filled: false,
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 18,
+                      ),
+                      prefixIcon: Padding(
+                        padding: const EdgeInsets.only(left: 20, right: 12),
+                        child: Icon(
+                          Icons.search_rounded,
+                          color: Colors.white.withValues(alpha: 0.4),
+                          size: 28,
+                        ),
+                      ),
+                      suffixIcon: _keyword.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(
+                                Icons.close_rounded,
+                                color: Colors.white54,
+                                size: 24,
+                              ),
+                              onPressed: () {
+                                _controller.clear();
+                                setState(() => _keyword = '');
+                              },
+                            )
+                          : null,
                     ),
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
-          Expanded(
-            child: _keyword.isEmpty
-                ? const Center(
-                    child: Text(
-                      'Nhập từ khóa để tìm kiếm',
-                      style: TextStyle(color: Colors.grey, fontSize: 16),
-                    ),
-                  )
-                : _TvSearchResults(keyword: _keyword),
           ),
         ],
       ),
     );
   }
+
+  Widget _buildFilterRow() {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        TvDesignSystem.overscanMargin,
+        TvDesignSystem.spaceMd,
+        TvDesignSystem.overscanMargin,
+        TvDesignSystem.spaceMd,
+      ),
+      child: SizedBox(
+        height: 52,
+        child: FocusTraversalGroup(
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            children: [
+              // Genre chips
+              ..._genres.map(
+                (g) => _buildFilterChip(
+                  g['label']!,
+                  isSelected: _selectedGenre == g['slug'],
+                  onTap: () => setState(() {
+                    _selectedGenre = _selectedGenre == g['slug']
+                        ? null
+                        : g['slug'];
+                  }),
+                ),
+              ),
+              // Divider
+              _buildChipDivider(),
+              // Country chips
+              ..._countries.map(
+                (c) => _buildFilterChip(
+                  c['label']!,
+                  isSelected: _selectedCountry == c['slug'],
+                  onTap: () => setState(() {
+                    _selectedCountry = _selectedCountry == c['slug']
+                        ? null
+                        : c['slug'];
+                  }),
+                ),
+              ),
+              // Divider
+              _buildChipDivider(),
+              // Year chips
+              ...[2025, 2024, 2023, 2022].map(
+                (y) => _buildFilterChip(
+                  '$y',
+                  isSelected: _selectedYear == y,
+                  onTap: () => setState(() {
+                    _selectedYear = _selectedYear == y ? null : y;
+                  }),
+                ),
+              ),
+              // Clear all
+              if (_hasFilters)
+                Padding(
+                  padding: const EdgeInsets.only(left: 12),
+                  child: _buildFilterChip(
+                    'Xóa bộ lọc',
+                    isSelected: false,
+                    isClear: true,
+                    onTap: _clearFilters,
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildChipDivider() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      child: Container(width: 1, color: Colors.white.withValues(alpha: 0.12)),
+    );
+  }
+
+  Widget _buildFilterChip(
+    String label, {
+    required bool isSelected,
+    required VoidCallback onTap,
+    bool isClear = false,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 10),
+      child: TvFocusWrapper(
+        onTap: onTap,
+        focusedScale: 1.05,
+        builder: (context, hasFocus) {
+          return AnimatedContainer(
+            duration: TvDesignSystem.durationFast,
+            padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? TvDesignSystem.primary
+                  : isClear
+                  ? Colors.redAccent.withValues(alpha: 0.15)
+                  : hasFocus
+                  ? Colors.white
+                  : Colors.white.withValues(alpha: 0.06),
+              borderRadius: BorderRadius.circular(TvDesignSystem.radiusSm),
+              border: Border.all(
+                color: hasFocus
+                    ? Colors.white
+                    : isSelected
+                    ? TvDesignSystem.primary
+                    : isClear
+                    ? Colors.redAccent.withValues(alpha: 0.5)
+                    : Colors.white.withValues(alpha: 0.08),
+                width: hasFocus ? 2 : 1,
+              ),
+            ),
+            child: Text(
+              label,
+              style: TvDesignSystem.labelLarge.copyWith(
+                color: isClear
+                    ? Colors.redAccent
+                    : hasFocus && !isSelected
+                    ? Colors.black
+                    : isSelected || hasFocus
+                    ? Colors.white
+                    : Colors.white70,
+                fontSize: 18,
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
 }
 
-class _TvSearchResults extends ConsumerWidget {
+/// Paginated search results (keyword only)
+class _TvPaginatedSearchResults extends ConsumerWidget {
   final String keyword;
-  const _TvSearchResults({required this.keyword});
+  const _TvPaginatedSearchResults({required this.keyword});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final searchAsync = ref.watch(
-      searchFilmsProvider((keyword: keyword, page: 1)),
+    final state = ref.watch(paginatedSearchFilmsProvider(keyword));
+    final notifier = ref.read(paginatedSearchFilmsProvider(keyword).notifier);
+
+    return _TvFilmGrid(
+      items: state.items,
+      isLoading: state.isLoading,
+      hasMore: state.hasMore,
+      onLoadMore: () => notifier.loadMore(),
+    );
+  }
+}
+
+/// Paginated filter results (genre/country/year)
+class _TvPaginatedFilterResults extends ConsumerWidget {
+  final String? genre;
+  final String? country;
+  final int? year;
+  final String? keyword;
+
+  const _TvPaginatedFilterResults({
+    this.genre,
+    this.country,
+    this.year,
+    this.keyword,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final params = FilmFilterParams(
+      slug: (keyword != null && keyword!.isNotEmpty)
+          ? keyword!
+          : (genre ?? country ?? 'phim-moi-cap-nhat'),
+      source: (keyword != null && keyword!.isNotEmpty)
+          ? PaginatedSource.search
+          : genre != null
+          ? PaginatedSource.genre
+          : country != null
+          ? PaginatedSource.country
+          : PaginatedSource.type,
+      category: genre,
+      country: country,
+      year: year,
     );
 
-    return searchAsync.when(
-      data: (response) {
-        final items = response.data?.items ?? [];
-        if (items.isEmpty) {
-          return const Center(
-            child: Text('Không tìm thấy phim',
-                style: TextStyle(color: Colors.white, fontSize: 16)),
-          );
-        }
-        return GridView.builder(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 5,
-            childAspectRatio: 0.6,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-          ),
-          itemCount: items.length,
-          itemBuilder: (context, index) {
-            final film = items[index];
-            return Focus(
-              onKeyEvent: (node, event) {
-                if (event is KeyDownEvent &&
-                    event.logicalKey == LogicalKeyboardKey.select) {
-                  context.push('/detail/${film.slug}');
-                  return KeyEventResult.handled;
-                }
-                return KeyEventResult.ignored;
-              },
-              child: Builder(
-                builder: (context) {
-                  final hasFocus = Focus.of(context).hasFocus;
-                  return AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    transform: hasFocus
-                        ? Matrix4.diagonal3Values(1.05, 1.05, 1.0)
-                        : Matrix4.identity(),
-                    transformAlignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      border: hasFocus
-                          ? Border.all(color: AppColors.primary, width: 3)
-                          : null,
-                    ),
-                    child: GestureDetector(
-                      onTap: () => context.push('/detail/${film.slug}'),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: AppImage(
-                                imageUrl: film.fullThumbUrl,
-                                boxFit: BoxFit.cover,
-                                width: double.infinity,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            film.name ?? '',
-                            style: const TextStyle(
-                                color: Colors.white, fontSize: 12),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
+    final state = ref.watch(paginatedFilmsProvider(params));
+    final notifier = ref.read(paginatedFilmsProvider(params).notifier);
+
+    return _TvFilmGrid(
+      items: state.items,
+      isLoading: state.isLoading,
+      hasMore: state.hasMore,
+      onLoadMore: () => notifier.loadMore(),
+    );
+  }
+}
+
+/// Reusable grid with pagination - uses TvFilmCard for premium look
+class _TvFilmGrid extends StatelessWidget {
+  final List<FilmItem> items;
+  final bool isLoading;
+  final bool hasMore;
+  final VoidCallback onLoadMore;
+
+  const _TvFilmGrid({
+    required this.items,
+    required this.isLoading,
+    required this.hasMore,
+    required this.onLoadMore,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (items.isEmpty && isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(color: TvDesignSystem.primary),
+      );
+    }
+
+    if (items.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.movie_filter_rounded,
+              color: Colors.white.withValues(alpha: 0.12),
+              size: 80,
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Không tìm thấy phim',
+              style: TvDesignSystem.titleLarge.copyWith(
+                color: Colors.white.withValues(alpha: 0.3),
               ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return FocusTraversalGroup(
+      child: NotificationListener<ScrollNotification>(
+        onNotification: (notification) {
+          if (notification is ScrollEndNotification &&
+              notification.metrics.extentAfter < 200 &&
+              hasMore &&
+              !isLoading) {
+            onLoadMore();
+          }
+          return false;
+        },
+        child: GridView.builder(
+          padding: EdgeInsets.symmetric(
+            horizontal: TvDesignSystem.overscanMargin,
+            vertical: TvDesignSystem.spaceMd,
+          ),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 4,
+            childAspectRatio: 0.76,
+            crossAxisSpacing: 36,
+            mainAxisSpacing: 40,
+          ),
+          itemCount: items.length + (isLoading ? 1 : 0),
+          itemBuilder: (context, index) {
+            if (index >= items.length) {
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: CircularProgressIndicator(
+                    color: TvDesignSystem.primary,
+                    strokeWidth: 2,
+                  ),
+                ),
+              );
+            }
+
+            final film = items[index];
+            return TvFilmCard(
+              film: film,
+              onTap: () => context.push('/detail/${film.slug}'),
+              width: double.infinity,
+              aspectRatio: 16 / 9,
             );
           },
-        );
-      },
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (_, _) => const Center(
-        child: Text('Có lỗi xảy ra', style: TextStyle(color: Colors.white)),
+        ),
       ),
     );
   }
