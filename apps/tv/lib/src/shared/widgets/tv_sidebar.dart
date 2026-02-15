@@ -29,14 +29,12 @@ class _TvSidebarState extends ConsumerState<TvSidebar> {
 
   final List<Map<String, dynamic>> _menuItems = [
     {'icon': Icons.home_rounded, 'label': 'Trang chủ'},
-    {'icon': Icons.history_rounded, 'label': 'Vừa xem'},
-    {'icon': Icons.favorite_rounded, 'label': 'Yêu thích'},
+    // Temporarily hidden: Vừa xem, Yêu thích
   ];
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authStateProvider);
-    final user = authState.value;
+    // Auth and User section temporarily hidden
 
     return FocusTraversalGroup(
       child: Focus(
@@ -174,8 +172,8 @@ class _TvSidebarState extends ConsumerState<TvSidebar> {
                       ),
                     ),
 
-                    // Profile Section
-                    _buildUserSection(user),
+                    // Profile Section (Temporarily hidden)
+                    // _buildUserSection(user),
                   ],
                 ),
               ),
@@ -192,33 +190,7 @@ class _TvSidebarState extends ConsumerState<TvSidebar> {
     );
   }
 
-  Widget _buildUserSection(dynamic user) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
-          child: Divider(
-            color: Colors.white.withValues(alpha: 0.08),
-            height: 1,
-          ),
-        ),
-        const SizedBox(height: 32),
-        _SidebarItem(
-          icon: user?.photoURL == null
-              ? Icons.account_circle_outlined
-              : Icons.account_circle,
-          label: user?.displayName ?? 'Đăng nhập',
-          isExpanded: _isExpanded,
-          isSelected: false,
-          onTap: () => context.push(user == null ? '/login' : '/profile'),
-          onRightPress: _moveFocusToContent,
-          isAvatar: true,
-          avatarUrl: user?.photoURL,
-          highlightColor: Colors.white,
-        ),
-      ],
-    );
-  }
+  // _buildUserSection removed temporarily
 }
 
 class _SidebarItem extends StatefulWidget {

@@ -9,6 +9,8 @@ import '../../shared/widgets/tv_sidebar.dart';
 import '../../shared/widgets/tv_shelf.dart';
 import '../../shared/widgets/tv_focus_button.dart';
 import '../../shared/tv_design_system.dart';
+import '../update/tv_update_dialog.dart';
+import '../update/tv_update_providers.dart';
 
 class TvHomePage extends ConsumerStatefulWidget {
   const TvHomePage({super.key});
@@ -27,11 +29,26 @@ class _TvHomePageState extends ConsumerState<TvHomePage> {
   // Top category tabs (iQIYI style)
   static const _contentTabs = [
     'Khám phá',
-    'Phim lẻ',
     'Phim bộ',
-    'Hoạt hình',
+    'Phim lẻ',
     'TV Shows',
+    'Hoạt hình',
+    'Vietsub',
+    'Thuyết minh',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkForUpdate());
+  }
+
+  Future<void> _checkForUpdate() async {
+    final updateInfo = await ref.read(appUpdateCheckProvider.future);
+    if (updateInfo != null && mounted) {
+      TvUpdateDialog.show(context, updateInfo);
+    }
+  }
 
   @override
   void dispose() {
@@ -119,8 +136,9 @@ class _TvHomePageState extends ConsumerState<TvHomePage> {
                 onDestinationSelected: (index) {
                   setState(() {
                     _selectedMenuIndex = index;
-                    if (index == 0) _selectedTabIndex = 0;
-                    _focusedFilm = null;
+                    _selectedTabIndex = 0;
+                    _focusedFilm =
+                        null; // Reset to trigger auto-focus on new section
                   });
                   _scrollController.animateTo(
                     0,
@@ -485,16 +503,8 @@ class _TvHomePageState extends ConsumerState<TvHomePage> {
   List<Widget> _buildContentForTab() {
     switch (_selectedTabIndex) {
       case 0: // Khám phá
-        return _buildDiscoverShelves();
-      case 1: // Phim lẻ
-        return [
-          _buildShelfSliver('Phim lẻ mới nhất', 'phim-le', isLandscape: true),
-          _buildGenreShelfSliver('Hành động kịch tính', 'hanh-dong'),
-          _buildGenreShelfSliver('Tình cảm lãng mạn', 'tinh-cam'),
-          _buildGenreShelfSliver('Kinh dị rùng rợn', 'kinh-di'),
-          _buildShelfSliver('Phim chiếu rạp hot', 'phim-le'),
-        ];
-      case 2: // Phim bộ
+        return _buildFeaturedDiscoverSections();
+      case 1: // Phim bộ
         return [
           _buildShelfSliver(
             'Phim bộ mới cập nhật',
@@ -506,41 +516,115 @@ class _TvHomePageState extends ConsumerState<TvHomePage> {
           _buildGenreShelfSliver('Tâm lý - Gia đình', 'tam-ly'),
           _buildShelfSliver('Phim bộ hot trong tuần', 'phim-bo'),
         ];
-      case 3: // Hoạt hình
+      case 2: // Phim lẻ
         return [
-          _buildShelfSliver('Anime mới nhất', 'hoat-hinh', isLandscape: true),
-          _buildGenreShelfSliver('Anime hành động', 'hanh-dong'),
-          _buildGenreShelfSliver('Anime phiêu lưu', 'phieu-luu'),
-          _buildGenreShelfSliver('Anime viễn tưởng', 'vien-tuong'),
+          _buildShelfSliver('Phim lẻ mới nhất', 'phim-le', isLandscape: true),
+          _buildGenreShelfSliver('Hành động kịch tính', 'hanh-dong'),
+          _buildGenreShelfSliver('Tình cảm lãng mạn', 'tinh-cam'),
+          _buildGenreShelfSliver('Kinh dị rùng rợn', 'kinh-di'),
+          _buildShelfSliver('Phim chiếu rạp hot', 'phim-le'),
         ];
-      case 4: // TV Shows
+      case 3: // TV Shows
         return [
           _buildShelfSliver('TV Shows nổi bật', 'tv-shows', isLandscape: true),
           _buildGenreShelfSliver('Reality Shows', 'reality'),
           _buildGenreShelfSliver('Talk Shows', 'talk-show'),
           _buildGenreShelfSliver('Music Shows', 'music'),
         ];
+      case 4: // Hoạt hình
+        return [
+          _buildShelfSliver('Anime mới nhất', 'hoat-hinh', isLandscape: true),
+          _buildGenreShelfSliver('Anime hành động', 'hanh-dong'),
+          _buildGenreShelfSliver('Anime phiêu lưu', 'phieu-luu'),
+          _buildGenreShelfSliver('Anime viễn tưởng', 'vien-tuong'),
+        ];
+      case 5: // Vietsub
+        return [
+          _buildShelfSliver(
+            'Phim Vietsub mới nhất',
+            'phim-vietsub',
+            isLandscape: true,
+          ),
+          _buildGenreShelfSliver('Phim bộ Vietsub', 'phim-bo'),
+          _buildGenreShelfSliver('Phim lẻ Vietsub', 'phim-le'),
+        ];
+      case 6: // Thuyết minh
+        return [
+          _buildShelfSliver(
+            'Phim Thuyết minh mới nhất',
+            'phim-thuyet-minh',
+            isLandscape: true,
+          ),
+          _buildGenreShelfSliver('Phim bộ Thuyết minh', 'phim-bo'),
+          _buildGenreShelfSliver('Phim lẻ Thuyết minh', 'phim-le'),
+        ];
       default:
         return _buildDiscoverShelves();
     }
   }
 
+  List<Widget> _buildFeaturedDiscoverSections() {
+    final latestAsync = ref.watch(
+      filmsByTypeProvider((
+        typeSlug: 'phim-moi-cap-nhat',
+        page: 1,
+        sortField: null,
+        year: null,
+      )),
+    );
+    final hotAsync = ref.watch(
+      filmsByTypeProvider((
+        typeSlug: 'phim-moi-cap-nhat',
+        page: 1,
+        sortField: 'view',
+        year: DateTime.now().year,
+      )),
+    );
+
+    final featuredFilmsAsync = latestAsync.when(
+      data: (latestRes) => hotAsync.when(
+        data: (hotRes) {
+          final hotItems = hotRes.data?.items ?? [];
+          final latestItems = latestRes.data?.items ?? [];
+          final hotSlugs = hotItems.map((e) => e.slug).toSet();
+          final merged = [
+            ...hotItems,
+            ...latestItems.where((item) => !hotSlugs.contains(item.slug)),
+          ];
+
+          return AsyncValue.data(
+            FilmListResponse(
+              status: latestRes.status,
+              data: FilmListData(
+                items: merged,
+                appDomainCdnImage: latestRes.data?.appDomainCdnImage,
+              ),
+            ),
+          );
+        },
+        loading: () => AsyncValue.data(latestRes),
+        error: (_, _) => AsyncValue.data(latestRes),
+      ),
+      loading: () => const AsyncValue<FilmListResponse>.loading(),
+      error: (e, s) => AsyncValue<FilmListResponse>.error(e, s),
+    );
+
+    return [
+      _buildBaseShelfSliver('MỚI CẬP NHẬT', featuredFilmsAsync, true),
+      _buildGenreShelfSliver('PHIM HÀNH ĐỘNG', 'hanh-dong'),
+      _buildGenreShelfSliver('PHIM TÌNH CẢM', 'tinh-cam'),
+      _buildGenreShelfSliver('PHIM KINH DỊ', 'kinh-di'),
+      _buildShelfSliver('PHIM HOẠT HÌNH', 'hoat-hinh', isLandscape: true),
+    ];
+  }
+
   List<Widget> _buildDiscoverShelves() {
     return [
-      _buildShelfSliver(
-        'Thịnh hành hôm nay',
-        'phim-moi-cap-nhat',
-        isLandscape: true,
-      ),
-      _buildGenreShelfSliver('Phim hành động đề cử', 'hanh-dong'),
-      _buildShelfSliver('Phim kinh điển hot', 'phim-le'),
-      _buildShelfSliver(
-        'Phim bộ truyền hình mới nhất',
-        'phim-bo',
-        isLandscape: true,
-      ),
-      _buildGenreShelfSliver('Vũ trụ Anime', 'hoat-hinh'),
-      _buildGenreShelfSliver('Kinh dị đặc sắc', 'kinh-di'),
+      _buildShelfSliver('MỚI CẬP NHẬT', 'phim-moi-cap-nhat', isLandscape: true),
+      _buildGenreShelfSliver('PHIM HÀNH ĐỘNG', 'hanh-dong'),
+      _buildGenreShelfSliver('PHIM TÌNH CẢM', 'tinh-cam'),
+      _buildGenreShelfSliver('PHIM KINH DỊ', 'kinh-di'),
+      _buildShelfSliver('PHIM HOẠT HÌNH', 'hoat-hinh', isLandscape: true),
     ];
   }
 
@@ -582,11 +666,11 @@ class _TvHomePageState extends ConsumerState<TvHomePage> {
       child: filmsAsync.when(
         data: (response) {
           final items = response.data?.items ?? [];
-          if (_focusedFilm == null &&
-              items.isNotEmpty &&
-              _selectedTabIndex == 0) {
+          if (_focusedFilm == null && items.isNotEmpty) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (mounted) setState(() => _focusedFilm = items.first);
+              if (mounted && _focusedFilm == null) {
+                setState(() => _focusedFilm = items.first);
+              }
             });
           }
           return TvShelf(
@@ -615,20 +699,30 @@ class _TvHomePageState extends ConsumerState<TvHomePage> {
               'Chưa có lịch sử xem',
             );
           }
+          final items = entries
+              .map(
+                (e) => FilmItem(
+                  slug: e.slug,
+                  name: e.name,
+                  originName: e.originName,
+                  thumbUrl: e.thumbUrl,
+                  episodeCurrent: e.episode,
+                ),
+              )
+              .toList();
+
+          if (_focusedFilm == null && items.isNotEmpty) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted && _focusedFilm == null) {
+                setState(() => _focusedFilm = items.first);
+              }
+            });
+          }
           return TvShelf(
             title: 'Đã xem gần đây',
-            items: entries
-                .map(
-                  (e) => FilmItem(
-                    slug: e.slug,
-                    name: e.name,
-                    originName: e.originName,
-                    thumbUrl: e.thumbUrl,
-                    episodeCurrent: e.episode,
-                  ),
-                )
-                .toList(),
+            items: items,
             onFilmTap: (film) => context.push('/detail/${film.slug}'),
+            onFilmFocused: (film) => setState(() => _focusedFilm = film),
             isLarge: true,
           );
         },
@@ -650,20 +744,29 @@ class _TvHomePageState extends ConsumerState<TvHomePage> {
               'Chưa có phim yêu thích',
             );
           }
+          final items = entries
+              .map(
+                (e) => FilmItem(
+                  slug: e.slug,
+                  name: e.name,
+                  originName: e.originName,
+                  thumbUrl: e.thumbUrl,
+                ),
+              )
+              .toList();
+
+          if (_focusedFilm == null && items.isNotEmpty) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted && _focusedFilm == null) {
+                setState(() => _focusedFilm = items.first);
+              }
+            });
+          }
           return TvShelf(
-            title: 'Phim yêu thích',
-            items: entries
-                .map(
-                  (e) => FilmItem(
-                    slug: e.slug,
-                    name: e.name,
-                    originName: e.originName,
-                    thumbUrl: e.thumbUrl,
-                    episodeCurrent: e.episode,
-                  ),
-                )
-                .toList(),
+            title: 'Danh sách yêu thích',
+            items: items,
             onFilmTap: (film) => context.push('/detail/${film.slug}'),
+            onFilmFocused: (film) => setState(() => _focusedFilm = film),
             isLarge: true,
           );
         },

@@ -99,16 +99,26 @@ class _TvFilmCardState extends State<TvFilmCard> {
                         fit: StackFit.expand,
                         children: [
                           CachedNetworkImage(
-                            imageUrl: widget.film.fullThumbUrl,
+                            imageUrl:
+                                (widget.film.posterUrl != null &&
+                                    widget.film.posterUrl!.isNotEmpty)
+                                ? widget.film.fullPosterUrl
+                                : widget.film.fullThumbUrl,
                             fit: BoxFit.cover,
                             filterQuality: FilterQuality.high,
                             placeholder: (context, url) => Container(
                               color: Colors.white.withValues(alpha: 0.05),
                             ),
-                            errorWidget: (context, url, error) => const Icon(
-                              Icons.movie_outlined,
-                              color: Colors.white24,
-                            ),
+                            errorWidget: (context, url, error) =>
+                                CachedNetworkImage(
+                                  imageUrl: widget.film.fullThumbUrl,
+                                  fit: BoxFit.cover,
+                                  errorWidget: (context, url, error) =>
+                                      const Icon(
+                                        Icons.movie_outlined,
+                                        color: Colors.white24,
+                                      ),
+                                ),
                           ),
                           // Premium border overlay when focused
                           if (isCardFocused && widget.showBorder)

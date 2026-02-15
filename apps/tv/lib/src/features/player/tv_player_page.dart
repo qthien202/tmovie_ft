@@ -4,11 +4,13 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
 import 'package:core/core.dart';
 import '../../shared/tv_design_system.dart';
 import '../../shared/widgets/tv_focus_button.dart';
+import '../../shared/widgets/tv_focus_wrapper.dart';
 
 class TvPlayerPage extends ConsumerStatefulWidget {
   final String videoUrl;
@@ -45,7 +47,7 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
   // Custom Controls State
   bool _controlsVisible = true;
   Timer? _hideTimer;
-  BoxFit _videoFit = BoxFit.contain;
+  BoxFit _videoFit = BoxFit.cover; // Default to cover for TV immersion
 
   @override
   void initState() {
@@ -106,6 +108,7 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
         autoPlay: true,
         allowFullScreen: false,
         showControls: false,
+        aspectRatio: _videoController!.value.aspectRatio,
         startAt: savedPosition != null && savedPosition > 0
             ? Duration(seconds: savedPosition)
             : null,
@@ -235,14 +238,12 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
 
           final key = event.logicalKey;
 
-          // D-pad SELECT or Enter → toggle controls
           if (key == LogicalKeyboardKey.select ||
               key == LogicalKeyboardKey.enter) {
             if (!_controlsVisible) {
               _toggleControls();
               return KeyEventResult.handled;
             }
-            // If controls visible, toggle play/pause
             if (_videoController != null) {
               setState(() {
                 if (_videoController!.value.isPlaying) {
@@ -257,7 +258,6 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
             }
           }
 
-          // D-pad LEFT → rewind 10s
           if (key == LogicalKeyboardKey.arrowLeft && !_showPlaylist) {
             if (_videoController != null) {
               final current = _videoController!.value.position;
@@ -268,7 +268,6 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
             }
           }
 
-          // D-pad RIGHT → forward 10s
           if (key == LogicalKeyboardKey.arrowRight && !_showPlaylist) {
             if (_videoController != null) {
               final current = _videoController!.value.position;
@@ -279,25 +278,36 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
             }
           }
 
-          // BACK key → close playlist or exit player
           if (key == LogicalKeyboardKey.goBack ||
-              key == LogicalKeyboardKey.escape) {
+              key == LogicalKeyboardKey.escape ||
+              key == LogicalKeyboardKey.backspace) {
             if (_showPlaylist) {
               setState(() => _showPlaylist = false);
               _startHideTimer();
               return KeyEventResult.handled;
             }
-            Navigator.of(context).pop();
+            context.pop();
             return KeyEventResult.handled;
           }
 
-          // MENU / contextMenu → toggle playlist
-          if (key == LogicalKeyboardKey.contextMenu) {
-            setState(() {
-              _showPlaylist = !_showPlaylist;
-              _controlsVisible = true;
-            });
-            return KeyEventResult.handled;
+          if (key == LogicalKeyboardKey.contextMenu ||
+              key == LogicalKeyboardKey.arrowUp) {
+            if (!_showPlaylist && !_controlsVisible) {
+              setState(() => _controlsVisible = true);
+              _startHideTimer();
+              return KeyEventResult.handled;
+            }
+            return KeyEventResult.ignored;
+          }
+
+          if (key == LogicalKeyboardKey.arrowDown) {
+            if (!_showPlaylist) {
+              setState(() {
+                _showPlaylist = true;
+                _controlsVisible = true;
+              });
+              return KeyEventResult.handled;
+            }
           }
 
           return KeyEventResult.ignored;
@@ -309,12 +319,14 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
               child: _hasError
                   ? _buildErrorView()
                   : _chewieController != null
-                  ? FittedBox(
-                      fit: _videoFit,
-                      child: SizedBox(
-                        width: _videoController!.value.size.width,
-                        height: _videoController!.value.size.height,
-                        child: Chewie(controller: _chewieController!),
+                  ? SizedBox.expand(
+                      child: FittedBox(
+                        fit: _videoFit,
+                        child: SizedBox(
+                          width: _videoController!.value.size.width,
+                          height: _videoController!.value.size.height,
+                          child: Chewie(controller: _chewieController!),
+                        ),
                       ),
                     )
                   : const Center(
@@ -325,33 +337,25 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
                     ),
             ),
 
-            // 2. Tap Surface
-            Positioned.fill(
-              child: GestureDetector(
-                onTap: _toggleControls,
-                behavior: HitTestBehavior.opaque,
+            // 2. Control Layout
+            AnimatedOpacity(
+              opacity: _controlsVisible ? 1.0 : 0.0,
+              duration: TvDesignSystem.durationMedium,
+              child: IgnorePointer(
+                ignoring: !_controlsVisible,
+                child: Stack(
+                  children: [
+                    _buildTopHUD(),
+                    _buildCenterControls(),
+                    _buildBottomBar(),
+                  ],
+                ),
               ),
             ),
 
-            // 3. Custom Controls
-            _buildCustomControls(),
-
-            // 4. Playlist Sidebar
+            // 3. Playlist Overlay (Redesigned for TV)
             if (_showPlaylist) _buildPlaylistOverlay(),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCustomControls() {
-    return AnimatedOpacity(
-      opacity: _controlsVisible ? 1.0 : 0.0,
-      duration: TvDesignSystem.durationMedium,
-      child: IgnorePointer(
-        ignoring: !_controlsVisible,
-        child: Stack(
-          children: [_buildTopHUD(), _buildCenterControls(), _buildBottomBar()],
         ),
       ),
     );
@@ -363,8 +367,8 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
       left: 0,
       right: 0,
       child: Container(
-        height: 140,
-        padding: const EdgeInsets.symmetric(horizontal: 48),
+        height: 180,
+        padding: const EdgeInsets.symmetric(horizontal: 64, vertical: 48),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
@@ -372,54 +376,86 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
             colors: [Colors.black.withValues(alpha: 0.9), Colors.transparent],
           ),
         ),
-        child: SafeArea(
-          bottom: false,
-          child: Row(
-            children: [
-              TvFocusButton(
-                icon: Icons.arrow_back_rounded,
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-              const SizedBox(width: 32),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      widget.filmName.toUpperCase(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 28,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 1,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TvFocusButton(
+              icon: Icons.arrow_back_rounded,
+              onPressed: () => context.pop(),
+            ),
+            const SizedBox(width: 32),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.filmName.toUpperCase(),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 32,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.2,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black.withValues(alpha: 0.5),
+                          blurRadius: 10,
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'NOW PLAYING: $_currentEpisodeName',
-                      style: TextStyle(
-                        color: TvDesignSystem.primary.withValues(alpha:0.9),
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 2,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: TvDesignSystem.primary,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          _currentEpisodeName,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
+                      const SizedBox(width: 16),
+                      Text(
+                        'ĐANG PHÁT',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.5),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 2,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              TvFocusButton(
-                icon: Icons.playlist_play_rounded,
-                label: 'EPISODES',
-                onPressed: () => setState(() {
-                  _showPlaylist = true;
-                  _controlsVisible = true;
-                }),
-              ),
-            ],
-          ),
+            ),
+            TvFocusButton(
+              icon: Icons.video_settings_rounded,
+              label: 'Tỉ Lệ',
+              onPressed: () {
+                setState(() {
+                  _videoFit = _videoFit == BoxFit.cover
+                      ? BoxFit.contain
+                      : (_videoFit == BoxFit.contain
+                            ? BoxFit.fill
+                            : BoxFit.cover);
+                });
+                _startHideTimer();
+              },
+            ),
+          ],
         ),
       ),
     );
@@ -429,22 +465,13 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
     final isPlaying = _videoController?.value.isPlaying ?? false;
     return Center(
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          TvFocusButton(
-            icon: Icons.replay_10_rounded,
-            size: 80,
-            onPressed: () {
-              if (_videoController == null) return;
-              final current = _videoController!.value.position;
-              _videoController!.seekTo(current - const Duration(seconds: 10));
-              _startHideTimer();
-            },
-          ),
-          const SizedBox(width: 80),
+          _buildSeekButton(Icons.replay_10_rounded, -10),
+          const SizedBox(width: 64),
           TvFocusButton(
             icon: isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
-            size: 120,
+            size: 140,
             isPrimary: true,
             onPressed: () {
               setState(() {
@@ -458,19 +485,38 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
               });
             },
           ),
-          const SizedBox(width: 80),
-          TvFocusButton(
-            icon: Icons.forward_10_rounded,
-            size: 80,
-            onPressed: () {
-              if (_videoController == null) return;
-              final current = _videoController!.value.position;
-              _videoController!.seekTo(current + const Duration(seconds: 10));
-              _startHideTimer();
-            },
-          ),
+          const SizedBox(width: 64),
+          _buildSeekButton(Icons.forward_10_rounded, 10),
         ],
       ),
+    );
+  }
+
+  Widget _buildSeekButton(IconData icon, int seconds) {
+    return TvFocusWrapper(
+      onTap: () {
+        if (_videoController == null) return;
+        final current = _videoController!.value.position;
+        _videoController!.seekTo(current + Duration(seconds: seconds));
+        _startHideTimer();
+      },
+      builder: (context, hasFocus) {
+        return Container(
+          width: 80,
+          height: 80,
+          decoration: BoxDecoration(
+            color: hasFocus
+                ? Colors.white
+                : Colors.white.withValues(alpha: 0.1),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            icon,
+            color: hasFocus ? Colors.black : Colors.white,
+            size: 40,
+          ),
+        );
+      },
     );
   }
 
@@ -482,7 +528,7 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
       left: 0,
       right: 0,
       child: Container(
-        padding: const EdgeInsets.fromLTRB(48, 48, 48, 64),
+        padding: const EdgeInsets.fromLTRB(64, 60, 64, 64),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.bottomCenter,
@@ -493,16 +539,46 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            VideoProgressIndicator(
-              _videoController!,
-              allowScrubbing: true,
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              colors: VideoProgressColors(
-                playedColor: TvDesignSystem.primary,
-                bufferedColor: Colors.white.withValues(alpha: 0.25),
-                backgroundColor: Colors.white.withValues(alpha: 0.1),
+            Focus(
+              onKeyEvent: (node, event) {
+                if (event is KeyDownEvent) {
+                  if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+                    _videoController!.seekTo(
+                      _videoController!.value.position -
+                          const Duration(seconds: 30),
+                    );
+                    return KeyEventResult.handled;
+                  }
+                  if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
+                    _videoController!.seekTo(
+                      _videoController!.value.position +
+                          const Duration(seconds: 30),
+                    );
+                    return KeyEventResult.handled;
+                  }
+                }
+                return KeyEventResult.ignored;
+              },
+              child: Builder(
+                builder: (context) {
+                  final hasFocus = Focus.of(context).hasFocus;
+                  return AnimatedContainer(
+                    duration: TvDesignSystem.durationFast,
+                    height: hasFocus ? 12 : 6,
+                    child: VideoProgressIndicator(
+                      _videoController!,
+                      allowScrubbing: true,
+                      colors: VideoProgressColors(
+                        playedColor: TvDesignSystem.primary,
+                        bufferedColor: Colors.white.withValues(alpha: 0.2),
+                        backgroundColor: Colors.white.withValues(alpha: 0.1),
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
+            const SizedBox(height: 24),
             Row(
               children: [
                 ValueListenableBuilder(
@@ -512,8 +588,8 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
                       _formatDuration(value.position),
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.w700,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w900,
                         fontFeatures: [FontFeature.tabularFigures()],
                       ),
                     );
@@ -522,33 +598,19 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
                 Text(
                   ' / ${_formatDuration(_videoController!.value.duration)}',
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha:0.4),
-                    fontSize: 22,
+                    color: Colors.white.withValues(alpha: 0.4),
+                    fontSize: 24,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 const Spacer(),
                 TvFocusButton(
-                  icon: _videoFit == BoxFit.contain
-                      ? Icons.fullscreen_rounded
-                      : _videoFit == BoxFit.cover
-                      ? Icons.crop_free_rounded
-                      : Icons.aspect_ratio_rounded,
-                  label: _videoFit == BoxFit.contain
-                      ? 'FIT'
-                      : _videoFit == BoxFit.cover
-                      ? 'STRETCH'
-                      : 'FILL',
-                  onPressed: () {
-                    setState(() {
-                      _videoFit = _videoFit == BoxFit.contain
-                          ? BoxFit.cover
-                          : _videoFit == BoxFit.cover
-                          ? BoxFit.fill
-                          : BoxFit.contain;
-                    });
-                    _startHideTimer();
-                  },
+                  icon: Icons.apps_rounded,
+                  label: 'TẬP PHIM',
+                  onPressed: () => setState(() {
+                    _showPlaylist = true;
+                    _controlsVisible = true;
+                  }),
                 ),
               ],
             ),
@@ -578,29 +640,30 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
             const Icon(
               Icons.error_outline_rounded,
               color: Colors.white30,
-              size: 100,
+              size: 120,
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 40),
             const Text(
-              'Oops! Something went wrong.',
+              'KHÔNG THỂ TẢI VIDEO',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 32,
+                fontSize: 36,
                 fontWeight: FontWeight.w900,
+                letterSpacing: 2,
               ),
             ),
             const SizedBox(height: 16),
             const Text(
-              'The video could not be loaded.',
-              style: TextStyle(color: Colors.white38, fontSize: 22),
+              'Vui lòng kiểm tra lại kết nối hoặc đổi server.',
+              style: TextStyle(color: Colors.white38, fontSize: 20),
             ),
-            const SizedBox(height: 64),
+            const SizedBox(height: 60),
             TvFocusButton(
               icon: Icons.arrow_back_rounded,
-              label: 'GO BACK',
+              label: 'QUAY LẠI',
               isPrimary: true,
               autofocus: true,
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => context.pop(),
             ),
           ],
         ),
@@ -615,7 +678,7 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
 
     return Stack(
       children: [
-        // Backdrop
+        // Backdrop Blur
         Positioned.fill(
           child: GestureDetector(
             onTap: () {
@@ -623,262 +686,199 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
               _startHideTimer();
             },
             child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-              child: Container(color: Colors.black54),
+              filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+              child: Container(color: Colors.black.withValues(alpha: 0.8)),
             ),
           ),
         ),
-        // Liquid Glass Sidebar
-        Positioned(
-          top: 0,
-          right: 0,
-          bottom: 0,
-          width: 480,
-          child: ClipRRect(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha:0.7),
-                  border: Border(
-                    left: BorderSide(
-                      color: Colors.white.withValues(alpha:0.1),
-                      width: 1.5,
-                    ),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha:0.5),
-                      blurRadius: 50,
-                      spreadRadius: 20,
-                    ),
-                  ],
-                ),
-                child: SafeArea(
-                  left: false,
-                  child: Column(
+        // Episode Selector
+        Center(
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.85,
+            height: MediaQuery.of(context).size.height * 0.8,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(32),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+            ),
+            child: Column(
+              children: [
+                // Header
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(48, 48, 48, 24),
+                  child: Row(
                     children: [
-                      // Header
-                      Padding(
-                        padding: const EdgeInsets.all(40),
-                        child: Row(
-                          children: [
-                            const Text(
-                              'EPISODES',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 24,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 2,
-                              ),
-                            ),
-                            const Spacer(),
-                            TvFocusButton(
-                              icon: Icons.close_rounded,
-                              onPressed: () {
-                                setState(() => _showPlaylist = false);
-                                _startHideTimer();
-                              },
-                            ),
-                          ],
+                      const Icon(
+                        Icons.playlist_play_rounded,
+                        color: TvDesignSystem.primary,
+                        size: 40,
+                      ),
+                      const SizedBox(width: 16),
+                      const Text(
+                        'DANH SÁCH TẬP PHIM',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 32,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 2,
                         ),
                       ),
-                      // Server selector
-                      if (servers.length > 1)
-                        SizedBox(
-                          height: 56,
-                          child: FocusTraversalGroup(
-                            child: ListView.separated(
-                            padding: const EdgeInsets.symmetric(horizontal: 40),
-                            scrollDirection: Axis.horizontal,
-                            itemCount: servers.length,
-                            separatorBuilder: (_, _) =>
-                                const SizedBox(width: 16),
-                            itemBuilder: (context, index) {
-                              final isSelected = index == _selectedServerIndex;
-                              return Focus(
-                                onKeyEvent: (node, event) {
-                                  if (event is KeyDownEvent &&
-                                      (event.logicalKey ==
-                                              LogicalKeyboardKey.select ||
-                                          event.logicalKey ==
-                                              LogicalKeyboardKey.enter)) {
-                                    setState(
-                                      () => _selectedServerIndex = index,
-                                    );
-                                    return KeyEventResult.handled;
-                                  }
-                                  return KeyEventResult.ignored;
-                                },
-                                child: Builder(
-                                  builder: (context) {
-                                    final hasFocus = Focus.of(context).hasFocus;
-                                    return ChoiceChip(
-                                      label: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 8,
-                                        ),
-                                        child: Text(
-                                          servers[index].serverName ??
-                                              'SERVER ${index + 1}',
-                                        ),
-                                      ),
-                                      selected: isSelected,
-                                      onSelected: (val) {
-                                        if (val) {
-                                          setState(
-                                            () => _selectedServerIndex = index,
-                                          );
-                                        }
-                                      },
-                                      selectedColor: TvDesignSystem.primary,
-                                      backgroundColor: hasFocus
-                                          ? Colors.white.withValues(alpha:0.15)
-                                          : Colors.white.withValues(alpha:0.05),
-                                      labelStyle: TextStyle(
-                                        color: isSelected
-                                            ? Colors.white
-                                            : (hasFocus
-                                                  ? Colors.white
-                                                  : Colors.white38),
-                                        fontWeight: isSelected || hasFocus
-                                            ? FontWeight.w900
-                                            : FontWeight.w600,
-                                        fontSize: 16,
-                                      ),
-                                      side: BorderSide(
-                                        color: hasFocus
-                                            ? Colors.white
-                                            : (isSelected
-                                                  ? TvDesignSystem.primary
-                                                  : Colors.transparent),
-                                        width: 1.5,
-                                      ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              );
-                            },
-                          ),
-                          ),
-                        ),
-                      const SizedBox(height: 32),
-                      // Episode grid
-                      Expanded(
-                        child: FocusTraversalGroup(
-                          child: GridView.builder(
-                            padding: const EdgeInsets.fromLTRB(40, 0, 40, 60),
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  mainAxisSpacing: 24,
-                                  crossAxisSpacing: 24,
-                                  childAspectRatio: 2.2,
-                                ),
-                          itemCount: episodes.length,
-                          itemBuilder: (context, index) {
-                            final ep = episodes[index];
-                            final isCurrent = ep.name == _currentEpisodeName;
-                            final videoUrl = ep.linkM3u8 ?? ep.linkEmbed ?? '';
-                            return Focus(
-                              autofocus: isCurrent,
-                              onKeyEvent: (node, event) {
-                                if (event is KeyDownEvent &&
-                                    (event.logicalKey ==
-                                            LogicalKeyboardKey.select ||
-                                        event.logicalKey ==
-                                            LogicalKeyboardKey.enter) &&
-                                    videoUrl.isNotEmpty) {
-                                  _switchEpisode(ep, _selectedServerIndex);
-                                  return KeyEventResult.handled;
-                                }
-                                return KeyEventResult.ignored;
-                              },
-                              child: Builder(
-                                builder: (context) {
-                                  final hasFocus = Focus.of(context).hasFocus;
-                                  return AnimatedScale(
-                                    scale: hasFocus ? 1.08 : 1.0,
-                                    duration: TvDesignSystem.durationFast,
-                                    curve: TvDesignSystem.curveFluid,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: isCurrent
-                                            ? TvDesignSystem.primary
-                                                  .withValues(alpha:0.2)
-                                            : (hasFocus
-                                                  ? Colors.white.withValues(alpha:
-                                                      0.15,
-                                                    )
-                                                  : Colors.white.withValues(alpha:
-                                                      0.06,
-                                                    )),
-                                        borderRadius: BorderRadius.circular(16),
-                                        border: Border.all(
-                                          color: isCurrent
-                                              ? TvDesignSystem.primary
-                                              : (hasFocus
-                                                    ? Colors.white
-                                                    : Colors.white.withValues(alpha:
-                                                        0.1,
-                                                      )),
-                                          width: hasFocus ? 2 : 1.5,
-                                        ),
-                                        boxShadow: hasFocus
-                                            ? [
-                                                BoxShadow(
-                                                  color: Colors.white
-                                                      .withValues(alpha:0.15),
-                                                  blurRadius: 15,
-                                                ),
-                                              ]
-                                            : [],
-                                      ),
-                                      child: Material(
-                                        color: Colors.transparent,
-                                        child: InkWell(
-                                          onTap: videoUrl.isEmpty
-                                              ? null
-                                              : () => _switchEpisode(
-                                                  ep,
-                                                  _selectedServerIndex,
-                                                ),
-                                          borderRadius: BorderRadius.circular(
-                                            16,
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              ep.name ?? '',
-                                              style: TextStyle(
-                                                color: isCurrent || hasFocus
-                                                    ? Colors.white
-                                                    : Colors.white60,
-                                                fontSize: 20,
-                                                fontWeight:
-                                                    isCurrent || hasFocus
-                                                    ? FontWeight.w900
-                                                    : FontWeight.w600,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            );
-                          },
-                          ),
-                        ),
+                      const Spacer(),
+                      TvFocusButton(
+                        icon: Icons.close_rounded,
+                        onPressed: () {
+                          setState(() => _showPlaylist = false);
+                          _startHideTimer();
+                        },
                       ),
                     ],
                   ),
                 ),
-              ),
+                // Server selector
+                if (servers.length > 1)
+                  Container(
+                    height: 80,
+                    margin: const EdgeInsets.only(bottom: 24),
+                    child: ListView.separated(
+                      padding: const EdgeInsets.symmetric(horizontal: 48),
+                      scrollDirection: Axis.horizontal,
+                      itemCount: servers.length,
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(width: 16),
+                      itemBuilder: (context, index) {
+                        final isSelected = index == _selectedServerIndex;
+                        return TvFocusWrapper(
+                          onTap: () =>
+                              setState(() => _selectedServerIndex = index),
+                          builder: (context, hasFocus) {
+                            return AnimatedContainer(
+                              duration: TvDesignSystem.durationFast,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 32,
+                                vertical: 12,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? TvDesignSystem.primary
+                                    : (hasFocus
+                                          ? Colors.white
+                                          : Colors.white.withValues(
+                                              alpha: 0.05,
+                                            )),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: hasFocus
+                                      ? Colors.white
+                                      : Colors.transparent,
+                                  width: 2,
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  servers[index].serverName ??
+                                      'SERVER ${index + 1}',
+                                  style: TextStyle(
+                                    color: hasFocus && !isSelected
+                                        ? Colors.black
+                                        : Colors.white,
+                                    fontWeight: isSelected || hasFocus
+                                        ? FontWeight.w900
+                                        : FontWeight.w600,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                // Episode grid
+                Expanded(
+                  child: FocusTraversalGroup(
+                    child: GridView.builder(
+                      padding: const EdgeInsets.fromLTRB(48, 0, 48, 48),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 5,
+                            mainAxisSpacing: 20,
+                            crossAxisSpacing: 20,
+                            childAspectRatio: 1.8,
+                          ),
+                      itemCount: episodes.length,
+                      itemBuilder: (context, index) {
+                        final ep = episodes[index];
+                        final isCurrent = ep.name == _currentEpisodeName;
+                        return TvFocusWrapper(
+                          autofocus: isCurrent,
+                          onTap: () => _switchEpisode(ep, _selectedServerIndex),
+                          builder: (context, hasFocus) {
+                            return AnimatedScale(
+                              scale: hasFocus ? 1.05 : 1.0,
+                              duration: TvDesignSystem.durationFast,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: isCurrent
+                                      ? TvDesignSystem.primary
+                                      : (hasFocus
+                                            ? Colors.white
+                                            : Colors.white.withValues(
+                                                alpha: 0.08,
+                                              )),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: hasFocus
+                                        ? Colors.white
+                                        : Colors.white.withValues(alpha: 0.1),
+                                    width: 2,
+                                  ),
+                                  boxShadow: hasFocus
+                                      ? [
+                                          BoxShadow(
+                                            color: Colors.black.withValues(
+                                              alpha: 0.5,
+                                            ),
+                                            blurRadius: 20,
+                                          ),
+                                        ]
+                                      : [],
+                                ),
+                                child: Center(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        ep.name ?? '',
+                                        style: TextStyle(
+                                          color: hasFocus && !isCurrent
+                                              ? Colors.black
+                                              : Colors.white,
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.w900,
+                                        ),
+                                      ),
+                                      if (isCurrent)
+                                        const Text(
+                                          'ĐANG XEM',
+                                          style: TextStyle(
+                                            color: Colors.white70,
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
