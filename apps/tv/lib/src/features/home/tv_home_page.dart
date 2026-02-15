@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
-import 'dart:ui';
 
 import '../../shared/widgets/tv_sidebar.dart';
 import '../../shared/widgets/tv_shelf.dart';
@@ -170,31 +169,25 @@ class _TvHomePageState extends ConsumerState<TvHomePage> {
         children: [
           // Film type tag
           if (film.type != null)
-            ClipRRect(
-              borderRadius: BorderRadius.circular(TvDesignSystem.radiusSm),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 18,
-                    vertical: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(
-                      TvDesignSystem.radiusSm,
-                    ),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.1),
-                    ),
-                  ),
-                  child: Text(
-                    _getTypeLabel(film.type!).toUpperCase(),
-                    style: TvDesignSystem.labelSmall.copyWith(
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 2.5,
-                    ),
-                  ),
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 18,
+                vertical: 10,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(
+                  TvDesignSystem.radiusSm,
+                ),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.15),
+                ),
+              ),
+              child: Text(
+                _getTypeLabel(film.type!).toUpperCase(),
+                style: TvDesignSystem.labelSmall.copyWith(
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 2.5,
                 ),
               ),
             ),
@@ -803,60 +796,49 @@ class _TvHomePageState extends ConsumerState<TvHomePage> {
         ? _focusedFilm!.fullPosterUrl
         : (_focusedFilm?.fullThumbUrl ?? '');
 
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 1800),
-      child: Stack(
-        key: ValueKey(imageUrl + (_focusedFilm?.slug ?? 'bg')),
-        fit: StackFit.expand,
-        children: [
-          if (imageUrl.isNotEmpty)
-            AppImage(imageUrl: imageUrl, boxFit: BoxFit.cover)
-          else
-            Container(color: TvDesignSystem.background),
+    return RepaintBoundary(
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 800),
+        child: Stack(
+          key: ValueKey(imageUrl + (_focusedFilm?.slug ?? 'bg')),
+          fit: StackFit.expand,
+          children: [
+            if (imageUrl.isNotEmpty)
+              AppImage(imageUrl: imageUrl, boxFit: BoxFit.cover)
+            else
+              Container(color: TvDesignSystem.background),
 
-          // Multi-layer gradients
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.black.withValues(alpha: 0.2),
-                  Colors.black.withValues(alpha: 0.5),
-                  TvDesignSystem.background,
-                ],
-                stops: const [0.0, 0.4, 0.95],
+            // Simplified gradient overlay (2 layers instead of 3)
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withValues(alpha: 0.2),
+                    Colors.black.withValues(alpha: 0.5),
+                    TvDesignSystem.background,
+                  ],
+                  stops: const [0.0, 0.4, 0.95],
+                ),
               ),
             ),
-          ),
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-                colors: [
-                  TvDesignSystem.background.withValues(alpha: 0.95),
-                  TvDesignSystem.background.withValues(alpha: 0.3),
-                  Colors.transparent,
-                ],
-                stops: const [0.0, 0.5, 1.0],
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: [
+                    TvDesignSystem.background.withValues(alpha: 0.95),
+                    TvDesignSystem.background.withValues(alpha: 0.3),
+                    Colors.transparent,
+                  ],
+                  stops: const [0.0, 0.5, 1.0],
+                ),
               ),
             ),
-          ),
-          Container(
-            decoration: BoxDecoration(
-              gradient: RadialGradient(
-                center: const Alignment(0.4, -0.4),
-                radius: 1.5,
-                colors: [
-                  Colors.transparent,
-                  TvDesignSystem.background.withValues(alpha: 0.4),
-                ],
-                stops: const [0.3, 1.0],
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -868,15 +850,10 @@ class _TvHomePageState extends ConsumerState<TvHomePage> {
         child: AnimatedContainer(
           duration: TvDesignSystem.durationMedium,
           curve: TvDesignSystem.curveFluid,
+          // Use solid dark overlay instead of BackdropFilter (too heavy for TV GPU)
           color: _isSidebarFocused
-              ? Colors.black.withValues(alpha: 0.5)
+              ? Colors.black.withValues(alpha: 0.7)
               : Colors.transparent,
-          child: _isSidebarFocused
-              ? BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
-                  child: Container(color: Colors.transparent),
-                )
-              : null,
         ),
       ),
     );

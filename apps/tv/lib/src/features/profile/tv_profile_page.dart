@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -299,9 +297,8 @@ class TvProfilePage extends ConsumerWidget {
   }) {
     showDialog(
       context: context,
-      builder: (context) => BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-        child: AlertDialog(
+      barrierColor: Colors.black.withValues(alpha: 0.8),
+      builder: (context) => AlertDialog(
           backgroundColor: TvDesignSystem.surface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(TvDesignSystem.radiusLg),
@@ -383,7 +380,6 @@ class TvProfilePage extends ConsumerWidget {
             ),
           ],
         ),
-      ),
     );
   }
 }

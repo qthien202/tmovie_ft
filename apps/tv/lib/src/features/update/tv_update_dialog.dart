@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -41,8 +40,8 @@ class TvUpdateDialog extends ConsumerWidget {
         }
         return KeyEventResult.ignored;
       },
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+      child: Container(
+        color: Colors.black.withValues(alpha: 0.85),
         child: Center(
           child: Container(
             width: 700,

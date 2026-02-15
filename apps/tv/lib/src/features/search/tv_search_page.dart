@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -368,73 +367,70 @@ class _TvSearchPageState extends ConsumerState<TvSearchPage> {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(TvDesignSystem.radiusMd),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                  child: Focus(
-                    onKeyEvent: (node, event) {
-                      if (event is KeyDownEvent) {
-                        if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
-                          FocusManager.instance.primaryFocus?.focusInDirection(
-                            TraversalDirection.right,
-                          );
-                          return KeyEventResult.handled;
-                        }
-                        if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
-                          FocusManager.instance.primaryFocus?.focusInDirection(
-                            TraversalDirection.left,
-                          );
-                          return KeyEventResult.handled;
-                        }
+                child: Focus(
+                  onKeyEvent: (node, event) {
+                    if (event is KeyDownEvent) {
+                      if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
+                        FocusManager.instance.primaryFocus?.focusInDirection(
+                          TraversalDirection.right,
+                        );
+                        return KeyEventResult.handled;
                       }
-                      return KeyEventResult.ignored;
-                    },
-                    child: TextField(
-                      controller: _controller,
-                      focusNode: _searchFocusNode,
-                      onChanged: _onSearchChanged,
-                      style: TvDesignSystem.titleLarge.copyWith(
-                        color: hasFocus ? Colors.black : Colors.white,
+                      if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+                        FocusManager.instance.primaryFocus?.focusInDirection(
+                          TraversalDirection.left,
+                        );
+                        return KeyEventResult.handled;
+                      }
+                    }
+                    return KeyEventResult.ignored;
+                  },
+                  child: TextField(
+                    controller: _controller,
+                    focusNode: _searchFocusNode,
+                    onChanged: _onSearchChanged,
+                    style: TvDesignSystem.titleLarge.copyWith(
+                      color: hasFocus ? Colors.black : Colors.white,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: 'Nhập tên phim cần tìm...',
+                      hintStyle: TvDesignSystem.titleLarge.copyWith(
+                        color: hasFocus
+                            ? Colors.black.withValues(alpha: 0.3)
+                            : Colors.white.withValues(alpha: 0.2),
                       ),
-                      decoration: InputDecoration(
-                        hintText: 'Nhập tên phim cần tìm...',
-                        hintStyle: TvDesignSystem.titleLarge.copyWith(
+                      filled: false,
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 18,
+                      ),
+                      prefixIcon: Padding(
+                        padding: const EdgeInsets.only(left: 20, right: 12),
+                        child: Icon(
+                          Icons.search_rounded,
                           color: hasFocus
-                              ? Colors.black.withValues(alpha: 0.3)
-                              : Colors.white.withValues(alpha: 0.2),
+                              ? Colors.black.withValues(alpha: 0.4)
+                              : Colors.white.withValues(alpha: 0.4),
+                          size: 32,
                         ),
-                        filled: false,
-                        border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 18,
-                        ),
-                        prefixIcon: Padding(
-                          padding: const EdgeInsets.only(left: 20, right: 12),
-                          child: Icon(
-                            Icons.search_rounded,
-                            color: hasFocus
-                                ? Colors.black.withValues(alpha: 0.4)
-                                : Colors.white.withValues(alpha: 0.4),
-                            size: 32,
-                          ),
-                        ),
-                        suffixIcon: _keyword.isNotEmpty
-                            ? IconButton(
-                                padding: const EdgeInsets.only(right: 16),
-                                icon: Icon(
-                                  Icons.close_rounded,
-                                  color: hasFocus
-                                      ? Colors.black45
-                                      : Colors.white54,
-                                  size: 28,
-                                ),
-                                onPressed: () {
-                                  _controller.clear();
-                                  setState(() => _keyword = '');
-                                },
-                              )
-                            : null,
                       ),
+                      suffixIcon: _keyword.isNotEmpty
+                          ? IconButton(
+                              padding: const EdgeInsets.only(right: 16),
+                              icon: Icon(
+                                Icons.close_rounded,
+                                color: hasFocus
+                                    ? Colors.black45
+                                    : Colors.white54,
+                                size: 28,
+                              ),
+                              onPressed: () {
+                                _controller.clear();
+                                setState(() => _keyword = '');
+                              },
+                            )
+                          : null,
                     ),
                   ),
                 ),
@@ -442,7 +438,6 @@ class _TvSearchPageState extends ConsumerState<TvSearchPage> {
             ),
           ),
           const SizedBox(width: 24),
-          _buildFilterToggleButton(),
         ],
       ),
     );

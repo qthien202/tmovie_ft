@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:core/core.dart';
-import 'dart:ui';
 import '../tv_design_system.dart';
 
 class TvSidebar extends ConsumerStatefulWidget {
@@ -57,22 +54,19 @@ class _TvSidebarState extends ConsumerState<TvSidebar> {
           ),
           child: Stack(
             children: [
-              // Liquid Glass Blur Overlay
+              // Dark overlay when expanded (no BackdropFilter - too heavy for TV GPU)
               if (_isExpanded)
                 Positioned.fill(
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Colors.white.withValues(alpha: 0.05),
-                            Colors.transparent,
-                            Colors.black.withValues(alpha: 0.2),
-                          ],
-                        ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.white.withValues(alpha: 0.03),
+                          Colors.transparent,
+                          Colors.black.withValues(alpha: 0.15),
+                        ],
                       ),
                     ),
                   ),
