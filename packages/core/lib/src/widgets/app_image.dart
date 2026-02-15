@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:shimmer/shimmer.dart';
 
 class AppImage extends StatelessWidget {
   final String imageUrl;
@@ -43,10 +42,8 @@ class AppImage extends StatelessWidget {
       fit: boxFit,
       width: width,
       height: height,
-      placeholder: (context, url) => Shimmer.fromColors(
-        baseColor: Colors.grey.shade800,
-        highlightColor: Colors.grey.shade600,
-        child: Container(color: Colors.grey.shade800),
+      placeholder: (context, url) => Container(
+        color: Colors.grey.shade900,
       ),
       errorWidget: (context, url, error) => _placeholder(),
     );

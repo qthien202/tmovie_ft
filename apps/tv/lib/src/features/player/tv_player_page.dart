@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -47,7 +45,10 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
   // Custom Controls State
   bool _controlsVisible = true;
   Timer? _hideTimer;
-  BoxFit _videoFit = BoxFit.cover; // Default to cover for TV immersion
+  Timer? _uiUpdateTimer;
+  BoxFit _videoFit = BoxFit.cover;
+  Duration _currentPosition = Duration.zero;
+  Duration _totalDuration = Duration.zero;
 
   @override
   void initState() {
@@ -123,6 +124,24 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
         (_) => _saveCurrentPosition(),
       );
 
+      // Update UI position every 1 second (not every frame)
+      _uiUpdateTimer?.cancel();
+      _uiUpdateTimer = Timer.periodic(
+        const Duration(seconds: 1),
+        (_) {
+          if (!mounted || _videoController == null) return;
+          if (!_videoController!.value.isInitialized) return;
+          final pos = _videoController!.value.position;
+          final dur = _videoController!.value.duration;
+          if (pos != _currentPosition || dur != _totalDuration) {
+            setState(() {
+              _currentPosition = pos;
+              _totalDuration = dur;
+            });
+          }
+        },
+      );
+
       if (mounted) setState(() {});
     } catch (e) {
       if (mounted) setState(() => _hasError = true);
@@ -150,6 +169,7 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
 
     _saveCurrentPosition();
     _videoController?.pause();
+    _uiUpdateTimer?.cancel();
 
     _chewieController?.dispose();
     _videoController?.dispose();
@@ -211,6 +231,7 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
     WidgetsBinding.instance.removeObserver(this);
     _positionSaveTimer?.cancel();
     _hideTimer?.cancel();
+    _uiUpdateTimer?.cancel();
 
     if (_videoController != null && _videoController!.value.isInitialized) {
       _videoController!.pause();
@@ -316,33 +337,32 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
           children: [
             // 1. Player Layer
             Positioned.fill(
-              child: _hasError
-                  ? _buildErrorView()
-                  : _chewieController != null
-                  ? SizedBox.expand(
-                      child: FittedBox(
-                        fit: _videoFit,
-                        child: SizedBox(
-                          width: _videoController!.value.size.width,
-                          height: _videoController!.value.size.height,
-                          child: Chewie(controller: _chewieController!),
+              child: RepaintBoundary(
+                child: _hasError
+                    ? _buildErrorView()
+                    : _chewieController != null
+                    ? SizedBox.expand(
+                        child: FittedBox(
+                          fit: _videoFit,
+                          child: SizedBox(
+                            width: _videoController!.value.size.width,
+                            height: _videoController!.value.size.height,
+                            child: Chewie(controller: _chewieController!),
+                          ),
+                        ),
+                      )
+                    : const Center(
+                        child: CircularProgressIndicator(
+                          color: TvDesignSystem.primary,
+                          strokeWidth: 3,
                         ),
                       ),
-                    )
-                  : const Center(
-                      child: CircularProgressIndicator(
-                        color: TvDesignSystem.primary,
-                        strokeWidth: 3,
-                      ),
-                    ),
+              ),
             ),
 
             // 2. Control Layout
-            AnimatedOpacity(
-              opacity: _controlsVisible ? 1.0 : 0.0,
-              duration: TvDesignSystem.durationMedium,
-              child: IgnorePointer(
-                ignoring: !_controlsVisible,
+            if (_controlsVisible)
+              RepaintBoundary(
                 child: Stack(
                   children: [
                     _buildTopHUD(),
@@ -351,9 +371,8 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
                   ],
                 ),
               ),
-            ),
 
-            // 3. Playlist Overlay (Redesigned for TV)
+            // 3. Playlist Overlay
             if (_showPlaylist) _buildPlaylistOverlay(),
           ],
         ),
@@ -539,64 +558,78 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Focus(
-              onKeyEvent: (node, event) {
-                if (event is KeyDownEvent) {
-                  if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
-                    _videoController!.seekTo(
-                      _videoController!.value.position -
-                          const Duration(seconds: 30),
-                    );
-                    return KeyEventResult.handled;
+            RepaintBoundary(
+              child: Focus(
+                onKeyEvent: (node, event) {
+                  if (event is KeyDownEvent) {
+                    if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+                      _videoController!.seekTo(
+                        _videoController!.value.position -
+                            const Duration(seconds: 30),
+                      );
+                      return KeyEventResult.handled;
+                    }
+                    if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
+                      _videoController!.seekTo(
+                        _videoController!.value.position +
+                            const Duration(seconds: 30),
+                      );
+                      return KeyEventResult.handled;
+                    }
                   }
-                  if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
-                    _videoController!.seekTo(
-                      _videoController!.value.position +
-                          const Duration(seconds: 30),
-                    );
-                    return KeyEventResult.handled;
-                  }
-                }
-                return KeyEventResult.ignored;
-              },
-              child: Builder(
-                builder: (context) {
-                  final hasFocus = Focus.of(context).hasFocus;
-                  return AnimatedContainer(
-                    duration: TvDesignSystem.durationFast,
-                    height: hasFocus ? 12 : 6,
-                    child: VideoProgressIndicator(
-                      _videoController!,
-                      allowScrubbing: true,
-                      colors: VideoProgressColors(
-                        playedColor: TvDesignSystem.primary,
-                        bufferedColor: Colors.white.withValues(alpha: 0.2),
-                        backgroundColor: Colors.white.withValues(alpha: 0.1),
-                      ),
-                    ),
-                  );
+                  return KeyEventResult.ignored;
                 },
+                child: Builder(
+                  builder: (context) {
+                    final hasFocus = Focus.of(context).hasFocus;
+                    final h = hasFocus ? 12.0 : 6.0;
+                    final progress = _totalDuration.inMilliseconds > 0
+                        ? (_currentPosition.inMilliseconds /
+                                _totalDuration.inMilliseconds)
+                            .clamp(0.0, 1.0)
+                        : 0.0;
+                    return SizedBox(
+                      height: h,
+                      child: Stack(
+                        children: [
+                          Container(
+                            height: h,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(h / 2),
+                            ),
+                          ),
+                          FractionallySizedBox(
+                            widthFactor: progress,
+                            child: Container(
+                              height: h,
+                              decoration: BoxDecoration(
+                                color: TvDesignSystem.primary,
+                                borderRadius: BorderRadius.circular(h / 2),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
             const SizedBox(height: 24),
             Row(
               children: [
-                ValueListenableBuilder(
-                  valueListenable: _videoController!,
-                  builder: (context, VideoPlayerValue value, child) {
-                    return Text(
-                      _formatDuration(value.position),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.w900,
-                        fontFeatures: [FontFeature.tabularFigures()],
-                      ),
-                    );
-                  },
+                Text(
+                  _formatDuration(_currentPosition),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.w900,
+                    fontFeatures: [FontFeature.tabularFigures()],
+                  ),
                 ),
                 Text(
-                  ' / ${_formatDuration(_videoController!.value.duration)}',
+                  ' / ${_formatDuration(_totalDuration)}',
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.4),
                     fontSize: 24,
@@ -678,17 +711,14 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
 
     return Stack(
       children: [
-        // Backdrop Blur
+        // Dark overlay (no BackdropFilter - too heavy for TV GPU)
         Positioned.fill(
           child: GestureDetector(
             onTap: () {
               setState(() => _showPlaylist = false);
               _startHideTimer();
             },
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-              child: Container(color: Colors.black.withValues(alpha: 0.8)),
-            ),
+            child: Container(color: Colors.black.withValues(alpha: 0.92)),
           ),
         ),
         // Episode Selector
@@ -814,10 +844,7 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
                           autofocus: isCurrent,
                           onTap: () => _switchEpisode(ep, _selectedServerIndex),
                           builder: (context, hasFocus) {
-                            return AnimatedScale(
-                              scale: hasFocus ? 1.05 : 1.0,
-                              duration: TvDesignSystem.durationFast,
-                              child: Container(
+                            return Container(
                                 decoration: BoxDecoration(
                                   color: isCurrent
                                       ? TvDesignSystem.primary
@@ -833,16 +860,6 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
                                         : Colors.white.withValues(alpha: 0.1),
                                     width: 2,
                                   ),
-                                  boxShadow: hasFocus
-                                      ? [
-                                          BoxShadow(
-                                            color: Colors.black.withValues(
-                                              alpha: 0.5,
-                                            ),
-                                            blurRadius: 20,
-                                          ),
-                                        ]
-                                      : [],
                                 ),
                                 child: Center(
                                   child: Column(
@@ -870,8 +887,7 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
                                     ],
                                   ),
                                 ),
-                              ),
-                            );
+                              );
                           },
                         );
                       },

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:core/core.dart';
-import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../tv_design_system.dart';
 
@@ -39,149 +38,145 @@ class _TvFilmCardState extends State<TvFilmCard> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final availableWidth = widget.width.isInfinite
-            ? constraints.maxWidth
-            : widget.width;
-        final thumbHeight = availableWidth / widget.aspectRatio;
+    final thumbHeight = widget.width / widget.aspectRatio;
+    final isCardFocused = widget.isFocused ?? _isFocused;
 
-        final isCardFocused = widget.isFocused ?? _isFocused;
-
-        return Focus(
-          canRequestFocus: widget.canRequestFocus,
-          onFocusChange: (hasFocus) {
-            setState(() => _isFocused = hasFocus);
-            widget.onFocusChange?.call(hasFocus);
-          },
-          onKeyEvent: (node, event) {
-            if (event is KeyDownEvent &&
-                (event.logicalKey == LogicalKeyboardKey.select ||
-                    event.logicalKey == LogicalKeyboardKey.enter)) {
-              widget.onTap();
-              return KeyEventResult.handled;
-            }
-            return KeyEventResult.ignored;
-          },
-          child: GestureDetector(
-            onTap: widget.onTap,
-            child: AnimatedScale(
-              scale: isCardFocused ? 1.08 : 1.0,
-              duration: TvDesignSystem.durationFast,
-              curve: TvDesignSystem.curveFluid,
-              child: SizedBox(
-                width: availableWidth,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Thumbnail area with border
-                    AnimatedContainer(
-                      duration: TvDesignSystem.durationFast,
-                      width: availableWidth,
-                      height: thumbHeight,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(
-                          TvDesignSystem.radiusLg,
-                        ),
-                        boxShadow: isCardFocused && widget.showShadow
-                            ? [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.5),
-                                  blurRadius: 30,
-                                  offset: const Offset(0, 15),
-                                ),
-                              ]
-                            : [],
+    return RepaintBoundary(
+      child: Focus(
+        canRequestFocus: widget.canRequestFocus,
+        onFocusChange: (hasFocus) {
+          setState(() => _isFocused = hasFocus);
+          widget.onFocusChange?.call(hasFocus);
+        },
+        onKeyEvent: (node, event) {
+          if (event is KeyDownEvent &&
+              (event.logicalKey == LogicalKeyboardKey.select ||
+                  event.logicalKey == LogicalKeyboardKey.enter)) {
+            widget.onTap();
+            return KeyEventResult.handled;
+          }
+          return KeyEventResult.ignored;
+        },
+        child: GestureDetector(
+          onTap: widget.onTap,
+          child: AnimatedScale(
+            scale: isCardFocused ? 1.08 : 1.0,
+            duration: TvDesignSystem.durationFast,
+            curve: TvDesignSystem.curveFluid,
+            child: SizedBox(
+              width: widget.width,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Thumbnail area with border
+                  Container(
+                    width: widget.width,
+                    height: thumbHeight,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(
+                        TvDesignSystem.radiusLg,
                       ),
-                      clipBehavior: Clip.antiAlias,
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          CachedNetworkImage(
-                            imageUrl:
-                                (widget.film.posterUrl != null &&
-                                    widget.film.posterUrl!.isNotEmpty)
-                                ? widget.film.fullPosterUrl
-                                : widget.film.fullThumbUrl,
-                            fit: BoxFit.cover,
-                            filterQuality: FilterQuality.high,
-                            placeholder: (context, url) => Container(
-                              color: Colors.white.withValues(alpha: 0.05),
-                            ),
-                            errorWidget: (context, url, error) =>
-                                CachedNetworkImage(
-                                  imageUrl: widget.film.fullThumbUrl,
-                                  fit: BoxFit.cover,
-                                  errorWidget: (context, url, error) =>
-                                      const Icon(
-                                        Icons.movie_outlined,
-                                        color: Colors.white24,
-                                      ),
-                                ),
+                      boxShadow: isCardFocused && widget.showShadow
+                          ? [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.5),
+                                blurRadius: 20,
+                                offset: const Offset(0, 10),
+                              ),
+                            ]
+                          : null,
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        CachedNetworkImage(
+                          imageUrl:
+                              (widget.film.posterUrl != null &&
+                                  widget.film.posterUrl!.isNotEmpty)
+                              ? widget.film.fullPosterUrl
+                              : widget.film.fullThumbUrl,
+                          fit: BoxFit.cover,
+                          filterQuality: FilterQuality.low,
+                          memCacheWidth: (widget.width * 1.5).toInt(),
+                          placeholder: (context, url) => Container(
+                            color: Colors.white.withValues(alpha: 0.05),
                           ),
-                          // Premium border overlay when focused
-                          if (isCardFocused && widget.showBorder)
-                            Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(
-                                  TvDesignSystem.radiusLg,
-                                ),
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 4.0,
-                                ),
+                          errorWidget: (context, url, error) =>
+                              CachedNetworkImage(
+                                imageUrl: widget.film.fullThumbUrl,
+                                fit: BoxFit.cover,
+                                filterQuality: FilterQuality.low,
+                                memCacheWidth: (widget.width * 1.5).toInt(),
+                                errorWidget: (context, url, error) =>
+                                    const Icon(
+                                      Icons.movie_outlined,
+                                      color: Colors.white24,
+                                    ),
+                              ),
+                        ),
+                        // Border overlay when focused
+                        if (isCardFocused && widget.showBorder)
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(
+                                TvDesignSystem.radiusLg,
+                              ),
+                              border: Border.all(
+                                color: Colors.white,
+                                width: 4.0,
                               ),
                             ),
-                          _buildBadges(isCardFocused),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    // Film Details Below Card
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            widget.film.name ?? '',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: isCardFocused
-                                  ? Colors.white
-                                  : Colors.white70,
-                              fontSize: 18,
-                              fontWeight: isCardFocused
-                                  ? FontWeight.w900
-                                  : FontWeight.w700,
-                              height: 1.2,
-                            ),
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            widget.film.originName ?? '',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: isCardFocused
-                                  ? Colors.white.withValues(alpha: 0.6)
-                                  : Colors.white.withValues(alpha: 0.3),
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
+                        _buildBadges(isCardFocused),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 12),
+                  // Film Details Below Card
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.film.name ?? '',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: isCardFocused
+                                ? Colors.white
+                                : Colors.white70,
+                            fontSize: 18,
+                            fontWeight: isCardFocused
+                                ? FontWeight.w900
+                                : FontWeight.w700,
+                            height: 1.2,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          widget.film.originName ?? '',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: isCardFocused
+                                ? Colors.white.withValues(alpha: 0.6)
+                                : Colors.white.withValues(alpha: 0.3),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
