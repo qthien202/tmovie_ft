@@ -67,13 +67,10 @@ class TvUpdateDialog extends ConsumerWidget {
         color: Colors.transparent,
         child: Center(
           child: Container(
-            width: 760,
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.85,
-            ),
+            width: 640,
             decoration: BoxDecoration(
               color: const Color(0xFF1A1A1A),
-              borderRadius: BorderRadius.circular(32),
+              borderRadius: BorderRadius.circular(24),
               border: Border.all(
                 color: Colors.white.withValues(alpha: 0.1),
                 width: 1.5,
@@ -92,181 +89,121 @@ class TvUpdateDialog extends ConsumerWidget {
               ],
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(32),
-              child: Stack(
-                children: [
-                  // Subtle accent gradient
-                  Positioned(
-                    top: -100,
-                    right: -100,
-                    child: Container(
-                      width: 300,
-                      height: 300,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: RadialGradient(
-                          colors: [
-                            TvDesignSystem.primary.withValues(alpha: 0.15),
-                            Colors.transparent,
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  Padding(
-                    padding: const EdgeInsets.all(56),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
+              borderRadius: BorderRadius.circular(24),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 48,
+                  vertical: 36,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Icon + Title row
+                    Row(
                       children: [
-                        // Icon + Badge
-                        Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Container(
-                              width: 120,
-                              height: 120,
-                              decoration: BoxDecoration(
-                                color: TvDesignSystem.primary.withValues(
-                                  alpha: 0.08,
-                                ),
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            Container(
-                              width: 90,
-                              height: 90,
-                              decoration: BoxDecoration(
-                                color: TvDesignSystem.primary.withValues(
-                                  alpha: 0.15,
-                                ),
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: TvDesignSystem.primary.withValues(
-                                    alpha: 0.3,
-                                  ),
-                                  width: 2,
-                                ),
-                              ),
-                              child: const Icon(
-                                Icons.rocket_launch_rounded,
-                                color: TvDesignSystem.primary,
-                                size: 48,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 40),
-
-                        // Text Content
-                        const Text(
-                          'PHIÊN BẢN MỚI ĐÃ SẴN SÀNG',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 32,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1.5,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 16),
                         Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 6,
-                          ),
+                          width: 64,
+                          height: 64,
                           decoration: BoxDecoration(
                             color: TvDesignSystem.primary.withValues(
-                              alpha: 0.1,
+                              alpha: 0.15,
                             ),
-                            borderRadius: BorderRadius.circular(8),
+                            shape: BoxShape.circle,
                             border: Border.all(
                               color: TvDesignSystem.primary.withValues(
                                 alpha: 0.3,
                               ),
+                              width: 2,
                             ),
                           ),
-                          child: Text(
-                            'Update to v${updateInfo.latestVersion}',
-                            style: const TextStyle(
-                              color: TvDesignSystem.primary,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 1,
+                          child: const Icon(
+                            Icons.rocket_launch_rounded,
+                            color: TvDesignSystem.primary,
+                            size: 32,
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'PHIÊN BẢN MỚI',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 1,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: TvDesignSystem.primary.withValues(
+                                    alpha: 0.1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(
+                                    color: TvDesignSystem.primary.withValues(
+                                      alpha: 0.3,
+                                    ),
+                                  ),
+                                ),
+                                child: Text(
+                                  'v${updateInfo.latestVersion}',
+                                  style: const TextStyle(
+                                    color: TvDesignSystem.primary,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    // Release Notes (compact)
+                    if (updateInfo.releaseNotes.isNotEmpty) ...[
+                      const SizedBox(height: 24),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.03),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.05),
+                          ),
+                        ),
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxHeight: 120),
+                          child: SingleChildScrollView(
+                            child: Text(
+                              updateInfo.releaseNotes,
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.7),
+                                fontSize: 16,
+                                height: 1.5,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
                         ),
-                        const SizedBox(height: 32),
+                      ),
+                    ],
 
-                        // Release Notes Card
-                        if (updateInfo.releaseNotes.isNotEmpty)
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(24),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.03),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.05),
-                              ),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.new_releases_outlined,
-                                      size: 20,
-                                      color: Colors.white.withValues(
-                                        alpha: 0.5,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      'CÓ GÌ MỚI?',
-                                      style: TextStyle(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.5,
-                                        ),
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w900,
-                                        letterSpacing: 1,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 16),
-                                ConstrainedBox(
-                                  constraints: const BoxConstraints(
-                                    maxHeight: 180,
-                                  ),
-                                  child: SingleChildScrollView(
-                                    child: Text(
-                                      updateInfo.releaseNotes,
-                                      style: TextStyle(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.8,
-                                        ),
-                                        fontSize: 18,
-                                        height: 1.6,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                    const SizedBox(height: 32),
 
-                        const SizedBox(height: 48),
-
-                        // Progress or Actions
-                        _buildDynamicContent(context, ref, downloadState),
-                      ],
-                    ),
-                  ),
-                ],
+                    // Progress or Actions
+                    _buildDynamicContent(context, ref, downloadState),
+                  ],
+                ),
               ),
             ),
           ),
