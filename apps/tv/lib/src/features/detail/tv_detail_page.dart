@@ -211,7 +211,7 @@ class _TvDetailPageState extends ConsumerState<TvDetailPage> {
                               if (_hasMultipleEpisodes(film))
                                 TvFocusButton(
                                   icon: Icons.layers_rounded,
-                                  label: 'MÙA PHIM',
+                                  label: 'TẬP PHIM',
                                   onPressed: () => context.push(
                                     '/season/${widget.slug}',
                                     extra: {
