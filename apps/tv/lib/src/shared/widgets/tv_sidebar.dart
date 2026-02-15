@@ -26,7 +26,8 @@ class _TvSidebarState extends ConsumerState<TvSidebar> {
 
   final List<Map<String, dynamic>> _menuItems = [
     {'icon': Icons.home_rounded, 'label': 'Trang chủ'},
-    // Temporarily hidden: Vừa xem, Yêu thích
+    {'icon': Icons.history_rounded, 'label': 'Vừa xem'},
+    {'icon': Icons.favorite_rounded, 'label': 'Yêu thích'},
   ];
 
   @override
