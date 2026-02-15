@@ -88,6 +88,10 @@ class _TvSearchPageState extends ConsumerState<TvSearchPage> {
       _selectedGenre = widget.initialGenre;
       _tempGenre = widget.initialGenre;
     }
+    // Auto-focus search field on page open
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _searchFocusNode.requestFocus();
+    });
   }
 
   @override
@@ -437,6 +441,8 @@ class _TvSearchPageState extends ConsumerState<TvSearchPage> {
               ),
             ),
           ),
+          const SizedBox(width: 16),
+          _buildFilterToggleButton(),
           const SizedBox(width: 24),
         ],
       ),

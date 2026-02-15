@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,11 +14,33 @@ class TvUpdateDialog extends ConsumerWidget {
   const TvUpdateDialog({super.key, required this.updateInfo});
 
   static Future<void> show(BuildContext context, AppUpdateInfo updateInfo) {
-    return showDialog(
+    return showGeneralDialog(
       context: context,
       barrierDismissible: false,
-      barrierColor: Colors.black87,
-      builder: (context) => TvUpdateDialog(updateInfo: updateInfo),
+      barrierLabel: 'Update Dialog',
+      barrierColor: Colors.black.withValues(alpha: 0.8),
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (context, anim1, anim2) =>
+          TvUpdateDialog(updateInfo: updateInfo),
+      transitionBuilder: (context, anim1, anim2, child) {
+        final curve = CurvedAnimation(
+          parent: anim1,
+          curve: Curves.easeOutQuart,
+        );
+        return BackdropFilter(
+          filter: ImageFilter.blur(
+            sigmaX: 15 * anim1.value,
+            sigmaY: 15 * anim1.value,
+          ),
+          child: FadeTransition(
+            opacity: anim1,
+            child: ScaleTransition(
+              scale: Tween<double>(begin: 0.9, end: 1.0).animate(curve),
+              child: child,
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -40,117 +63,211 @@ class TvUpdateDialog extends ConsumerWidget {
         }
         return KeyEventResult.ignored;
       },
-      child: Container(
-        color: Colors.black.withValues(alpha: 0.85),
+      child: Material(
+        color: Colors.transparent,
         child: Center(
           child: Container(
-            width: 700,
-            padding: const EdgeInsets.all(48),
+            width: 760,
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.85,
+            ),
             decoration: BoxDecoration(
-              color: TvDesignSystem.surface,
-              borderRadius: BorderRadius.circular(TvDesignSystem.radiusXl),
+              color: const Color(0xFF1A1A1A),
+              borderRadius: BorderRadius.circular(32),
               border: Border.all(
                 color: Colors.white.withValues(alpha: 0.1),
                 width: 1.5,
               ),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Update icon
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: TvDesignSystem.primary.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: TvDesignSystem.primary.withValues(alpha: 0.3),
-                      width: 2,
-                    ),
-                  ),
-                  child: const Icon(
-                    Icons.system_update_rounded,
-                    color: TvDesignSystem.primary,
-                    size: 56,
-                  ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.5),
+                  blurRadius: 50,
+                  spreadRadius: 10,
                 ),
-                const SizedBox(height: 32),
-
-                // Title
-                const Text(
-                  'Phiên bản mới đã sẵn sàng',
-                  style: TvDesignSystem.headlineLarge,
-                  textAlign: TextAlign.center,
+                BoxShadow(
+                  color: TvDesignSystem.primary.withValues(alpha: 0.1),
+                  blurRadius: 100,
+                  spreadRadius: -20,
                 ),
-                const SizedBox(height: 12),
-
-                // Version
-                Text(
-                  'v${updateInfo.latestVersion}',
-                  style: TvDesignSystem.titleLarge.copyWith(
-                    color: TvDesignSystem.primary,
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Release notes
-                if (updateInfo.releaseNotes.isNotEmpty) ...[
-                  ConstrainedBox(
-                    constraints: const BoxConstraints(maxHeight: 120),
-                    child: SingleChildScrollView(
-                      child: Text(
-                        updateInfo.releaseNotes,
-                        style: TvDesignSystem.bodyMedium.copyWith(
-                          color: Colors.white.withValues(alpha: 0.6),
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                ],
-
-                // Progress bar
-                if (downloadState.status ==
-                    UpdateDownloadStatus.downloading) ...[
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(
-                      TvDesignSystem.radiusFull,
-                    ),
-                    child: LinearProgressIndicator(
-                      value: downloadState.progress,
-                      minHeight: 12,
-                      backgroundColor: Colors.white.withValues(alpha: 0.1),
-                      valueColor: const AlwaysStoppedAnimation<Color>(
-                        TvDesignSystem.primary,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    '${(downloadState.progress * 100).toStringAsFixed(0)}%',
-                    style: TvDesignSystem.labelLarge.copyWith(
-                      color: TvDesignSystem.primary,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                ],
-
-                // Error message
-                if (downloadState.status == UpdateDownloadStatus.error) ...[
-                  Text(
-                    downloadState.errorMessage ?? 'Đã xảy ra lỗi',
-                    style: TvDesignSystem.bodyMedium.copyWith(
-                      color: Colors.redAccent,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 24),
-                ],
-
-                // Action buttons
-                _buildActionButtons(context, ref, downloadState),
               ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(32),
+              child: Stack(
+                children: [
+                  // Subtle accent gradient
+                  Positioned(
+                    top: -100,
+                    right: -100,
+                    child: Container(
+                      width: 300,
+                      height: 300,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: RadialGradient(
+                          colors: [
+                            TvDesignSystem.primary.withValues(alpha: 0.15),
+                            Colors.transparent,
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  Padding(
+                    padding: const EdgeInsets.all(56),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Icon + Badge
+                        Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Container(
+                              width: 120,
+                              height: 120,
+                              decoration: BoxDecoration(
+                                color: TvDesignSystem.primary.withValues(
+                                  alpha: 0.08,
+                                ),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            Container(
+                              width: 90,
+                              height: 90,
+                              decoration: BoxDecoration(
+                                color: TvDesignSystem.primary.withValues(
+                                  alpha: 0.15,
+                                ),
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: TvDesignSystem.primary.withValues(
+                                    alpha: 0.3,
+                                  ),
+                                  width: 2,
+                                ),
+                              ),
+                              child: const Icon(
+                                Icons.rocket_launch_rounded,
+                                color: TvDesignSystem.primary,
+                                size: 48,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 40),
+
+                        // Text Content
+                        const Text(
+                          'PHIÊN BẢN MỚI ĐÃ SẴN SÀNG',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 32,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.5,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: TvDesignSystem.primary.withValues(
+                              alpha: 0.1,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: TvDesignSystem.primary.withValues(
+                                alpha: 0.3,
+                              ),
+                            ),
+                          ),
+                          child: Text(
+                            'Update to v${updateInfo.latestVersion}',
+                            style: const TextStyle(
+                              color: TvDesignSystem.primary,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 1,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+
+                        // Release Notes Card
+                        if (updateInfo.releaseNotes.isNotEmpty)
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.03),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.05),
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.new_releases_outlined,
+                                      size: 20,
+                                      color: Colors.white.withValues(
+                                        alpha: 0.5,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      'CÓ GÌ MỚI?',
+                                      style: TextStyle(
+                                        color: Colors.white.withValues(
+                                          alpha: 0.5,
+                                        ),
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 1,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 16),
+                                ConstrainedBox(
+                                  constraints: const BoxConstraints(
+                                    maxHeight: 180,
+                                  ),
+                                  child: SingleChildScrollView(
+                                    child: Text(
+                                      updateInfo.releaseNotes,
+                                      style: TextStyle(
+                                        color: Colors.white.withValues(
+                                          alpha: 0.8,
+                                        ),
+                                        fontSize: 18,
+                                        height: 1.6,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                        const SizedBox(height: 48),
+
+                        // Progress or Actions
+                        _buildDynamicContent(context, ref, downloadState),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -158,79 +275,162 @@ class TvUpdateDialog extends ConsumerWidget {
     );
   }
 
-  Widget _buildActionButtons(
+  Widget _buildDynamicContent(
     BuildContext context,
     WidgetRef ref,
-    UpdateDownloadState downloadState,
+    UpdateDownloadState state,
   ) {
-    switch (downloadState.status) {
-      case UpdateDownloadStatus.idle:
-      case UpdateDownloadStatus.error:
-        return FocusTraversalGroup(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+    if (state.status == UpdateDownloadStatus.downloading) {
+      return Column(
+        children: [
+          Stack(
             children: [
-              TvFocusButton(
-                icon: Icons.download_rounded,
-                label: 'Cập nhật',
-                isPrimary: true,
-                autofocus: true,
-                onPressed: () {
-                  ref
-                      .read(updateDownloadProvider.notifier)
-                      .startDownload(updateInfo.downloadUrl);
-                },
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: LinearProgressIndicator(
+                  value: state.progress,
+                  minHeight: 14,
+                  backgroundColor: Colors.white.withValues(alpha: 0.08),
+                  valueColor: const AlwaysStoppedAnimation<Color>(
+                    TvDesignSystem.primary,
+                  ),
+                ),
               ),
-              const SizedBox(width: 24),
-              TvFocusButton(
-                icon: Icons.schedule_rounded,
-                label: 'Để sau',
-                onPressed: () => Navigator.of(context).pop(),
+              // Particle effect simulation could go here
+            ],
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Đang tải xuống...',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.5),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(
+                '${(state.progress * 100).toStringAsFixed(0)}%',
+                style: const TextStyle(
+                  color: TvDesignSystem.primary,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w900,
+                ),
               ),
             ],
           ),
-        );
+          const SizedBox(height: 32),
+          TvFocusButton(
+            icon: Icons.close_rounded,
+            label: 'HỦY TẢI',
+            onPressed: () =>
+                ref.read(updateDownloadProvider.notifier).cancelDownload(),
+          ),
+        ],
+      );
+    }
 
-      case UpdateDownloadStatus.downloading:
-        return TvFocusButton(
-          icon: Icons.cancel_rounded,
-          label: 'Hủy',
-          autofocus: true,
-          onPressed: () {
-            ref.read(updateDownloadProvider.notifier).cancelDownload();
-          },
-        );
-
-      case UpdateDownloadStatus.downloaded:
-        return TvFocusButton(
-          icon: Icons.install_mobile_rounded,
-          label: 'Cài đặt ngay',
-          isPrimary: true,
-          autofocus: true,
-          onPressed: () {
-            ref.read(updateDownloadProvider.notifier).installApk();
-          },
-        );
-
-      case UpdateDownloadStatus.installing:
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const SizedBox(
-              width: 24,
-              height: 24,
-              child: CircularProgressIndicator(
-                color: TvDesignSystem.primary,
-                strokeWidth: 3,
+    if (state.status == UpdateDownloadStatus.error) {
+      return Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            decoration: BoxDecoration(
+              color: Colors.redAccent.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.redAccent.withValues(alpha: 0.3),
               ),
             ),
-            const SizedBox(width: 16),
-            Text(
-              'Đang cài đặt...',
-              style: TvDesignSystem.labelLarge,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.error_outline_rounded,
+                  color: Colors.redAccent,
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  state.errorMessage ?? 'Lỗi tải xuống phiên bản mới',
+                  style: const TextStyle(
+                    color: Colors.redAccent,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
-          ],
-        );
+          ),
+          const SizedBox(height: 32),
+          _buildIdleActions(context, ref),
+        ],
+      );
     }
+
+    if (state.status == UpdateDownloadStatus.downloaded) {
+      return TvFocusButton(
+        icon: Icons.install_mobile_rounded,
+        label: 'CÀI ĐẶT NGAY',
+        isPrimary: true,
+        autofocus: true,
+        onPressed: () => ref.read(updateDownloadProvider.notifier).installApk(),
+      );
+    }
+
+    if (state.status == UpdateDownloadStatus.installing) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const SizedBox(
+            width: 28,
+            height: 28,
+            child: CircularProgressIndicator(
+              color: TvDesignSystem.primary,
+              strokeWidth: 4,
+            ),
+          ),
+          const SizedBox(width: 20),
+          const Text(
+            'ĐANG CHUẨN BỊ CÀI ĐẶT...',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1,
+            ),
+          ),
+        ],
+      );
+    }
+
+    return _buildIdleActions(context, ref);
+  }
+
+  Widget _buildIdleActions(BuildContext context, WidgetRef ref) {
+    return FocusTraversalGroup(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          TvFocusButton(
+            icon: Icons.bolt_rounded,
+            label: 'CẬP NHẬT NGAY',
+            isPrimary: true,
+            autofocus: true,
+            onPressed: () {
+              ref
+                  .read(updateDownloadProvider.notifier)
+                  .startDownload(updateInfo.downloadUrl);
+            },
+          ),
+          const SizedBox(width: 24),
+          TvFocusButton(
+            icon: Icons.schedule_rounded,
+            label: 'ĐỂ SAU',
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+      ),
+    );
   }
 }
