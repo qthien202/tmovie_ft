@@ -40,17 +40,16 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
   late String _currentVideoUrl;
   late String _currentEpisodeName;
   int _selectedServerIndex = 0;
-  bool _showPlaylist = false;
-  int _focusedEpisodeIndex = 0;
-  static const int _gridColumns = 6;
 
   // Custom Controls State
   bool _controlsVisible = true;
   Timer? _hideTimer;
   Timer? _uiUpdateTimer;
-  BoxFit _videoFit = BoxFit.cover;
   Duration _currentPosition = Duration.zero;
   Duration _totalDuration = Duration.zero;
+
+  // Playlist overlay (separate from player widget tree)
+  OverlayEntry? _playlistOverlay;
 
   @override
   void initState() {
@@ -165,7 +164,7 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
     if (url == null || url.isEmpty) return;
 
     if (url == _currentVideoUrl && _currentEpisodeName == ep.name) {
-      setState(() => _showPlaylist = false);
+      _hidePlaylistOverlay();
       return;
     }
 
@@ -176,11 +175,12 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
     _chewieController?.dispose();
     _videoController?.dispose();
 
+    _hidePlaylistOverlay();
+
     setState(() {
       _currentVideoUrl = url;
       _currentEpisodeName = ep.name ?? '';
       _selectedServerIndex = serverIndex;
-      _showPlaylist = false;
       _controlsVisible = true;
     });
 
@@ -201,10 +201,64 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
     _initializePlayer();
   }
 
+  // ─── Playlist Overlay (uses Overlay so player never rebuilds) ───
+
+  bool get _isPlaylistVisible => _playlistOverlay != null;
+
+  void _showPlaylistOverlay() {
+    if (_isPlaylistVisible) return;
+    _hideTimer?.cancel();
+    _uiUpdateTimer?.cancel(); // Stop UI updates so player doesn't steal focus
+
+    final eps = widget.episodes[_selectedServerIndex].serverData ?? [];
+    final idx = eps.indexWhere((e) => e.name == _currentEpisodeName);
+
+    _playlistOverlay = OverlayEntry(
+      builder: (context) => _PlaylistOverlayWidget(
+        episodes: widget.episodes,
+        initialServerIndex: _selectedServerIndex,
+        initialEpisodeIndex: idx >= 0 ? idx : 0,
+        currentEpisodeName: _currentEpisodeName,
+        onSelectEpisode: (ep, serverIndex) {
+          _switchEpisode(ep, serverIndex);
+        },
+        onClose: () {
+          _hidePlaylistOverlay();
+        },
+      ),
+    );
+
+    Overlay.of(context).insert(_playlistOverlay!);
+    setState(() => _controlsVisible = true);
+  }
+
+  void _hidePlaylistOverlay() {
+    _playlistOverlay?.remove();
+    _playlistOverlay = null;
+    _startHideTimer();
+    // Resume UI update timer
+    _uiUpdateTimer?.cancel();
+    _uiUpdateTimer = Timer.periodic(
+      const Duration(seconds: 1),
+      (_) {
+        if (!mounted || _videoController == null) return;
+        if (!_videoController!.value.isInitialized) return;
+        final pos = _videoController!.value.position;
+        final dur = _videoController!.value.duration;
+        if (pos != _currentPosition || dur != _totalDuration) {
+          setState(() {
+            _currentPosition = pos;
+            _totalDuration = dur;
+          });
+        }
+      },
+    );
+    if (mounted) setState(() {});
+  }
+
   void _toggleControls() {
-    if (_showPlaylist) {
-      setState(() => _showPlaylist = false);
-      _startHideTimer();
+    if (_isPlaylistVisible) {
+      _hidePlaylistOverlay();
       return;
     }
 
@@ -221,7 +275,7 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
     _hideTimer?.cancel();
     _hideTimer = Timer(const Duration(seconds: 4), () {
       if (mounted &&
-          !_showPlaylist &&
+          !_isPlaylistVisible &&
           _videoController?.value.isPlaying == true) {
         setState(() => _controlsVisible = false);
       }
@@ -234,6 +288,7 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
     _positionSaveTimer?.cancel();
     _hideTimer?.cancel();
     _uiUpdateTimer?.cancel();
+    _playlistOverlay?.remove();
 
     if (_videoController != null && _videoController!.value.isInitialized) {
       _videoController!.pause();
@@ -261,53 +316,9 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
 
           final key = event.logicalKey;
 
-          // ── Playlist mode: grid navigation ──
-          if (_showPlaylist) {
-            final eps = widget.episodes[_selectedServerIndex].serverData ?? [];
-            if (key == LogicalKeyboardKey.arrowRight) {
-              if (_focusedEpisodeIndex < eps.length - 1) {
-                setState(() => _focusedEpisodeIndex++);
-              }
-              return KeyEventResult.handled;
-            }
-            if (key == LogicalKeyboardKey.arrowLeft) {
-              if (_focusedEpisodeIndex > 0) {
-                setState(() => _focusedEpisodeIndex--);
-              }
-              return KeyEventResult.handled;
-            }
-            if (key == LogicalKeyboardKey.arrowDown) {
-              final next = _focusedEpisodeIndex + _gridColumns;
-              if (next < eps.length) {
-                setState(() => _focusedEpisodeIndex = next);
-              }
-              return KeyEventResult.handled;
-            }
-            if (key == LogicalKeyboardKey.arrowUp) {
-              final next = _focusedEpisodeIndex - _gridColumns;
-              if (next >= 0) {
-                setState(() => _focusedEpisodeIndex = next);
-              } else {
-                setState(() => _showPlaylist = false);
-                _startHideTimer();
-              }
-              return KeyEventResult.handled;
-            }
-            if (key == LogicalKeyboardKey.select ||
-                key == LogicalKeyboardKey.enter) {
-              if (_focusedEpisodeIndex < eps.length) {
-                _switchEpisode(eps[_focusedEpisodeIndex], _selectedServerIndex);
-              }
-              return KeyEventResult.handled;
-            }
-            if (key == LogicalKeyboardKey.goBack ||
-                key == LogicalKeyboardKey.escape ||
-                key == LogicalKeyboardKey.backspace) {
-              setState(() => _showPlaylist = false);
-              _startHideTimer();
-              return KeyEventResult.handled;
-            }
-            return KeyEventResult.handled;
+          // If playlist overlay is open, let it handle keys
+          if (_isPlaylistVisible) {
+            return KeyEventResult.ignored;
           }
 
           // ── Normal player mode ──
@@ -369,13 +380,7 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
           }
 
           if (key == LogicalKeyboardKey.arrowDown) {
-            final eps = widget.episodes[_selectedServerIndex].serverData ?? [];
-            final idx = eps.indexWhere((e) => e.name == _currentEpisodeName);
-            setState(() {
-              _focusedEpisodeIndex = idx >= 0 ? idx : 0;
-              _showPlaylist = true;
-              _controlsVisible = true;
-            });
+            _showPlaylistOverlay();
             return KeyEventResult.handled;
           }
 
@@ -389,14 +394,10 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
                 child: _hasError
                     ? _buildErrorView()
                     : _chewieController != null
-                    ? SizedBox.expand(
-                        child: FittedBox(
-                          fit: _videoFit,
-                          child: SizedBox(
-                            width: _videoController!.value.size.width,
-                            height: _videoController!.value.size.height,
-                            child: Chewie(controller: _chewieController!),
-                          ),
+                    ? Center(
+                        child: AspectRatio(
+                          aspectRatio: _videoController!.value.aspectRatio,
+                          child: Chewie(controller: _chewieController!),
                         ),
                       )
                     : const Center(
@@ -419,9 +420,6 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
                   ],
                 ),
               ),
-
-            // 3. Playlist Overlay
-            if (_showPlaylist) _buildPlaylistOverlay(),
           ],
         ),
       ),
@@ -507,20 +505,6 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
                   ),
                 ],
               ),
-            ),
-            TvFocusButton(
-              icon: Icons.video_settings_rounded,
-              label: 'Tỉ Lệ',
-              onPressed: () {
-                setState(() {
-                  _videoFit = _videoFit == BoxFit.cover
-                      ? BoxFit.contain
-                      : (_videoFit == BoxFit.contain
-                            ? BoxFit.fill
-                            : BoxFit.cover);
-                });
-                _startHideTimer();
-              },
             ),
           ],
         ),
@@ -688,10 +672,7 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
                 TvFocusButton(
                   icon: Icons.apps_rounded,
                   label: 'TẬP PHIM',
-                  onPressed: () => setState(() {
-                    _showPlaylist = true;
-                    _controlsVisible = true;
-                  }),
+                  onPressed: () => _showPlaylistOverlay(),
                 ),
               ],
             ),
@@ -751,191 +732,401 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
       ),
     );
   }
+}
 
-  Widget _buildPlaylistOverlay() {
+// ─── Separate StatefulWidget for Playlist Overlay ───
+// This widget has its own state, so setState here NEVER rebuilds the player.
+
+class _PlaylistOverlayWidget extends StatefulWidget {
+  final List<Episode> episodes;
+  final int initialServerIndex;
+  final int initialEpisodeIndex;
+  final String currentEpisodeName;
+  final void Function(ServerData ep, int serverIndex) onSelectEpisode;
+  final VoidCallback onClose;
+
+  const _PlaylistOverlayWidget({
+    required this.episodes,
+    required this.initialServerIndex,
+    required this.initialEpisodeIndex,
+    required this.currentEpisodeName,
+    required this.onSelectEpisode,
+    required this.onClose,
+  });
+
+  @override
+  State<_PlaylistOverlayWidget> createState() => _PlaylistOverlayWidgetState();
+}
+
+class _PlaylistOverlayWidgetState extends State<_PlaylistOverlayWidget> {
+  late int _selectedServerIndex;
+  late int _focusedEpisodeIndex;
+  static const int _gridColumns = 6;
+  final ScrollController _scrollController = ScrollController();
+  final FocusNode _focusNode = FocusNode();
+  bool _serverTabsFocused = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedServerIndex = widget.initialServerIndex;
+    _focusedEpisodeIndex = widget.initialEpisodeIndex;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _focusNode.requestFocus(); // Force focus to this overlay
+      _scrollToFocusedEpisode();
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  List<ServerData> get _currentEpisodes =>
+      widget.episodes[_selectedServerIndex].serverData ?? [];
+
+  void _switchServer(int serverIndex) {
+    if (serverIndex == _selectedServerIndex) return;
+    final eps = widget.episodes[serverIndex].serverData ?? [];
+    final idx = eps.indexWhere((e) => e.name == widget.currentEpisodeName);
+    setState(() {
+      _selectedServerIndex = serverIndex;
+      _focusedEpisodeIndex = idx >= 0 ? idx : 0;
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToFocusedEpisode();
+    });
+  }
+
+  void _scrollToFocusedEpisode() {
+    if (!_scrollController.hasClients) return;
+    const rowHeight = 76.0;
+    final row = _focusedEpisodeIndex ~/ _gridColumns;
+    final targetOffset = (row * rowHeight).clamp(
+      0.0,
+      _scrollController.position.maxScrollExtent,
+    );
+    _scrollController.animateTo(
+      targetOffset,
+      duration: TvDesignSystem.durationFast,
+      curve: TvDesignSystem.curveFluid,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final servers = widget.episodes;
-    final currentServer = servers[_selectedServerIndex];
-    final episodes = currentServer.serverData ?? [];
+    final episodes = _currentEpisodes;
 
-    return Stack(
-      children: [
-        // Dim overlay
-        Positioned.fill(
-          child: GestureDetector(
-            onTap: () {
-              setState(() => _showPlaylist = false);
-              _startHideTimer();
-            },
-            child: Container(color: Colors.black.withValues(alpha: 0.7)),
-          ),
-        ),
-        // Bottom panel
-        Positioned(
-          bottom: 0,
-          left: 0,
-          right: 0,
-          child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.bottomCenter,
-                  end: Alignment.topCenter,
-                  colors: [
-                    Colors.black,
-                    Colors.black.withValues(alpha: 0.95),
-                    Colors.black.withValues(alpha: 0.85),
-                  ],
-                ),
-                border: Border(
-                  top: BorderSide(
-                    color: Colors.white.withValues(alpha: 0.1),
-                  ),
-                ),
+    return Focus(
+      focusNode: _focusNode,
+      onKeyEvent: (node, event) {
+        if (event is! KeyDownEvent) return KeyEventResult.ignored;
+        final key = event.logicalKey;
+
+        // ── Server tabs mode ──
+        if (_serverTabsFocused) {
+          if (key == LogicalKeyboardKey.arrowRight) {
+            if (_selectedServerIndex < servers.length - 1) {
+              _switchServer(_selectedServerIndex + 1);
+            }
+            return KeyEventResult.handled;
+          }
+          if (key == LogicalKeyboardKey.arrowLeft) {
+            if (_selectedServerIndex > 0) {
+              _switchServer(_selectedServerIndex - 1);
+            }
+            return KeyEventResult.handled;
+          }
+          if (key == LogicalKeyboardKey.arrowDown) {
+            setState(() => _serverTabsFocused = false);
+            return KeyEventResult.handled;
+          }
+          if (key == LogicalKeyboardKey.arrowUp) {
+            widget.onClose();
+            return KeyEventResult.handled;
+          }
+          if (key == LogicalKeyboardKey.select ||
+              key == LogicalKeyboardKey.enter) {
+            // Already on the selected server, go back to grid
+            setState(() => _serverTabsFocused = false);
+            return KeyEventResult.handled;
+          }
+          if (key == LogicalKeyboardKey.goBack ||
+              key == LogicalKeyboardKey.escape ||
+              key == LogicalKeyboardKey.backspace) {
+            widget.onClose();
+            return KeyEventResult.handled;
+          }
+          return KeyEventResult.handled;
+        }
+
+        // ── Episode grid mode ──
+        if (key == LogicalKeyboardKey.arrowRight) {
+          if (_focusedEpisodeIndex < episodes.length - 1) {
+            setState(() => _focusedEpisodeIndex++);
+            _scrollToFocusedEpisode();
+          }
+          return KeyEventResult.handled;
+        }
+        if (key == LogicalKeyboardKey.arrowLeft) {
+          if (_focusedEpisodeIndex > 0) {
+            setState(() => _focusedEpisodeIndex--);
+            _scrollToFocusedEpisode();
+          }
+          return KeyEventResult.handled;
+        }
+        if (key == LogicalKeyboardKey.arrowUp) {
+          final next = _focusedEpisodeIndex - _gridColumns;
+          if (next >= 0) {
+            setState(() => _focusedEpisodeIndex = next);
+            _scrollToFocusedEpisode();
+          } else if (servers.length > 1) {
+            // At top row → go to server tabs
+            setState(() => _serverTabsFocused = true);
+          } else {
+            widget.onClose();
+          }
+          return KeyEventResult.handled;
+        }
+        if (key == LogicalKeyboardKey.arrowDown) {
+          final nextIdx = _focusedEpisodeIndex + _gridColumns;
+          if (nextIdx < episodes.length) {
+            setState(() => _focusedEpisodeIndex = nextIdx);
+            _scrollToFocusedEpisode();
+          }
+          return KeyEventResult.handled;
+        }
+        if (key == LogicalKeyboardKey.select ||
+            key == LogicalKeyboardKey.enter) {
+          if (_focusedEpisodeIndex < episodes.length) {
+            widget.onSelectEpisode(
+                episodes[_focusedEpisodeIndex], _selectedServerIndex);
+          }
+          return KeyEventResult.handled;
+        }
+        if (key == LogicalKeyboardKey.goBack ||
+            key == LogicalKeyboardKey.escape ||
+            key == LogicalKeyboardKey.backspace) {
+          widget.onClose();
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.handled;
+      },
+      child: Material(
+        color: Colors.transparent,
+        child: Stack(
+          children: [
+            // Dim overlay
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: widget.onClose,
+                child: Container(color: Colors.black.withValues(alpha: 0.7)),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(48, 24, 48, 16),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.playlist_play_rounded,
-                          color: TvDesignSystem.primary,
-                          size: 28,
-                        ),
-                        const SizedBox(width: 12),
-                        Text(
-                          _currentEpisodeName,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Text(
-                          'ĐANG PHÁT',
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.4),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 2,
-                          ),
-                        ),
-                        const Spacer(),
-                        Text(
-                          '${episodes.length} tập',
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.3),
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
+            ),
+            // Bottom panel
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    colors: [
+                      Colors.black,
+                      Colors.black.withValues(alpha: 0.95),
+                      Colors.black.withValues(alpha: 0.85),
+                    ],
+                  ),
+                  border: Border(
+                    top: BorderSide(
+                      color: Colors.white.withValues(alpha: 0.1),
                     ),
                   ),
-                  // Episode grid (max 3 rows visible)
-                  ConstrainedBox(
-                    constraints: const BoxConstraints(maxHeight: 240),
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.fromLTRB(48, 0, 48, 32),
-                      child: Wrap(
-                        spacing: 16,
-                        runSpacing: 16,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(48, 24, 48, 0),
+                      child: Row(
                         children: [
-                          for (int i = 0; i < episodes.length; i++)
-                            _buildEpCell(episodes[i], i),
+                          const Icon(
+                            Icons.playlist_play_rounded,
+                            color: TvDesignSystem.primary,
+                            size: 28,
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            widget.currentEpisodeName,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            'ĐANG PHÁT',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.4),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 2,
+                            ),
+                          ),
+                          const Spacer(),
+                          Text(
+                            '${episodes.length} tập',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.3),
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ],
                       ),
                     ),
-                  ),
-                ],
+                    // Server tabs
+                    if (servers.length > 1)
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(48, 12, 48, 0),
+                        child: Row(
+                          children: [
+                            for (int i = 0; i < servers.length; i++) ...[
+                              if (i > 0) const SizedBox(width: 8),
+                              GestureDetector(
+                                onTap: () => _switchServer(i),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 8,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: i == _selectedServerIndex
+                                        ? TvDesignSystem.primary
+                                        : Colors.white.withValues(alpha: 0.08),
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: _serverTabsFocused &&
+                                              i == _selectedServerIndex
+                                          ? Colors.white
+                                          : (i == _selectedServerIndex
+                                              ? TvDesignSystem.primary
+                                              : Colors.white
+                                                  .withValues(alpha: 0.15)),
+                                      width: _serverTabsFocused &&
+                                              i == _selectedServerIndex
+                                          ? 2.5
+                                          : 1,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    servers[i].serverName ?? 'Server ${i + 1}',
+                                    style: TextStyle(
+                                      color: i == _selectedServerIndex
+                                          ? Colors.white
+                                          : Colors.white
+                                              .withValues(alpha: 0.6),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    const SizedBox(height: 16),
+                    // Episode grid
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxHeight: 240),
+                      child: SingleChildScrollView(
+                        controller: _scrollController,
+                        padding: const EdgeInsets.fromLTRB(48, 0, 48, 32),
+                        child: Wrap(
+                          spacing: 16,
+                          runSpacing: 16,
+                          children: [
+                            for (int i = 0; i < episodes.length; i++)
+                              _buildEpCell(episodes[i], i),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
-      );
-    }
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget _buildEpCell(ServerData ep, int index) {
-    final isCurrent = ep.name == _currentEpisodeName;
+    final isCurrent = ep.name == widget.currentEpisodeName;
     final isFocused = index == _focusedEpisodeIndex;
-    final cellKey = GlobalKey();
 
-    // Auto-scroll focused cell into view
-    if (isFocused) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (cellKey.currentContext != null) {
-          Scrollable.ensureVisible(
-            cellKey.currentContext!,
-            alignment: 0.3,
-            duration: TvDesignSystem.durationFast,
-          );
-        }
-      });
-    }
-
-    return AnimatedScale(
-      key: cellKey,
-      scale: isFocused ? 1.08 : 1.0,
-      duration: TvDesignSystem.durationFast,
-      child: Container(
-        width: 130,
-        height: 60,
-        decoration: BoxDecoration(
-          color: isCurrent
-              ? TvDesignSystem.primary
-              : (isFocused
-                    ? Colors.white
-                    : Colors.white.withValues(alpha: 0.08)),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isFocused
+    return Container(
+      width: 130,
+      height: 60,
+      decoration: BoxDecoration(
+        color: isCurrent
+            ? TvDesignSystem.primary
+            : (isFocused
                 ? Colors.white
-                : Colors.white.withValues(alpha: 0.1),
-            width: isFocused ? 3 : 1.5,
-          ),
-          boxShadow: isFocused
-              ? [
-                  BoxShadow(
-                    color: Colors.white.withValues(alpha: 0.15),
-                    blurRadius: 12,
-                  ),
-                ]
-              : null,
+                : Colors.white.withValues(alpha: 0.08)),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isFocused
+              ? Colors.white
+              : Colors.white.withValues(alpha: 0.1),
+          width: isFocused ? 3 : 1.5,
         ),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                ep.name ?? '',
-                style: TextStyle(
-                  color: isFocused && !isCurrent
-                      ? Colors.black
-                      : Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w900,
+        boxShadow: isFocused
+            ? [
+                BoxShadow(
+                  color: Colors.white.withValues(alpha: 0.15),
+                  blurRadius: 12,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              ]
+            : null,
+      ),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              ep.name ?? '',
+              style: TextStyle(
+                color: isFocused && !isCurrent ? Colors.black : Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w900,
               ),
-              if (isCurrent)
-                Text(
-                  'ĐANG XEM',
-                  style: TextStyle(
-                    color: isFocused
-                        ? Colors.black54
-                        : Colors.white.withValues(alpha: 0.7),
-                    fontSize: 9,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1,
-                  ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            if (isCurrent)
+              Text(
+                'ĐANG XEM',
+                style: TextStyle(
+                  color: isFocused
+                      ? Colors.black54
+                      : Colors.white.withValues(alpha: 0.7),
+                  fontSize: 9,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1,
                 ),
-            ],
-          ),
+              ),
+          ],
         ),
       ),
     );
