@@ -394,10 +394,14 @@ class _TvPlayerPageState extends ConsumerState<TvPlayerPage>
                 child: _hasError
                     ? _buildErrorView()
                     : _chewieController != null
-                    ? Center(
-                        child: AspectRatio(
-                          aspectRatio: _videoController!.value.aspectRatio,
-                          child: Chewie(controller: _chewieController!),
+                    ? SizedBox.expand(
+                        child: FittedBox(
+                          fit: BoxFit.cover,
+                          child: SizedBox(
+                            width: _videoController!.value.size.width,
+                            height: _videoController!.value.size.height,
+                            child: Chewie(controller: _chewieController!),
+                          ),
                         ),
                       )
                     : const Center(
