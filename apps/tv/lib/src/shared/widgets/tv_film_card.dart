@@ -38,7 +38,6 @@ class _TvFilmCardState extends State<TvFilmCard> {
 
   @override
   Widget build(BuildContext context) {
-    final thumbHeight = widget.width / widget.aspectRatio;
     final isCardFocused = widget.isFocused ?? _isFocused;
 
     return RepaintBoundary(
@@ -63,15 +62,19 @@ class _TvFilmCardState extends State<TvFilmCard> {
             scale: isCardFocused ? 1.08 : 1.0,
             duration: TvDesignSystem.durationFast,
             curve: TvDesignSystem.curveFluid,
-            child: SizedBox(
-              width: widget.width,
-              child: Column(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final actualWidth = widget.width.isFinite
+                    ? widget.width
+                    : constraints.maxWidth;
+                final thumbHeight = actualWidth / widget.aspectRatio;
+                return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   // Thumbnail area with border
                   Container(
-                    width: widget.width,
+                    width: actualWidth,
                     height: thumbHeight,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(
@@ -99,7 +102,7 @@ class _TvFilmCardState extends State<TvFilmCard> {
                               : widget.film.fullThumbUrl,
                           fit: BoxFit.cover,
                           filterQuality: FilterQuality.low,
-                          memCacheWidth: (widget.width * 1.5).toInt(),
+                          memCacheWidth: (actualWidth * 1.5).toInt(),
                           placeholder: (context, url) => Container(
                             color: Colors.white.withValues(alpha: 0.05),
                           ),
@@ -108,7 +111,7 @@ class _TvFilmCardState extends State<TvFilmCard> {
                                 imageUrl: widget.film.fullThumbUrl,
                                 fit: BoxFit.cover,
                                 filterQuality: FilterQuality.low,
-                                memCacheWidth: (widget.width * 1.5).toInt(),
+                                memCacheWidth: (actualWidth * 1.5).toInt(),
                                 errorWidget: (context, url, error) =>
                                     const Icon(
                                       Icons.movie_outlined,
@@ -172,7 +175,8 @@ class _TvFilmCardState extends State<TvFilmCard> {
                     ),
                   ),
                 ],
-              ),
+              );
+              },
             ),
           ),
         ),
