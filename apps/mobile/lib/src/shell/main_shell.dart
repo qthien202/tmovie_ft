@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -40,50 +41,73 @@ class _MainShellState extends ConsumerState<MainShell> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
+      extendBody: true,
       body: widget.child,
-      bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          color: AppColors.surfaceColor,
-          border: Border(top: BorderSide(color: AppColors.border)),
+      bottomNavigationBar: Padding(
+        padding: EdgeInsets.fromLTRB(
+          16,
+          0,
+          16,
+          MediaQuery.paddingOf(context).bottom > 0 ? 6 : 12,
         ),
-        child: SafeArea(
-          top: false,
-          child: SizedBox(
-            height: 62,
-            child: Row(
-              children: List.generate(_tabs.length, (index) {
-                final isSelected = _selectedIndex == index;
-                final color = isSelected
-                    ? AppColors.primaryValue
-                    : AppColors.textTertiary;
-                return Expanded(
-                  child: InkWell(
-                    onTap: () {
-                      setState(() => _selectedIndex = index);
-                      context.go(_tabs[index]['route'] as String);
-                    },
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          _tabs[index]['icon'] as IconData,
-                          color: color,
-                          size: AppSizes.iconMd,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          _tabs[index]['label'] as String,
-                          style: AppTypography.labelSmall.copyWith(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(28),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+            child: Container(
+              height: 64,
+              decoration: BoxDecoration(
+                // Liquid glass: translucent fill with a top sheen + light edge.
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.white.withValues(alpha: 0.14),
+                    Colors.white.withValues(alpha: 0.05),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(28),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.18),
+                ),
+              ),
+              child: Row(
+                children: List.generate(_tabs.length, (index) {
+                  final isSelected = _selectedIndex == index;
+                  final color = isSelected
+                      ? AppColors.primaryValue
+                      : Colors.white.withValues(alpha: 0.6);
+                  return Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        setState(() => _selectedIndex = index);
+                        context.go(_tabs[index]['route'] as String);
+                      },
+                      borderRadius: BorderRadius.circular(20),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            _tabs[index]['icon'] as IconData,
                             color: color,
-                            fontWeight:
-                                isSelected ? FontWeight.w700 : FontWeight.w500,
+                            size: AppSizes.iconMd,
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 3),
+                          Text(
+                            _tabs[index]['label'] as String,
+                            style: AppTypography.labelSmall.copyWith(
+                              color: color,
+                              fontSize: 11,
+                              fontWeight:
+                                  isSelected ? FontWeight.w700 : FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                );
-              }),
+                  );
+                }),
+              ),
             ),
           ),
         ),
