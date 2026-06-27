@@ -114,13 +114,17 @@ jobs:
           # section here — never the lazy auto-generated commit list.
           V="${{ steps.ver.outputs.version }}"
           NOTES="$RUNNER_TEMP/release-notes.md"
+          # Pull the Vietnamese in-app block (between the app:vi markers) of the
+          # matching version — that is what users see in the update dialog.
           awk -v ver="## v$V" '
-            $0 == ver {grab=1; next}
-            grab && /^## v/ {exit}
-            grab {print}
+            $0 == ver {insec=1; next}
+            insec && /^## v/ {exit}
+            insec && /<!-- app:vi -->/ {invi=1; next}
+            insec && /<!-- \/app:vi -->/ {invi=0; next}
+            insec && invi {print}
           ' CHANGELOG.md | sed '/./,$!d' > "$NOTES"
           if [ ! -s "$NOTES" ]; then
-            echo "::error::No CHANGELOG.md section found for v$V. Add a '## v$V' entry before releasing."
+            echo "::error::No CHANGELOG.md app:vi block found for v$V. Add a '## v$V' section with a <!-- app:vi --> block before releasing."
             exit 1
           fi
           echo "path=$NOTES" >> "$GITHUB_OUTPUT"
