@@ -239,7 +239,7 @@ class ProfilePage extends ConsumerWidget {
                         _MenuTileV2(
                           icon: Icons.settings_rounded,
                           label: 'Cài đặt tài khoản',
-                          color: Colors.blueAccent,
+                          color: AppColors.primaryValue,
                           onTap: () => _showSettingsSheet(context, ref),
                         ),
                         _MenuTileV2(
@@ -297,7 +297,7 @@ class ProfilePage extends ConsumerWidget {
         ),
         CircleAvatar(
           radius: 36,
-          backgroundColor: const Color(0xff080808),
+          backgroundColor: AppColors.backgroundColor,
           child: CircleAvatar(
             radius: 33,
             backgroundImage: user.photoURL != null
@@ -320,7 +320,7 @@ class ProfilePage extends ConsumerWidget {
             decoration: BoxDecoration(
               color: AppColors.primaryValue,
               shape: BoxShape.circle,
-              border: Border.all(color: const Color(0xff080808), width: 2),
+              border: Border.all(color: AppColors.backgroundColor, width: 2),
             ),
             child: const Icon(
               Icons.star_rounded,
@@ -500,7 +500,7 @@ class ProfilePage extends ConsumerWidget {
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
         decoration: const BoxDecoration(
-          color: Color(0xff161616),
+          color: AppColors.surfaceColor,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         padding: const EdgeInsets.all(24),
@@ -574,7 +574,7 @@ class ProfilePage extends ConsumerWidget {
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
         decoration: const BoxDecoration(
-          color: Color(0xff161616),
+          color: AppColors.surfaceColor,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         padding: const EdgeInsets.all(24),
@@ -627,7 +627,7 @@ class ProfilePage extends ConsumerWidget {
       builder: (context) => BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
         child: AlertDialog(
-          backgroundColor: const Color(0xff161616),
+          backgroundColor: AppColors.surfaceColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
             side: BorderSide(color: Colors.white.withOpacity(0.1)),
@@ -670,7 +670,7 @@ class ProfilePage extends ConsumerWidget {
       builder: (context) => BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
         child: AlertDialog(
-          backgroundColor: const Color(0xff161616),
+          backgroundColor: AppColors.surfaceColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
             side: BorderSide(color: Colors.white.withOpacity(0.1)),
