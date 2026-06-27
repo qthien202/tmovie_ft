@@ -50,13 +50,14 @@ class _MainShellState extends ConsumerState<MainShell> {
           MediaQuery.paddingOf(context).bottom > 0 ? 6 : 12,
         ),
         child: Container(
-          height: 68,
+          height: 70,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surfaceElevated,
             borderRadius: BorderRadius.circular(34),
+            border: Border.all(color: AppColors.border),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.28),
+                color: Colors.black.withValues(alpha: 0.40),
                 blurRadius: 24,
                 offset: const Offset(0, 8),
               ),
@@ -66,48 +67,51 @@ class _MainShellState extends ConsumerState<MainShell> {
             children: List.generate(_tabs.length, (index) {
               final isSelected = _selectedIndex == index;
               const accent = AppColors.primaryValue;
-              const inactive = Color(0xFF9AA0A6);
+              const inactive = Color(0xFF8A949B);
               return Expanded(
                 child: InkWell(
                   onTap: () {
                     setState(() => _selectedIndex = index);
                     context.go(_tabs[index]['route'] as String);
                   },
-                  borderRadius: BorderRadius.circular(24),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // Active: soft grey "blob" behind the icon.
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 250),
-                        curve: Curves.easeOut,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? Colors.black.withValues(alpha: 0.06)
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        child: Icon(
-                          _tabs[index]['icon'] as IconData,
-                          color: isSelected ? accent : inactive,
-                          size: 24,
-                        ),
+                  borderRadius: BorderRadius.circular(22),
+                  child: Center(
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 250),
+                      curve: Curves.easeOut,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 7,
                       ),
-                      const SizedBox(height: 3),
-                      Text(
-                        _tabs[index]['label'] as String,
-                        style: AppTypography.labelSmall.copyWith(
-                          color: isSelected ? accent : inactive,
-                          fontSize: 11,
-                          fontWeight:
-                              isSelected ? FontWeight.w700 : FontWeight.w500,
-                        ),
+                      decoration: BoxDecoration(
+                        // Active: soft highlight pill wrapping icon + label.
+                        color: isSelected
+                            ? Colors.white.withValues(alpha: 0.10)
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(20),
                       ),
-                    ],
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            _tabs[index]['icon'] as IconData,
+                            color: isSelected ? accent : inactive,
+                            size: 22,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            _tabs[index]['label'] as String,
+                            style: AppTypography.labelSmall.copyWith(
+                              color: isSelected ? accent : inactive,
+                              fontSize: 11,
+                              fontWeight: isSelected
+                                  ? FontWeight.w700
+                                  : FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               );
