@@ -60,17 +60,17 @@ class _SplashPageState extends State<SplashPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.backgroundColor,
       body: Stack(
         fit: StackFit.expand,
         children: [
           // Background Gradient
-          Container(
-            decoration: const BoxDecoration(
+          const DecoratedBox(
+            decoration: BoxDecoration(
               gradient: RadialGradient(
                 center: Alignment.center,
                 radius: 1.5,
-                colors: [AppColors.surfaceColor, Colors.black],
+                colors: [AppColors.surfaceColor, AppColors.backgroundColor],
               ),
             ),
           ),
@@ -126,22 +126,20 @@ class _SplashPageState extends State<SplashPage>
                             size: 80,
                           ),
                         ),
-                        const SizedBox(height: 32),
-                        const Text(
+                        const SizedBox(height: AppSpacing.xxl),
+                        Text(
                           'TMOVIE',
-                          style: TextStyle(
-                            color: Colors.white,
+                          style: AppTypography.displayLarge.copyWith(
                             fontSize: 48,
                             fontWeight: FontWeight.w900,
                             letterSpacing: 8,
                           ),
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: AppSpacing.md),
                         Text(
                           'ULTIMATE CINEMA EXPERIENCE',
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.3),
-                            fontSize: 12,
+                          style: AppTypography.labelSmall.copyWith(
+                            color: AppColors.textTertiary,
                             fontWeight: FontWeight.w600,
                             letterSpacing: 2,
                           ),
@@ -163,8 +161,8 @@ class _SplashPageState extends State<SplashPage>
               child: SizedBox(
                 width: 40,
                 height: 2,
-                child: LinearProgressIndicator(
-                  backgroundColor: Colors.white.withValues(alpha: 0.05),
+                child: const LinearProgressIndicator(
+                  backgroundColor: AppColors.surfaceColor,
                   color: AppColors.primaryValue,
                 ),
               ),

@@ -11,7 +11,7 @@ class LoginPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.backgroundColor,
       body: Stack(
         fit: StackFit.expand,
         children: [
@@ -64,23 +64,20 @@ class LoginPage extends ConsumerWidget {
                       size: 60,
                     ),
                   ),
-                  const SizedBox(height: 24),
-                  const Text(
+                  const SizedBox(height: AppSpacing.xl),
+                  Text(
                     'TMovie',
-                    style: TextStyle(
-                      color: Colors.white,
+                    style: AppTypography.displayLarge.copyWith(
                       fontSize: 40,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 2,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppSpacing.sm),
                   Text(
                     'Xem phim không giới hạn',
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.5),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+                    style: AppTypography.titleMedium.copyWith(
+                      color: AppColors.textSecondary,
                     ),
                   ),
 
@@ -96,21 +93,19 @@ class LoginPage extends ConsumerWidget {
                     onPressed: () => context.go('/home'),
                     child: Text(
                       'Để sau, tôi muốn xem tiếp',
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.4),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                      style: AppTypography.labelLarge.copyWith(
+                        color: AppColors.textSecondary,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: AppSpacing.lg),
 
                   // Footer info
                   Text(
                     'Bằng việc tiếp tục, bạn đồng ý với Điều khoản sử dụng\nvà Chính sách bảo mật của chúng tôi.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.2),
+                    style: AppTypography.labelSmall.copyWith(
+                      color: AppColors.textTertiary,
                       fontSize: 10,
                       height: 1.5,
                     ),
@@ -125,7 +120,7 @@ class LoginPage extends ConsumerWidget {
   }
 
   Widget _buildGoogleButton(BuildContext context, WidgetRef ref) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
       height: 56,
       child: ElevatedButton(
@@ -138,21 +133,18 @@ class LoginPage extends ConsumerWidget {
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
+          foregroundColor: Colors.black87,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: AppRadius.brLg,
           ),
           elevation: 0,
         ),
-        child: Row(
+        child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.network(
-              'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_\"G\"_logo.svg/1200px-Google_\"G\"_logo.svg.png',
-              height: 24,
-            ),
-            const SizedBox(width: 12),
-            const Text(
+            Icon(Icons.g_mobiledata_rounded, size: 30),
+            SizedBox(width: 8),
+            Text(
               'Tiếp tục với Google',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
