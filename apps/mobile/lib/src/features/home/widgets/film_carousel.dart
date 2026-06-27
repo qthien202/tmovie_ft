@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
+import 'package:design_system/design_system.dart';
 
 class FilmCarousel extends StatefulWidget {
   final List<FilmItem> films;

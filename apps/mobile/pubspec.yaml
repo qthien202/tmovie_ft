@@ -14,6 +14,14 @@ dependencies:
 
   core:
     path: ../../packages/core
+  design_system:
+    path: ../../packages/design_system
+  catalog:
+    path: ../../packages/catalog
+  detail:
+    path: ../../packages/detail
+  media_library:
+    path: ../../packages/media_library
 
   flutter_riverpod: ^2.6.1
   go_router: ^14.8.1
@@ -44,3 +52,5 @@ flutter:
   uses-material-design: true
   assets:
     - assets/app_icon.png
+    - assets/onboarding/
+    - shorebird.yaml

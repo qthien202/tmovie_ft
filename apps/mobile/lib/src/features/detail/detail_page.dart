@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
+import 'package:design_system/design_system.dart';
+import 'package:detail/detail.dart';
+import 'package:media_library/media_library.dart';
 import 'widgets/film_info.dart';
 import 'widgets/episode_selector.dart';
 
