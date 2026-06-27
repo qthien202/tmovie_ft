@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -50,120 +49,69 @@ class _MainShellState extends ConsumerState<MainShell> {
           16,
           MediaQuery.paddingOf(context).bottom > 0 ? 6 : 12,
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(28),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-            child: Container(
-              height: 64,
-              decoration: BoxDecoration(
-                // Liquid glass: translucent fill with a top sheen + light edge.
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.white.withValues(alpha: 0.14),
-                    Colors.white.withValues(alpha: 0.05),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(28),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.18),
-                ),
+        child: Container(
+          height: 68,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(34),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.28),
+                blurRadius: 24,
+                offset: const Offset(0, 8),
               ),
-              child: Stack(
-                children: [
-                  // Liquid-glass "lens" droplet that glides to the active tab.
-                  AnimatedAlign(
-                    duration: const Duration(milliseconds: 350),
-                    curve: Curves.easeOutCubic,
-                    alignment: Alignment(
-                      -1 + _selectedIndex * (2 / (_tabs.length - 1)),
-                      0,
-                    ),
-                    child: FractionallySizedBox(
-                      widthFactor: 1 / _tabs.length,
-                      heightFactor: 1,
-                      child: Padding(
+            ],
+          ),
+          child: Row(
+            children: List.generate(_tabs.length, (index) {
+              final isSelected = _selectedIndex == index;
+              const accent = AppColors.primaryValue;
+              const inactive = Color(0xFF9AA0A6);
+              return Expanded(
+                child: InkWell(
+                  onTap: () {
+                    setState(() => _selectedIndex = index);
+                    context.go(_tabs[index]['route'] as String);
+                  },
+                  borderRadius: BorderRadius.circular(24),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Active: soft grey "blob" behind the icon.
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        curve: Curves.easeOut,
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 9,
+                          horizontal: 20,
+                          vertical: 4,
                         ),
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                Colors.white.withValues(alpha: 0.28),
-                                Colors.white.withValues(alpha: 0.08),
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(40),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.45),
-                              width: 1.2,
-                            ),
-                            boxShadow: [
-                              // depth under the lens
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.22),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              ),
-                              // teal glow
-                              BoxShadow(
-                                color: Colors.white.withValues(alpha: 0.22),
-                                blurRadius: 16,
-                                spreadRadius: -4,
-                              ),
-                            ],
-                          ),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? Colors.black.withValues(alpha: 0.06)
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        child: Icon(
+                          _tabs[index]['icon'] as IconData,
+                          color: isSelected ? accent : inactive,
+                          size: 24,
                         ),
                       ),
-                    ),
-                  ),
-                  Row(
-                    children: List.generate(_tabs.length, (index) {
-                      final isSelected = _selectedIndex == index;
-                      final color = isSelected
-                          ? Colors.white
-                          : Colors.white.withValues(alpha: 0.55);
-                      return Expanded(
-                        child: InkWell(
-                          onTap: () {
-                            setState(() => _selectedIndex = index);
-                            context.go(_tabs[index]['route'] as String);
-                          },
-                          borderRadius: BorderRadius.circular(20),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                _tabs[index]['icon'] as IconData,
-                                color: color,
-                                size: AppSizes.iconMd,
-                              ),
-                              const SizedBox(height: 3),
-                              Text(
-                                _tabs[index]['label'] as String,
-                                style: AppTypography.labelSmall.copyWith(
-                                  color: color,
-                                  fontSize: 11,
-                                  fontWeight: isSelected
-                                      ? FontWeight.w700
-                                      : FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
+                      const SizedBox(height: 3),
+                      Text(
+                        _tabs[index]['label'] as String,
+                        style: AppTypography.labelSmall.copyWith(
+                          color: isSelected ? accent : inactive,
+                          fontSize: 11,
+                          fontWeight:
+                              isSelected ? FontWeight.w700 : FontWeight.w500,
                         ),
-                      );
-                    }),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
+                ),
+              );
+            }),
           ),
         ),
       ),
