@@ -86,8 +86,8 @@ class _MainShellState extends ConsumerState<MainShell> {
                       heightFactor: 1,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 8,
+                          horizontal: 14,
+                          vertical: 9,
                         ),
                         child: DecoratedBox(
                           decoration: BoxDecoration(
@@ -95,19 +95,28 @@ class _MainShellState extends ConsumerState<MainShell> {
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
                               colors: [
-                                Colors.white.withValues(alpha: 0.30),
-                                Colors.white.withValues(alpha: 0.10),
+                                AppColors.primaryValue.withValues(alpha: 0.32),
+                                Colors.white.withValues(alpha: 0.08),
                               ],
                             ),
-                            borderRadius: BorderRadius.circular(18),
+                            borderRadius: BorderRadius.circular(40),
                             border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.35),
+                              color: Colors.white.withValues(alpha: 0.45),
+                              width: 1.2,
                             ),
                             boxShadow: [
+                              // depth under the lens
                               BoxShadow(
-                                color: Colors.white.withValues(alpha: 0.18),
+                                color: Colors.black.withValues(alpha: 0.22),
                                 blurRadius: 10,
-                                spreadRadius: -2,
+                                offset: const Offset(0, 4),
+                              ),
+                              // teal glow
+                              BoxShadow(
+                                color: AppColors.primaryValue
+                                    .withValues(alpha: 0.30),
+                                blurRadius: 16,
+                                spreadRadius: -4,
                               ),
                             ],
                           ),
@@ -119,8 +128,8 @@ class _MainShellState extends ConsumerState<MainShell> {
                     children: List.generate(_tabs.length, (index) {
                       final isSelected = _selectedIndex == index;
                       final color = isSelected
-                          ? AppColors.primaryValue
-                          : Colors.white.withValues(alpha: 0.6);
+                          ? Colors.white
+                          : Colors.white.withValues(alpha: 0.55);
                       return Expanded(
                         child: InkWell(
                           onTap: () {
