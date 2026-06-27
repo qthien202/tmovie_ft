@@ -89,59 +89,39 @@ class ProfilePage extends ConsumerWidget {
           SliverToBoxAdapter(
             child: Column(
               children: [
-                // 1. Header & profile card
-                Stack(
-                  children: [
-                    Container(
-                      height: 210,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            AppColors.primaryValue.withValues(alpha: 0.18),
-                            AppColors.backgroundColor,
-                          ],
-                        ),
-                      ),
+                // 1. Immersive header — avatar/name/stats float on a teal wash
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.fromLTRB(
+                    AppSpacing.lg,
+                    MediaQuery.paddingOf(context).top + AppSpacing.xl,
+                    AppSpacing.lg,
+                    AppSpacing.xl,
+                  ),
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color(0x330FA3A3),
+                        AppColors.backgroundColor,
+                      ],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(
-                        AppSpacing.lg,
-                        50,
-                        AppSpacing.lg,
-                        0,
+                  ),
+                  child: Column(
+                    children: [
+                      _buildAvatar(user),
+                      const SizedBox(height: AppSpacing.md),
+                      Text(
+                        user.displayName ?? 'Thành viên',
+                        style: AppTypography.headlineMedium,
                       ),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: AppSpacing.xl,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.surfaceColor,
-                          borderRadius: BorderRadius.circular(AppRadius.xl),
-                          border: Border.all(color: AppColors.border),
-                        ),
-                        child: Column(
-                          children: [
-                            _buildAvatar(user),
-                            const SizedBox(height: AppSpacing.md),
-                            Text(
-                              user.displayName ?? 'Thành viên',
-                              style: AppTypography.titleLarge,
-                            ),
-                            const SizedBox(height: AppSpacing.xxs),
-                            Text(
-                              user.email ?? '',
-                              style: AppTypography.labelSmall,
-                            ),
-                            const SizedBox(height: AppSpacing.lg),
-                            _buildStatsRow(historyAsync, favoritesAsync),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+                      const SizedBox(height: AppSpacing.xxs),
+                      Text(user.email ?? '', style: AppTypography.labelSmall),
+                      const SizedBox(height: AppSpacing.xl),
+                      _buildStatsRow(historyAsync, favoritesAsync),
+                    ],
+                  ),
                 ),
 
                 // 2. History section
@@ -324,21 +304,29 @@ class ProfilePage extends ConsumerWidget {
     AsyncValue<List<WatchHistoryEntry>> historyAsync,
     AsyncValue<List<WatchHistoryEntry>> favoritesAsync,
   ) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        _buildStatItem(
-          'Đã xem',
-          historyAsync.valueOrNull?.length.toString() ?? '0',
-        ),
-        _buildStatDivider(),
-        _buildStatItem(
-          'Yêu thích',
-          favoritesAsync.valueOrNull?.length.toString() ?? '0',
-        ),
-        _buildStatDivider(),
-        _buildStatItem('Cấp độ', 'Pro'),
-      ],
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceColor,
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _buildStatItem(
+            'Đã xem',
+            historyAsync.valueOrNull?.length.toString() ?? '0',
+          ),
+          _buildStatDivider(),
+          _buildStatItem(
+            'Yêu thích',
+            favoritesAsync.valueOrNull?.length.toString() ?? '0',
+          ),
+          _buildStatDivider(),
+          _buildStatItem('Cấp độ', 'Pro'),
+        ],
+      ),
     );
   }
 
