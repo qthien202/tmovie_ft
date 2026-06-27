@@ -155,17 +155,11 @@ class UpdateDialog extends ConsumerWidget {
         );
 
       case UpdateDownloadStatus.downloaded:
-        return SizedBox(
-          width: double.infinity,
-          child: FilledButton.icon(
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.primaryValue,
-              padding: const EdgeInsets.symmetric(vertical: 14),
-            ),
-            onPressed: notifier.installApk,
-            icon: const Icon(Icons.install_mobile_rounded),
-            label: const Text('Cài đặt ngay'),
-          ),
+        return AppButton(
+          label: 'Cài đặt ngay',
+          icon: Icons.install_mobile_rounded,
+          expanded: true,
+          onPressed: notifier.installApk,
         );
 
       case UpdateDownloadStatus.installing:
@@ -213,24 +207,17 @@ class UpdateDialog extends ConsumerWidget {
     return Row(
       children: [
         Expanded(
-          child: TextButton(
+          child: AppButton.ghost(
+            label: 'Để sau',
             onPressed: () => Navigator.of(context).pop(),
-            child: Text(
-              'Để sau',
-              style: TextStyle(color: Colors.white.withValues(alpha: 0.6)),
-            ),
           ),
         ),
         const SizedBox(width: 8),
         Expanded(
           flex: 2,
-          child: FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.primaryValue,
-              padding: const EdgeInsets.symmetric(vertical: 14),
-            ),
+          child: AppButton(
+            label: 'Cập nhật ngay',
             onPressed: () => notifier.startDownload(updateInfo.downloadUrl),
-            child: const Text('Cập nhật ngay'),
           ),
         ),
       ],
