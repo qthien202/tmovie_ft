@@ -12,6 +12,7 @@ export 'src/theme/app_elevation.dart';
 export 'src/theme/app_theme.dart';
 
 // Widgets
+export 'src/widgets/app_button.dart';
 export 'src/widgets/app_image.dart';
 export 'src/widgets/film_card.dart';
 export 'src/widgets/film_grid.dart';
