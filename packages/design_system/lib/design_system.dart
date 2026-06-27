@@ -13,6 +13,10 @@ export 'src/theme/app_theme.dart';
 
 // Widgets
 export 'src/widgets/app_button.dart';
+export 'src/widgets/app_card.dart';
+export 'src/widgets/app_chip.dart';
+export 'src/widgets/app_text_field.dart';
+export 'src/widgets/section_header.dart';
 export 'src/widgets/app_image.dart';
 export 'src/widgets/film_card.dart';
 export 'src/widgets/film_grid.dart';
