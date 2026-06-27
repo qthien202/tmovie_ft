@@ -88,7 +88,7 @@ class _MainShellState extends ConsumerState<MainShell> {
                         color: isSelected
                             ? Colors.white.withValues(alpha: 0.10)
                             : Colors.transparent,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(30),
                       ),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
