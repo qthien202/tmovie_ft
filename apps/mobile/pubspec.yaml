@@ -45,3 +45,4 @@ flutter:
   assets:
     - assets/app_icon.png
     - assets/onboarding/
+    - shorebird.yaml
