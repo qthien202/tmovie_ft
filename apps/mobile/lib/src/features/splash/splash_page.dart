@@ -70,7 +70,7 @@ class _SplashPageState extends State<SplashPage>
               gradient: RadialGradient(
                 center: Alignment.center,
                 radius: 1.5,
-                colors: [Color(0xFF1A1A1A), Colors.black],
+                colors: [AppColors.surfaceColor, Colors.black],
               ),
             ),
           ),
