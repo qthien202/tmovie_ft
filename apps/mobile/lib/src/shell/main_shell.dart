@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -49,85 +50,80 @@ class _MainShellState extends ConsumerState<MainShell> {
           16,
           MediaQuery.paddingOf(context).bottom > 0 ? 6 : 12,
         ),
-        child: Container(
-          height: 70,
-          decoration: BoxDecoration(
-            color: AppColors.surfaceElevated,
-            borderRadius: BorderRadius.circular(34),
-            border: Border.all(color: AppColors.border),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.40),
-                blurRadius: 24,
-                offset: const Offset(0, 8),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(34),
+          child: BackdropFilter(
+            // Liquid glass: blur the content scrolling behind the bar.
+            filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+            child: Container(
+              height: 70,
+              decoration: BoxDecoration(
+                color: AppColors.surfaceColor.withValues(alpha: 0.55),
+                borderRadius: BorderRadius.circular(34),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.12),
+                ),
               ),
-            ],
-          ),
-          child: Row(
-            children: List.generate(_tabs.length, (index) {
-              final isSelected = _selectedIndex == index;
-              const active = Colors.white;
-              const inactive = Color(0xFF8A949B);
-              return Expanded(
-                child: InkWell(
-                  onTap: () {
-                    setState(() => _selectedIndex = index);
-                    context.go(_tabs[index]['route'] as String);
-                  },
-                  borderRadius: BorderRadius.circular(22),
-                  child: Center(
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 250),
-                      curve: Curves.easeOut,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 7,
-                      ),
-                      decoration: BoxDecoration(
-                        // Active: dark frosted-glass pill (icon + label).
-                        gradient: isSelected
-                            ? LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  Colors.white.withValues(alpha: 0.10),
-                                  Colors.black.withValues(alpha: 0.22),
-                                ],
-                              )
-                            : null,
-                        borderRadius: BorderRadius.circular(30),
-                        border: isSelected
-                            ? Border.all(
-                                color: Colors.white.withValues(alpha: 0.16),
-                              )
-                            : null,
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            _tabs[index]['icon'] as IconData,
-                            color: isSelected ? active : inactive,
-                            size: 22,
+              child: Row(
+                children: List.generate(_tabs.length, (index) {
+                  final isSelected = _selectedIndex == index;
+                  const active = Colors.white;
+                  const inactive = Color(0xFF8A949B);
+                  return Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        setState(() => _selectedIndex = index);
+                        context.go(_tabs[index]['route'] as String);
+                      },
+                      borderRadius: BorderRadius.circular(22),
+                      child: Center(
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 250),
+                          curve: Curves.easeOut,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 7,
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            _tabs[index]['label'] as String,
-                            style: AppTypography.labelSmall.copyWith(
-                              color: isSelected ? active : inactive,
-                              fontSize: 11,
-                              fontWeight: isSelected
-                                  ? FontWeight.w700
-                                  : FontWeight.w500,
-                            ),
+                          decoration: BoxDecoration(
+                            // Active: lighter frosted pill on the glass bar.
+                            color: isSelected
+                                ? Colors.white.withValues(alpha: 0.16)
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(30),
+                            border: isSelected
+                                ? Border.all(
+                                    color: Colors.white.withValues(alpha: 0.10),
+                                  )
+                                : null,
                           ),
-                        ],
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                _tabs[index]['icon'] as IconData,
+                                color: isSelected ? active : inactive,
+                                size: 22,
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                _tabs[index]['label'] as String,
+                                style: AppTypography.labelSmall.copyWith(
+                                  color: isSelected ? active : inactive,
+                                  fontSize: 11,
+                                  fontWeight: isSelected
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-              );
-            }),
+                  );
+                }),
+              ),
+            ),
           ),
         ),
       ),
