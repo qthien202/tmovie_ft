@@ -122,55 +122,25 @@ class _DetailPageState extends ConsumerState<DetailPage>
 
           return Stack(
             children: [
-              // 1. Static Cinematic Background
-              Positioned.fill(
-                child: AppImage(
-                  imageUrl: film.fullThumbUrl,
-                  boxFit: BoxFit.cover,
-                ),
-              ),
-              Positioned.fill(
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.black.withValues(alpha: 0.4),
-                          Colors.black.withValues(alpha: 0.7),
-                          Colors.black,
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-
-              // 2. Main Scroll Content
+              // Main Scroll Content (hero lives in the SliverAppBar)
               CustomScrollView(
                 controller: _scrollController,
                 physics: const BouncingScrollPhysics(),
                 slivers: [
                   // App Bar with Poster & Tab Selection
                   SliverAppBar(
-                    expandedHeight: MediaQuery.of(context).size.height * 0.6,
+                    expandedHeight: MediaQuery.sizeOf(context).height * 0.62,
                     pinned: true,
                     stretch: true,
-                    backgroundColor: AppColors.backgroundColor.withValues(
-                      alpha: 0.5,
-                    ),
+                    backgroundColor: AppColors.backgroundColor,
                     elevation: 0,
                     leadingWidth: 70,
                     leading: _buildGlassBackButton(),
                     actions: [_buildFavoriteButton(film)],
                     flexibleSpace: FlexibleSpaceBar(
-                      stretchModes: const [
-                        StretchMode.zoomBackground,
-                        StretchMode.blurBackground,
-                      ],
-                      background: _buildPosterSection(film),
+                      collapseMode: CollapseMode.pin,
+                      stretchModes: const [StretchMode.zoomBackground],
+                      background: _buildHero(film),
                     ),
                     bottom: PreferredSize(
                       preferredSize: const Size.fromHeight(70),
@@ -340,67 +310,80 @@ class _DetailPageState extends ConsumerState<DetailPage>
     );
   }
 
-  Widget _buildPosterSection(FilmDetail film) {
+  Widget _buildHero(FilmDetail film) {
     return Stack(
       fit: StackFit.expand,
       children: [
-        AppImage(imageUrl: film.fullPosterUrl, boxFit: BoxFit.cover),
-        Container(
+        // Full-bleed artwork
+        AppImage(imageUrl: film.fullThumbUrl, boxFit: BoxFit.cover),
+        // Scrim for legibility + fade into the page
+        const DecoratedBox(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              stops: const [0.0, 0.4, 0.8, 1.0],
+              stops: [0.0, 0.45, 0.78, 1.0],
               colors: [
-                Colors.black.withValues(alpha: 0.2),
-                Colors.transparent,
-                Colors.black.withValues(alpha: 0.7),
-                Colors.black,
+                Color(0x66000000),
+                Color(0x00000000),
+                Color(0xCC0A0C0C),
+                AppColors.backgroundColor,
               ],
             ),
           ),
         ),
+        // Floating title + meta + primary action (clears the tab bar)
         Positioned(
-          left: 20,
-          bottom: 110,
-          child: Container(
-            width: 105,
-            height: 155,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.7),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
+          left: AppSpacing.lg,
+          right: AppSpacing.lg,
+          bottom: 78,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                film.name ?? '',
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: AppTypography.displayLarge.copyWith(
+                  fontSize: 30,
+                  height: 1.05,
+                  shadows: const [
+                    Shadow(
+                      color: Colors.black54,
+                      offset: Offset(0, 2),
+                      blurRadius: 12,
+                    ),
+                  ],
+                ),
+              ),
+              if ((film.originName ?? '').isNotEmpty) ...[
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  film.originName!,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
                 ),
               ],
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.2),
-                width: 1.5,
-              ),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(15),
-              child: AppImage(
-                imageUrl: film.fullThumbUrl,
-                boxFit: BoxFit.cover,
-              ),
-            ),
+              const SizedBox(height: AppSpacing.sm),
+              _HeroMetaLine(film: film),
+              if (_findVideoUrl(film) != null) ...[
+                const SizedBox(height: AppSpacing.lg),
+                AppButton(
+                  label: 'Xem phim',
+                  icon: Icons.play_arrow_rounded,
+                  size: AppButtonSize.lg,
+                  expanded: true,
+                  onPressed: () => _onPlayTap(film),
+                ),
+              ],
+            ],
           ),
         ),
-        if (_findVideoUrl(film) != null)
-          Positioned(right: 20, bottom: 110, child: _buildPlayButton(film)),
       ],
-    );
-  }
-
-  Widget _buildPlayButton(FilmDetail film) {
-    return AppButton(
-      label: 'Xem phim',
-      icon: Icons.play_arrow_rounded,
-      size: AppButtonSize.lg,
-      onPressed: () => _onPlayTap(film),
     );
   }
 
@@ -507,4 +490,71 @@ class _DetailPageState extends ConsumerState<DetailPage>
       ),
     );
   }
+}
+
+/// "★ 8.3 · 2026 · HD · Phụ đề · Tập 3" — dot-separated meta for the hero.
+class _HeroMetaLine extends StatelessWidget {
+  final FilmDetail film;
+  const _HeroMetaLine({required this.film});
+
+  @override
+  Widget build(BuildContext context) {
+    final rating = film.tmdb?.voteAverage ?? film.imdb?.voteAverage;
+    final parts = <Widget>[];
+
+    if (rating != null && rating > 0) {
+      parts.add(
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.star_rounded, color: AppColors.rating, size: 16),
+            const SizedBox(width: 3),
+            Text(
+              rating.toStringAsFixed(1),
+              style: AppTypography.labelMedium.copyWith(
+                color: AppColors.rating,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+    if (film.year != null) parts.add(_text('${film.year}'));
+    if ((film.quality ?? '').isNotEmpty) parts.add(_text(film.quality!));
+    if (film.lang?.contains('Vietsub') == true) parts.add(_text('Phụ đề'));
+    if ((film.episodeCurrent ?? '').isNotEmpty) {
+      parts.add(_text(film.episodeCurrent!));
+    }
+
+    final children = <Widget>[];
+    for (var i = 0; i < parts.length; i++) {
+      if (i > 0) {
+        children.add(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+            child: Text(
+              '·',
+              style: AppTypography.labelMedium.copyWith(
+                color: AppColors.textTertiary,
+              ),
+            ),
+          ),
+        );
+      }
+      children.add(parts[i]);
+    }
+
+    return Wrap(
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: children,
+    );
+  }
+
+  Widget _text(String s) => Text(
+        s,
+        style: AppTypography.labelMedium.copyWith(
+          color: AppColors.textSecondary,
+        ),
+      );
 }
