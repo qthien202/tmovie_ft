@@ -17,87 +17,59 @@ class FilmInfo extends ConsumerWidget {
     final imagesAsync = ref.watch(filmImagesProvider(slug));
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.lg,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Tên phim chính
-          Text(
-            film.name ?? '',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              letterSpacing: -0.5,
-            ),
-          ),
-          if (film.originName != null && film.originName!.isNotEmpty) ...[
-            const SizedBox(height: 4),
-            Text(
-              film.originName!,
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.5),
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-          const SizedBox(height: 20),
-
-          // Chips thông tin + điểm TMDB/IMDB
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
+          // Thời lượng (các meta khác đã hiển thị ở hero)
+          if (film.time != null && film.time!.isNotEmpty) ...[
+            Row(
               children: [
-                if (film.tmdb?.voteAverage != null &&
-                    film.tmdb!.voteAverage! > 0)
-                  _RatingChip(label: 'TMDB', score: film.tmdb!.voteAverage!),
-                if (film.imdb?.voteAverage != null &&
-                    film.imdb!.voteAverage! > 0)
-                  _RatingChip(label: 'IMDB', score: film.imdb!.voteAverage!),
-                if (film.year != null) _GlassChip(label: '${film.year}'),
-                if (film.quality != null) _GlassChip(label: film.quality!),
-                if (film.lang != null) _GlassChip(label: film.lang!),
-                if (film.time != null && film.time!.isNotEmpty)
-                  _GlassChip(label: film.time!),
-                if (film.episodeCurrent != null)
-                  _GlassChip(label: film.episodeCurrent!),
+                const Icon(
+                  Icons.schedule_rounded,
+                  size: AppSizes.iconSm,
+                  color: AppColors.textTertiary,
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Text(film.time!, style: AppTypography.bodyMedium),
               ],
             ),
-          ),
-          const SizedBox(height: 20),
+            const SizedBox(height: AppSpacing.lg),
+          ],
 
           // Thể loại
           if (film.category != null && film.category!.isNotEmpty)
             Wrap(
-              spacing: 8,
-              runSpacing: 8,
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.sm,
               children: film.category!.map((cat) {
                 return Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
+                    horizontal: AppSpacing.md,
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
+                    color: AppColors.primaryValue.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(AppRadius.sm),
                     border: Border.all(
-                      color: AppColors.primary.withValues(alpha: 0.3),
+                      color: AppColors.primaryValue.withValues(alpha: 0.3),
                     ),
                   ),
                   child: Text(
                     cat.name ?? '',
-                    style: TextStyle(
-                      color: AppColors.primary,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
+                    style: AppTypography.labelSmall.copyWith(
+                      color: AppColors.primaryValue,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 );
               }).toList(),
             ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.xl),
 
           // Cast Section
           peoplesAsync.when(
@@ -126,15 +98,8 @@ class FilmInfo extends ConsumerWidget {
                     const SizedBox(height: 16),
                   ],
                   if (actors.isNotEmpty) ...[
-                    const Text(
-                      'Diễn viên',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
+                    Text('Diễn viên', style: AppTypography.titleLarge),
+                    const SizedBox(height: AppSpacing.md),
                     SizedBox(
                       height: 130,
                       child: ListView.separated(
@@ -173,16 +138,9 @@ class FilmInfo extends ConsumerWidget {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 32),
-                  const Text(
-                    'Hình ảnh',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppSpacing.xxl),
+                  Text('Hình ảnh', style: AppTypography.titleLarge),
+                  const SizedBox(height: AppSpacing.md),
                   SizedBox(
                     height: 160,
                     child: ListView.separated(
@@ -220,21 +178,13 @@ class FilmInfo extends ConsumerWidget {
           ),
 
           if (film.content != null && film.content!.isNotEmpty) ...[
-            const SizedBox(height: 32),
-            const Text(
-              'Nội dung phim',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.xxl),
+            Text('Nội dung phim', style: AppTypography.titleLarge),
+            const SizedBox(height: AppSpacing.md),
             HtmlWidget(
               film.content!,
-              textStyle: TextStyle(
-                color: Colors.white.withValues(alpha: 0.7),
-                fontSize: 15,
+              textStyle: AppTypography.bodyLarge.copyWith(
+                color: AppColors.textSecondary,
                 height: 1.6,
               ),
             ),
@@ -275,66 +225,6 @@ class FilmInfo extends ConsumerWidget {
               child: AppImage(imageUrl: imageUrl, boxFit: BoxFit.contain),
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _RatingChip extends StatelessWidget {
-  final String label;
-  final double score;
-  const _RatingChip({required this.label, required this.score});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(right: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.amber.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.amber.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.star_rounded, color: Colors.amber, size: 16),
-          const SizedBox(width: 4),
-          Text(
-            '$label ${score.toStringAsFixed(1)}',
-            style: const TextStyle(
-              color: Colors.amber,
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _GlassChip extends StatelessWidget {
-  final String label;
-  const _GlassChip({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(right: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
-      ),
-      child: Text(
-        label,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
         ),
       ),
     );
