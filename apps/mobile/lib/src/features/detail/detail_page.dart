@@ -116,7 +116,10 @@ class _DetailPageState extends ConsumerState<DetailPage>
           final film = response.data?.item;
           if (film == null) {
             return Center(
-              child: Text('Không tìm thấy phim', style: AppTypography.bodyLarge),
+              child: Text(
+                'Không tìm thấy phim',
+                style: AppTypography.bodyLarge,
+              ),
             );
           }
 
@@ -295,7 +298,7 @@ class _DetailPageState extends ConsumerState<DetailPage>
                         color: Colors.white54,
                       ),
                     ),
-                    error: (_, __) => const Icon(
+                    error: (_, _) => const Icon(
                       Icons.favorite_border_rounded,
                       color: Colors.white54,
                       size: 20,
@@ -341,45 +344,58 @@ class _DetailPageState extends ConsumerState<DetailPage>
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                film.name ?? '',
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: AppTypography.displayLarge.copyWith(
-                  fontSize: 30,
-                  height: 1.05,
-                  shadows: const [
-                    Shadow(
-                      color: Colors.black54,
-                      offset: Offset(0, 2),
-                      blurRadius: 12,
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          film.name ?? '',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTypography.displayLarge.copyWith(
+                            fontSize: 28,
+                            height: 1.05,
+                            shadows: const [
+                              Shadow(
+                                color: Colors.black54,
+                                offset: Offset(0, 2),
+                                blurRadius: 12,
+                              ),
+                            ],
+                          ),
+                        ),
+                        if ((film.originName ?? '').isNotEmpty) ...[
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            film.originName!,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTypography.bodyMedium.copyWith(
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  if (_findVideoUrl(film) != null) ...[
+                    const SizedBox(width: AppSpacing.md),
+                    HeroCircleButton(
+                      icon: Icons.play_arrow_rounded,
+                      primary: true,
+                      size: 52,
+                      iconSize: 28,
+                      onTap: () => _onPlayTap(film),
                     ),
                   ],
-                ),
+                ],
               ),
-              if ((film.originName ?? '').isNotEmpty) ...[
-                const SizedBox(height: AppSpacing.xs),
-                Text(
-                  film.originName!,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ],
               const SizedBox(height: AppSpacing.sm),
               _HeroMetaLine(film: film),
-              if (_findVideoUrl(film) != null) ...[
-                const SizedBox(height: AppSpacing.lg),
-                AppButton(
-                  label: 'Xem phim',
-                  icon: Icons.play_arrow_rounded,
-                  size: AppButtonSize.lg,
-                  expanded: true,
-                  onPressed: () => _onPlayTap(film),
-                ),
-              ],
             ],
           ),
         ),
@@ -402,9 +418,7 @@ class _DetailPageState extends ConsumerState<DetailPage>
             decoration: BoxDecoration(
               color: AppColors.surfaceColor.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(AppRadius.lg),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.08),
-              ),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
             ),
             child: TabBar(
               controller: _tabController,
@@ -479,10 +493,7 @@ class _DetailPageState extends ConsumerState<DetailPage>
                   ),
                 ),
                 const SizedBox(width: AppSpacing.md),
-                AppButton(
-                  label: 'Xem ngay',
-                  onPressed: () => _onPlayTap(film),
-                ),
+                AppButton(label: 'Xem ngay', onPressed: () => _onPlayTap(film)),
               ],
             ),
           ),
@@ -552,9 +563,7 @@ class _HeroMetaLine extends StatelessWidget {
   }
 
   Widget _text(String s) => Text(
-        s,
-        style: AppTypography.labelMedium.copyWith(
-          color: AppColors.textSecondary,
-        ),
-      );
+    s,
+    style: AppTypography.labelMedium.copyWith(color: AppColors.textSecondary),
+  );
 }
