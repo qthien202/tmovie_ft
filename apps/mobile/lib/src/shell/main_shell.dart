@@ -16,8 +16,6 @@ class MainShell extends ConsumerStatefulWidget {
 }
 
 class _MainShellState extends ConsumerState<MainShell> {
-  int _selectedIndex = 0;
-
   static const _tabs = [
     {'route': '/home', 'icon': Icons.home_rounded, 'label': 'Trang chủ'},
     {'route': '/search', 'icon': Icons.search_rounded, 'label': 'Tìm kiếm'},
@@ -37,8 +35,19 @@ class _MainShellState extends ConsumerState<MainShell> {
     }
   }
 
+  /// Derive the active tab from the current route so the highlight always
+  /// matches what's on screen (deep links, programmatic nav, etc.).
+  int _indexForLocation(String location) {
+    final i = _tabs.indexWhere(
+      (t) => location.startsWith(t['route'] as String),
+    );
+    return i < 0 ? 0 : i;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final location = GoRouterState.of(context).matchedLocation;
+    final selectedIndex = _indexForLocation(location);
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       extendBody: true,
@@ -66,15 +75,12 @@ class _MainShellState extends ConsumerState<MainShell> {
               ),
               child: Row(
                 children: List.generate(_tabs.length, (index) {
-                  final isSelected = _selectedIndex == index;
+                  final isSelected = selectedIndex == index;
                   const active = Colors.white;
                   const inactive = Color(0xFF8A949B);
                   return Expanded(
                     child: InkWell(
-                      onTap: () {
-                        setState(() => _selectedIndex = index);
-                        context.go(_tabs[index]['route'] as String);
-                      },
+                      onTap: () => context.go(_tabs[index]['route'] as String),
                       borderRadius: BorderRadius.circular(22),
                       child: Center(
                         child: AnimatedContainer(
