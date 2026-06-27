@@ -7,6 +7,8 @@ import 'package:chewie/chewie.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_player/video_player.dart';
 import 'package:core/core.dart';
+import 'package:design_system/design_system.dart';
+import 'package:media_library/media_library.dart';
 
 class PlayerPage extends ConsumerStatefulWidget {
   final String videoUrl;

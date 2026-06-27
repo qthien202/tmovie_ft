@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import '../models/app_update_info.dart';
+import 'app_update_info.dart';
 
 class UpdateService {
   final Dio _dio;

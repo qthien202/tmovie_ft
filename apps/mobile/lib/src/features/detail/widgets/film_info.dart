@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:core/core.dart';
+import 'package:design_system/design_system.dart';
+import 'package:detail/detail.dart';
 
 class FilmInfo extends ConsumerWidget {
   final FilmDetail film;

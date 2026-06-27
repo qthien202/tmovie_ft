@@ -3,7 +3,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:core/core.dart';
+import 'package:design_system/design_system.dart';
+import 'package:catalog/catalog.dart';
 
 class SearchPage extends ConsumerStatefulWidget {
   const SearchPage({super.key});
