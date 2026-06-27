@@ -36,27 +36,16 @@ class NetflixDashboard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Column(
+    return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const FilmSection(title: 'MỚI CẬP NHẬT', slug: 'phim-moi-cap-nhat'),
-        const FilmSection(
-          title: 'PHIM HÀNH ĐỘNG',
-          slug: 'hanh-dong',
-          isGenre: true,
-        ),
-        const FilmSection(
-          title: 'PHIM TÌNH CẢM',
-          slug: 'tinh-cam',
-          isGenre: true,
-        ),
-        const FilmSection(
-          title: 'PHIM KINH DỊ',
-          slug: 'kinh-di',
-          isGenre: true,
-        ),
-        const FilmSection(title: 'PHIM HOẠT HÌNH', slug: 'hoat-hinh'),
-        const SizedBox(height: 100),
+        SizedBox(height: AppSpacing.md),
+        FilmSection(title: 'Mới cập nhật', slug: 'phim-moi-cap-nhat'),
+        FilmSection(title: 'Phim hành động', slug: 'hanh-dong', isGenre: true),
+        FilmSection(title: 'Phim tình cảm', slug: 'tinh-cam', isGenre: true),
+        FilmSection(title: 'Phim kinh dị', slug: 'kinh-di', isGenre: true),
+        FilmSection(title: 'Phim hoạt hình', slug: 'hoat-hinh'),
+        SizedBox(height: 100),
       ],
     );
   }
@@ -88,33 +77,20 @@ class FilmSection extends ConsumerWidget {
     );
 
     return Container(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-            child: Row(
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.2,
-                  ),
-                ),
-                const Spacer(),
-                GestureDetector(
-                  onTap: () => context.push('/film-list/$slug?title=$title'),
-                  child: Icon(
-                    Icons.chevron_right_rounded,
-                    color: Colors.white.withValues(alpha: 0.4),
-                    size: 24,
-                  ),
-                ),
-              ],
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              AppSpacing.md,
+              AppSpacing.lg,
+              AppSpacing.md,
+            ),
+            child: SectionHeader(
+              title: title,
+              onSeeAll: () => context.push('/film-list/$slug?title=$title'),
             ),
           ),
           SizedBox(
@@ -192,62 +168,25 @@ class PaginatedGridView extends ConsumerWidget {
       },
       child: Column(
         children: [
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.xl),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                Container(
-                  width: 4,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryValue,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                const Text(
-                  'DANH SÁCH PHIM',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.2,
-                  ),
-                ),
-                const Spacer(),
-                TextButton(
-                  onPressed: () {
-                    final title = typeSlug == 'phim-bo'
-                        ? 'Phim Bộ'
-                        : typeSlug == 'phim-le'
-                        ? 'Phim Lẻ'
-                        : typeSlug == 'tv-shows'
-                        ? 'TV Shows'
-                        : 'Danh sách phim';
-                    context.push('/film-list/$typeSlug?title=$title');
-                  },
-                  child: Row(
-                    children: [
-                      Text(
-                        'Xem tất cả',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.6),
-                          fontSize: 13,
-                        ),
-                      ),
-                      Icon(
-                        Icons.chevron_right_rounded,
-                        size: 18,
-                        color: Colors.white.withValues(alpha: 0.6),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+            child: SectionHeader(
+              title: 'Danh sách phim',
+              seeAllLabel: 'Xem tất cả',
+              onSeeAll: () {
+                final title = typeSlug == 'phim-bo'
+                    ? 'Phim Bộ'
+                    : typeSlug == 'phim-le'
+                    ? 'Phim Lẻ'
+                    : typeSlug == 'tv-shows'
+                    ? 'TV Shows'
+                    : 'Danh sách phim';
+                context.push('/film-list/$typeSlug?title=$title');
+              },
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           if (filmListState.items.isEmpty && filmListState.isLoading)
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
@@ -258,12 +197,10 @@ class PaginatedGridView extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
-                    'Có lỗi xảy ra',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
+                  Text('Có lỗi xảy ra', style: AppTypography.titleMedium),
+                  const SizedBox(height: AppSpacing.lg),
+                  AppButton(
+                    label: 'Thử lại',
                     onPressed: () => ref
                         .read(
                           paginatedFilmsProvider(
@@ -274,17 +211,13 @@ class PaginatedGridView extends ConsumerWidget {
                           ).notifier,
                         )
                         .loadFirstPage(),
-                    child: const Text('Thử lại'),
                   ),
                 ],
               ),
             )
           else if (filmListState.items.isEmpty)
-            const Center(
-              child: Text(
-                'Không có phim',
-                style: TextStyle(color: Colors.white),
-              ),
+            Center(
+              child: Text('Không có phim', style: AppTypography.bodyMedium),
             )
           else ...[
             Padding(
