@@ -160,31 +160,34 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           SafeArea(
             child: Column(
               children: [
-                // 1. Header Area
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                  child: Row(
-                    children: [
-                      const SizedBox(width: 40), // Balance the filter button
-                      const Spacer(),
-                      _buildDynamicTitleBadge(),
-                      const Spacer(),
-                      _buildGlassButton(
-                        icon: Icons.tune_rounded,
-                        onTap: _showFilterSheet,
-                        badgeCount:
-                            (_selectedGenres.length +
-                            _selectedCountries.length +
-                            (_selectedYear != null ? 1 : 0)),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // 2. Search Field Area
+                // Header: search field + filter inline
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-                  child: _buildCompactSearchField(),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: AppTextField(
+                          controller: _controller,
+                          hint: 'Nhập tên phim, diễn viên...',
+                          prefixIcon: Icons.search_rounded,
+                          textInputAction: TextInputAction.search,
+                          onChanged: (val) {
+                            setState(() {});
+                            _onSearchChanged(val);
+                          },
+                          onClear: _controller.text.isNotEmpty
+                              ? () {
+                                  _controller.clear();
+                                  _onSearchChanged('');
+                                  setState(() {});
+                                }
+                              : null,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      _buildFilterButton(),
+                    ],
+                  ),
                 ),
 
                 Expanded(
@@ -215,49 +218,48 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     );
   }
 
-  Widget _buildGlassButton({
-    required IconData icon,
-    required VoidCallback onTap,
-    int badgeCount = 0,
-  }) {
+  Widget _buildFilterButton() {
+    final count = _selectedGenres.length +
+        _selectedCountries.length +
+        (_selectedYear != null ? 1 : 0);
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        GestureDetector(
-          onTap: onTap,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.1),
-                  ),
-                ),
-                child: Icon(icon, color: Colors.white, size: 20),
+        Material(
+          color: AppColors.surfaceElevated,
+          borderRadius: AppRadius.brMd,
+          child: InkWell(
+            onTap: _showFilterSheet,
+            borderRadius: AppRadius.brMd,
+            child: Container(
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(
+                borderRadius: AppRadius.brMd,
+                border: Border.all(color: AppColors.border),
+              ),
+              child: const Icon(
+                Icons.tune_rounded,
+                color: AppColors.textPrimary,
+                size: AppSizes.iconMd,
               ),
             ),
           ),
         ),
-        if (badgeCount > 0)
+        if (count > 0)
           Positioned(
             top: -4,
             right: -4,
             child: Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: AppColors.primary,
+              padding: const EdgeInsets.all(5),
+              decoration: const BoxDecoration(
+                color: AppColors.primaryValue,
                 shape: BoxShape.circle,
               ),
               child: Text(
-                '$badgeCount',
+                '$count',
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: AppColors.onPrimary,
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
                 ),
@@ -265,83 +267,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             ),
           ),
       ],
-    );
-  }
-
-  Widget _buildDynamicTitleBadge() {
-    String title = 'TÌM KIẾM';
-    if (_selectedGenres.isNotEmpty ||
-        _selectedCountries.isNotEmpty ||
-        _selectedYear != null) {
-      title = 'LỌC KẾT QUẢ';
-    }
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
-      ),
-      child: Text(
-        title,
-        style: TextStyle(
-          color: AppColors.primary,
-          fontSize: 12,
-          fontWeight: FontWeight.w900,
-          letterSpacing: 1.5,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCompactSearchField() {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(15),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-        child: Container(
-          height: 48,
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.05),
-            borderRadius: BorderRadius.circular(15),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-          ),
-          child: TextField(
-            controller: _controller,
-            onChanged: (val) {
-              setState(() {});
-              _onSearchChanged(val);
-            },
-            autofocus: false,
-            style: const TextStyle(color: Colors.white, fontSize: 15),
-            decoration: InputDecoration(
-              hintText: 'Nhập tên phim, diễn viên...',
-              hintStyle: TextStyle(
-                color: Colors.white.withValues(alpha: 0.3),
-                fontSize: 14,
-              ),
-              prefixIcon: Icon(
-                Icons.search_rounded,
-                color: Colors.white.withValues(alpha: 0.4),
-                size: 20,
-              ),
-              suffixIcon: _controller.text.isNotEmpty
-                  ? IconButton(
-                      icon: const Icon(Icons.close_rounded, size: 18),
-                      color: Colors.white60,
-                      onPressed: () {
-                        _controller.clear();
-                        _onSearchChanged('');
-                        setState(() {});
-                      },
-                    )
-                  : null,
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(vertical: 11),
-            ),
-          ),
-        ),
-      ),
     );
   }
 
