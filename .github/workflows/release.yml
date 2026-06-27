@@ -74,6 +74,20 @@ jobs:
           EOF
           done
 
+      - name: Restore Firebase config
+        env:
+          FB_OPTIONS_MOBILE: ${{ secrets.FIREBASE_OPTIONS_MOBILE }}
+          FB_OPTIONS_TV: ${{ secrets.FIREBASE_OPTIONS_TV }}
+          GS_MOBILE: ${{ secrets.GOOGLE_SERVICES_MOBILE }}
+          GS_TV: ${{ secrets.GOOGLE_SERVICES_TV }}
+        run: |
+          # firebase_options.dart + google-services.json are gitignored (public
+          # repo), so the build restores them here from base64 secrets.
+          printf '%s' "$FB_OPTIONS_MOBILE" | base64 -d > apps/mobile/lib/firebase_options.dart
+          printf '%s' "$FB_OPTIONS_TV"     | base64 -d > apps/tv/lib/firebase_options.dart
+          printf '%s' "$GS_MOBILE" | base64 -d > apps/mobile/android/app/google-services.json
+          printf '%s' "$GS_TV"     | base64 -d > apps/tv/android/app/google-services.json
+
       - name: Resolve workspace dependencies
         run: flutter pub get
 
