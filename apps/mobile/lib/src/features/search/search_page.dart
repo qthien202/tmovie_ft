@@ -24,8 +24,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   @override
   void initState() {
     super.initState();
-    // Default filter to 2026 on first entry
-    _selectedYear = '2026';
+    // No default filter → mở Tìm kiếm là thấy ngay khu "Phổ biến nhất".
   }
 
   final List<({String name, String slug})> _genres = [
@@ -178,7 +177,32 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                             _selectedGenres.isEmpty &&
                             _selectedCountries.isEmpty &&
                             _selectedYear == null)
-                        ? _buildEmptyState()
+                        // Khám phá: luôn hiển thị phim phổ biến (content-led)
+                        ? Column(
+                            key: const ValueKey('discover'),
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.fromLTRB(
+                                  AppSpacing.lg,
+                                  AppSpacing.sm,
+                                  AppSpacing.lg,
+                                  AppSpacing.xs,
+                                ),
+                                child: Text(
+                                  'Phổ biến nhất',
+                                  style: AppTypography.titleLarge,
+                                ),
+                              ),
+                              const Expanded(
+                                child: _SearchList(
+                                  keyword: '',
+                                  selectedGenres: {},
+                                  selectedCountries: {},
+                                ),
+                              ),
+                            ],
+                          )
                         : _SearchList(
                             keyword: _keyword,
                             selectedGenres: _selectedGenres,
@@ -248,47 +272,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     );
   }
 
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          TweenAnimationBuilder<double>(
-            tween: Tween(begin: 0.0, end: 1.0),
-            duration: const Duration(seconds: 1),
-            builder: (context, value, child) {
-              return Opacity(
-                opacity: value,
-                child: Transform.scale(
-                  scale: 0.8 + (0.2 * value),
-                  child: child,
-                ),
-              );
-            },
-            child: Container(
-              padding: const EdgeInsets.all(30),
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.surfaceColor,
-              ),
-              child: const Icon(
-                Icons.search_rounded,
-                size: 80,
-                color: AppColors.border,
-              ),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xl),
-          Text('Tìm kiếm vạn phim hay', style: AppTypography.titleMedium),
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            'Nhập tên phim để khám phá ngay',
-            style: AppTypography.bodyMedium,
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class _SearchList extends ConsumerWidget {
