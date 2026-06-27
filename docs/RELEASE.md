@@ -44,6 +44,18 @@ Repo → Settings → Secrets and variables → Actions:
 Locally, the same signing kicks in if you create `apps/<app>/android/key.properties`
 (gitignored) with `storeFile/storePassword/keyAlias/keyPassword`.
 
+## Firebase config secrets (CI build)
+
+`firebase_options.dart` and `google-services.json` are gitignored (this repo is
+public). The workflow restores them from base64 secrets before building, so add:
+
+```bash
+gh secret set FIREBASE_OPTIONS_MOBILE < <(base64 -i apps/mobile/lib/firebase_options.dart)
+gh secret set FIREBASE_OPTIONS_TV     < <(base64 -i apps/tv/lib/firebase_options.dart)
+gh secret set GOOGLE_SERVICES_MOBILE  < <(base64 -i apps/mobile/android/app/google-services.json)
+gh secret set GOOGLE_SERVICES_TV      < <(base64 -i apps/tv/android/app/google-services.json)
+```
+
 ## Notes
 - Release notes come from the GitHub Release body; the workflow generates them
   automatically. Edit the release afterwards to customize.
