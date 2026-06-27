@@ -85,8 +85,11 @@ class FilmSectionSkeleton extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             itemCount: 4,
             separatorBuilder: (context, index) => const SizedBox(width: 14),
-            itemBuilder: (context, index) =>
-                const SizedBox(width: 145, child: FilmCardSkeleton()),
+            itemBuilder: (context, index) => SizedBox(
+              width: 145,
+              height: 220,
+              child: const FilmCardSkeleton(),
+            ),
           ),
         ),
       ],

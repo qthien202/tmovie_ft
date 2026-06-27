@@ -2,6 +2,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core/core.dart';
+import 'package:design_system/design_system.dart';
+import 'package:catalog/catalog.dart';
 import 'widgets/film_carousel.dart';
 import 'widgets/home_tab_view.dart';
 
@@ -108,7 +110,9 @@ class _HomePageState extends ConsumerState<HomePage>
                     context,
                   ),
                   sliver: SliverAppBar(
-                    expandedHeight: MediaQuery.of(context).size.height * 0.75,
+                    expandedHeight:
+                        MediaQuery.of(context).size.height *
+                        0.82, // Tăng thêm chiều cao
                     pinned: true,
                     stretch: true,
                     primary: false,
@@ -123,7 +127,7 @@ class _HomePageState extends ConsumerState<HomePage>
                       background: LayoutBuilder(
                         builder: (context, constraints) {
                           final expandedHeight =
-                              MediaQuery.of(context).size.height * 0.75;
+                              MediaQuery.of(context).size.height * 0.82;
                           final collapsedHeight = 60.5 + topPadding;
 
                           final double t =
@@ -131,37 +135,53 @@ class _HomePageState extends ConsumerState<HomePage>
                                       (expandedHeight - collapsedHeight))
                                   .clamp(0.0, 1.0);
 
-                          // Carousel sẽ biến mất HOÀN TOÀN trước khi Header thu vào trạng thái Sticky
-                          // t = 1.0 (mở), t = 0.0 (đóng)
-                          // Ở đây t > 0.4 Carousel mới hiện, dưới 0.4 là mờ hẳn.
-                          final opacity = ((t - 0.4) / 0.6).clamp(0.0, 1.0);
+                          // Tăng dải opacity để mờ dần đều, tránh biến mất đột ngột
+                          final opacity = ((t - 0.75) / 0.25).clamp(0.0, 1.0);
 
-                          return Opacity(
-                            opacity: opacity,
-                            child: Container(
-                              padding: EdgeInsets.only(
-                                top: topPadding,
-                                bottom: 85,
-                              ),
-                              child: Center(
-                                child: SingleChildScrollView(
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  child: featuredFilmsAsync.when(
-                                    data: (films) => FilmCarousel(
-                                      films: films,
-                                      autoPlay: !innerBoxIsScrolled,
-                                      onActiveFilmChanged: (film) {
-                                        if (mounted) {
-                                          setState(() {
-                                            _currentBackdropUrl =
-                                                film.fullThumbUrl;
-                                          });
-                                        }
-                                      },
+                          if (opacity <= 0 || innerBoxIsScrolled) {
+                            return const SizedBox();
+                          }
+
+                          final scale = (0.95 + (opacity * 0.05)).clamp(
+                            0.95,
+                            1.0,
+                          );
+
+                          return ClipRect(
+                            child: Opacity(
+                              opacity: opacity,
+                              child: Transform.scale(
+                                scale: scale,
+                                child: Container(
+                                  padding: EdgeInsets.only(
+                                    top: topPadding + 15,
+                                    bottom:
+                                        50, // Trả về mức an toàn để không mất tag
+                                  ),
+                                  child: Align(
+                                    alignment: Alignment.topCenter,
+                                    child: ConstrainedBox(
+                                      constraints: const BoxConstraints(
+                                        maxHeight: 650,
+                                      ),
+                                      child: featuredFilmsAsync.when(
+                                        data: (films) => FilmCarousel(
+                                          films: films,
+                                          autoPlay: !innerBoxIsScrolled,
+                                          onActiveFilmChanged: (film) {
+                                            if (mounted) {
+                                              setState(() {
+                                                _currentBackdropUrl =
+                                                    film.fullThumbUrl;
+                                              });
+                                            }
+                                          },
+                                        ),
+                                        loading: () =>
+                                            const FilmCarouselSkeleton(),
+                                        error: (e, s) => const SizedBox(),
+                                      ),
                                     ),
-                                    loading: () =>
-                                        const FilmCarouselSkeleton(),
-                                    error: (e, s) => const SizedBox(),
                                   ),
                                 ),
                               ),
@@ -289,5 +309,4 @@ class _HomePageState extends ConsumerState<HomePage>
       ),
     );
   }
-
 }

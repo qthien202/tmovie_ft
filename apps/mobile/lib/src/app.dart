@@ -1,9 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:core/core.dart';
+import 'package:flutter/services.dart';
+import 'package:design_system/design_system.dart';
 import 'router/app_router.dart';
 
-class TMovieApp extends StatelessWidget {
+class TMovieApp extends StatefulWidget {
   const TMovieApp({super.key});
+
+  @override
+  State<TMovieApp> createState() => _TMovieAppState();
+}
+
+class _TMovieAppState extends State<TMovieApp> {
+  @override
+  void initState() {
+    super.initState();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+  }
 
   @override
   Widget build(BuildContext context) {

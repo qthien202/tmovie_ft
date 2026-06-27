@@ -6,8 +6,14 @@ environment:
 
 workspace:
   - packages/core
+  - packages/design_system
+  - packages/catalog
+  - packages/detail
+  - packages/media_library
+  - packages/app_update
   - apps/mobile
   - apps/tv
+  - apps/desktop
 
 dev_dependencies:
   melos: ^7.0.0
