@@ -18,8 +18,10 @@ class UpdateService {
   });
 
   /// Fetch the latest release from GitHub.
+  /// [apkKeyword] selects the APK asset for the current app (e.g. "mobile" /
+  /// "tv") when a release bundles multiple apps' APKs.
   /// Returns null if network fails or no release found.
-  Future<AppUpdateInfo?> checkForUpdate() async {
+  Future<AppUpdateInfo?> checkForUpdate({String? apkKeyword}) async {
     try {
       final response = await _dio.get(
         'https://api.github.com/repos/$githubOwner/$githubRepo/releases/latest',
@@ -31,6 +33,7 @@ class UpdateService {
       if (response.statusCode == 200 && response.data != null) {
         return AppUpdateInfo.fromGitHubRelease(
           response.data as Map<String, dynamic>,
+          preferAssetKeyword: apkKeyword,
         );
       }
       return null;

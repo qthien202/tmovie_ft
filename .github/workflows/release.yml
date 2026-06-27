@@ -1,0 +1,104 @@
+name: Release APK (OTA)
+
+# Builds the mobile + TV release APKs and publishes a single GitHub Release
+# with both attached. The app's OTA updater reads releases/latest and picks the
+# APK matching its package id ("mobile" / "tv"), so one release serves both apps.
+#
+# Trigger:
+#   - push a tag  v1.2.3            (git tag v1.2.3 && git push origin v1.2.3)
+#   - or run manually (Actions tab) and type the version
+#
+# OTA update-installs require a CONSISTENT release key. Add these repo secrets
+# (Settings > Secrets and variables > Actions) or builds fall back to the debug
+# key (fine for a fresh install, but Android refuses update-installs across keys):
+#   KEYSTORE_BASE64    base64 of your release.keystore  (base64 -i release.keystore | pbcopy)
+#   KEYSTORE_PASSWORD  store password
+#   KEY_ALIAS          key alias
+#   KEY_PASSWORD       key password
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version, e.g. 1.2.3 (creates tag v1.2.3)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve version
+        id: ver
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION="${GITHUB_REF_NAME#v}"
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.41.5
+          cache: true
+
+      - name: Configure release signing
+        if: env.KEYSTORE_BASE64 != ''
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.keystore"
+          for app in mobile tv; do
+            cat > "apps/$app/android/key.properties" <<EOF
+          storeFile=$RUNNER_TEMP/release.keystore
+          storePassword=${{ secrets.KEYSTORE_PASSWORD }}
+          keyAlias=${{ secrets.KEY_ALIAS }}
+          keyPassword=${{ secrets.KEY_PASSWORD }}
+          EOF
+          done
+
+      - name: Resolve workspace dependencies
+        run: flutter pub get
+
+      - name: Build APKs
+        run: |
+          V="${{ steps.ver.outputs.version }}"
+          N="${{ github.run_number }}"
+          (cd apps/mobile && flutter build apk --release --build-name="$V" --build-number="$N")
+          (cd apps/tv && flutter build apk --release --build-name="$V" --build-number="$N")
+
+      - name: Stage APKs
+        run: |
+          V="${{ steps.ver.outputs.version }}"
+          mkdir -p dist
+          # TV first so legacy TV apps (which grab the first .apk) keep working.
+          cp apps/tv/build/app/outputs/flutter-apk/app-release.apk "dist/tmovie-tv-v$V.apk"
+          cp apps/mobile/build/app/outputs/flutter-apk/app-release.apk "dist/tmovie-mobile-v$V.apk"
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.ver.outputs.tag }}
+          name: TMovie v${{ steps.ver.outputs.version }}
+          generate_release_notes: true
+          make_latest: true
+          files: |
+            dist/tmovie-tv-v${{ steps.ver.outputs.version }}.apk
+            dist/tmovie-mobile-v${{ steps.ver.outputs.version }}.apk
