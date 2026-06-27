@@ -42,7 +42,9 @@ class GenrePage extends ConsumerWidget {
           Positioned.fill(
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
-              child: Container(color: Colors.black.withValues(alpha: 0.7)),
+              child: Container(
+                color: AppColors.backgroundColor.withValues(alpha: 0.8),
+              ),
             ),
           ),
 
@@ -72,36 +74,15 @@ class GenrePage extends ConsumerWidget {
                 // Glassmorphism sticky header
                 SliverAppBar(
                   pinned: true,
-                  backgroundColor: Colors.transparent,
+                  backgroundColor: AppColors.backgroundColor.withValues(
+                    alpha: 0.5,
+                  ),
                   elevation: 0,
                   centerTitle: true,
                   leading: const _AppBackButton(),
-                  title: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.05),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.1),
-                          ),
-                        ),
-                        child: Text(
-                          title.isNotEmpty ? title : slug,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
+                  title: Text(
+                    title.isNotEmpty ? title : slug,
+                    style: AppTypography.titleLarge,
                   ),
                 ),
 
@@ -128,11 +109,11 @@ class GenrePage extends ConsumerWidget {
                     ),
                   )
                 else if (items.isEmpty)
-                  const SliverFillRemaining(
+                  SliverFillRemaining(
                     child: Center(
                       child: Text(
                         'Không có phim',
-                        style: TextStyle(color: Colors.white),
+                        style: AppTypography.bodyMedium,
                       ),
                     ),
                   )
@@ -174,9 +155,9 @@ class _ErrorView extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text('Có lỗi xảy ra', style: TextStyle(color: Colors.white)),
-          const SizedBox(height: 16),
-          ElevatedButton(onPressed: onRetry, child: const Text('Thử lại')),
+          Text('Có lỗi xảy ra', style: AppTypography.titleMedium),
+          const SizedBox(height: AppSpacing.lg),
+          AppButton(label: 'Thử lại', onPressed: onRetry),
         ],
       ),
     );
@@ -189,25 +170,19 @@ class _AppBackButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: ClipOval(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-            ),
-            child: IconButton(
-              icon: const Icon(
-                Icons.arrow_back_rounded,
-                color: Colors.white,
-                size: 20,
-              ),
-              onPressed: () => context.pop(),
-            ),
+      padding: const EdgeInsets.all(AppSpacing.sm),
+      child: Material(
+        color: AppColors.surfaceElevated,
+        shape: const CircleBorder(
+          side: BorderSide(color: AppColors.border),
+        ),
+        child: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_rounded,
+            color: AppColors.textPrimary,
+            size: AppSizes.iconSm,
           ),
+          onPressed: () => context.pop(),
         ),
       ),
     );
