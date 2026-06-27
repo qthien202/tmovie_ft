@@ -1,17 +1,21 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:app_update/app_update.dart';
 import 'package:design_system/design_system.dart';
 
-class MainShell extends StatefulWidget {
+import '../features/update/update_dialog.dart';
+
+class MainShell extends ConsumerStatefulWidget {
   final Widget child;
   const MainShell({super.key, required this.child});
 
   @override
-  State<MainShell> createState() => _MainShellState();
+  ConsumerState<MainShell> createState() => _MainShellState();
 }
 
-class _MainShellState extends State<MainShell> {
+class _MainShellState extends ConsumerState<MainShell> {
   int _selectedIndex = 0;
 
   static const _tabs = [
@@ -19,6 +23,19 @@ class _MainShellState extends State<MainShell> {
     {'route': '/search', 'icon': Icons.search_rounded, 'label': 'Tìm kiếm'},
     {'route': '/profile', 'icon': Icons.person_rounded, 'label': 'Cá nhân'},
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkForUpdate());
+  }
+
+  Future<void> _checkForUpdate() async {
+    final updateInfo = await ref.read(appUpdateCheckProvider.future);
+    if (updateInfo != null && mounted) {
+      UpdateDialog.show(context, updateInfo);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
