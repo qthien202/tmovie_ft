@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -137,27 +136,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: Stack(
-        children: [
-          // Ambient Glow Background
-          Positioned(
-            top: -150,
-            right: -150,
-            child: ImageFiltered(
-              imageFilter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
-              child: Container(
-                width: 400,
-                height: 400,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColors.primary.withValues(alpha: 0.15),
-                ),
-              ),
-            ),
-          ),
-
-          SafeArea(
+      backgroundColor: AppColors.backgroundColor,
+      body: SafeArea(
             child: Column(
               children: [
                 // Header: search field + filter inline
@@ -213,8 +193,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               ],
             ),
           ),
-        ],
-      ),
     );
   }
 
@@ -289,31 +267,23 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             },
             child: Container(
               padding: const EdgeInsets.all(30),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.03),
+                color: AppColors.surfaceColor,
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.search_rounded,
                 size: 80,
-                color: Colors.white.withValues(alpha: 0.05),
+                color: AppColors.border,
               ),
             ),
           ),
-          const SizedBox(height: 24),
-          const Text(
-            'Tìm kiếm vạn phim hay',
-            style: TextStyle(
-              color: Colors.white38,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.5,
-            ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
+          const SizedBox(height: AppSpacing.xl),
+          Text('Tìm kiếm vạn phim hay', style: AppTypography.titleMedium),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
             'Nhập tên phim để khám phá ngay',
-            style: TextStyle(color: Colors.white12, fontSize: 13),
+            style: AppTypography.bodyMedium,
           ),
         ],
       ),
@@ -391,27 +361,22 @@ class _SearchList extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
+            const Icon(
               Icons.sentiment_dissatisfied_rounded,
               size: 60,
-              color: Colors.white.withValues(alpha: 0.05),
+              color: AppColors.border,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.lg),
             Text(
               'Không tìm thấy bộ phim nào phù hợp',
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.2),
-                fontSize: 14,
-              ),
+              style: AppTypography.bodyMedium,
             ),
             if (keyword.isNotEmpty) ...[
-              const SizedBox(height: 4),
+              const SizedBox(height: AppSpacing.xs),
               Text(
                 '"$keyword"',
-                style: TextStyle(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
+                style: AppTypography.titleMedium.copyWith(
+                  color: AppColors.primaryValue,
                 ),
               ),
             ],
@@ -496,27 +461,19 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+      decoration: const BoxDecoration(
+        color: AppColors.surfaceElevated,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
+        border: Border.fromBorderSide(BorderSide(color: AppColors.border)),
       ),
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(AppSpacing.xl),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Text(
-                'BỘ LỌC NÂNG CAO',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 1.5,
-                ),
-              ),
+              Text('Bộ lọc nâng cao', style: AppTypography.titleLarge),
               const Spacer(),
               TextButton(
                 onPressed: () {
@@ -527,62 +484,54 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
                 },
                 child: Text(
                   'Xóa tất cả',
-                  style: TextStyle(
-                    color: AppColors.primary,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
+                  style: AppTypography.labelMedium.copyWith(
+                    color: AppColors.primaryValue,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.xl),
           _buildSection(
-            'THỂ LOẠI (CHỌN NHIỀU)',
+            'Thể loại (chọn nhiều)',
             widget.genres,
             widget.selectedGenres,
             widget.onGenreToggle,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.xl),
           _buildSection(
-            'QUỐC GIA (CHỌN NHIỀU)',
+            'Quốc gia (chọn nhiều)',
             widget.countries,
             widget.selectedCountries,
             widget.onCountryToggle,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.xl),
           _buildYearSection(),
-          const SizedBox(height: 32),
+          const SizedBox(height: AppSpacing.xxl),
           SafeArea(
             top: false,
             child: Padding(
-              padding: const EdgeInsets.only(
-                bottom: 20,
-              ), // Extra space to clear nav bar
-              child: SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                  child: const Text(
-                    'XEM KẾT QUẢ',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 1.2,
-                    ),
-                  ),
-                ),
+              padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+              child: AppButton(
+                label: 'Xem kết quả',
+                expanded: true,
+                size: AppButtonSize.lg,
+                onPressed: () => Navigator.pop(context),
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSectionLabel(String label) {
+    return Text(
+      label,
+      style: AppTypography.labelSmall.copyWith(
+        color: AppColors.textSecondary,
+        fontWeight: FontWeight.w700,
+        letterSpacing: 0.5,
       ),
     );
   }
@@ -596,54 +545,19 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            color: Colors.white38,
-            fontSize: 10,
-            fontWeight: FontWeight.w900,
-            letterSpacing: 1.5,
-          ),
-        ),
-        const SizedBox(height: 12),
+        _buildSectionLabel(label),
+        const SizedBox(height: AppSpacing.md),
         Wrap(
-          spacing: 8,
-          runSpacing: 8,
+          spacing: AppSpacing.sm,
+          runSpacing: AppSpacing.sm,
           children: items.map((item) {
-            final isSelected = selectedSet.contains(item.slug);
-            return GestureDetector(
+            return AppChip(
+              label: item.name,
+              selected: selectedSet.contains(item.slug),
               onTap: () {
                 onToggle(item.slug);
                 setState(() {});
               },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? AppColors.primary.withValues(alpha: 0.15)
-                      : Colors.white.withValues(alpha: 0.03),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: isSelected
-                        ? AppColors.primary
-                        : Colors.white.withValues(alpha: 0.08),
-                  ),
-                ),
-                child: Text(
-                  item.name,
-                  style: TextStyle(
-                    color: isSelected ? Colors.white : Colors.white60,
-                    fontSize: 13,
-                    fontWeight: isSelected
-                        ? FontWeight.bold
-                        : FontWeight.normal,
-                  ),
-                ),
-              ),
             );
           }).toList(),
         ),
@@ -655,27 +569,22 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'NĂM PHÁT HÀNH',
-          style: TextStyle(
-            color: Colors.white38,
-            fontSize: 10,
-            fontWeight: FontWeight.w900,
-            letterSpacing: 1.5,
-          ),
-        ),
-        const SizedBox(height: 12),
+        _buildSectionLabel('Năm phát hành'),
+        const SizedBox(height: AppSpacing.md),
         SizedBox(
-          height: 38,
+          height: 40,
           child: ListView.separated(
             padding: EdgeInsets.zero,
             scrollDirection: Axis.horizontal,
             itemCount: widget.years.length,
-            separatorBuilder: (context, index) => const SizedBox(width: 8),
+            separatorBuilder: (context, index) =>
+                const SizedBox(width: AppSpacing.sm),
             itemBuilder: (context, index) {
               final year = widget.years[index];
               final isSelected = _localYear == year.slug;
-              return GestureDetector(
+              return AppChip(
+                label: year.name,
+                selected: isSelected,
                 onTap: () {
                   final newYear = isSelected ? null : year.slug;
                   widget.onYearSelect(newYear);
@@ -683,32 +592,6 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
                     _localYear = newYear;
                   });
                 },
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? AppColors.primary.withValues(alpha: 0.15)
-                        : Colors.white.withValues(alpha: 0.03),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: isSelected
-                          ? AppColors.primary
-                          : Colors.white.withValues(alpha: 0.08),
-                    ),
-                  ),
-                  child: Text(
-                    year.name,
-                    style: TextStyle(
-                      color: isSelected ? Colors.white : Colors.white60,
-                      fontSize: 13,
-                      fontWeight: isSelected
-                          ? FontWeight.bold
-                          : FontWeight.normal,
-                    ),
-                  ),
-                ),
               );
             },
           ),
