@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -25,6 +26,8 @@ class _MainShellState extends ConsumerState<MainShell> {
   @override
   void initState() {
     super.initState();
+    // Bỏ qua check cập nhật khi đang chạy debug/dev.
+    if (!kReleaseMode) return;
     WidgetsBinding.instance.addPostFrameCallback((_) => _checkForUpdate());
   }
 
@@ -48,17 +51,19 @@ class _MainShellState extends ConsumerState<MainShell> {
   Widget build(BuildContext context) {
     final location = GoRouterState.of(context).matchedLocation;
     final selectedIndex = _indexForLocation(location);
+
+    // Android: nâng thanh nav lên trên thanh điều hướng cử chỉ/nút của hệ thống.
+    // iOS: giữ nguyên khoảng cách cũ (home indicator đã đủ chỗ).
+    final isAndroid = Theme.of(context).platform == TargetPlatform.android;
+    final bottomNavPad = isAndroid
+        ? MediaQuery.viewPaddingOf(context).bottom + 8
+        : (MediaQuery.paddingOf(context).bottom > 0 ? 6.0 : 12.0);
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       extendBody: true,
       body: widget.child,
       bottomNavigationBar: Padding(
-        padding: EdgeInsets.fromLTRB(
-          16,
-          0,
-          16,
-          MediaQuery.paddingOf(context).bottom > 0 ? 6 : 12,
-        ),
+        padding: EdgeInsets.fromLTRB(16, 0, 16, bottomNavPad),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(34),
           child: BackdropFilter(
