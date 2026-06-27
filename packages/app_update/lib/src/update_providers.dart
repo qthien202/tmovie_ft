@@ -23,10 +23,15 @@ final updateServiceProvider = Provider<UpdateService>((ref) {
 final appUpdateCheckProvider =
     FutureProvider.autoDispose<AppUpdateInfo?>((ref) async {
   final service = ref.watch(updateServiceProvider);
-  final info = await service.checkForUpdate();
+  final packageInfo = await PackageInfo.fromPlatform();
+
+  // Last segment of the application id, e.g. com.thientech.mobile -> "mobile".
+  // Used to pick this app's APK from a release that bundles several apps.
+  final appKeyword = packageInfo.packageName.split('.').last;
+
+  final info = await service.checkForUpdate(apkKeyword: appKeyword);
   if (info == null || info.downloadUrl.isEmpty) return null;
 
-  final packageInfo = await PackageInfo.fromPlatform();
   if (UpdateService.isNewerVersion(packageInfo.version, info.latestVersion)) {
     return info;
   }
