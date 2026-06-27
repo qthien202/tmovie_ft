@@ -106,12 +106,31 @@ jobs:
           cp apps/tv/build/app/outputs/flutter-apk/app-release.apk "dist/tmovie-tv-v$V.apk"
           cp apps/mobile/build/app/outputs/flutter-apk/app-release.apk "dist/tmovie-mobile-v$V.apk"
 
+      - name: Build release notes
+        id: notes
+        run: |
+          # The in-app updater shows the release body as PLAIN TEXT, so we hand-write
+          # human-readable notes in CHANGELOG.md and pull out the matching version
+          # section here — never the lazy auto-generated commit list.
+          V="${{ steps.ver.outputs.version }}"
+          NOTES="$RUNNER_TEMP/release-notes.md"
+          awk -v ver="## v$V" '
+            $0 == ver {grab=1; next}
+            grab && /^## v/ {exit}
+            grab {print}
+          ' CHANGELOG.md | sed '/./,$!d' > "$NOTES"
+          if [ ! -s "$NOTES" ]; then
+            echo "::error::No CHANGELOG.md section found for v$V. Add a '## v$V' entry before releasing."
+            exit 1
+          fi
+          echo "path=$NOTES" >> "$GITHUB_OUTPUT"
+
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.ver.outputs.tag }}
           name: TMovie v${{ steps.ver.outputs.version }}
-          generate_release_notes: true
+          body_path: ${{ steps.notes.outputs.path }}
           make_latest: true
           files: |
             dist/tmovie-tv-v${{ steps.ver.outputs.version }}.apk
