@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -41,81 +40,50 @@ class _MainShellState extends ConsumerState<MainShell> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      extendBody: true, // Cho phép nội dung hiển thị dưới BottomBar
       body: widget.child,
       bottomNavigationBar: Container(
-        height: 65,
-        margin: const EdgeInsets.fromLTRB(24, 0, 24, 12),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(30),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.6),
-                borderRadius: BorderRadius.circular(30),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.1),
-                  width: 1,
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: List.generate(_tabs.length, (index) {
-                  final isSelected = _selectedIndex == index;
-                  return GestureDetector(
+        decoration: const BoxDecoration(
+          color: AppColors.surfaceColor,
+          border: Border(top: BorderSide(color: AppColors.border)),
+        ),
+        child: SafeArea(
+          top: false,
+          child: SizedBox(
+            height: 62,
+            child: Row(
+              children: List.generate(_tabs.length, (index) {
+                final isSelected = _selectedIndex == index;
+                final color = isSelected
+                    ? AppColors.primaryValue
+                    : AppColors.textTertiary;
+                return Expanded(
+                  child: InkWell(
                     onTap: () {
                       setState(() => _selectedIndex = index);
-                      final route = _tabs[index]['route'] as String;
-                      context.go(route);
+                      context.go(_tabs[index]['route'] as String);
                     },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? AppColors.primaryValue.withValues(alpha: 0.15)
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            _tabs[index]['icon'] as IconData,
-                            color: isSelected
-                                ? AppColors.primaryValue
-                                : Colors.white.withValues(alpha: 0.5),
-                            size: 26,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          _tabs[index]['icon'] as IconData,
+                          color: color,
+                          size: AppSizes.iconMd,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          _tabs[index]['label'] as String,
+                          style: AppTypography.labelSmall.copyWith(
+                            color: color,
+                            fontWeight:
+                                isSelected ? FontWeight.w700 : FontWeight.w500,
                           ),
-                          if (isSelected) ...[
-                            const SizedBox(height: 4),
-                            Container(
-                              width: 4,
-                              height: 4,
-                              decoration: const BoxDecoration(
-                                color: AppColors.primaryValue,
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: AppColors.primaryValue,
-                                    blurRadius: 10,
-                                    spreadRadius: 2,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  );
-                }),
-              ),
+                  ),
+                );
+              }),
             ),
           ),
         ),
