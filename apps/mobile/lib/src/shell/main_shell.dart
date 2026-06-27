@@ -66,7 +66,7 @@ class _MainShellState extends ConsumerState<MainShell> {
           child: Row(
             children: List.generate(_tabs.length, (index) {
               final isSelected = _selectedIndex == index;
-              const accent = AppColors.primaryValue;
+              const active = Colors.white;
               const inactive = Color(0xFF8A949B);
               return Expanded(
                 child: InkWell(
@@ -84,25 +84,37 @@ class _MainShellState extends ConsumerState<MainShell> {
                         vertical: 7,
                       ),
                       decoration: BoxDecoration(
-                        // Active: soft highlight pill wrapping icon + label.
-                        color: isSelected
-                            ? Colors.white.withValues(alpha: 0.10)
-                            : Colors.transparent,
+                        // Active: dark frosted-glass pill (icon + label).
+                        gradient: isSelected
+                            ? LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.white.withValues(alpha: 0.10),
+                                  Colors.black.withValues(alpha: 0.22),
+                                ],
+                              )
+                            : null,
                         borderRadius: BorderRadius.circular(30),
+                        border: isSelected
+                            ? Border.all(
+                                color: Colors.white.withValues(alpha: 0.16),
+                              )
+                            : null,
                       ),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
                             _tabs[index]['icon'] as IconData,
-                            color: isSelected ? accent : inactive,
+                            color: isSelected ? active : inactive,
                             size: 22,
                           ),
                           const SizedBox(height: 2),
                           Text(
                             _tabs[index]['label'] as String,
                             style: AppTypography.labelSmall.copyWith(
-                              color: isSelected ? accent : inactive,
+                              color: isSelected ? active : inactive,
                               fontSize: 11,
                               fontWeight: isSelected
                                   ? FontWeight.w700
