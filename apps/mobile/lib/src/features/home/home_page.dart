@@ -86,7 +86,10 @@ class _HomePageState extends ConsumerState<HomePage>
                 expandedHeight: heroHeight,
                 pinned: true,
                 stretch: true,
-                primary: false,
+                // primary:true reserves the status-bar inset so the pinned
+                // TabBar clears the notch when collapsed; the hero still
+                // bleeds full-screen behind the status bar via flexibleSpace.
+                primary: true,
                 backgroundColor: AppColors.backgroundColor,
                 elevation: 0,
                 toolbarHeight: 0,
