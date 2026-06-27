@@ -95,7 +95,7 @@ class _MainShellState extends ConsumerState<MainShell> {
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
                               colors: [
-                                AppColors.primaryValue.withValues(alpha: 0.32),
+                                Colors.white.withValues(alpha: 0.28),
                                 Colors.white.withValues(alpha: 0.08),
                               ],
                             ),
@@ -113,8 +113,7 @@ class _MainShellState extends ConsumerState<MainShell> {
                               ),
                               // teal glow
                               BoxShadow(
-                                color: AppColors.primaryValue
-                                    .withValues(alpha: 0.30),
+                                color: Colors.white.withValues(alpha: 0.22),
                                 blurRadius: 16,
                                 spreadRadius: -4,
                               ),
