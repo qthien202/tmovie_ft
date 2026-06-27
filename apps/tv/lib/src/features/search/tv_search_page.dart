@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
+import 'package:catalog/catalog.dart';
 
 import '../../shared/tv_design_system.dart';
 import '../../shared/widgets/tv_film_card.dart';

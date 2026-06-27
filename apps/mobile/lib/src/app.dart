@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:core/core.dart';
+import 'package:design_system/design_system.dart';
 import 'router/app_router.dart';
 
 class TMovieApp extends StatefulWidget {

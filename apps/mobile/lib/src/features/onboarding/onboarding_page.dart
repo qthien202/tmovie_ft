@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:core/core.dart';
-import 'dart:ui';
+import 'package:design_system/design_system.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});

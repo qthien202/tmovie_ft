@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
 import 'package:core/core.dart';
+import 'package:media_library/media_library.dart';
 import '../../shared/tv_design_system.dart';
 import '../../shared/widgets/tv_focus_button.dart';
 import '../../shared/widgets/tv_focus_wrapper.dart';

@@ -3,13 +3,16 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
+import 'package:design_system/design_system.dart';
+import 'package:catalog/catalog.dart';
+import 'package:media_library/media_library.dart';
 
 import '../../shared/widgets/tv_sidebar.dart';
 import '../../shared/widgets/tv_shelf.dart';
 import '../../shared/widgets/tv_focus_button.dart';
 import '../../shared/tv_design_system.dart';
 import '../update/tv_update_dialog.dart';
-import '../update/tv_update_providers.dart';
+import 'package:app_update/app_update.dart';
 
 class TvHomePage extends ConsumerStatefulWidget {
   const TvHomePage({super.key});

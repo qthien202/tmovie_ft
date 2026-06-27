@@ -6,6 +6,33 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:core/core.dart';
 
+import 'app_update_info.dart';
+import 'update_service.dart';
+
+/// GitHub release-backed update service. Reuses the shared [dioProvider].
+final updateServiceProvider = Provider<UpdateService>((ref) {
+  return UpdateService(
+    ref.watch(dioProvider),
+    githubOwner: 'qthien202',
+    githubRepo: 'tmovie_ft',
+  );
+});
+
+/// Checks GitHub for a newer release than the currently installed version.
+/// Returns null when up-to-date, on network failure, or when no APK asset exists.
+final appUpdateCheckProvider =
+    FutureProvider.autoDispose<AppUpdateInfo?>((ref) async {
+  final service = ref.watch(updateServiceProvider);
+  final info = await service.checkForUpdate();
+  if (info == null || info.downloadUrl.isEmpty) return null;
+
+  final packageInfo = await PackageInfo.fromPlatform();
+  if (UpdateService.isNewerVersion(packageInfo.version, info.latestVersion)) {
+    return info;
+  }
+  return null;
+});
+
 enum UpdateDownloadStatus { idle, downloading, downloaded, installing, error }
 
 class UpdateDownloadState {
@@ -92,7 +119,10 @@ class UpdateDownloadNotifier extends StateNotifier<UpdateDownloadState> {
     state = state.copyWith(status: UpdateDownloadStatus.installing);
 
     try {
-      const channel = MethodChannel('com.thientech.tv/updater');
+      // Native channel name is derived per-app from the package id so the
+      // same logic works on both com.thientech.tv and com.thientech.mobile.
+      final packageInfo = await PackageInfo.fromPlatform();
+      final channel = MethodChannel('${packageInfo.packageName}/updater');
       await channel.invokeMethod('installApk', {'filePath': state.apkFilePath});
     } catch (e) {
       state = state.copyWith(
@@ -114,24 +144,7 @@ class UpdateDownloadNotifier extends StateNotifier<UpdateDownloadState> {
   }
 }
 
-final updateDownloadProvider =
-    StateNotifierProvider.autoDispose<UpdateDownloadNotifier, UpdateDownloadState>(
-  (ref) {
-    final service = ref.watch(updateServiceProvider);
-    return UpdateDownloadNotifier(service);
-  },
-);
-
-final appUpdateCheckProvider = FutureProvider.autoDispose<AppUpdateInfo?>((ref) async {
-  final service = ref.watch(updateServiceProvider);
-  final info = await service.checkForUpdate();
-  if (info == null || info.downloadUrl.isEmpty) return null;
-
-  final packageInfo = await PackageInfo.fromPlatform();
-  final currentVersion = packageInfo.version;
-
-  if (UpdateService.isNewerVersion(currentVersion, info.latestVersion)) {
-    return info;
-  }
-  return null;
+final updateDownloadProvider = StateNotifierProvider.autoDispose<
+    UpdateDownloadNotifier, UpdateDownloadState>((ref) {
+  return UpdateDownloadNotifier(ref.watch(updateServiceProvider));
 });

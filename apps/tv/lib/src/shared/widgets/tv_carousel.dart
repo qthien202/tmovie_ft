@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:core/core.dart';
+import 'package:design_system/design_system.dart';
 import '../tv_design_system.dart';
 
 class TvCarousel extends StatefulWidget {
