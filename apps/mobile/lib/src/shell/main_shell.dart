@@ -16,8 +16,6 @@ class MainShell extends ConsumerStatefulWidget {
 }
 
 class _MainShellState extends ConsumerState<MainShell> {
-  int _selectedIndex = 0;
-
   static const _tabs = [
     {'route': '/home', 'icon': Icons.home_rounded, 'label': 'Trang chủ'},
     {'route': '/search', 'icon': Icons.search_rounded, 'label': 'Tìm kiếm'},
@@ -37,80 +35,95 @@ class _MainShellState extends ConsumerState<MainShell> {
     }
   }
 
+  /// Derive the active tab from the current route so the highlight always
+  /// matches what's on screen (deep links, programmatic nav, etc.).
+  int _indexForLocation(String location) {
+    final i = _tabs.indexWhere(
+      (t) => location.startsWith(t['route'] as String),
+    );
+    return i < 0 ? 0 : i;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final location = GoRouterState.of(context).matchedLocation;
+    final selectedIndex = _indexForLocation(location);
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      extendBody: true, // Cho phép nội dung hiển thị dưới BottomBar
+      extendBody: true,
       body: widget.child,
-      bottomNavigationBar: Container(
-        height: 65,
-        margin: const EdgeInsets.fromLTRB(24, 0, 24, 12),
+      bottomNavigationBar: Padding(
+        padding: EdgeInsets.fromLTRB(
+          16,
+          0,
+          16,
+          MediaQuery.paddingOf(context).bottom > 0 ? 6 : 12,
+        ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(34),
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+            // Liquid glass: blur the content scrolling behind the bar.
+            filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
             child: Container(
+              height: 70,
               decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.6),
-                borderRadius: BorderRadius.circular(30),
+                color: AppColors.surfaceColor.withValues(alpha: 0.55),
+                borderRadius: BorderRadius.circular(34),
                 border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.1),
-                  width: 1,
+                  color: Colors.white.withValues(alpha: 0.12),
                 ),
               ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: List.generate(_tabs.length, (index) {
-                  final isSelected = _selectedIndex == index;
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() => _selectedIndex = index);
-                      final route = _tabs[index]['route'] as String;
-                      context.go(route);
-                    },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? AppColors.primaryValue.withValues(alpha: 0.15)
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            _tabs[index]['icon'] as IconData,
-                            color: isSelected
-                                ? AppColors.primaryValue
-                                : Colors.white.withValues(alpha: 0.5),
-                            size: 26,
+                  final isSelected = selectedIndex == index;
+                  const active = Colors.white;
+                  const inactive = Color(0xFF8A949B);
+                  return Expanded(
+                    child: InkWell(
+                      onTap: () => context.go(_tabs[index]['route'] as String),
+                      borderRadius: BorderRadius.circular(22),
+                      child: Center(
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 250),
+                          curve: Curves.easeOut,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 7,
                           ),
-                          if (isSelected) ...[
-                            const SizedBox(height: 4),
-                            Container(
-                              width: 4,
-                              height: 4,
-                              decoration: const BoxDecoration(
-                                color: AppColors.primaryValue,
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: AppColors.primaryValue,
-                                    blurRadius: 10,
-                                    spreadRadius: 2,
-                                  ),
-                                ],
+                          decoration: BoxDecoration(
+                            // Active: lighter frosted pill on the glass bar.
+                            color: isSelected
+                                ? Colors.white.withValues(alpha: 0.16)
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(30),
+                            border: isSelected
+                                ? Border.all(
+                                    color: Colors.white.withValues(alpha: 0.10),
+                                  )
+                                : null,
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                _tabs[index]['icon'] as IconData,
+                                color: isSelected ? active : inactive,
+                                size: 22,
                               ),
-                            ),
-                          ],
-                        ],
+                              const SizedBox(height: 2),
+                              Text(
+                                _tabs[index]['label'] as String,
+                                style: AppTypography.labelSmall.copyWith(
+                                  color: isSelected ? active : inactive,
+                                  fontSize: 11,
+                                  fontWeight: isSelected
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                   );

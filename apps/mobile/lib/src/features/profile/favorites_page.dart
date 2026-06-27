@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -14,13 +13,13 @@ class FavoritesPage extends ConsumerWidget {
     final favoritesAsync = ref.watch(favoritesProvider);
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.backgroundColor,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
           _buildHeader(context),
           SliverPadding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppSpacing.lg),
             sliver: favoritesAsync.when(
               data: (favorites) {
                 if (favorites.isEmpty) {
@@ -32,14 +31,13 @@ class FavoritesPage extends ConsumerWidget {
                 return SliverGrid(
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
-                    mainAxisSpacing: 16,
-                    crossAxisSpacing: 12,
+                    mainAxisSpacing: AppSpacing.lg,
+                    crossAxisSpacing: AppSpacing.md,
                     childAspectRatio: 0.65,
                   ),
                   delegate: SliverChildBuilderDelegate((context, index) {
                     final item = favorites[index];
-                    // Reusing the same grid item as it has the same fields
-                    return _FavoriteGridItem(item: item);
+                    return _PosterGridTile(item: item, subtitle: item.originName);
                   }, childCount: favorites.length),
                 );
               },
@@ -48,10 +46,7 @@ class FavoritesPage extends ConsumerWidget {
               ),
               error: (err, stack) => SliverFillRemaining(
                 child: Center(
-                  child: Text(
-                    'Error: $err',
-                    style: const TextStyle(color: Colors.white),
-                  ),
+                  child: Text('Error: $err', style: AppTypography.bodyMedium),
                 ),
               ),
             ),
@@ -63,27 +58,19 @@ class FavoritesPage extends ConsumerWidget {
 
   Widget _buildHeader(BuildContext context) {
     return SliverAppBar(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.backgroundColor,
       elevation: 0,
       pinned: true,
       centerTitle: true,
       leading: IconButton(
         icon: const Icon(
           Icons.arrow_back_ios_new_rounded,
-          color: Colors.white,
-          size: 20,
+          color: AppColors.textPrimary,
+          size: AppSizes.iconSm,
         ),
         onPressed: () => context.pop(),
       ),
-      title: const Text(
-        'Phim yêu thích',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          letterSpacing: 0.5,
-        ),
-      ),
+      title: Text('Phim yêu thích', style: AppTypography.titleLarge),
     );
   }
 
@@ -91,33 +78,28 @@ class FavoritesPage extends ConsumerWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(
+        const Icon(
           Icons.favorite_border_rounded,
           size: 80,
-          color: Colors.white.withValues(alpha: 0.05),
+          color: AppColors.border,
         ),
-        const SizedBox(height: 24),
-        const Text(
-          'Chưa có phim yêu thích',
-          style: TextStyle(
-            color: Colors.white54,
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 8),
-        const Text(
+        const SizedBox(height: AppSpacing.xl),
+        Text('Chưa có phim yêu thích', style: AppTypography.titleMedium),
+        const SizedBox(height: AppSpacing.sm),
+        Text(
           'Hãy nhấn ❤️ để lưu lại những bộ phim bạn thích',
-          style: TextStyle(color: Colors.white24, fontSize: 14),
+          style: AppTypography.bodyMedium,
         ),
       ],
     );
   }
 }
 
-class _FavoriteGridItem extends StatelessWidget {
+/// Poster + title + optional subtitle. Mirrors the History grid tile.
+class _PosterGridTile extends StatelessWidget {
   final WatchHistoryEntry item;
-  const _FavoriteGridItem({required this.item});
+  final String? subtitle;
+  const _PosterGridTile({required this.item, this.subtitle});
 
   @override
   Widget build(BuildContext context) {
@@ -129,17 +111,11 @@ class _FavoriteGridItem extends StatelessWidget {
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.4),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+                borderRadius: BorderRadius.circular(AppRadius.md),
+                boxShadow: AppElevation.sm,
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppRadius.md),
                 child: AppImage(
                   imageUrl: item.thumbUrl ?? '',
                   boxFit: BoxFit.cover,
@@ -148,27 +124,23 @@ class _FavoriteGridItem extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
           Text(
             item.name,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 12,
+            style: AppTypography.labelSmall.copyWith(
+              color: AppColors.textPrimary,
               fontWeight: FontWeight.w600,
             ),
           ),
-          if (item.originName != null) ...[
-            const SizedBox(height: 2),
+          if (subtitle != null) ...[
+            const SizedBox(height: AppSpacing.xxs),
             Text(
-              item.originName!,
+              subtitle!,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.4),
-                fontSize: 10,
-              ),
+              style: AppTypography.labelSmall.copyWith(fontSize: 10),
             ),
           ],
         ],

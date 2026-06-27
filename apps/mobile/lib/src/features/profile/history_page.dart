@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -14,13 +13,13 @@ class HistoryPage extends ConsumerWidget {
     final historyAsync = ref.watch(watchHistoryProvider);
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.backgroundColor,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
           _buildHeader(context),
           SliverPadding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppSpacing.lg),
             sliver: historyAsync.when(
               data: (history) {
                 if (history.isEmpty) {
@@ -32,13 +31,18 @@ class HistoryPage extends ConsumerWidget {
                 return SliverGrid(
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
-                    mainAxisSpacing: 16,
-                    crossAxisSpacing: 12,
+                    mainAxisSpacing: AppSpacing.lg,
+                    crossAxisSpacing: AppSpacing.md,
                     childAspectRatio: 0.65,
                   ),
                   delegate: SliverChildBuilderDelegate((context, index) {
                     final item = history[index];
-                    return _HistoryGridItem(item: item);
+                    return _PosterGridTile(
+                      item: item,
+                      subtitle: item.episode != null
+                          ? 'Tập ${item.episode}'
+                          : null,
+                    );
                   }, childCount: history.length),
                 );
               },
@@ -47,10 +51,7 @@ class HistoryPage extends ConsumerWidget {
               ),
               error: (err, stack) => SliverFillRemaining(
                 child: Center(
-                  child: Text(
-                    'Error: $err',
-                    style: const TextStyle(color: Colors.white),
-                  ),
+                  child: Text('Error: $err', style: AppTypography.bodyMedium),
                 ),
               ),
             ),
@@ -62,27 +63,19 @@ class HistoryPage extends ConsumerWidget {
 
   Widget _buildHeader(BuildContext context) {
     return SliverAppBar(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.backgroundColor,
       elevation: 0,
       pinned: true,
       centerTitle: true,
       leading: IconButton(
         icon: const Icon(
           Icons.arrow_back_ios_new_rounded,
-          color: Colors.white,
-          size: 20,
+          color: AppColors.textPrimary,
+          size: AppSizes.iconSm,
         ),
         onPressed: () => context.pop(),
       ),
-      title: const Text(
-        'Lịch sử xem',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          letterSpacing: 0.5,
-        ),
-      ),
+      title: Text('Lịch sử xem', style: AppTypography.titleLarge),
     );
   }
 
@@ -90,33 +83,28 @@ class HistoryPage extends ConsumerWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(
+        const Icon(
           Icons.history_rounded,
           size: 80,
-          color: Colors.white.withValues(alpha: 0.05),
+          color: AppColors.border,
         ),
-        const SizedBox(height: 24),
-        const Text(
-          'Chưa có lịch sử xem',
-          style: TextStyle(
-            color: Colors.white54,
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 8),
-        const Text(
+        const SizedBox(height: AppSpacing.xl),
+        Text('Chưa có lịch sử xem', style: AppTypography.titleMedium),
+        const SizedBox(height: AppSpacing.sm),
+        Text(
           'Hãy bắt đầu xem những bộ phim bạn thích',
-          style: TextStyle(color: Colors.white24, fontSize: 14),
+          style: AppTypography.bodyMedium,
         ),
       ],
     );
   }
 }
 
-class _HistoryGridItem extends StatelessWidget {
+/// Poster + title + optional subtitle. Shared by History & Favorites grids.
+class _PosterGridTile extends StatelessWidget {
   final WatchHistoryEntry item;
-  const _HistoryGridItem({required this.item});
+  final String? subtitle;
+  const _PosterGridTile({required this.item, this.subtitle});
 
   @override
   Widget build(BuildContext context) {
@@ -128,17 +116,11 @@ class _HistoryGridItem extends StatelessWidget {
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.4),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+                borderRadius: BorderRadius.circular(AppRadius.md),
+                boxShadow: AppElevation.sm,
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppRadius.md),
                 child: AppImage(
                   imageUrl: item.thumbUrl ?? '',
                   boxFit: BoxFit.cover,
@@ -147,25 +129,23 @@ class _HistoryGridItem extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
           Text(
             item.name,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 12,
+            style: AppTypography.labelSmall.copyWith(
+              color: AppColors.textPrimary,
               fontWeight: FontWeight.w600,
             ),
           ),
-          if (item.episode != null) ...[
-            const SizedBox(height: 2),
+          if (subtitle != null) ...[
+            const SizedBox(height: AppSpacing.xxs),
             Text(
-              'Tập ${item.episode}',
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.4),
-                fontSize: 10,
-              ),
+              subtitle!,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: AppTypography.labelSmall.copyWith(fontSize: 10),
             ),
           ],
         ],

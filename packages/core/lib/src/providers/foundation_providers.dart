@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../database/app_database.dart';
 import '../network/dio_provider.dart';
 import '../network/api_service.dart';
 import '../network/tmdb_service.dart';
@@ -22,8 +23,18 @@ final apiServiceProvider = Provider<ApiService>((ref) {
   return ApiService(ref.watch(dioProvider));
 });
 
+/// Local Drift database — source of truth for the catalog (offline-first).
+final appDatabaseProvider = Provider<AppDatabase>((ref) {
+  final db = AppDatabase();
+  ref.onDispose(db.close);
+  return db;
+});
+
 final filmRepositoryProvider = Provider<FilmRepository>((ref) {
-  return FilmRepositoryImpl(ref.watch(apiServiceProvider));
+  return FilmRepositoryImpl(
+    ref.watch(apiServiceProvider),
+    ref.watch(appDatabaseProvider),
+  );
 });
 
 final tmdbServiceProvider = Provider<TmdbService>((ref) {

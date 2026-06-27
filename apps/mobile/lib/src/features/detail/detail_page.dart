@@ -110,16 +110,13 @@ class _DetailPageState extends ConsumerState<DetailPage>
     final detailAsync = ref.watch(filmDetailProvider(widget.slug));
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.backgroundColor,
       body: detailAsync.when(
         data: (response) {
           final film = response.data?.item;
           if (film == null) {
-            return const Center(
-              child: Text(
-                'Không tìm thấy phim',
-                style: TextStyle(color: Colors.white),
-              ),
+            return Center(
+              child: Text('Không tìm thấy phim', style: AppTypography.bodyLarge),
             );
           }
 
@@ -161,7 +158,9 @@ class _DetailPageState extends ConsumerState<DetailPage>
                     expandedHeight: MediaQuery.of(context).size.height * 0.6,
                     pinned: true,
                     stretch: true,
-                    backgroundColor: Colors.black.withValues(alpha: 0.5),
+                    backgroundColor: AppColors.backgroundColor.withValues(
+                      alpha: 0.5,
+                    ),
                     elevation: 0,
                     leadingWidth: 70,
                     leading: _buildGlassBackButton(),
@@ -225,15 +224,12 @@ class _DetailPageState extends ConsumerState<DetailPage>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
-                'Có lỗi xảy ra',
-                style: TextStyle(color: Colors.white),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
+              Text('Có lỗi xảy ra', style: AppTypography.titleMedium),
+              const SizedBox(height: AppSpacing.lg),
+              AppButton(
+                label: 'Thử lại',
                 onPressed: () =>
                     ref.invalidate(filmDetailProvider(widget.slug)),
-                child: const Text('Thử lại'),
               ),
             ],
           ),
@@ -400,65 +396,46 @@ class _DetailPageState extends ConsumerState<DetailPage>
   }
 
   Widget _buildPlayButton(FilmDetail film) {
-    return Container(
-      decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.3),
-            blurRadius: 25,
-            spreadRadius: 2,
-          ),
-        ],
-      ),
-      child: ElevatedButton.icon(
-        onPressed: () => _onPlayTap(film),
-        icon: const Icon(Icons.play_arrow_rounded, size: 30),
-        label: const Text(
-          'XEM PHIM',
-          style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.2),
-        ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-        ),
-      ),
+    return AppButton(
+      label: 'Xem phim',
+      icon: Icons.play_arrow_rounded,
+      size: AppButtonSize.lg,
+      onPressed: () => _onPlayTap(film),
     );
   }
 
   Widget _buildGlassTabBar() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.sm,
+      ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: Container(
             height: 50,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.03),
-              borderRadius: BorderRadius.circular(15),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+              color: AppColors.surfaceColor.withValues(alpha: 0.5),
+              borderRadius: BorderRadius.circular(AppRadius.lg),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.08),
+              ),
             ),
             child: TabBar(
               controller: _tabController,
-              indicatorColor: AppColors.primary,
+              indicatorColor: AppColors.primaryValue,
               indicatorWeight: 3,
               indicatorSize: TabBarIndicatorSize.label,
               dividerColor: Colors.transparent,
-              labelColor: AppColors.primary,
-              unselectedLabelColor: Colors.white54,
-              labelStyle: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 13,
-              ),
+              labelColor: AppColors.primaryValue,
+              unselectedLabelColor: AppColors.textSecondary,
+              labelStyle: AppTypography.labelMedium,
+              unselectedLabelStyle: AppTypography.labelMedium,
               tabs: const [
-                Tab(text: 'THÔNG TIN'),
-                Tab(text: 'TẬP PHIM'),
+                Tab(text: 'Thông tin'),
+                Tab(text: 'Tập phim'),
               ],
             ),
           ),
@@ -475,20 +452,20 @@ class _DetailPageState extends ConsumerState<DetailPage>
       left: 16,
       right: 16,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(25),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.6),
-              borderRadius: BorderRadius.circular(25),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+              color: AppColors.surfaceColor.withValues(alpha: 0.7),
+              borderRadius: BorderRadius.circular(AppRadius.xl),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
             ),
             child: Row(
               children: [
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
                   child: AppImage(
                     imageUrl: film.fullThumbUrl,
                     width: 50,
@@ -496,7 +473,7 @@ class _DetailPageState extends ConsumerState<DetailPage>
                     boxFit: BoxFit.cover,
                   ),
                 ),
-                const SizedBox(width: 15),
+                const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -506,39 +483,22 @@ class _DetailPageState extends ConsumerState<DetailPage>
                         film.name ?? '',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: AppTypography.titleMedium,
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: AppSpacing.xxs),
                       Text(
                         film.episodeCurrent ?? 'Mới nhất',
-                        style: TextStyle(
-                          color: AppColors.primary.withValues(alpha: 0.7),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
+                        style: AppTypography.labelSmall.copyWith(
+                          color: AppColors.secondary,
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(width: 10),
-                ElevatedButton(
+                const SizedBox(width: AppSpacing.md),
+                AppButton(
+                  label: 'Xem ngay',
                   onPressed: () => _onPlayTap(film),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                  ),
-                  child: const Text(
-                    'XEM NGAY',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
                 ),
               ],
             ),

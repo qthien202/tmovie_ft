@@ -97,11 +97,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      const Text(
+                      Text(
                         'TMovie',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 32,
+                        style: AppTypography.displayLarge.copyWith(
                           fontWeight: FontWeight.w900,
                           letterSpacing: 1,
                         ),
@@ -121,21 +119,14 @@ class _OnboardingPageState extends State<OnboardingPage> {
                         Text(
                           _onboardingData[_currentPage]['title']!,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: -0.5,
-                          ),
+                          style: AppTypography.headlineLarge,
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppSpacing.lg),
                         Text(
                           _onboardingData[_currentPage]['description']!,
                           textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.6),
-                            fontSize: 16,
-                            height: 1.5,
+                          style: AppTypography.bodyLarge.copyWith(
+                            color: AppColors.textSecondary,
                           ),
                         ),
                       ],
@@ -168,7 +159,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
                       ),
 
                       // Next/Start Button
-                      ElevatedButton(
+                      AppButton(
+                        label: _currentPage == _onboardingData.length - 1
+                            ? 'Bắt đầu ngay'
+                            : 'Tiếp tục',
+                        size: AppButtonSize.lg,
                         onPressed: () {
                           if (_currentPage == _onboardingData.length - 1) {
                             context.go('/login');
@@ -179,30 +174,6 @@ class _OnboardingPageState extends State<OnboardingPage> {
                             );
                           }
                         },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryValue,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 16,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          elevation: 10,
-                          shadowColor: AppColors.primaryValue.withValues(
-                            alpha: 0.5,
-                          ),
-                        ),
-                        child: Text(
-                          _currentPage == _onboardingData.length - 1
-                              ? 'BẮT ĐẦU NGAY'
-                              : 'TIẾP TỤC',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1.2,
-                          ),
-                        ),
                       ),
                     ],
                   ),
@@ -221,9 +192,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 onPressed: () => context.go('/login'),
                 child: Text(
                   'Bỏ qua',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.5),
-                    fontWeight: FontWeight.w600,
+                  style: AppTypography.labelMedium.copyWith(
+                    color: AppColors.textSecondary,
                   ),
                 ),
               ),
