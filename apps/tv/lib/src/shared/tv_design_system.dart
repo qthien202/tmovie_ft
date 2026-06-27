@@ -6,7 +6,7 @@ class TvDesignSystem {
 
   // ─── Color Palette ─── (Matching Mobile AppColors)
   static const Color primary = AppColors.primaryValue; // Electric Blue 2026
-  static const Color secondary = Color(0xFF60A5FA);
+  static const Color secondary = AppColors.secondary;
   static const Color accent = AppColors.primaryValue;
   static const Color background = AppColors.backgroundColor; // OLED Black
   static const Color surface = Color(0xFF121212); // Dark Grey Surface
@@ -107,7 +107,7 @@ class TvDesignSystem {
 
   // ─── Gradients ───
   static const LinearGradient primaryGradient = LinearGradient(
-    colors: [primary, Color(0xFF1D4ED8)],
+    colors: [primary, AppColors.primaryDim],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
