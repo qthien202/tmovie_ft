@@ -1,11 +1,22 @@
 // TMovie shared UI: theme + reusable widgets.
 export 'package:shimmer/shimmer.dart';
 
-// Theme
+// Design tokens
 export 'src/theme/app_colors.dart';
+export 'src/theme/app_spacing.dart';
+export 'src/theme/app_radius.dart';
+export 'src/theme/app_typography.dart';
+export 'src/theme/app_sizes.dart';
+export 'src/theme/app_motion.dart';
+export 'src/theme/app_elevation.dart';
 export 'src/theme/app_theme.dart';
 
 // Widgets
+export 'src/widgets/app_button.dart';
+export 'src/widgets/app_card.dart';
+export 'src/widgets/app_chip.dart';
+export 'src/widgets/app_text_field.dart';
+export 'src/widgets/section_header.dart';
 export 'src/widgets/app_image.dart';
 export 'src/widgets/film_card.dart';
 export 'src/widgets/film_grid.dart';

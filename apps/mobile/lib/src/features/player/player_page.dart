@@ -132,12 +132,10 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
       );
 
       // Save position periodically
-      if (_positionSaveTimer == null) {
-        _positionSaveTimer = Timer.periodic(
-          const Duration(seconds: 10),
-          (_) => _saveCurrentPosition(),
-        );
-      }
+      _positionSaveTimer ??= Timer.periodic(
+        const Duration(seconds: 10),
+        (_) => _saveCurrentPosition(),
+      );
 
       if (mounted) setState(() {});
     } catch (e) {
@@ -146,8 +144,9 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
   }
 
   Future<void> _saveCurrentPosition() async {
-    if (_videoController == null || !_videoController!.value.isInitialized)
+    if (_videoController == null || !_videoController!.value.isInitialized) {
       return;
+    }
     final position = _videoController!.value.position.inSeconds;
     if (position <= 0) return;
     final repo = ref.read(historyRepositoryProvider);
@@ -567,13 +566,7 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
               ),
             ),
             const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: _exitPlayer,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryValue,
-              ),
-              child: const Text('Quay lại'),
-            ),
+            AppButton(label: 'Quay lại', onPressed: _exitPlayer),
           ],
         ),
       ),
@@ -659,10 +652,11 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
                                 ),
                                 selected: isSelected,
                                 onSelected: (val) {
-                                  if (val)
+                                  if (val) {
                                     setState(
                                       () => _selectedServerIndex = index,
                                     );
+                                  }
                                 },
                                 selectedColor: AppColors.primaryValue,
                                 backgroundColor: Colors.white10,

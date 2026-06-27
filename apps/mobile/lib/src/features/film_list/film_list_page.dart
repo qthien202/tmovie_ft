@@ -135,6 +135,11 @@ class _FilmListPageState extends ConsumerState<FilmListPage> {
     });
   }
 
+  int get _activeFilterCount =>
+      _selectedGenres.length +
+      _selectedCountries.length +
+      (_selectedYear != null ? 1 : 0);
+
   @override
   Widget build(BuildContext context) {
     // Build filter params based on current selections
@@ -189,10 +194,10 @@ class _FilmListPageState extends ConsumerState<FilmListPage> {
         : null;
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.backgroundColor,
       body: Stack(
         children: [
-          // Background
+          // Cinematic blurred backdrop of the first result.
           if (firstFilm != null)
             Positioned.fill(
               child: AnimatedSwitcher(
@@ -213,9 +218,9 @@ class _FilmListPageState extends ConsumerState<FilmListPage> {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Colors.black.withValues(alpha: 0.6),
-                      Colors.black.withValues(alpha: 0.8),
-                      Colors.black,
+                      AppColors.backgroundColor.withValues(alpha: 0.7),
+                      AppColors.backgroundColor.withValues(alpha: 0.9),
+                      AppColors.backgroundColor,
                     ],
                   ),
                 ),
@@ -237,56 +242,74 @@ class _FilmListPageState extends ConsumerState<FilmListPage> {
               child: CustomScrollView(
                 physics: const BouncingScrollPhysics(),
                 slivers: [
-                  // Minimalist Header
+                  // Header: back · title · filter
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSpacing.lg,
+                        AppSpacing.md,
+                        AppSpacing.lg,
+                        0,
+                      ),
                       child: Row(
                         children: [
-                          _buildGlassButton(
+                          _IconButton(
                             icon: Icons.chevron_left_rounded,
                             onTap: () => context.pop(),
                           ),
-                          const Spacer(),
-                          _buildDynamicTitleBadge(),
-                          const Spacer(),
-                          _buildGlassButton(
+                          const SizedBox(width: AppSpacing.md),
+                          Expanded(
+                            child: Text(
+                              widget.title,
+                              style: AppTypography.titleLarge,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.md),
+                          _IconButton(
                             icon: Icons.tune_rounded,
                             onTap: _showFilterSheet,
-                            badgeCount:
-                                (_selectedGenres.length +
-                                _selectedCountries.length +
-                                (_selectedYear != null ? 1 : 0)),
+                            badgeCount: _activeFilterCount,
                           ),
                         ],
                       ),
                     ),
                   ),
 
-                  // Search Field
-                  SliverAppBar(
-                    pinned: false,
-                    floating: true,
-                    backgroundColor: Colors.transparent,
-                    elevation: 0,
-                    toolbarHeight: 65,
-                    titleSpacing: 16,
-                    automaticallyImplyLeading: false,
-                    title: _buildCompactSearchField(),
+                  // Search field
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSpacing.lg,
+                        AppSpacing.md,
+                        AppSpacing.lg,
+                        AppSpacing.md,
+                      ),
+                      child: AppTextField(
+                        controller: _searchController,
+                        hint: 'Nhập tên phim cần tìm...',
+                        prefixIcon: Icons.search_rounded,
+                        onChanged: _onSearchChanged,
+                        onClear: _searchController.text.isNotEmpty
+                            ? () {
+                                _searchController.clear();
+                                _onSearchChanged('');
+                              }
+                            : null,
+                      ),
+                    ),
                   ),
 
-                  // Quick Genre Chips & Active Filters
+                  // Quick genre chips & active filters
                   SliverToBoxAdapter(
                     child: Column(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
+                          padding: const EdgeInsets.only(bottom: AppSpacing.sm),
                           child: _buildQuickGenreScroll(),
                         ),
-                        if (_selectedGenres.isNotEmpty ||
-                            _selectedCountries.isNotEmpty ||
-                            _selectedYear != null)
-                          _buildActiveFilterChips(),
+                        if (_activeFilterCount > 0) _buildActiveFilterChips(),
                       ],
                     ),
                   ),
@@ -296,8 +319,8 @@ class _FilmListPageState extends ConsumerState<FilmListPage> {
                     const SliverFillRemaining(
                       child: Padding(
                         padding: EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 24,
+                          horizontal: AppSpacing.lg,
+                          vertical: AppSpacing.xl,
                         ),
                         child: FilmGridSkeleton(),
                       ),
@@ -306,17 +329,19 @@ class _FilmListPageState extends ConsumerState<FilmListPage> {
                       filmListState.items.isEmpty)
                     SliverFillRemaining(child: _buildErrorState(provider))
                   else if (filmListState.items.isEmpty)
-                    const SliverFillRemaining(
+                    SliverFillRemaining(
                       child: Center(
                         child: Text(
                           'Không tìm thấy nội dung phù hợp',
-                          style: TextStyle(color: Colors.white38, fontSize: 13),
+                          style: AppTypography.bodyMedium,
                         ),
                       ),
                     )
                   else
                     SliverPadding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.lg,
+                      ),
                       sliver: FilmGrid.asSliver(
                         films: filmListState.items,
                         onFilmTap: (film) =>
@@ -329,7 +354,7 @@ class _FilmListPageState extends ConsumerState<FilmListPage> {
                       child: Padding(
                         padding: EdgeInsets.symmetric(
                           vertical: 40,
-                          horizontal: 16,
+                          horizontal: AppSpacing.lg,
                         ),
                         child: FilmGridSkeleton(count: 3),
                       ),
@@ -345,172 +370,22 @@ class _FilmListPageState extends ConsumerState<FilmListPage> {
     );
   }
 
-  Widget _buildGlassButton({
-    required IconData icon,
-    required VoidCallback onTap,
-    int badgeCount = 0,
-  }) {
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: GestureDetector(
-              onTap: onTap,
-              child: Container(
-                width: 42,
-                height: 42,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.12),
-                  ),
-                ),
-                child: Icon(icon, color: Colors.white, size: 22),
-              ),
-            ),
-          ),
-        ),
-        if (badgeCount > 0)
-          Positioned(
-            top: -4,
-            right: -4,
-            child: Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                shape: BoxShape.circle,
-              ),
-              child: Text(
-                '$badgeCount',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildDynamicTitleBadge() {
-    String title = widget.title.toUpperCase();
-    if (_searchQuery != null) {
-      title = 'TÌM KIẾM';
-    } else if (_selectedGenres.isNotEmpty ||
-        _selectedCountries.isNotEmpty ||
-        _selectedYear != null) {
-      title = 'LỌC KẾT QUẢ';
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
-      decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
-      ),
-      child: Text(
-        title,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 12,
-          fontWeight: FontWeight.w900,
-          letterSpacing: 1.2,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCompactSearchField() {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(14),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Container(
-          height: 46,
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.07),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-          ),
-          child: TextField(
-            controller: _searchController,
-            onChanged: _onSearchChanged,
-            style: const TextStyle(color: Colors.white, fontSize: 13),
-            decoration: InputDecoration(
-              hintText: 'Nhập tên phim cần tìm...',
-              hintStyle: const TextStyle(color: Colors.white24, fontSize: 13),
-              prefixIcon: const Icon(
-                Icons.search_rounded,
-                color: Colors.white54,
-                size: 18,
-              ),
-              suffixIcon: _searchController.text.isNotEmpty
-                  ? IconButton(
-                      icon: const Icon(
-                        Icons.close_rounded,
-                        color: Colors.white54,
-                        size: 16,
-                      ),
-                      onPressed: () {
-                        _searchController.clear();
-                        _onSearchChanged('');
-                      },
-                    )
-                  : null,
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(vertical: 11),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildQuickGenreScroll() {
     return SizedBox(
-      height: 38,
+      height: 40,
       child: ListView.separated(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
         itemCount: _genres.length,
-        separatorBuilder: (context, index) => const SizedBox(width: 8),
+        separatorBuilder: (context, index) =>
+            const SizedBox(width: AppSpacing.sm),
         itemBuilder: (context, index) {
           final genre = _genres[index];
-          final isSelected = _selectedGenres.contains(genre.slug);
-          return GestureDetector(
+          return AppChip(
+            label: genre.name,
+            selected: _selectedGenres.contains(genre.slug),
             onTap: () => _toggleGenre(genre.slug),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 250),
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? AppColors.primary
-                    : Colors.white.withValues(alpha: 0.05),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: isSelected
-                      ? AppColors.primary
-                      : Colors.white.withValues(alpha: 0.1),
-                ),
-              ),
-              child: Text(
-                genre.name,
-                style: TextStyle(
-                  color: isSelected ? Colors.white : Colors.white60,
-                  fontSize: 12,
-                  fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
-                ),
-              ),
-            ),
           );
         },
       ),
@@ -556,32 +431,34 @@ class _FilmListPageState extends ConsumerState<FilmListPage> {
 
     return Container(
       height: 44,
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
       child: ListView.separated(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
         scrollDirection: Axis.horizontal,
         itemCount: filters.length,
-        separatorBuilder: (context, index) => const SizedBox(width: 8),
+        separatorBuilder: (context, index) =>
+            const SizedBox(width: AppSpacing.sm),
         itemBuilder: (context, index) {
           final filter = filters[index];
           return Chip(
             label: Text(
               filter.label,
-              style: const TextStyle(color: Colors.white, fontSize: 11),
+              style: AppTypography.labelSmall.copyWith(
+                color: AppColors.primaryValue,
+              ),
             ),
-            backgroundColor: AppColors.primary.withValues(alpha: 0.2),
-            side: BorderSide(color: AppColors.primary.withValues(alpha: 0.5)),
+            backgroundColor: AppColors.primaryValue.withValues(alpha: 0.14),
+            side: BorderSide(
+              color: AppColors.primaryValue.withValues(alpha: 0.4),
+            ),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(AppRadius.pill),
             ),
-            deleteIcon: const Icon(
-              Icons.close_rounded,
-              color: Colors.white70,
-              size: 14,
-            ),
+            deleteIcon: const Icon(Icons.close_rounded, size: 14),
+            deleteIconColor: AppColors.primaryValue,
             onDeleted: filter.onRemove,
             visualDensity: VisualDensity.compact,
-            padding: const EdgeInsets.symmetric(horizontal: 4),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
           );
         },
       ),
@@ -595,24 +472,81 @@ class _FilmListPageState extends ConsumerState<FilmListPage> {
         children: [
           const Icon(
             Icons.error_outline_rounded,
-            color: Colors.white24,
+            color: AppColors.textTertiary,
             size: 60,
           ),
-          const SizedBox(height: 16),
-          const Text('Có lỗi xảy ra', style: TextStyle(color: Colors.white70)),
-          const SizedBox(height: 24),
-          ElevatedButton(
+          const SizedBox(height: AppSpacing.lg),
+          Text('Có lỗi xảy ra', style: AppTypography.titleMedium),
+          const SizedBox(height: AppSpacing.xl),
+          AppButton(
+            label: 'Thử lại',
             onPressed: () => ref.read(provider.notifier).loadFirstPage(),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            child: const Text('Thử lại'),
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Token-styled square icon button used in the header.
+class _IconButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+  final int badgeCount;
+
+  const _IconButton({
+    required this.icon,
+    required this.onTap,
+    this.badgeCount = 0,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Material(
+          color: AppColors.surfaceElevated,
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(AppRadius.md),
+            child: Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(AppRadius.md),
+                border: Border.all(color: AppColors.border),
+              ),
+              child: Icon(
+                icon,
+                color: AppColors.textPrimary,
+                size: AppSizes.iconMd,
+              ),
+            ),
+          ),
+        ),
+        if (badgeCount > 0)
+          Positioned(
+            top: -4,
+            right: -4,
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: const BoxDecoration(
+                color: AppColors.primaryValue,
+                shape: BoxShape.circle,
+              ),
+              child: Text(
+                '$badgeCount',
+                style: AppTypography.labelSmall.copyWith(
+                  color: AppColors.onPrimary,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }
@@ -658,27 +592,19 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFF161616),
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+      decoration: const BoxDecoration(
+        color: AppColors.surfaceElevated,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
+        border: Border.fromBorderSide(BorderSide(color: AppColors.border)),
       ),
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(AppSpacing.xl),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Text(
-                'BỘ LỌC NÂNG CAO',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 1.5,
-                ),
-              ),
+              Text('Bộ lọc nâng cao', style: AppTypography.titleLarge),
               const Spacer(),
               TextButton(
                 onPressed: () {
@@ -689,57 +615,51 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
                 },
                 child: Text(
                   'Xóa tất cả',
-                  style: TextStyle(
-                    color: AppColors.primary,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
+                  style: AppTypography.labelMedium.copyWith(
+                    color: AppColors.primaryValue,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.xl),
 
           _buildSection(
-            'THỂ LOẠI (CHỌN NHIỀU)',
+            'Thể loại (chọn nhiều)',
             widget.genres,
             widget.selectedGenres,
             widget.onGenreToggle,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.xl),
           _buildSection(
-            'QUỐC GIA (CHỌN NHIỀU)',
+            'Quốc gia (chọn nhiều)',
             widget.countries,
             widget.selectedCountries,
             widget.onCountryToggle,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.xl),
           _buildYearSection(),
 
-          const SizedBox(height: 40),
-          SizedBox(
-            width: double.infinity,
-            height: 52,
-            child: ElevatedButton(
-              onPressed: () => Navigator.pop(context),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-              child: const Text(
-                'XEM KẾT QUẢ',
-                style: TextStyle(
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 1.2,
-                ),
-              ),
-            ),
+          const SizedBox(height: AppSpacing.xxl),
+          AppButton(
+            label: 'Xem kết quả',
+            expanded: true,
+            size: AppButtonSize.lg,
+            onPressed: () => Navigator.pop(context),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSpacing.lg),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSectionLabel(String label) {
+    return Text(
+      label,
+      style: AppTypography.labelSmall.copyWith(
+        color: AppColors.textSecondary,
+        fontWeight: FontWeight.w700,
+        letterSpacing: 0.5,
       ),
     );
   }
@@ -753,54 +673,19 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            color: Colors.white38,
-            fontSize: 10,
-            fontWeight: FontWeight.w900,
-            letterSpacing: 1.5,
-          ),
-        ),
-        const SizedBox(height: 12),
+        _buildSectionLabel(label),
+        const SizedBox(height: AppSpacing.md),
         Wrap(
-          spacing: 8,
-          runSpacing: 8,
+          spacing: AppSpacing.sm,
+          runSpacing: AppSpacing.sm,
           children: items.map((item) {
-            final isSelected = selectedSet.contains(item.slug);
-            return GestureDetector(
+            return AppChip(
+              label: item.name,
+              selected: selectedSet.contains(item.slug),
               onTap: () {
                 onToggle(item.slug);
                 setState(() {});
               },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? AppColors.primary.withValues(alpha: 0.15)
-                      : Colors.white.withValues(alpha: 0.03),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: isSelected
-                        ? AppColors.primary
-                        : Colors.white.withValues(alpha: 0.08),
-                  ),
-                ),
-                child: Text(
-                  item.name,
-                  style: TextStyle(
-                    color: isSelected ? Colors.white : Colors.white60,
-                    fontSize: 13,
-                    fontWeight: isSelected
-                        ? FontWeight.bold
-                        : FontWeight.normal,
-                  ),
-                ),
-              ),
             );
           }).toList(),
         ),
@@ -812,26 +697,21 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'NĂM PHÁT HÀNH',
-          style: TextStyle(
-            color: Colors.white38,
-            fontSize: 10,
-            fontWeight: FontWeight.w900,
-            letterSpacing: 1.5,
-          ),
-        ),
-        const SizedBox(height: 12),
+        _buildSectionLabel('Năm phát hành'),
+        const SizedBox(height: AppSpacing.md),
         SizedBox(
           height: 40,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: widget.years.length,
-            separatorBuilder: (context, index) => const SizedBox(width: 8),
+            separatorBuilder: (context, index) =>
+                const SizedBox(width: AppSpacing.sm),
             itemBuilder: (context, index) {
               final year = widget.years[index];
               final isSelected = _localYear == year.slug;
-              return GestureDetector(
+              return AppChip(
+                label: year.name,
+                selected: isSelected,
                 onTap: () {
                   final newYear = isSelected ? null : year.slug;
                   widget.onYearSelect(newYear);
@@ -839,32 +719,6 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
                     _localYear = newYear;
                   });
                 },
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? AppColors.primary.withValues(alpha: 0.15)
-                        : Colors.white.withValues(alpha: 0.03),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: isSelected
-                          ? AppColors.primary
-                          : Colors.white.withValues(alpha: 0.08),
-                    ),
-                  ),
-                  child: Text(
-                    year.name,
-                    style: TextStyle(
-                      color: isSelected ? Colors.white : Colors.white60,
-                      fontSize: 13,
-                      fontWeight: isSelected
-                          ? FontWeight.bold
-                          : FontWeight.normal,
-                    ),
-                  ),
-                ),
               );
             },
           ),
