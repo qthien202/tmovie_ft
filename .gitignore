@@ -58,3 +58,11 @@ app.*.map.json
 **/GoogleService-Info.plist
 **/firebase_options.dart
 json/
+
+# Analyzer / build output dumps
+analysis.txt
+**/analyze_output*.txt
+
+# Agent tooling
+.agents/
+skills-lock.json
