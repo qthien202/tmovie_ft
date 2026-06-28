@@ -1,33 +1,34 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
 import 'package:media_library/media_library.dart';
+import 'package:catalog/catalog.dart';
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Watch history requires sign-in, so the profile is gated behind login.
     final authAsync = ref.watch(authStateProvider);
-
     return authAsync.when(
-      data: (user) {
-        if (user == null) {
-          return _buildSignedOutView(context, ref);
-        }
-        return _buildSignedInView(context, ref, user);
-      },
+      data: (user) => user == null
+          ? _buildSignedOut(context)
+          : _buildSignedIn(context, ref, user),
       loading: () => const Scaffold(
         backgroundColor: AppColors.backgroundColor,
         body: Center(child: CircularProgressIndicator()),
       ),
-      error: (_, __) => _buildSignedOutView(context, ref),
+      error: (_, _) => _buildSignedOut(context),
     );
   }
 
-  Widget _buildSignedOutView(BuildContext context, WidgetRef ref) {
+  // ── Signed-out: prompt to log in ──
+  Widget _buildSignedOut(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       body: Center(
@@ -37,38 +38,39 @@ class ProfilePage extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                padding: const EdgeInsets.all(AppSpacing.xs),
+                padding: const EdgeInsets.all(AppSpacing.lg),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
+                  color: AppColors.primaryValue.withValues(alpha: 0.10),
                   border: Border.all(
-                    color: AppColors.primaryValue.withValues(alpha: 0.4),
+                    color: AppColors.primaryValue.withValues(alpha: 0.35),
                     width: 2,
                   ),
                 ),
-                child: CircleAvatar(
-                  radius: 50,
-                  backgroundColor: AppColors.surfaceElevated,
-                  child: const Icon(
-                    Icons.person_rounded,
-                    size: 50,
-                    color: AppColors.textSecondary,
-                  ),
+                child: const Icon(
+                  Icons.person_rounded,
+                  size: 56,
+                  color: AppColors.primaryValue,
                 ),
               ),
               const SizedBox(height: AppSpacing.xl),
-              Text('Đăng nhập để đồng bộ', style: AppTypography.headlineMedium),
+              Text('Đăng nhập để bắt đầu', style: AppTypography.headlineMedium),
               const SizedBox(height: AppSpacing.sm),
               Text(
-                'Lịch sử xem & phim yêu thích trên mọi thiết bị',
+                'Đăng nhập để lưu lịch sử xem & phim yêu thích, đồng bộ trên mọi thiết bị.',
                 textAlign: TextAlign.center,
                 style: AppTypography.bodyMedium,
               ),
               const SizedBox(height: AppSpacing.xxl),
-              _GoogleSignInButton(
-                onPressed: () async {
-                  final authService = ref.read(authServiceProvider);
-                  await authService.signInWithGoogle();
-                },
+              SizedBox(
+                width: double.infinity,
+                child: AppButton(
+                  label: 'Đăng nhập với Google',
+                  icon: Icons.login_rounded,
+                  size: AppButtonSize.lg,
+                  expanded: true,
+                  onPressed: () => context.go('/login'),
+                ),
               ),
             ],
           ),
@@ -77,7 +79,8 @@ class ProfilePage extends ConsumerWidget {
     );
   }
 
-  Widget _buildSignedInView(BuildContext context, WidgetRef ref, dynamic user) {
+  // ── Signed-in: history, favourites, menu ──
+  Widget _buildSignedIn(BuildContext context, WidgetRef ref, User user) {
     final historyAsync = ref.watch(watchHistoryProvider);
     final favoritesAsync = ref.watch(favoritesProvider);
 
@@ -89,150 +92,49 @@ class ProfilePage extends ConsumerWidget {
           SliverToBoxAdapter(
             child: Column(
               children: [
-                // 1. Immersive header — avatar/name/stats float on a teal wash
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.fromLTRB(
-                    AppSpacing.lg,
-                    MediaQuery.paddingOf(context).top + AppSpacing.xl,
-                    AppSpacing.lg,
-                    AppSpacing.xl,
-                  ),
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Color(0x330FA3A3),
-                        AppColors.backgroundColor,
-                      ],
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      _buildAvatar(user),
-                      const SizedBox(height: AppSpacing.md),
-                      Text(
-                        user.displayName ?? 'Thành viên',
-                        style: AppTypography.headlineMedium,
-                      ),
-                      const SizedBox(height: AppSpacing.xxs),
-                      Text(user.email ?? '', style: AppTypography.labelSmall),
-                      const SizedBox(height: AppSpacing.xl),
-                      _buildStatsRow(historyAsync, favoritesAsync),
-                    ],
-                  ),
-                ),
+                _buildCover(context, user, historyAsync, favoritesAsync),
 
-                // 2. History section
-                historyAsync.when(
-                  data: (history) => _buildSection(
-                    title: 'Vừa xem gần đây',
-                    onSeeAll: history.isNotEmpty
-                        ? () => context.push('/history')
-                        : null,
-                    child: history.isEmpty
+                _buildSection(
+                  title: 'Tiếp tục xem',
+                  child: historyAsync.when(
+                    data: (history) => history.isEmpty
                         ? _buildEmptySection(
-                            icon: Icons.history_rounded,
+                            icon: Icons.play_circle_outline_rounded,
                             text: 'Chưa có lịch sử xem',
                           )
-                        : SizedBox(
-                            height: 180,
-                            child: ListView.separated(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: AppSpacing.lg,
-                              ),
-                              scrollDirection: Axis.horizontal,
-                              itemCount: history.length,
-                              separatorBuilder: (_, __) =>
-                                  const SizedBox(width: AppSpacing.md),
-                              itemBuilder: (context, index) =>
-                                  _HistoryCard(item: history[index]),
-                            ),
-                          ),
+                        : _buildContinueRail(history),
+                    loading: () => const _ContinueSkeleton(),
+                    error: (_, _) => _buildEmptySection(
+                      icon: Icons.play_circle_outline_rounded,
+                      text: 'Chưa có lịch sử xem',
+                    ),
                   ),
-                  loading: () => const _HistorySkeleton(),
-                  error: (_, __) => const SizedBox.shrink(),
+                  onSeeAll: historyAsync.valueOrNull?.isNotEmpty == true
+                      ? () => context.push('/history')
+                      : null,
                 ),
 
-                // 3. Favorites section
-                favoritesAsync.when(
-                  data: (favorites) => _buildSection(
-                    title: 'Danh sách yêu thích',
-                    onSeeAll: favorites.isNotEmpty
-                        ? () => context.push('/favorites')
-                        : null,
-                    child: favorites.isEmpty
+                _buildSection(
+                  title: 'Yêu thích',
+                  child: favoritesAsync.when(
+                    data: (favorites) => favorites.isEmpty
                         ? _buildEmptySection(
                             icon: Icons.favorite_border_rounded,
                             text: 'Chưa có phim yêu thích',
                           )
-                        : SizedBox(
-                            height: 180,
-                            child: ListView.separated(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: AppSpacing.lg,
-                              ),
-                              scrollDirection: Axis.horizontal,
-                              itemCount: favorites.length,
-                              separatorBuilder: (_, __) =>
-                                  const SizedBox(width: AppSpacing.md),
-                              itemBuilder: (context, index) =>
-                                  _HistoryCard(item: favorites[index]),
-                            ),
-                          ),
+                        : _buildPosterRail(favorites),
+                    loading: () => const _PosterSkeleton(),
+                    error: (_, _) => _buildEmptySection(
+                      icon: Icons.favorite_border_rounded,
+                      text: 'Chưa có phim yêu thích',
+                    ),
                   ),
-                  loading: () => const _HistorySkeleton(),
-                  error: (_, __) => const SizedBox.shrink(),
+                  onSeeAll: favoritesAsync.valueOrNull?.isNotEmpty == true
+                      ? () => context.push('/favorites')
+                      : null,
                 ),
 
-                // 4. Menu
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    AppSpacing.lg,
-                    AppSpacing.xl,
-                    AppSpacing.lg,
-                    100,
-                  ),
-                  child: Column(
-                    children: [
-                      _buildMenuContainer([
-                        _MenuTileV2(
-                          icon: Icons.settings_rounded,
-                          label: 'Cài đặt tài khoản',
-                          onTap: () => _showSettingsSheet(context, ref),
-                        ),
-                        _buildMenuDivider(),
-                        _MenuTileV2(
-                          icon: Icons.notifications_rounded,
-                          label: 'Thông báo & Tin nhắn',
-                          onTap: () {},
-                        ),
-                      ]),
-                      const SizedBox(height: AppSpacing.md),
-                      _buildMenuContainer([
-                        _MenuTileV2(
-                          icon: Icons.help_center_rounded,
-                          label: 'Trung tâm trợ giúp',
-                          onTap: () => _showHelpSheet(context),
-                        ),
-                        _buildMenuDivider(),
-                        _MenuTileV2(
-                          icon: Icons.security_rounded,
-                          label: 'Quyền riêng tư',
-                          onTap: () {},
-                        ),
-                      ]),
-                      const SizedBox(height: AppSpacing.xl),
-                      AppButton.ghost(
-                        label: 'Đăng xuất tài khoản',
-                        icon: Icons.logout_rounded,
-                        expanded: true,
-                        onPressed: () => _showLogoutDialog(context, ref),
-                      ),
-                    ],
-                  ),
-                ),
+                _buildMenu(context, ref, signedIn: true),
               ],
             ),
           ),
@@ -241,13 +143,124 @@ class ProfilePage extends ConsumerWidget {
     );
   }
 
-  Widget _buildAvatar(dynamic user) {
+  // ── Cinematic cover header ──
+  Widget _buildCover(
+    BuildContext context,
+    User user,
+    AsyncValue<List<WatchHistoryEntry>> historyAsync,
+    AsyncValue<List<WatchHistoryEntry>> favoritesAsync,
+  ) {
+    final history = historyAsync.valueOrNull ?? const <WatchHistoryEntry>[];
+    final backdrop = history.isNotEmpty ? history.first.thumbUrl : null;
+    final topInset = MediaQuery.paddingOf(context).top;
+
+    return Column(
+      children: [
+        SizedBox(
+          height: 168 + topInset,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Positioned.fill(child: _coverBanner(backdrop)),
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: -52,
+                child: Center(child: _buildAvatar(user, size: 104)),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 60),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+          child: Column(
+            children: [
+              Text(
+                user.displayName ?? 'Thành viên',
+                style: AppTypography.headlineMedium,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.cloud_done_rounded,
+                    size: 14,
+                    color: AppColors.primaryValue,
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                  Flexible(
+                    child: Text(
+                      user.email ?? 'Đã đồng bộ trên các thiết bị',
+                      style: AppTypography.labelSmall,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.xl),
+              _buildStatsRow(historyAsync, favoritesAsync),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _coverBanner(String? backdrop) {
+    final hasImage = backdrop != null && backdrop.isNotEmpty;
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        if (hasImage)
+          AppImage(imageUrl: backdrop, boxFit: BoxFit.cover)
+        else
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFF12B5B5), Color(0xFF0A4F4F)],
+              ),
+            ),
+          ),
+        if (hasImage)
+          BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 26, sigmaY: 26),
+            child: Container(
+              color: AppColors.backgroundColor.withValues(alpha: 0.32),
+            ),
+          ),
+        // Fade the bottom into the page so the avatar/name read cleanly.
+        const DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.transparent,
+                Color(0x660A0C0C),
+                AppColors.backgroundColor,
+              ],
+              stops: [0.35, 0.72, 1.0],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAvatar(User user, {double size = 80}) {
+    final photoUrl = user.photoURL;
+    final inner = size * 0.44;
     return Stack(
       alignment: Alignment.center,
       children: [
         Container(
-          width: 80,
-          height: 80,
+          width: size,
+          height: size,
           decoration: const BoxDecoration(
             shape: BoxShape.circle,
             gradient: SweepGradient(
@@ -260,39 +273,39 @@ class ProfilePage extends ConsumerWidget {
           ),
         ),
         CircleAvatar(
-          radius: 36,
-          backgroundColor: AppColors.surfaceColor,
+          radius: inner + 4,
+          backgroundColor: AppColors.backgroundColor,
           child: CircleAvatar(
-            radius: 33,
+            radius: inner,
             backgroundColor: AppColors.surfaceElevated,
-            backgroundImage: user.photoURL != null
-                ? NetworkImage(user.photoURL!)
-                : null,
-            child: user.photoURL == null
-                ? const Icon(
+            backgroundImage: photoUrl != null ? NetworkImage(photoUrl) : null,
+            child: photoUrl == null
+                ? Icon(
                     Icons.person_rounded,
-                    size: 32,
+                    size: size * 0.4,
                     color: AppColors.textSecondary,
                   )
                 : null,
           ),
         ),
         Positioned(
-          bottom: 0,
-          right: 0,
-          child: Container(
-            padding: const EdgeInsets.all(3),
-            decoration: const BoxDecoration(
+          bottom: size * 0.03,
+          right: size * 0.03,
+          child: const DecoratedBox(
+            decoration: BoxDecoration(
               color: AppColors.primaryValue,
               shape: BoxShape.circle,
               border: Border.fromBorderSide(
-                BorderSide(color: AppColors.surfaceColor, width: 2),
+                BorderSide(color: AppColors.backgroundColor, width: 2.5),
               ),
             ),
-            child: const Icon(
-              Icons.star_rounded,
-              color: AppColors.onPrimary,
-              size: 12,
+            child: Padding(
+              padding: EdgeInsets.all(4),
+              child: Icon(
+                Icons.star_rounded,
+                color: AppColors.onPrimary,
+                size: 13,
+              ),
             ),
           ),
         ),
@@ -315,24 +328,26 @@ class ProfilePage extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           _buildStatItem(
+            Icons.visibility_rounded,
             'Đã xem',
             historyAsync.valueOrNull?.length.toString() ?? '0',
           ),
           _buildStatDivider(),
           _buildStatItem(
+            Icons.favorite_rounded,
             'Yêu thích',
             favoritesAsync.valueOrNull?.length.toString() ?? '0',
           ),
-          _buildStatDivider(),
-          _buildStatItem('Cấp độ', 'Pro'),
         ],
       ),
     );
   }
 
-  Widget _buildStatItem(String label, String value) {
+  Widget _buildStatItem(IconData icon, String label, String value) {
     return Column(
       children: [
+        Icon(icon, color: AppColors.primaryValue, size: AppSizes.iconSm),
+        const SizedBox(height: AppSpacing.xs),
         Text(
           value,
           style: AppTypography.titleLarge.copyWith(fontWeight: FontWeight.w900),
@@ -344,9 +359,10 @@ class ProfilePage extends ConsumerWidget {
   }
 
   Widget _buildStatDivider() {
-    return Container(height: 20, width: 1, color: AppColors.border);
+    return Container(height: 36, width: 1, color: AppColors.border);
   }
 
+  // ── Sections ──
   Widget _buildSection({
     required String title,
     VoidCallback? onSeeAll,
@@ -370,6 +386,34 @@ class ProfilePage extends ConsumerWidget {
     );
   }
 
+  /// Landscape "continue watching" rail.
+  Widget _buildContinueRail(List<WatchHistoryEntry> items) {
+    return SizedBox(
+      height: 168,
+      child: ListView.separated(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+        scrollDirection: Axis.horizontal,
+        itemCount: items.length,
+        separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.md),
+        itemBuilder: (context, index) => _ContinueCard(item: items[index]),
+      ),
+    );
+  }
+
+  /// Portrait poster rail for favourites.
+  Widget _buildPosterRail(List<WatchHistoryEntry> items) {
+    return SizedBox(
+      height: 200,
+      child: ListView.separated(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+        scrollDirection: Axis.horizontal,
+        itemCount: items.length,
+        separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.md),
+        itemBuilder: (context, index) => _PosterCard(item: items[index]),
+      ),
+    );
+  }
+
   Widget _buildEmptySection({required IconData icon, required String text}) {
     return Padding(
       padding: const EdgeInsets.symmetric(
@@ -381,6 +425,61 @@ class ProfilePage extends ConsumerWidget {
           Icon(icon, color: AppColors.textTertiary, size: AppSizes.iconSm),
           const SizedBox(width: AppSpacing.sm),
           Text(text, style: AppTypography.bodyMedium),
+        ],
+      ),
+    );
+  }
+
+  // ── Menu ──
+  Widget _buildMenu(
+    BuildContext context,
+    WidgetRef ref, {
+    required bool signedIn,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.xl,
+        AppSpacing.lg,
+        100,
+      ),
+      child: Column(
+        children: [
+          // One clean account list — only entries that actually do something.
+          _buildMenuContainer([
+            _MenuTileV2(
+              icon: Icons.history_rounded,
+              label: 'Lịch sử xem',
+              onTap: () => context.push('/history'),
+            ),
+            _buildMenuDivider(),
+            _MenuTileV2(
+              icon: Icons.favorite_rounded,
+              label: 'Phim yêu thích',
+              onTap: () => context.push('/favorites'),
+            ),
+            _buildMenuDivider(),
+            _MenuTileV2(
+              icon: Icons.delete_sweep_rounded,
+              label: 'Quản lý dữ liệu',
+              onTap: () => _showSettingsSheet(context, ref),
+            ),
+            _buildMenuDivider(),
+            _MenuTileV2(
+              icon: Icons.help_center_rounded,
+              label: 'Trung tâm trợ giúp',
+              onTap: () => _showHelpSheet(context),
+            ),
+          ]),
+          if (signedIn) ...[
+            const SizedBox(height: AppSpacing.xl),
+            AppButton.ghost(
+              label: 'Đăng xuất tài khoản',
+              icon: Icons.logout_rounded,
+              expanded: true,
+              onPressed: () => _showLogoutDialog(context, ref),
+            ),
+          ],
         ],
       ),
     );
@@ -422,8 +521,32 @@ class ProfilePage extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Cài đặt tài khoản', style: AppTypography.headlineMedium),
+            Text('Quản lý dữ liệu', style: AppTypography.headlineMedium),
             const SizedBox(height: AppSpacing.xl),
+            _MenuTile(
+              icon: Icons.sync_rounded,
+              label: 'Đồng bộ phim hot mới (từ OPhim)',
+              onTap: () async {
+                Navigator.pop(context);
+                final messenger = ScaffoldMessenger.of(context);
+                messenger.showSnackBar(
+                  const SnackBar(content: Text('Đang đồng bộ phim mới…')),
+                );
+                try {
+                  await ref
+                      .read(heroRepositoryProvider)
+                      .getHero(forceRefresh: true);
+                  ref.invalidate(heroFilmsProvider);
+                  messenger.showSnackBar(
+                    const SnackBar(content: Text('Đã đồng bộ phim hot mới')),
+                  );
+                } catch (_) {
+                  messenger.showSnackBar(
+                    const SnackBar(content: Text('Đồng bộ thất bại, thử lại sau')),
+                  );
+                }
+              },
+            ),
             _MenuTile(
               icon: Icons.delete_sweep_rounded,
               label: 'Xóa lịch sử xem',
@@ -504,7 +627,7 @@ class ProfilePage extends ConsumerWidget {
             const SizedBox(height: AppSpacing.lg),
             Center(
               child: Text(
-                'Phiên bản 1.0.0 (BETA)',
+                'Phiên bản 1.3.0',
                 style: AppTypography.labelSmall,
               ),
             ),
@@ -635,57 +758,101 @@ class _MenuTileV2 extends StatelessWidget {
   }
 }
 
-class _GoogleSignInButton extends StatelessWidget {
-  final VoidCallback onPressed;
-  const _GoogleSignInButton({required this.onPressed});
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.xl,
-          vertical: AppSpacing.md,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-        ),
-        elevation: 0,
-      ),
-      child: const Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.g_mobiledata_rounded, size: 28),
-          SizedBox(width: AppSpacing.sm),
-          Text(
-            'Đăng nhập bằng Google',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _HistoryCard extends StatelessWidget {
+/// Landscape "continue watching" card: 16:9 art, play badge, title overlay.
+class _ContinueCard extends StatelessWidget {
   final WatchHistoryEntry item;
-  const _HistoryCard({required this.item});
+  const _ContinueCard({required this.item});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => context.push('/detail/${item.slug}'),
       child: SizedBox(
-        width: 130,
+        width: 232,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              AppImage(imageUrl: item.thumbUrl ?? '', boxFit: BoxFit.cover),
+              const DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.transparent, Color(0xCC04201F)],
+                    stops: [0.45, 1.0],
+                  ),
+                ),
+              ),
+              const Center(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Icon(
+                      Icons.play_arrow_rounded,
+                      color: Colors.black,
+                      size: 22,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: AppSpacing.md,
+                right: AppSpacing.md,
+                bottom: AppSpacing.md,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      item.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.labelLarge.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    if (item.episode != null)
+                      Text(
+                        'Tập ${item.episode}',
+                        style: AppTypography.labelSmall.copyWith(
+                          color: Colors.white70,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Portrait poster card for the favourites rail.
+class _PosterCard extends StatelessWidget {
+  final WatchHistoryEntry item;
+  const _PosterCard({required this.item});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => context.push('/detail/${item.slug}'),
+      child: SizedBox(
+        width: 124,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(AppRadius.md),
+                borderRadius: BorderRadius.circular(AppRadius.lg),
                 child: AppImage(
                   imageUrl: item.thumbUrl ?? '',
                   boxFit: BoxFit.cover,
@@ -700,11 +867,6 @@ class _HistoryCard extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: AppTypography.labelMedium,
             ),
-            if (item.episode != null)
-              Text(
-                'Tập ${item.episode}',
-                style: AppTypography.labelSmall,
-              ),
           ],
         ),
       ),
@@ -745,18 +907,42 @@ class _MenuTile extends StatelessWidget {
   }
 }
 
-class _HistorySkeleton extends StatelessWidget {
-  const _HistorySkeleton();
+class _ContinueSkeleton extends StatelessWidget {
+  const _ContinueSkeleton();
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 180,
+      height: 168,
       child: ListView.separated(
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
         scrollDirection: Axis.horizontal,
         itemCount: 3,
-        separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.md),
+        separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.md),
+        itemBuilder: (context, index) => Container(
+          width: 232,
+          decoration: BoxDecoration(
+            color: AppColors.surfaceColor,
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PosterSkeleton extends StatelessWidget {
+  const _PosterSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 200,
+      child: ListView.separated(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+        scrollDirection: Axis.horizontal,
+        itemCount: 3,
+        separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.md),
         itemBuilder: (context, index) => const FilmCardSkeleton(),
       ),
     );

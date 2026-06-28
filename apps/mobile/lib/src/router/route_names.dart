@@ -4,6 +4,9 @@ class RouteNames {
   static const splash = 'splash';
   static const home = 'home';
   static const search = 'search';
+  static const tabSeries = 'tabSeries';
+  static const tabSingle = 'tabSingle';
+  static const tabTvShows = 'tabTvShows';
   static const detail = 'detail';
   static const player = 'player';
   static const filmList = 'filmList';

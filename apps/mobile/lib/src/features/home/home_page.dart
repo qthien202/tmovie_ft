@@ -1,5 +1,8 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
 import 'package:catalog/catalog.dart';
@@ -33,51 +36,19 @@ class _HomePageState extends ConsumerState<HomePage>
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
-    // Lấy phim mới nhất + phim hot rồi trộn lại
-    final latestAsync = ref.watch(
-      filmsByTypeProvider((
-        typeSlug: 'phim-moi-cap-nhat',
-        page: 1,
-        sortField: null,
-        year: null,
-      )),
-    );
-    final hotAsync = ref.watch(
-      filmsByTypeProvider((
-        typeSlug: 'phim-moi-cap-nhat',
-        page: 1,
-        sortField: 'view',
-        year: DateTime.now().year,
-      )),
-    );
-
-    // Trộn 2 danh sách: hot trước, mới nhất sau, loại trùng
-    final featuredFilmsAsync = latestAsync.when(
-      data: (latestRes) => hotAsync.when(
-        data: (hotRes) {
-          final hotItems = hotRes.data?.items ?? [];
-          final latestItems = latestRes.data?.items ?? [];
-          final hotSlugs = hotItems.map((e) => e.slug).toSet();
-          final merged = [
-            ...hotItems,
-            ...latestItems.where((item) => !hotSlugs.contains(item.slug)),
-          ];
-          return AsyncValue.data(merged);
-        },
-        loading: () => AsyncValue.data(latestRes.data?.items ?? <FilmItem>[]),
-        error: (_, _) => AsyncValue.data(latestRes.data?.items ?? <FilmItem>[]),
-      ),
-      loading: () => const AsyncValue<List<FilmItem>>.loading(),
-      error: (e, s) => AsyncValue<List<FilmItem>>.error(e, s),
-    );
+    // Hero ưu tiên phim Hàn/Trung/Âu Mỹ rating cao của năm nay.
+    final featuredFilmsAsync = ref.watch(heroFilmsProvider);
 
     final heroHeight = MediaQuery.sizeOf(context).height * 0.62;
     const tabBarHeight = 56.0;
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      body: NestedScrollView(
+      body: Stack(
+        children: [
+          NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
             SliverOverlapAbsorber(
@@ -171,6 +142,42 @@ class _HomePageState extends ConsumerState<HomePage>
               },
             );
           }).toList(),
+        ),
+          ),
+          // Floating search icon (top-right over the hero) → global search.
+          Positioned(
+            top: MediaQuery.paddingOf(context).top + 8,
+            right: 16,
+            child: const _HomeSearchButton(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Frosted circular search button shown over the home hero.
+class _HomeSearchButton extends StatelessWidget {
+  const _HomeSearchButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(22),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        child: Material(
+          color: Colors.black.withValues(alpha: 0.28),
+          shape: const CircleBorder(),
+          child: InkWell(
+            customBorder: const CircleBorder(),
+            onTap: () => context.push('/search'),
+            child: const SizedBox(
+              width: 44,
+              height: 44,
+              child: Icon(Icons.search_rounded, color: Colors.white, size: 24),
+            ),
+          ),
         ),
       ),
     );

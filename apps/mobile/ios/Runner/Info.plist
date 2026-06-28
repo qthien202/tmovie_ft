@@ -29,16 +29,16 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.689830026078-ev3ikjj7l1io2n8tknuqgpj44dal126p</string>
+				<string>com.googleusercontent.apps.320728716423-4qlgtsn5okmtsj2kma8isn4o8lkon8r2</string>
 			</array>
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>GIDClientID</key>
-	<string>689830026078-ev3ikjj7l1io2n8tknuqgpj44dal126p.apps.googleusercontent.com</string>
+	<string>320728716423-4qlgtsn5okmtsj2kma8isn4o8lkon8r2.apps.googleusercontent.com</string>
 	<key>GIDServerClientID</key>
-	<string>689830026078-kh1qnbfu1ecbfcmr1ge51kvgo8oc8v8l.apps.googleusercontent.com</string>
+	<string>320728716423-ot9e6g429mtd2huq570vg0v6i823p8la.apps.googleusercontent.com</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>

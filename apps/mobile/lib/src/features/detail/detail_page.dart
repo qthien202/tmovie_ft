@@ -287,7 +287,7 @@ class _DetailPageState extends ConsumerState<DetailPage>
                       isFav
                           ? Icons.favorite_rounded
                           : Icons.favorite_border_rounded,
-                      color: isFav ? Colors.redAccent : Colors.white,
+                      color: isFav ? AppColors.primaryValue : Colors.white,
                       size: 20,
                     ),
                     loading: () => const SizedBox(
