@@ -65,11 +65,19 @@ class CompositeFavoritesRepository implements FavoritesRepository {
       final merged = bySlug.values.toList()
         ..sort((a, b) => (b.timestamp ?? 0).compareTo(a.timestamp ?? 0));
 
-      // Pull remote-only favourites into the local DB.
+      // Two-way reconcile (idempotent): pull remote-only favourites down into
+      // the local DB, and push local-only favourites up to Firestore so ones
+      // saved offline / against the old project still reach the cloud.
       final localSlugs = localList.map((e) => e.slug).toSet();
+      final remoteSlugs = remoteList.map((e) => e.slug).toSet();
       for (final e in merged) {
         if (!localSlugs.contains(e.slug)) {
           await local.addFavorite(e);
+        }
+        if (!remoteSlugs.contains(e.slug)) {
+          try {
+            await r.addFavorite(e);
+          } catch (_) {}
         }
       }
       return merged;

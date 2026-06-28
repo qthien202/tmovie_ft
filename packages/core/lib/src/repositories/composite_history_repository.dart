@@ -82,11 +82,21 @@ class CompositeHistoryRepository implements HistoryRepository {
       final merged = bySlug.values.toList()
         ..sort((a, b) => (b.timestamp ?? 0).compareTo(a.timestamp ?? 0));
 
-      // Pull anything that only existed remotely down into the local DB.
+      // Two-way reconcile (idempotent — only touches what's missing on a side):
+      //  * remote-only entries get pulled down into the local DB;
+      //  * local-only entries get pushed up to Firestore, so history that was
+      //    saved locally while offline / signed out / against the wrong project
+      //    still reaches the cloud the next time this screen loads.
       final localSlugs = localList.map((e) => e.slug).toSet();
+      final remoteSlugs = remoteList.map((e) => e.slug).toSet();
       for (final e in merged) {
         if (!localSlugs.contains(e.slug)) {
           await local.addHistory(e);
+        }
+        if (!remoteSlugs.contains(e.slug)) {
+          try {
+            await r.addHistory(e);
+          } catch (_) {}
         }
       }
       return merged;
