@@ -8,6 +8,27 @@ Vietnamese block free of Markdown styling (use emoji + "•" bullets).
 
 Every new feature/release must add a `## vX.Y.Z` section with both parts.
 
+## v1.3.0
+
+Browse redesign, smarter hot-film hero, and cross-device sync.
+- New bottom navigation: dedicated Phim bộ, Phim lẻ and TV Shows tabs (the Search tab is gone), each with its own layout — editorial rails, poster grid, and landscape cards.
+- Category and Search are now one screen with an advanced filter: sort (mới cập nhật / phổ biến / năm), film type, multi-select genre & country, and release year.
+- Home hero now surfaces genuinely trending Korean / Chinese / Western titles (sourced from Trakt), with animation excluded.
+- Watch history and favorites sync both ways with the cloud, so they follow you across devices.
+- Search is reachable from a top-bar icon on every browse tab and a floating button on Home.
+
+<!-- app:vi -->
+✨ Giao diện mới
+• Thanh điều hướng mới: tách riêng tab Phim bộ, Phim lẻ và TV Shows, mỗi tab một bố cục riêng.
+• Gộp Danh mục và Tìm kiếm thành một màn, thêm bộ lọc nâng cao: sắp xếp, loại phim, thể loại, quốc gia, năm.
+
+🔥 Phim hot chuẩn hơn
+• Mục nổi bật ở Trang chủ ưu tiên phim Hàn/Trung/Âu Mỹ đang thịnh hành, đã loại bỏ hoạt hình.
+
+☁ Đồng bộ đa thiết bị
+• Lịch sử xem và phim yêu thích đồng bộ hai chiều với đám mây, theo bạn trên mọi thiết bị.
+<!-- /app:vi -->
+
 ## v1.2.1
 
 Player bug fixes on Android.
