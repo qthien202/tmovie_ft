@@ -444,31 +444,30 @@ class ProfilePage extends ConsumerWidget {
       ),
       child: Column(
         children: [
+          // One clean account list — only entries that actually do something.
           _buildMenuContainer([
             _MenuTileV2(
+              icon: Icons.history_rounded,
+              label: 'Lịch sử xem',
+              onTap: () => context.push('/history'),
+            ),
+            _buildMenuDivider(),
+            _MenuTileV2(
+              icon: Icons.favorite_rounded,
+              label: 'Phim yêu thích',
+              onTap: () => context.push('/favorites'),
+            ),
+            _buildMenuDivider(),
+            _MenuTileV2(
               icon: Icons.delete_sweep_rounded,
-              label: 'Quản lý lịch sử & yêu thích',
+              label: 'Quản lý dữ liệu',
               onTap: () => _showSettingsSheet(context, ref),
             ),
             _buildMenuDivider(),
             _MenuTileV2(
-              icon: Icons.notifications_rounded,
-              label: 'Thông báo & Tin nhắn',
-              onTap: () {},
-            ),
-          ]),
-          const SizedBox(height: AppSpacing.md),
-          _buildMenuContainer([
-            _MenuTileV2(
               icon: Icons.help_center_rounded,
               label: 'Trung tâm trợ giúp',
               onTap: () => _showHelpSheet(context),
-            ),
-            _buildMenuDivider(),
-            _MenuTileV2(
-              icon: Icons.security_rounded,
-              label: 'Quyền riêng tư',
-              onTap: () {},
             ),
           ]),
           if (signedIn) ...[
