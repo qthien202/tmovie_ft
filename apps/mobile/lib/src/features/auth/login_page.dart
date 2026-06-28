@@ -5,11 +5,37 @@ import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
 import 'dart:ui';
 
-class LoginPage extends ConsumerWidget {
+class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends ConsumerState<LoginPage> {
+  bool _signingIn = false;
+
+  Future<void> _signInWithGoogle() async {
+    if (_signingIn) return;
+    setState(() => _signingIn = true);
+    try {
+      final user = await ref.read(authServiceProvider).signInWithGoogle();
+      if (!mounted) return;
+      if (user != null) {
+        context.go('/home');
+        return;
+      }
+      // Null = user cancelled or sign-in failed.
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Đăng nhập chưa hoàn tất, thử lại nhé.')),
+      );
+    } finally {
+      if (mounted) setState(() => _signingIn = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       body: Stack(
@@ -84,13 +110,13 @@ class LoginPage extends ConsumerWidget {
                   const Spacer(),
 
                   // Google Login Button
-                  _buildGoogleButton(context, ref),
+                  _buildGoogleButton(),
 
                   const SizedBox(height: 16),
 
-                  // Guest Login
+                  // Guest Login (disabled while a sign-in is in flight)
                   TextButton(
-                    onPressed: () => context.go('/home'),
+                    onPressed: _signingIn ? null : () => context.go('/home'),
                     child: Text(
                       'Để sau, tôi muốn xem tiếp',
                       style: AppTypography.labelLarge.copyWith(
@@ -119,37 +145,39 @@ class LoginPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildGoogleButton(BuildContext context, WidgetRef ref) {
+  Widget _buildGoogleButton() {
     return SizedBox(
       width: double.infinity,
       height: 56,
       child: ElevatedButton(
-        onPressed: () async {
-          final authService = ref.read(authServiceProvider);
-          final user = await authService.signInWithGoogle();
-          if (user != null && context.mounted) {
-            context.go('/home');
-          }
-        },
+        onPressed: _signingIn ? null : _signInWithGoogle,
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.white,
           foregroundColor: Colors.black87,
-          shape: RoundedRectangleBorder(
-            borderRadius: AppRadius.brLg,
-          ),
+          disabledBackgroundColor: Colors.white.withValues(alpha: 0.85),
+          shape: RoundedRectangleBorder(borderRadius: AppRadius.brLg),
           elevation: 0,
         ),
-        child: const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.g_mobiledata_rounded, size: 30),
-            SizedBox(width: 8),
-            Text(
-              'Tiếp tục với Google',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
+        child: _signingIn
+            ? const SizedBox(
+                height: 24,
+                width: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.4,
+                  valueColor: AlwaysStoppedAnimation(Colors.black54),
+                ),
+              )
+            : const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.g_mobiledata_rounded, size: 30),
+                  SizedBox(width: 8),
+                  Text(
+                    'Tiếp tục với Google',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
       ),
     );
   }

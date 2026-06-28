@@ -59,3 +59,50 @@ class FilmImages extends Table {
   @override
   Set<Column> get primaryKey => {slug};
 }
+
+/// Device-local watch history (one row per film, newest first by [watchedAt]).
+/// `json` holds the full `WatchHistoryEntry` payload.
+@DataClassName('WatchHistoryRow')
+class WatchHistories extends Table {
+  TextColumn get slug => text()();
+  TextColumn get json => text()();
+  IntColumn get watchedAt => integer()(); // epoch ms
+
+  @override
+  Set<Column> get primaryKey => {slug};
+}
+
+/// Resume positions, keyed by `${filmSlug}_$episodeSlug`.
+@DataClassName('PlaybackRow')
+class PlaybackPositions extends Table {
+  TextColumn get id => text()();
+  IntColumn get positionSeconds => integer()();
+  IntColumn get updatedAt => integer()(); // epoch ms
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+/// Device-local favourites (one row per film, newest first by [addedAt]).
+@DataClassName('FavoriteRow')
+class Favorites extends Table {
+  TextColumn get slug => text()();
+  TextColumn get json => text()();
+  IntColumn get addedAt => integer()(); // epoch ms
+
+  @override
+  Set<Column> get primaryKey => {slug};
+}
+
+/// Generic local cache (e.g. the daily hero list). [dateKey] (YYYY-MM-DD) lets
+/// callers gate a refresh to once per day; [value] holds arbitrary JSON.
+@DataClassName('AppCacheRow')
+class AppCacheEntries extends Table {
+  TextColumn get cacheKey => text()();
+  TextColumn get value => text()();
+  TextColumn get dateKey => text().nullable()();
+  IntColumn get updatedAt => integer()(); // epoch ms
+
+  @override
+  Set<Column> get primaryKey => {cacheKey};
+}

@@ -3,6 +3,9 @@ import '../models/tmdb_season_response.dart';
 
 /// Service to fetch episode stills directly from TMDB API v3.
 /// Uses a free API key for read-only access to public movie/TV data.
+///
+/// (Hot-list discovery for the home hero now lives in [TraktService]; this
+/// service is only used for per-episode still images on the detail page.)
 class TmdbService {
   static const _baseUrl = 'https://api.themoviedb.org/3';
   static const _apiKey = '2b07206ac62c7bfbd40cf28044152e4f';

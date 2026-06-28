@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
 
@@ -43,12 +44,17 @@ class _SplashPageState extends State<SplashPage>
     await Future.delayed(const Duration(milliseconds: 2500));
     if (!mounted) return;
 
-    final user = AuthService().currentUser;
-    if (user != null) {
+    // Logged-in users skip straight to home.
+    if (AuthService().currentUser != null) {
       context.go('/home');
-    } else {
-      context.go('/onboarding');
+      return;
     }
+
+    // Onboarding is shown only on the very first launch.
+    final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
+    final seenOnboarding = prefs.getBool('onboarding_seen') ?? false;
+    context.go(seenOnboarding ? '/login' : '/onboarding');
   }
 
   @override

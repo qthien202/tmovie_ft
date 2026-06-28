@@ -1662,6 +1662,1110 @@ class FilmImagesCompanion extends UpdateCompanion<FilmImagesRow> {
   }
 }
 
+class $WatchHistoriesTable extends WatchHistories
+    with TableInfo<$WatchHistoriesTable, WatchHistoryRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $WatchHistoriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _slugMeta = const VerificationMeta('slug');
+  @override
+  late final GeneratedColumn<String> slug = GeneratedColumn<String>(
+    'slug',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _jsonMeta = const VerificationMeta('json');
+  @override
+  late final GeneratedColumn<String> json = GeneratedColumn<String>(
+    'json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _watchedAtMeta = const VerificationMeta(
+    'watchedAt',
+  );
+  @override
+  late final GeneratedColumn<int> watchedAt = GeneratedColumn<int>(
+    'watched_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [slug, json, watchedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'watch_histories';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<WatchHistoryRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('slug')) {
+      context.handle(
+        _slugMeta,
+        slug.isAcceptableOrUnknown(data['slug']!, _slugMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_slugMeta);
+    }
+    if (data.containsKey('json')) {
+      context.handle(
+        _jsonMeta,
+        json.isAcceptableOrUnknown(data['json']!, _jsonMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_jsonMeta);
+    }
+    if (data.containsKey('watched_at')) {
+      context.handle(
+        _watchedAtMeta,
+        watchedAt.isAcceptableOrUnknown(data['watched_at']!, _watchedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_watchedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {slug};
+  @override
+  WatchHistoryRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return WatchHistoryRow(
+      slug: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}slug'],
+      )!,
+      json: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}json'],
+      )!,
+      watchedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}watched_at'],
+      )!,
+    );
+  }
+
+  @override
+  $WatchHistoriesTable createAlias(String alias) {
+    return $WatchHistoriesTable(attachedDatabase, alias);
+  }
+}
+
+class WatchHistoryRow extends DataClass implements Insertable<WatchHistoryRow> {
+  final String slug;
+  final String json;
+  final int watchedAt;
+  const WatchHistoryRow({
+    required this.slug,
+    required this.json,
+    required this.watchedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['slug'] = Variable<String>(slug);
+    map['json'] = Variable<String>(json);
+    map['watched_at'] = Variable<int>(watchedAt);
+    return map;
+  }
+
+  WatchHistoriesCompanion toCompanion(bool nullToAbsent) {
+    return WatchHistoriesCompanion(
+      slug: Value(slug),
+      json: Value(json),
+      watchedAt: Value(watchedAt),
+    );
+  }
+
+  factory WatchHistoryRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return WatchHistoryRow(
+      slug: serializer.fromJson<String>(json['slug']),
+      json: serializer.fromJson<String>(json['json']),
+      watchedAt: serializer.fromJson<int>(json['watchedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'slug': serializer.toJson<String>(slug),
+      'json': serializer.toJson<String>(json),
+      'watchedAt': serializer.toJson<int>(watchedAt),
+    };
+  }
+
+  WatchHistoryRow copyWith({String? slug, String? json, int? watchedAt}) =>
+      WatchHistoryRow(
+        slug: slug ?? this.slug,
+        json: json ?? this.json,
+        watchedAt: watchedAt ?? this.watchedAt,
+      );
+  WatchHistoryRow copyWithCompanion(WatchHistoriesCompanion data) {
+    return WatchHistoryRow(
+      slug: data.slug.present ? data.slug.value : this.slug,
+      json: data.json.present ? data.json.value : this.json,
+      watchedAt: data.watchedAt.present ? data.watchedAt.value : this.watchedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WatchHistoryRow(')
+          ..write('slug: $slug, ')
+          ..write('json: $json, ')
+          ..write('watchedAt: $watchedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(slug, json, watchedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is WatchHistoryRow &&
+          other.slug == this.slug &&
+          other.json == this.json &&
+          other.watchedAt == this.watchedAt);
+}
+
+class WatchHistoriesCompanion extends UpdateCompanion<WatchHistoryRow> {
+  final Value<String> slug;
+  final Value<String> json;
+  final Value<int> watchedAt;
+  final Value<int> rowid;
+  const WatchHistoriesCompanion({
+    this.slug = const Value.absent(),
+    this.json = const Value.absent(),
+    this.watchedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  WatchHistoriesCompanion.insert({
+    required String slug,
+    required String json,
+    required int watchedAt,
+    this.rowid = const Value.absent(),
+  }) : slug = Value(slug),
+       json = Value(json),
+       watchedAt = Value(watchedAt);
+  static Insertable<WatchHistoryRow> custom({
+    Expression<String>? slug,
+    Expression<String>? json,
+    Expression<int>? watchedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (slug != null) 'slug': slug,
+      if (json != null) 'json': json,
+      if (watchedAt != null) 'watched_at': watchedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  WatchHistoriesCompanion copyWith({
+    Value<String>? slug,
+    Value<String>? json,
+    Value<int>? watchedAt,
+    Value<int>? rowid,
+  }) {
+    return WatchHistoriesCompanion(
+      slug: slug ?? this.slug,
+      json: json ?? this.json,
+      watchedAt: watchedAt ?? this.watchedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (slug.present) {
+      map['slug'] = Variable<String>(slug.value);
+    }
+    if (json.present) {
+      map['json'] = Variable<String>(json.value);
+    }
+    if (watchedAt.present) {
+      map['watched_at'] = Variable<int>(watchedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WatchHistoriesCompanion(')
+          ..write('slug: $slug, ')
+          ..write('json: $json, ')
+          ..write('watchedAt: $watchedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PlaybackPositionsTable extends PlaybackPositions
+    with TableInfo<$PlaybackPositionsTable, PlaybackRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PlaybackPositionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _positionSecondsMeta = const VerificationMeta(
+    'positionSeconds',
+  );
+  @override
+  late final GeneratedColumn<int> positionSeconds = GeneratedColumn<int>(
+    'position_seconds',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, positionSeconds, updatedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'playback_positions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PlaybackRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('position_seconds')) {
+      context.handle(
+        _positionSecondsMeta,
+        positionSeconds.isAcceptableOrUnknown(
+          data['position_seconds']!,
+          _positionSecondsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_positionSecondsMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PlaybackRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PlaybackRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      positionSeconds: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}position_seconds'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $PlaybackPositionsTable createAlias(String alias) {
+    return $PlaybackPositionsTable(attachedDatabase, alias);
+  }
+}
+
+class PlaybackRow extends DataClass implements Insertable<PlaybackRow> {
+  final String id;
+  final int positionSeconds;
+  final int updatedAt;
+  const PlaybackRow({
+    required this.id,
+    required this.positionSeconds,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['position_seconds'] = Variable<int>(positionSeconds);
+    map['updated_at'] = Variable<int>(updatedAt);
+    return map;
+  }
+
+  PlaybackPositionsCompanion toCompanion(bool nullToAbsent) {
+    return PlaybackPositionsCompanion(
+      id: Value(id),
+      positionSeconds: Value(positionSeconds),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory PlaybackRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PlaybackRow(
+      id: serializer.fromJson<String>(json['id']),
+      positionSeconds: serializer.fromJson<int>(json['positionSeconds']),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'positionSeconds': serializer.toJson<int>(positionSeconds),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+    };
+  }
+
+  PlaybackRow copyWith({String? id, int? positionSeconds, int? updatedAt}) =>
+      PlaybackRow(
+        id: id ?? this.id,
+        positionSeconds: positionSeconds ?? this.positionSeconds,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
+  PlaybackRow copyWithCompanion(PlaybackPositionsCompanion data) {
+    return PlaybackRow(
+      id: data.id.present ? data.id.value : this.id,
+      positionSeconds: data.positionSeconds.present
+          ? data.positionSeconds.value
+          : this.positionSeconds,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PlaybackRow(')
+          ..write('id: $id, ')
+          ..write('positionSeconds: $positionSeconds, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, positionSeconds, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PlaybackRow &&
+          other.id == this.id &&
+          other.positionSeconds == this.positionSeconds &&
+          other.updatedAt == this.updatedAt);
+}
+
+class PlaybackPositionsCompanion extends UpdateCompanion<PlaybackRow> {
+  final Value<String> id;
+  final Value<int> positionSeconds;
+  final Value<int> updatedAt;
+  final Value<int> rowid;
+  const PlaybackPositionsCompanion({
+    this.id = const Value.absent(),
+    this.positionSeconds = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PlaybackPositionsCompanion.insert({
+    required String id,
+    required int positionSeconds,
+    required int updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       positionSeconds = Value(positionSeconds),
+       updatedAt = Value(updatedAt);
+  static Insertable<PlaybackRow> custom({
+    Expression<String>? id,
+    Expression<int>? positionSeconds,
+    Expression<int>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (positionSeconds != null) 'position_seconds': positionSeconds,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PlaybackPositionsCompanion copyWith({
+    Value<String>? id,
+    Value<int>? positionSeconds,
+    Value<int>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return PlaybackPositionsCompanion(
+      id: id ?? this.id,
+      positionSeconds: positionSeconds ?? this.positionSeconds,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (positionSeconds.present) {
+      map['position_seconds'] = Variable<int>(positionSeconds.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PlaybackPositionsCompanion(')
+          ..write('id: $id, ')
+          ..write('positionSeconds: $positionSeconds, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $FavoritesTable extends Favorites
+    with TableInfo<$FavoritesTable, FavoriteRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FavoritesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _slugMeta = const VerificationMeta('slug');
+  @override
+  late final GeneratedColumn<String> slug = GeneratedColumn<String>(
+    'slug',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _jsonMeta = const VerificationMeta('json');
+  @override
+  late final GeneratedColumn<String> json = GeneratedColumn<String>(
+    'json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _addedAtMeta = const VerificationMeta(
+    'addedAt',
+  );
+  @override
+  late final GeneratedColumn<int> addedAt = GeneratedColumn<int>(
+    'added_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [slug, json, addedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'favorites';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<FavoriteRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('slug')) {
+      context.handle(
+        _slugMeta,
+        slug.isAcceptableOrUnknown(data['slug']!, _slugMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_slugMeta);
+    }
+    if (data.containsKey('json')) {
+      context.handle(
+        _jsonMeta,
+        json.isAcceptableOrUnknown(data['json']!, _jsonMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_jsonMeta);
+    }
+    if (data.containsKey('added_at')) {
+      context.handle(
+        _addedAtMeta,
+        addedAt.isAcceptableOrUnknown(data['added_at']!, _addedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_addedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {slug};
+  @override
+  FavoriteRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FavoriteRow(
+      slug: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}slug'],
+      )!,
+      json: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}json'],
+      )!,
+      addedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}added_at'],
+      )!,
+    );
+  }
+
+  @override
+  $FavoritesTable createAlias(String alias) {
+    return $FavoritesTable(attachedDatabase, alias);
+  }
+}
+
+class FavoriteRow extends DataClass implements Insertable<FavoriteRow> {
+  final String slug;
+  final String json;
+  final int addedAt;
+  const FavoriteRow({
+    required this.slug,
+    required this.json,
+    required this.addedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['slug'] = Variable<String>(slug);
+    map['json'] = Variable<String>(json);
+    map['added_at'] = Variable<int>(addedAt);
+    return map;
+  }
+
+  FavoritesCompanion toCompanion(bool nullToAbsent) {
+    return FavoritesCompanion(
+      slug: Value(slug),
+      json: Value(json),
+      addedAt: Value(addedAt),
+    );
+  }
+
+  factory FavoriteRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FavoriteRow(
+      slug: serializer.fromJson<String>(json['slug']),
+      json: serializer.fromJson<String>(json['json']),
+      addedAt: serializer.fromJson<int>(json['addedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'slug': serializer.toJson<String>(slug),
+      'json': serializer.toJson<String>(json),
+      'addedAt': serializer.toJson<int>(addedAt),
+    };
+  }
+
+  FavoriteRow copyWith({String? slug, String? json, int? addedAt}) =>
+      FavoriteRow(
+        slug: slug ?? this.slug,
+        json: json ?? this.json,
+        addedAt: addedAt ?? this.addedAt,
+      );
+  FavoriteRow copyWithCompanion(FavoritesCompanion data) {
+    return FavoriteRow(
+      slug: data.slug.present ? data.slug.value : this.slug,
+      json: data.json.present ? data.json.value : this.json,
+      addedAt: data.addedAt.present ? data.addedAt.value : this.addedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FavoriteRow(')
+          ..write('slug: $slug, ')
+          ..write('json: $json, ')
+          ..write('addedAt: $addedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(slug, json, addedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FavoriteRow &&
+          other.slug == this.slug &&
+          other.json == this.json &&
+          other.addedAt == this.addedAt);
+}
+
+class FavoritesCompanion extends UpdateCompanion<FavoriteRow> {
+  final Value<String> slug;
+  final Value<String> json;
+  final Value<int> addedAt;
+  final Value<int> rowid;
+  const FavoritesCompanion({
+    this.slug = const Value.absent(),
+    this.json = const Value.absent(),
+    this.addedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  FavoritesCompanion.insert({
+    required String slug,
+    required String json,
+    required int addedAt,
+    this.rowid = const Value.absent(),
+  }) : slug = Value(slug),
+       json = Value(json),
+       addedAt = Value(addedAt);
+  static Insertable<FavoriteRow> custom({
+    Expression<String>? slug,
+    Expression<String>? json,
+    Expression<int>? addedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (slug != null) 'slug': slug,
+      if (json != null) 'json': json,
+      if (addedAt != null) 'added_at': addedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  FavoritesCompanion copyWith({
+    Value<String>? slug,
+    Value<String>? json,
+    Value<int>? addedAt,
+    Value<int>? rowid,
+  }) {
+    return FavoritesCompanion(
+      slug: slug ?? this.slug,
+      json: json ?? this.json,
+      addedAt: addedAt ?? this.addedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (slug.present) {
+      map['slug'] = Variable<String>(slug.value);
+    }
+    if (json.present) {
+      map['json'] = Variable<String>(json.value);
+    }
+    if (addedAt.present) {
+      map['added_at'] = Variable<int>(addedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FavoritesCompanion(')
+          ..write('slug: $slug, ')
+          ..write('json: $json, ')
+          ..write('addedAt: $addedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $AppCacheEntriesTable extends AppCacheEntries
+    with TableInfo<$AppCacheEntriesTable, AppCacheRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AppCacheEntriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _cacheKeyMeta = const VerificationMeta(
+    'cacheKey',
+  );
+  @override
+  late final GeneratedColumn<String> cacheKey = GeneratedColumn<String>(
+    'cache_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _valueMeta = const VerificationMeta('value');
+  @override
+  late final GeneratedColumn<String> value = GeneratedColumn<String>(
+    'value',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dateKeyMeta = const VerificationMeta(
+    'dateKey',
+  );
+  @override
+  late final GeneratedColumn<String> dateKey = GeneratedColumn<String>(
+    'date_key',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [cacheKey, value, dateKey, updatedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'app_cache_entries';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AppCacheRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('cache_key')) {
+      context.handle(
+        _cacheKeyMeta,
+        cacheKey.isAcceptableOrUnknown(data['cache_key']!, _cacheKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_cacheKeyMeta);
+    }
+    if (data.containsKey('value')) {
+      context.handle(
+        _valueMeta,
+        value.isAcceptableOrUnknown(data['value']!, _valueMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_valueMeta);
+    }
+    if (data.containsKey('date_key')) {
+      context.handle(
+        _dateKeyMeta,
+        dateKey.isAcceptableOrUnknown(data['date_key']!, _dateKeyMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {cacheKey};
+  @override
+  AppCacheRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AppCacheRow(
+      cacheKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}cache_key'],
+      )!,
+      value: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}value'],
+      )!,
+      dateKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}date_key'],
+      ),
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $AppCacheEntriesTable createAlias(String alias) {
+    return $AppCacheEntriesTable(attachedDatabase, alias);
+  }
+}
+
+class AppCacheRow extends DataClass implements Insertable<AppCacheRow> {
+  final String cacheKey;
+  final String value;
+  final String? dateKey;
+  final int updatedAt;
+  const AppCacheRow({
+    required this.cacheKey,
+    required this.value,
+    this.dateKey,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['cache_key'] = Variable<String>(cacheKey);
+    map['value'] = Variable<String>(value);
+    if (!nullToAbsent || dateKey != null) {
+      map['date_key'] = Variable<String>(dateKey);
+    }
+    map['updated_at'] = Variable<int>(updatedAt);
+    return map;
+  }
+
+  AppCacheEntriesCompanion toCompanion(bool nullToAbsent) {
+    return AppCacheEntriesCompanion(
+      cacheKey: Value(cacheKey),
+      value: Value(value),
+      dateKey: dateKey == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dateKey),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory AppCacheRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AppCacheRow(
+      cacheKey: serializer.fromJson<String>(json['cacheKey']),
+      value: serializer.fromJson<String>(json['value']),
+      dateKey: serializer.fromJson<String?>(json['dateKey']),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'cacheKey': serializer.toJson<String>(cacheKey),
+      'value': serializer.toJson<String>(value),
+      'dateKey': serializer.toJson<String?>(dateKey),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+    };
+  }
+
+  AppCacheRow copyWith({
+    String? cacheKey,
+    String? value,
+    Value<String?> dateKey = const Value.absent(),
+    int? updatedAt,
+  }) => AppCacheRow(
+    cacheKey: cacheKey ?? this.cacheKey,
+    value: value ?? this.value,
+    dateKey: dateKey.present ? dateKey.value : this.dateKey,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  AppCacheRow copyWithCompanion(AppCacheEntriesCompanion data) {
+    return AppCacheRow(
+      cacheKey: data.cacheKey.present ? data.cacheKey.value : this.cacheKey,
+      value: data.value.present ? data.value.value : this.value,
+      dateKey: data.dateKey.present ? data.dateKey.value : this.dateKey,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AppCacheRow(')
+          ..write('cacheKey: $cacheKey, ')
+          ..write('value: $value, ')
+          ..write('dateKey: $dateKey, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(cacheKey, value, dateKey, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AppCacheRow &&
+          other.cacheKey == this.cacheKey &&
+          other.value == this.value &&
+          other.dateKey == this.dateKey &&
+          other.updatedAt == this.updatedAt);
+}
+
+class AppCacheEntriesCompanion extends UpdateCompanion<AppCacheRow> {
+  final Value<String> cacheKey;
+  final Value<String> value;
+  final Value<String?> dateKey;
+  final Value<int> updatedAt;
+  final Value<int> rowid;
+  const AppCacheEntriesCompanion({
+    this.cacheKey = const Value.absent(),
+    this.value = const Value.absent(),
+    this.dateKey = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  AppCacheEntriesCompanion.insert({
+    required String cacheKey,
+    required String value,
+    this.dateKey = const Value.absent(),
+    required int updatedAt,
+    this.rowid = const Value.absent(),
+  }) : cacheKey = Value(cacheKey),
+       value = Value(value),
+       updatedAt = Value(updatedAt);
+  static Insertable<AppCacheRow> custom({
+    Expression<String>? cacheKey,
+    Expression<String>? value,
+    Expression<String>? dateKey,
+    Expression<int>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (cacheKey != null) 'cache_key': cacheKey,
+      if (value != null) 'value': value,
+      if (dateKey != null) 'date_key': dateKey,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  AppCacheEntriesCompanion copyWith({
+    Value<String>? cacheKey,
+    Value<String>? value,
+    Value<String?>? dateKey,
+    Value<int>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return AppCacheEntriesCompanion(
+      cacheKey: cacheKey ?? this.cacheKey,
+      value: value ?? this.value,
+      dateKey: dateKey ?? this.dateKey,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (cacheKey.present) {
+      map['cache_key'] = Variable<String>(cacheKey.value);
+    }
+    if (value.present) {
+      map['value'] = Variable<String>(value.value);
+    }
+    if (dateKey.present) {
+      map['date_key'] = Variable<String>(dateKey.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AppCacheEntriesCompanion(')
+          ..write('cacheKey: $cacheKey, ')
+          ..write('value: $value, ')
+          ..write('dateKey: $dateKey, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -1670,6 +2774,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $FilmDetailsTable filmDetails = $FilmDetailsTable(this);
   late final $FilmPeoplesTable filmPeoples = $FilmPeoplesTable(this);
   late final $FilmImagesTable filmImages = $FilmImagesTable(this);
+  late final $WatchHistoriesTable watchHistories = $WatchHistoriesTable(this);
+  late final $PlaybackPositionsTable playbackPositions =
+      $PlaybackPositionsTable(this);
+  late final $FavoritesTable favorites = $FavoritesTable(this);
+  late final $AppCacheEntriesTable appCacheEntries = $AppCacheEntriesTable(
+    this,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1680,6 +2791,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     filmDetails,
     filmPeoples,
     filmImages,
+    watchHistories,
+    playbackPositions,
+    favorites,
+    appCacheEntries,
   ];
 }
 
@@ -2622,6 +3737,688 @@ typedef $$FilmImagesTableProcessedTableManager =
       FilmImagesRow,
       PrefetchHooks Function()
     >;
+typedef $$WatchHistoriesTableCreateCompanionBuilder =
+    WatchHistoriesCompanion Function({
+      required String slug,
+      required String json,
+      required int watchedAt,
+      Value<int> rowid,
+    });
+typedef $$WatchHistoriesTableUpdateCompanionBuilder =
+    WatchHistoriesCompanion Function({
+      Value<String> slug,
+      Value<String> json,
+      Value<int> watchedAt,
+      Value<int> rowid,
+    });
+
+class $$WatchHistoriesTableFilterComposer
+    extends Composer<_$AppDatabase, $WatchHistoriesTable> {
+  $$WatchHistoriesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get slug => $composableBuilder(
+    column: $table.slug,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get json => $composableBuilder(
+    column: $table.json,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get watchedAt => $composableBuilder(
+    column: $table.watchedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$WatchHistoriesTableOrderingComposer
+    extends Composer<_$AppDatabase, $WatchHistoriesTable> {
+  $$WatchHistoriesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get slug => $composableBuilder(
+    column: $table.slug,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get json => $composableBuilder(
+    column: $table.json,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get watchedAt => $composableBuilder(
+    column: $table.watchedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$WatchHistoriesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $WatchHistoriesTable> {
+  $$WatchHistoriesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get slug =>
+      $composableBuilder(column: $table.slug, builder: (column) => column);
+
+  GeneratedColumn<String> get json =>
+      $composableBuilder(column: $table.json, builder: (column) => column);
+
+  GeneratedColumn<int> get watchedAt =>
+      $composableBuilder(column: $table.watchedAt, builder: (column) => column);
+}
+
+class $$WatchHistoriesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $WatchHistoriesTable,
+          WatchHistoryRow,
+          $$WatchHistoriesTableFilterComposer,
+          $$WatchHistoriesTableOrderingComposer,
+          $$WatchHistoriesTableAnnotationComposer,
+          $$WatchHistoriesTableCreateCompanionBuilder,
+          $$WatchHistoriesTableUpdateCompanionBuilder,
+          (
+            WatchHistoryRow,
+            BaseReferences<
+              _$AppDatabase,
+              $WatchHistoriesTable,
+              WatchHistoryRow
+            >,
+          ),
+          WatchHistoryRow,
+          PrefetchHooks Function()
+        > {
+  $$WatchHistoriesTableTableManager(
+    _$AppDatabase db,
+    $WatchHistoriesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$WatchHistoriesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$WatchHistoriesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$WatchHistoriesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> slug = const Value.absent(),
+                Value<String> json = const Value.absent(),
+                Value<int> watchedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => WatchHistoriesCompanion(
+                slug: slug,
+                json: json,
+                watchedAt: watchedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String slug,
+                required String json,
+                required int watchedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => WatchHistoriesCompanion.insert(
+                slug: slug,
+                json: json,
+                watchedAt: watchedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$WatchHistoriesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $WatchHistoriesTable,
+      WatchHistoryRow,
+      $$WatchHistoriesTableFilterComposer,
+      $$WatchHistoriesTableOrderingComposer,
+      $$WatchHistoriesTableAnnotationComposer,
+      $$WatchHistoriesTableCreateCompanionBuilder,
+      $$WatchHistoriesTableUpdateCompanionBuilder,
+      (
+        WatchHistoryRow,
+        BaseReferences<_$AppDatabase, $WatchHistoriesTable, WatchHistoryRow>,
+      ),
+      WatchHistoryRow,
+      PrefetchHooks Function()
+    >;
+typedef $$PlaybackPositionsTableCreateCompanionBuilder =
+    PlaybackPositionsCompanion Function({
+      required String id,
+      required int positionSeconds,
+      required int updatedAt,
+      Value<int> rowid,
+    });
+typedef $$PlaybackPositionsTableUpdateCompanionBuilder =
+    PlaybackPositionsCompanion Function({
+      Value<String> id,
+      Value<int> positionSeconds,
+      Value<int> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$PlaybackPositionsTableFilterComposer
+    extends Composer<_$AppDatabase, $PlaybackPositionsTable> {
+  $$PlaybackPositionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get positionSeconds => $composableBuilder(
+    column: $table.positionSeconds,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$PlaybackPositionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $PlaybackPositionsTable> {
+  $$PlaybackPositionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get positionSeconds => $composableBuilder(
+    column: $table.positionSeconds,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PlaybackPositionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PlaybackPositionsTable> {
+  $$PlaybackPositionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get positionSeconds => $composableBuilder(
+    column: $table.positionSeconds,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$PlaybackPositionsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PlaybackPositionsTable,
+          PlaybackRow,
+          $$PlaybackPositionsTableFilterComposer,
+          $$PlaybackPositionsTableOrderingComposer,
+          $$PlaybackPositionsTableAnnotationComposer,
+          $$PlaybackPositionsTableCreateCompanionBuilder,
+          $$PlaybackPositionsTableUpdateCompanionBuilder,
+          (
+            PlaybackRow,
+            BaseReferences<_$AppDatabase, $PlaybackPositionsTable, PlaybackRow>,
+          ),
+          PlaybackRow,
+          PrefetchHooks Function()
+        > {
+  $$PlaybackPositionsTableTableManager(
+    _$AppDatabase db,
+    $PlaybackPositionsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PlaybackPositionsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PlaybackPositionsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PlaybackPositionsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<int> positionSeconds = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PlaybackPositionsCompanion(
+                id: id,
+                positionSeconds: positionSeconds,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required int positionSeconds,
+                required int updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => PlaybackPositionsCompanion.insert(
+                id: id,
+                positionSeconds: positionSeconds,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PlaybackPositionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PlaybackPositionsTable,
+      PlaybackRow,
+      $$PlaybackPositionsTableFilterComposer,
+      $$PlaybackPositionsTableOrderingComposer,
+      $$PlaybackPositionsTableAnnotationComposer,
+      $$PlaybackPositionsTableCreateCompanionBuilder,
+      $$PlaybackPositionsTableUpdateCompanionBuilder,
+      (
+        PlaybackRow,
+        BaseReferences<_$AppDatabase, $PlaybackPositionsTable, PlaybackRow>,
+      ),
+      PlaybackRow,
+      PrefetchHooks Function()
+    >;
+typedef $$FavoritesTableCreateCompanionBuilder =
+    FavoritesCompanion Function({
+      required String slug,
+      required String json,
+      required int addedAt,
+      Value<int> rowid,
+    });
+typedef $$FavoritesTableUpdateCompanionBuilder =
+    FavoritesCompanion Function({
+      Value<String> slug,
+      Value<String> json,
+      Value<int> addedAt,
+      Value<int> rowid,
+    });
+
+class $$FavoritesTableFilterComposer
+    extends Composer<_$AppDatabase, $FavoritesTable> {
+  $$FavoritesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get slug => $composableBuilder(
+    column: $table.slug,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get json => $composableBuilder(
+    column: $table.json,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get addedAt => $composableBuilder(
+    column: $table.addedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$FavoritesTableOrderingComposer
+    extends Composer<_$AppDatabase, $FavoritesTable> {
+  $$FavoritesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get slug => $composableBuilder(
+    column: $table.slug,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get json => $composableBuilder(
+    column: $table.json,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get addedAt => $composableBuilder(
+    column: $table.addedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$FavoritesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $FavoritesTable> {
+  $$FavoritesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get slug =>
+      $composableBuilder(column: $table.slug, builder: (column) => column);
+
+  GeneratedColumn<String> get json =>
+      $composableBuilder(column: $table.json, builder: (column) => column);
+
+  GeneratedColumn<int> get addedAt =>
+      $composableBuilder(column: $table.addedAt, builder: (column) => column);
+}
+
+class $$FavoritesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $FavoritesTable,
+          FavoriteRow,
+          $$FavoritesTableFilterComposer,
+          $$FavoritesTableOrderingComposer,
+          $$FavoritesTableAnnotationComposer,
+          $$FavoritesTableCreateCompanionBuilder,
+          $$FavoritesTableUpdateCompanionBuilder,
+          (
+            FavoriteRow,
+            BaseReferences<_$AppDatabase, $FavoritesTable, FavoriteRow>,
+          ),
+          FavoriteRow,
+          PrefetchHooks Function()
+        > {
+  $$FavoritesTableTableManager(_$AppDatabase db, $FavoritesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FavoritesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FavoritesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FavoritesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> slug = const Value.absent(),
+                Value<String> json = const Value.absent(),
+                Value<int> addedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => FavoritesCompanion(
+                slug: slug,
+                json: json,
+                addedAt: addedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String slug,
+                required String json,
+                required int addedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => FavoritesCompanion.insert(
+                slug: slug,
+                json: json,
+                addedAt: addedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$FavoritesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $FavoritesTable,
+      FavoriteRow,
+      $$FavoritesTableFilterComposer,
+      $$FavoritesTableOrderingComposer,
+      $$FavoritesTableAnnotationComposer,
+      $$FavoritesTableCreateCompanionBuilder,
+      $$FavoritesTableUpdateCompanionBuilder,
+      (
+        FavoriteRow,
+        BaseReferences<_$AppDatabase, $FavoritesTable, FavoriteRow>,
+      ),
+      FavoriteRow,
+      PrefetchHooks Function()
+    >;
+typedef $$AppCacheEntriesTableCreateCompanionBuilder =
+    AppCacheEntriesCompanion Function({
+      required String cacheKey,
+      required String value,
+      Value<String?> dateKey,
+      required int updatedAt,
+      Value<int> rowid,
+    });
+typedef $$AppCacheEntriesTableUpdateCompanionBuilder =
+    AppCacheEntriesCompanion Function({
+      Value<String> cacheKey,
+      Value<String> value,
+      Value<String?> dateKey,
+      Value<int> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$AppCacheEntriesTableFilterComposer
+    extends Composer<_$AppDatabase, $AppCacheEntriesTable> {
+  $$AppCacheEntriesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get cacheKey => $composableBuilder(
+    column: $table.cacheKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get dateKey => $composableBuilder(
+    column: $table.dateKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$AppCacheEntriesTableOrderingComposer
+    extends Composer<_$AppDatabase, $AppCacheEntriesTable> {
+  $$AppCacheEntriesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get cacheKey => $composableBuilder(
+    column: $table.cacheKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get dateKey => $composableBuilder(
+    column: $table.dateKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$AppCacheEntriesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AppCacheEntriesTable> {
+  $$AppCacheEntriesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get cacheKey =>
+      $composableBuilder(column: $table.cacheKey, builder: (column) => column);
+
+  GeneratedColumn<String> get value =>
+      $composableBuilder(column: $table.value, builder: (column) => column);
+
+  GeneratedColumn<String> get dateKey =>
+      $composableBuilder(column: $table.dateKey, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$AppCacheEntriesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AppCacheEntriesTable,
+          AppCacheRow,
+          $$AppCacheEntriesTableFilterComposer,
+          $$AppCacheEntriesTableOrderingComposer,
+          $$AppCacheEntriesTableAnnotationComposer,
+          $$AppCacheEntriesTableCreateCompanionBuilder,
+          $$AppCacheEntriesTableUpdateCompanionBuilder,
+          (
+            AppCacheRow,
+            BaseReferences<_$AppDatabase, $AppCacheEntriesTable, AppCacheRow>,
+          ),
+          AppCacheRow,
+          PrefetchHooks Function()
+        > {
+  $$AppCacheEntriesTableTableManager(
+    _$AppDatabase db,
+    $AppCacheEntriesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AppCacheEntriesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AppCacheEntriesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AppCacheEntriesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> cacheKey = const Value.absent(),
+                Value<String> value = const Value.absent(),
+                Value<String?> dateKey = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => AppCacheEntriesCompanion(
+                cacheKey: cacheKey,
+                value: value,
+                dateKey: dateKey,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String cacheKey,
+                required String value,
+                Value<String?> dateKey = const Value.absent(),
+                required int updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => AppCacheEntriesCompanion.insert(
+                cacheKey: cacheKey,
+                value: value,
+                dateKey: dateKey,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$AppCacheEntriesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AppCacheEntriesTable,
+      AppCacheRow,
+      $$AppCacheEntriesTableFilterComposer,
+      $$AppCacheEntriesTableOrderingComposer,
+      $$AppCacheEntriesTableAnnotationComposer,
+      $$AppCacheEntriesTableCreateCompanionBuilder,
+      $$AppCacheEntriesTableUpdateCompanionBuilder,
+      (
+        AppCacheRow,
+        BaseReferences<_$AppDatabase, $AppCacheEntriesTable, AppCacheRow>,
+      ),
+      AppCacheRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -2636,4 +4433,12 @@ class $AppDatabaseManager {
       $$FilmPeoplesTableTableManager(_db, _db.filmPeoples);
   $$FilmImagesTableTableManager get filmImages =>
       $$FilmImagesTableTableManager(_db, _db.filmImages);
+  $$WatchHistoriesTableTableManager get watchHistories =>
+      $$WatchHistoriesTableTableManager(_db, _db.watchHistories);
+  $$PlaybackPositionsTableTableManager get playbackPositions =>
+      $$PlaybackPositionsTableTableManager(_db, _db.playbackPositions);
+  $$FavoritesTableTableManager get favorites =>
+      $$FavoritesTableTableManager(_db, _db.favorites);
+  $$AppCacheEntriesTableTableManager get appCacheEntries =>
+      $$AppCacheEntriesTableTableManager(_db, _db.appCacheEntries);
 }

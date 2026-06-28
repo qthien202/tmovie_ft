@@ -32,3 +32,13 @@ final filmsByCountryProvider = FutureProvider.family
       final repo = ref.watch(filmRepositoryProvider);
       return repo.getFilmsByCountry(params.slug, page: params.page);
     });
+
+/// Films shown in the home hero carousel.
+///
+/// Delegates to [HeroRepository], which serves a local → Firestore → OPhim
+/// cache (refreshed at most once per day). For an explicit pull-to-refresh,
+/// call `ref.read(heroRepositoryProvider).getHero(forceRefresh: true)` then
+/// invalidate this provider.
+final heroFilmsProvider = FutureProvider.autoDispose<List<FilmItem>>((ref) {
+  return ref.watch(heroRepositoryProvider).getHero();
+});
