@@ -8,6 +8,20 @@ Vietnamese block free of Markdown styling (use emoji + "•" bullets).
 
 Every new feature/release must add a `## vX.Y.Z` section with both parts.
 
+## v1.3.1
+
+Video player and film-detail polish.
+- Player: redesigned controls (center buttons grouped, no longer spread to the edges), now auto-plays the next episode when one ends — with a "next episode" card (countdown, play now / cancel) — plus a playback-speed control (1x–2x).
+- Film detail redesigned into one immersive cinematic scroll (no more tabs): a bigger hero with a prominent "Xem ngay" button, an easy-to-scan episode grid, and a content-led layout.
+
+<!-- app:vi -->
+🎬 Trình phát mới
+• Nút điều khiển gom gọn lại giữa màn hình, tự động phát tập tiếp theo khi hết tập (có thẻ "tập tiếp theo" đếm ngược), thêm chỉnh tốc độ phát 1x–2x.
+
+✨ Trang phim đẹp hơn
+• Trang chi tiết chuyển sang phong cách điện ảnh một mạch cuộn: ảnh lớn, nút Xem ngay nổi bật, danh sách tập dạng lưới dễ chọn.
+<!-- /app:vi -->
+
 ## v1.3.0
 
 Browse redesign, smarter hot-film hero, and cross-device sync.

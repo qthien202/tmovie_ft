@@ -40,36 +40,19 @@ class FilmInfo extends ConsumerWidget {
             const SizedBox(height: AppSpacing.lg),
           ],
 
-          // Thể loại
-          if (film.category != null && film.category!.isNotEmpty)
-            Wrap(
-              spacing: AppSpacing.sm,
-              runSpacing: AppSpacing.sm,
-              children: film.category!.map((cat) {
-                return Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryValue.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(AppRadius.sm),
-                    border: Border.all(
-                      color: AppColors.primaryValue.withValues(alpha: 0.3),
-                    ),
-                  ),
-                  child: Text(
-                    cat.name ?? '',
-                    style: AppTypography.labelSmall.copyWith(
-                      color: AppColors.primaryValue,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                );
-              }).toList(),
+          // Nội dung (synopsis) — surfaced early for a content-led layout.
+          if (film.content != null && film.content!.isNotEmpty) ...[
+            const _SectionTitle('Nội dung phim'),
+            const SizedBox(height: AppSpacing.md),
+            HtmlWidget(
+              film.content!,
+              textStyle: AppTypography.bodyLarge.copyWith(
+                color: AppColors.textSecondary,
+                height: 1.6,
+              ),
             ),
-
-          const SizedBox(height: AppSpacing.xl),
+            const SizedBox(height: AppSpacing.xl),
+          ],
 
           // Cast Section
           peoplesAsync.when(
@@ -98,7 +81,7 @@ class FilmInfo extends ConsumerWidget {
                     const SizedBox(height: 16),
                   ],
                   if (actors.isNotEmpty) ...[
-                    Text('Diễn viên', style: AppTypography.titleLarge),
+                    const _SectionTitle('Diễn viên'),
                     const SizedBox(height: AppSpacing.md),
                     SizedBox(
                       height: 130,
@@ -106,7 +89,7 @@ class FilmInfo extends ConsumerWidget {
                         scrollDirection: Axis.horizontal,
                         physics: const BouncingScrollPhysics(),
                         itemCount: actors.length,
-                        separatorBuilder: (_, __) => const SizedBox(width: 16),
+                        separatorBuilder: (_, _) => const SizedBox(width: 16),
                         itemBuilder: (context, index) {
                           return _ActorCard(
                             person: actors[index],
@@ -120,7 +103,7 @@ class FilmInfo extends ConsumerWidget {
               );
             },
             loading: () => _buildFallbackMeta(),
-            error: (_, __) => _buildFallbackMeta(),
+            error: (_, _) => _buildFallbackMeta(),
           ),
 
           // Image Gallery Section
@@ -139,7 +122,7 @@ class FilmInfo extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: AppSpacing.xxl),
-                  Text('Hình ảnh', style: AppTypography.titleLarge),
+                  const _SectionTitle('Hình ảnh'),
                   const SizedBox(height: AppSpacing.md),
                   SizedBox(
                     height: 160,
@@ -147,7 +130,7 @@ class FilmInfo extends ConsumerWidget {
                       scrollDirection: Axis.horizontal,
                       physics: const BouncingScrollPhysics(),
                       itemCount: backdrops.length,
-                      separatorBuilder: (_, __) => const SizedBox(width: 12),
+                      separatorBuilder: (_, _) => const SizedBox(width: 12),
                       itemBuilder: (context, index) {
                         final img = backdrops[index];
                         final imageUrl =
@@ -174,21 +157,9 @@ class FilmInfo extends ConsumerWidget {
               );
             },
             loading: () => const SizedBox(),
-            error: (_, __) => const SizedBox(),
+            error: (_, _) => const SizedBox(),
           ),
 
-          if (film.content != null && film.content!.isNotEmpty) ...[
-            const SizedBox(height: AppSpacing.xxl),
-            Text('Nội dung phim', style: AppTypography.titleLarge),
-            const SizedBox(height: AppSpacing.md),
-            HtmlWidget(
-              film.content!,
-              textStyle: AppTypography.bodyLarge.copyWith(
-                color: AppColors.textSecondary,
-                height: 1.6,
-              ),
-            ),
-          ],
         ],
       ),
     );
@@ -227,6 +198,30 @@ class FilmInfo extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Section heading with a teal accent bar (cinematic, consistent with catalog).
+class _SectionTitle extends StatelessWidget {
+  final String text;
+  const _SectionTitle(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 4,
+          height: 20,
+          decoration: BoxDecoration(
+            color: AppColors.primaryValue,
+            borderRadius: BorderRadius.circular(AppRadius.pill),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.sm),
+        Text(text, style: AppTypography.titleLarge),
+      ],
     );
   }
 }
