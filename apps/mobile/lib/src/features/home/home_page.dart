@@ -33,6 +33,7 @@ class _HomePageState extends ConsumerState<HomePage>
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     // Hero ưu tiên phim Hàn/Trung/Âu Mỹ rating cao của năm nay.
     final featuredFilmsAsync = ref.watch(heroFilmsProvider);
