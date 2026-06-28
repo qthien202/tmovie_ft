@@ -55,7 +55,7 @@ class HeroRepository {
       // 2. Firestore shared cache from today (only when local was missing).
       final remote = await _cache.read(_cacheKey);
       if (remote != null && remote['dateKey'] == today) {
-        final films = _decodeItems(remote['items']);
+        final films = _decodeRemote(remote);
         if (films.isNotEmpty) {
           await _saveLocal(films, today); // backfill so next time is local-only
           return films;
@@ -71,7 +71,10 @@ class HeroRepository {
         await _cache.write(_cacheKey, {
           'dateKey': today,
           'updatedAt': _now,
-          'items': films.map((f) => f.toJson()).toList(),
+          // Store as a JSON string: FilmItem.toJson keeps nested FilmCategory/
+          // FilmCountry as objects (explicitToJson:false), which Firestore's
+          // set() rejects. Encoding to a string sidesteps that entirely.
+          'itemsJson': jsonEncode(films.map((f) => f.toJson()).toList()),
         });
         return films;
       }
@@ -113,6 +116,14 @@ class HeroRepository {
     } catch (_) {
       return const [];
     }
+  }
+
+  /// Firestore payload → films. Prefers the `itemsJson` string field; falls
+  /// back to a legacy `items` array if present.
+  List<FilmItem> _decodeRemote(Map<String, dynamic> remote) {
+    final raw = remote['itemsJson'];
+    if (raw is String) return _decodeList(raw);
+    return _decodeItems(remote['items']);
   }
 
   List<FilmItem> _decodeItems(Object? raw) {
