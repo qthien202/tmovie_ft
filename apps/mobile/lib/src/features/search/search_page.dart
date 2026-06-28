@@ -141,9 +141,14 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               children: [
                 // Header: search field + filter inline
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                  padding: const EdgeInsets.fromLTRB(8, 12, 16, 8),
                   child: Row(
                     children: [
+                      IconButton(
+                        icon: const Icon(Icons.chevron_left_rounded),
+                        color: AppColors.textPrimary,
+                        onPressed: () => Navigator.of(context).maybePop(),
+                      ),
                       Expanded(
                         child: AppTextField(
                           controller: _controller,

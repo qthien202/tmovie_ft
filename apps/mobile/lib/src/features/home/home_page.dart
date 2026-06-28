@@ -1,5 +1,8 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
 import 'package:catalog/catalog.dart';
@@ -43,7 +46,9 @@ class _HomePageState extends ConsumerState<HomePage>
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      body: NestedScrollView(
+      body: Stack(
+        children: [
+          NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
             SliverOverlapAbsorber(
@@ -137,6 +142,42 @@ class _HomePageState extends ConsumerState<HomePage>
               },
             );
           }).toList(),
+        ),
+          ),
+          // Floating search icon (top-right over the hero) → global search.
+          Positioned(
+            top: MediaQuery.paddingOf(context).top + 8,
+            right: 16,
+            child: const _HomeSearchButton(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Frosted circular search button shown over the home hero.
+class _HomeSearchButton extends StatelessWidget {
+  const _HomeSearchButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(22),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        child: Material(
+          color: Colors.black.withValues(alpha: 0.28),
+          shape: const CircleBorder(),
+          child: InkWell(
+            customBorder: const CircleBorder(),
+            onTap: () => context.push('/search'),
+            child: const SizedBox(
+              width: 44,
+              height: 44,
+              child: Icon(Icons.search_rounded, color: Colors.white, size: 24),
+            ),
+          ),
         ),
       ),
     );

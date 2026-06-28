@@ -10,7 +10,16 @@ class FilmListPage extends ConsumerStatefulWidget {
   final String typeSlug;
   final String title;
 
-  const FilmListPage({super.key, required this.typeSlug, required this.title});
+  /// When shown as a bottom-nav root tab there's nothing to pop back to, so the
+  /// header hides its back button.
+  final bool isRootTab;
+
+  const FilmListPage({
+    super.key,
+    required this.typeSlug,
+    required this.title,
+    this.isRootTab = false,
+  });
 
   @override
   ConsumerState<FilmListPage> createState() => _FilmListPageState();
@@ -253,11 +262,13 @@ class _FilmListPageState extends ConsumerState<FilmListPage> {
                       ),
                       child: Row(
                         children: [
-                          _IconButton(
-                            icon: Icons.chevron_left_rounded,
-                            onTap: () => context.pop(),
-                          ),
-                          const SizedBox(width: AppSpacing.md),
+                          if (!widget.isRootTab) ...[
+                            _IconButton(
+                              icon: Icons.chevron_left_rounded,
+                              onTap: () => context.pop(),
+                            ),
+                            const SizedBox(width: AppSpacing.md),
+                          ],
                           Expanded(
                             child: Text(
                               widget.title,

@@ -55,18 +55,22 @@ class FilmSection extends ConsumerWidget {
   final String title;
   final String slug;
   final bool isGenre;
+  final bool isCountry;
 
   const FilmSection({
     super.key,
     required this.title,
     required this.slug,
     this.isGenre = false,
+    this.isCountry = false,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final filmsAsync = ref.watch(
-      isGenre
+      isCountry
+          ? filmsByCountryProvider((slug: slug, page: 1))
+          : isGenre
           ? filmsByGenreProvider((slug: slug, page: 1))
           : filmsByTypeProvider((
               typeSlug: slug,
