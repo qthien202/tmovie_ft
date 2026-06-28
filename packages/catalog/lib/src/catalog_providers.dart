@@ -33,45 +33,111 @@ final filmsByCountryProvider = FutureProvider.family
       return repo.getFilmsByCountry(params.slug, page: params.page);
     });
 
-/// Films shown in the home hero carousel.
+/// Films shown in the home hero carousel — what's actually trending now.
 ///
-/// Leads with what's hot right now — the platform's freshest updates
-/// (`phim-moi-cap-nhat`, the same feed as the "Mới cập nhật" row) — while
-/// prioritising the three regions our audience watches most: Korea, China and
-/// the West (Âu Mỹ). Region titles come first (in their trending order), then
-/// everything else, so the hero is current AND on-brand.
+/// Pipeline: TMDB (the intermediary "what's hot globally" source) → match each
+/// trending title against OPhim via search (so we only show titles that are
+/// actually playable here) → the searches are cached in the local Drift DB
+/// (offline-first). Korea/China/West originals are prioritised. Falls back to
+/// OPhim's freshest-updates feed if TMDB is unavailable or nothing matches.
 final heroFilmsProvider = FutureProvider.autoDispose<List<FilmItem>>((
   ref,
 ) async {
   final repo = ref.watch(filmRepositoryProvider);
-  const preferred = {'han-quoc', 'trung-quoc', 'au-my'};
+  final tmdb = ref.watch(tmdbServiceProvider);
 
-  Future<List<FilmItem>> fetchPage(int page) async {
+  List<TmdbTrendingTitle> trending;
+  try {
+    trending = await tmdb.getTrending();
+  } catch (_) {
+    trending = const [];
+  }
+  if (trending.isEmpty) return _freshestFallback(repo);
+
+  // Prioritise the regions our audience watches most.
+  const prefLangs = {'ko', 'zh', 'cn', 'en'};
+  trending.sort((a, b) {
+    final ap = prefLangs.contains(a.language) ? 0 : 1;
+    final bp = prefLangs.contains(b.language) ? 0 : 1;
+    return ap.compareTo(bp);
+  });
+
+  // Look the top trending titles up on OPhim in parallel (cached per keyword).
+  final candidates = trending.take(18).toList();
+  final matches = await Future.wait(
+    candidates.map((t) => _matchOnOphim(repo, t)),
+  );
+
+  final seen = <String>{};
+  final result = <FilmItem>[];
+  for (final m in matches) {
+    final slug = m?.slug;
+    if (m == null || slug == null || !seen.add(slug)) continue;
+    result.add(m);
+    if (result.length >= 10) break;
+  }
+
+  // Not enough playable matches — fall back to the freshest OPhim feed.
+  if (result.length < 3) return _freshestFallback(repo);
+  return result;
+});
+
+String _normalize(String s) =>
+    s.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), ' ').trim();
+
+/// Find the OPhim film that best matches a TMDB trending title.
+Future<FilmItem?> _matchOnOphim(
+  FilmRepository repo,
+  TmdbTrendingTitle t,
+) async {
+  for (final query in [t.name, t.originalName]) {
+    if (query.trim().isEmpty) continue;
     try {
-      final res = await repo.getFilmsByType('phim-moi-cap-nhat', page: page);
+      final res = await repo.searchFilms(query);
+      final items = res.data?.items ?? const <FilmItem>[];
+      if (items.isEmpty) continue;
+      final q = _normalize(query);
+      for (final it in items) {
+        final origin = _normalize(it.originName ?? '');
+        final name = _normalize(it.name ?? '');
+        if (origin == q ||
+            name == q ||
+            (origin.isNotEmpty && (origin.contains(q) || q.contains(origin)))) {
+          return it;
+        }
+      }
+      // No strong match — accept the top search hit for this title.
+      return items.first;
+    } catch (_) {
+      // Try the next query form.
+    }
+  }
+  return null;
+}
+
+/// OPhim's freshest-updates feed, Korea/China/West first. Offline-first cached.
+Future<List<FilmItem>> _freshestFallback(FilmRepository repo) async {
+  const preferred = {'han-quoc', 'trung-quoc', 'au-my'};
+  Future<List<FilmItem>> page(int p) async {
+    try {
+      final res = await repo.getFilmsByType('phim-moi-cap-nhat', page: p);
       return res.data?.items ?? const <FilmItem>[];
     } catch (_) {
       return const <FilmItem>[];
     }
   }
 
-  // A couple of pages of the freshest titles to prioritise from.
-  final pages = await Future.wait([fetchPage(1), fetchPage(2)]);
+  final pages = await Future.wait([page(1), page(2)]);
   final all = [for (final p in pages) ...p];
-
-  bool isPreferred(FilmItem f) =>
-      (f.country ?? const <FilmCountry>[]).any((c) => preferred.contains(c.slug));
-
   final region = <FilmItem>[];
   final rest = <FilmItem>[];
   final seen = <String>{};
   for (final f in all) {
     final slug = f.slug;
     if (slug == null || !seen.add(slug)) continue;
-    (isPreferred(f) ? region : rest).add(f);
+    final pref = (f.country ?? const <FilmCountry>[])
+        .any((c) => preferred.contains(c.slug));
+    (pref ? region : rest).add(f);
   }
-
-  // Region titles first; top up with other fresh titles so the hero is full.
-  final ordered = [...region, ...rest];
-  return ordered.take(10).toList();
-});
+  return [...region, ...rest].take(10).toList();
+}
