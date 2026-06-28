@@ -7,7 +7,7 @@ import 'package:design_system/design_system.dart';
 import 'package:detail/detail.dart';
 import 'package:media_library/media_library.dart';
 import 'widgets/film_info.dart';
-import 'widgets/episode_selector.dart';
+import 'widgets/episodes_rail.dart';
 
 class DetailPage extends ConsumerStatefulWidget {
   final String slug;
@@ -19,16 +19,13 @@ class DetailPage extends ConsumerStatefulWidget {
   ConsumerState<DetailPage> createState() => _DetailPageState();
 }
 
-class _DetailPageState extends ConsumerState<DetailPage>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+class _DetailPageState extends ConsumerState<DetailPage> {
   late ScrollController _scrollController;
   bool _showStickyCTA = false;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
     _scrollController = ScrollController();
 
     _scrollController.addListener(() {
@@ -37,19 +34,23 @@ class _DetailPageState extends ConsumerState<DetailPage>
         setState(() => _showStickyCTA = showCTA);
       }
     });
-
-    _tabController.addListener(() {
-      if (!_tabController.indexIsChanging) {
-        setState(() {});
-      }
-    });
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  /// Whether the episode rail is worth showing (a series with >1 playable
+  /// episode). Single-episode films just use the hero's "Xem ngay".
+  bool _hasMultipleEpisodes(FilmDetail film) {
+    final eps = film.episodes;
+    if (eps == null || eps.isEmpty) return false;
+    for (final s in eps) {
+      if ((s.serverData?.length ?? 0) > 1) return true;
+    }
+    return false;
   }
 
   String? _findVideoUrl(FilmDetail film) {
@@ -130,57 +131,57 @@ class _DetailPageState extends ConsumerState<DetailPage>
                 controller: _scrollController,
                 physics: const BouncingScrollPhysics(),
                 slivers: [
-                  // App Bar with Poster & Tab Selection
+                  // Immersive hero — no tab bar; the page flows as one scroll.
                   SliverAppBar(
-                    expandedHeight: MediaQuery.sizeOf(context).height * 0.62,
+                    expandedHeight: MediaQuery.sizeOf(context).height * 0.66,
                     pinned: true,
                     stretch: true,
                     backgroundColor: AppColors.backgroundColor,
                     elevation: 0,
                     leadingWidth: 70,
                     leading: _buildGlassBackButton(),
-                    actions: [_buildFavoriteButton(film)],
                     flexibleSpace: FlexibleSpaceBar(
-                      collapseMode: CollapseMode.pin,
+                      collapseMode: CollapseMode.parallax,
                       stretchModes: const [StretchMode.zoomBackground],
                       background: _buildHero(film),
                     ),
-                    bottom: PreferredSize(
-                      preferredSize: const Size.fromHeight(70),
-                      child: _buildGlassTabBar(),
-                    ),
                   ),
 
-                  // Content Sliver (Switches based on Tab)
+                  // Flowing content: episodes rail → cast / gallery / synopsis.
                   SliverPadding(
                     padding: const EdgeInsets.only(bottom: 120),
                     sliver: SliverToBoxAdapter(
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 300),
-                        child: _tabController.index == 0
-                            ? FilmInfo(film: film)
-                            : EpisodeSelector(
-                                episodes: film.episodes ?? [],
-                                filmName: film.name ?? '',
-                                slug: film.slug ?? '',
-                                onEpisodeTap: (ep) {
-                                  final repo = ref.read(
-                                    historyRepositoryProvider,
-                                  );
-                                  repo.addHistory(
-                                    WatchHistoryEntry(
-                                      slug: film.slug ?? '',
-                                      name: film.name ?? '',
-                                      originName: film.originName,
-                                      thumbUrl: film.fullThumbUrl,
-                                      episode: ep.name,
-                                      timestamp:
-                                          DateTime.now().millisecondsSinceEpoch,
-                                    ),
-                                  );
-                                  ref.invalidate(watchHistoryProvider);
-                                },
-                              ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (_hasMultipleEpisodes(film)) ...[
+                            const SizedBox(height: AppSpacing.xl),
+                            EpisodesRail(
+                              episodes: film.episodes ?? [],
+                              filmName: film.name ?? '',
+                              slug: film.slug ?? '',
+                              thumbUrl: film.fullThumbUrl,
+                              onEpisodeTap: (ep) {
+                                final repo = ref.read(
+                                  historyRepositoryProvider,
+                                );
+                                repo.addHistory(
+                                  WatchHistoryEntry(
+                                    slug: film.slug ?? '',
+                                    name: film.name ?? '',
+                                    originName: film.originName,
+                                    thumbUrl: film.fullThumbUrl,
+                                    episode: ep.name,
+                                    timestamp:
+                                        DateTime.now().millisecondsSinceEpoch,
+                                  ),
+                                );
+                                ref.invalidate(watchHistoryProvider);
+                              },
+                            ),
+                          ],
+                          FilmInfo(film: film),
+                        ],
                       ),
                     ),
                   ),
@@ -241,161 +242,102 @@ class _DetailPageState extends ConsumerState<DetailPage>
     );
   }
 
-  Widget _buildFavoriteButton(FilmDetail film) {
+  Future<void> _toggleFavorite(FilmDetail film) async {
     final slug = film.slug ?? '';
-    final isFavAsync = ref.watch(isFavoriteProvider(slug));
-
-    return Padding(
-      padding: const EdgeInsets.only(right: 16),
-      child: Center(
-        child: GestureDetector(
-          onTap: () async {
-            final isFav = isFavAsync.valueOrNull ?? false;
-            final repo = ref.read(favoritesRepositoryProvider);
-            if (isFav) {
-              await repo.removeFavorite(slug);
-            } else {
-              await repo.addFavorite(
-                WatchHistoryEntry(
-                  slug: slug,
-                  name: film.name ?? '',
-                  originName: film.originName,
-                  thumbUrl: film.fullThumbUrl,
-                  timestamp: DateTime.now().millisecondsSinceEpoch,
-                ),
-              );
-            }
-            ref.invalidate(isFavoriteProvider(slug));
-            ref.invalidate(favoritesProvider);
-          },
-          child: ClipOval(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.2),
-                  ),
-                ),
-                child: Center(
-                  child: isFavAsync.when(
-                    data: (isFav) => Icon(
-                      isFav
-                          ? Icons.favorite_rounded
-                          : Icons.favorite_border_rounded,
-                      color: isFav ? AppColors.primaryValue : Colors.white,
-                      size: 20,
-                    ),
-                    loading: () => const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white54,
-                      ),
-                    ),
-                    error: (_, _) => const Icon(
-                      Icons.favorite_border_rounded,
-                      color: Colors.white54,
-                      size: 20,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
+    final isFav = ref.read(isFavoriteProvider(slug)).valueOrNull ?? false;
+    final repo = ref.read(favoritesRepositoryProvider);
+    if (isFav) {
+      await repo.removeFavorite(slug);
+    } else {
+      await repo.addFavorite(
+        WatchHistoryEntry(
+          slug: slug,
+          name: film.name ?? '',
+          originName: film.originName,
+          thumbUrl: film.fullThumbUrl,
+          timestamp: DateTime.now().millisecondsSinceEpoch,
         ),
-      ),
-    );
+      );
+    }
+    ref.invalidate(isFavoriteProvider(slug));
+    ref.invalidate(favoritesProvider);
   }
 
   Widget _buildHero(FilmDetail film) {
+    final hasVideo = _findVideoUrl(film) != null;
+    final genres = (film.category ?? []).take(3).toList();
+
     return Stack(
       fit: StackFit.expand,
       children: [
         // Full-bleed artwork
         AppImage(imageUrl: film.fullThumbUrl, boxFit: BoxFit.cover),
-        // Scrim for legibility + fade into the page
+        // Cinematic scrim: darken top a touch, deep fade into the page.
         const DecoratedBox(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              stops: [0.0, 0.45, 0.78, 1.0],
+              stops: [0.0, 0.38, 0.70, 1.0],
               colors: [
-                Color(0x66000000),
+                Color(0x59000000),
                 Color(0x00000000),
-                Color(0xCC0A0C0C),
+                Color(0xDD0A0C0C),
                 AppColors.backgroundColor,
               ],
             ),
           ),
         ),
-        // Floating title + meta + primary action (clears the tab bar)
+        // Floating title + meta + primary action.
         Positioned(
           left: AppSpacing.lg,
           right: AppSpacing.lg,
-          bottom: 78,
+          bottom: 28,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          film.name ?? '',
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: AppTypography.displayLarge.copyWith(
-                            fontSize: 28,
-                            height: 1.05,
-                            shadows: const [
-                              Shadow(
-                                color: Colors.black54,
-                                offset: Offset(0, 2),
-                                blurRadius: 12,
-                              ),
-                            ],
-                          ),
-                        ),
-                        if ((film.originName ?? '').isNotEmpty) ...[
-                          const SizedBox(height: AppSpacing.xs),
-                          Text(
-                            film.originName!,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: AppTypography.bodyMedium.copyWith(
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                  if (_findVideoUrl(film) != null) ...[
-                    const SizedBox(width: AppSpacing.md),
-                    HeroCircleButton(
-                      icon: Icons.play_arrow_rounded,
-                      primary: true,
-                      size: 52,
-                      iconSize: 28,
-                      onTap: () => _onPlayTap(film),
+              if (genres.isNotEmpty) ...[
+                Wrap(
+                  spacing: AppSpacing.sm,
+                  runSpacing: AppSpacing.xs,
+                  children: [
+                    for (final g in genres) _HeroGenreChip(label: g.name ?? ''),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.md),
+              ],
+              Text(
+                film.name ?? '',
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: AppTypography.displayLarge.copyWith(
+                  fontSize: 30,
+                  height: 1.05,
+                  shadows: const [
+                    Shadow(
+                      color: Colors.black87,
+                      offset: Offset(0, 2),
+                      blurRadius: 16,
                     ),
                   ],
-                ],
+                ),
               ),
+              if ((film.originName ?? '').isNotEmpty) ...[
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  film.originName!,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
               const SizedBox(height: AppSpacing.sm),
               _HeroMetaLine(film: film),
+              const SizedBox(height: AppSpacing.lg),
+              _buildHeroActions(film, hasVideo),
             ],
           ),
         ),
@@ -403,41 +345,28 @@ class _DetailPageState extends ConsumerState<DetailPage>
     );
   }
 
-  Widget _buildGlassTabBar() {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.lg,
-        vertical: AppSpacing.sm,
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-          child: Container(
-            height: 50,
-            decoration: BoxDecoration(
-              color: AppColors.surfaceColor.withValues(alpha: 0.5),
-              borderRadius: BorderRadius.circular(AppRadius.lg),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-            ),
-            child: TabBar(
-              controller: _tabController,
-              indicatorColor: AppColors.primaryValue,
-              indicatorWeight: 3,
-              indicatorSize: TabBarIndicatorSize.label,
-              dividerColor: Colors.transparent,
-              labelColor: AppColors.primaryValue,
-              unselectedLabelColor: AppColors.textSecondary,
-              labelStyle: AppTypography.labelMedium,
-              unselectedLabelStyle: AppTypography.labelMedium,
-              tabs: const [
-                Tab(text: 'Thông tin'),
-                Tab(text: 'Tập phim'),
-              ],
-            ),
-          ),
-        ),
-      ),
+  /// Primary "Xem ngay" CTA + favorite, the cinematic call-to-action row.
+  Widget _buildHeroActions(FilmDetail film, bool hasVideo) {
+    final slug = film.slug ?? '';
+    final isFav = ref.watch(isFavoriteProvider(slug)).valueOrNull ?? false;
+
+    final favBtn = _HeroSquareAction(
+      icon: isFav ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+      label: 'Thích',
+      active: isFav,
+      onTap: () => _toggleFavorite(film),
+    );
+
+    if (!hasVideo) {
+      return Row(children: [favBtn]);
+    }
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(child: _PlayCtaButton(onTap: () => _onPlayTap(film))),
+        const SizedBox(width: AppSpacing.md),
+        favBtn,
+      ],
     );
   }
 
@@ -492,11 +421,172 @@ class _DetailPageState extends ConsumerState<DetailPage>
                     ],
                   ),
                 ),
-                const SizedBox(width: AppSpacing.md),
-                AppButton(label: 'Xem ngay', onPressed: () => _onPlayTap(film)),
+                const SizedBox(width: AppSpacing.sm),
+                _StickyFavorite(film: film, onToggle: () => _toggleFavorite(film)),
+                const SizedBox(width: AppSpacing.sm),
+                AppButton(
+                  label: 'Xem ngay',
+                  icon: Icons.play_arrow_rounded,
+                  onPressed: () => _onPlayTap(film),
+                ),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Small teal-tinted genre chip used in the hero.
+class _HeroGenreChip extends StatelessWidget {
+  final String label;
+  const _HeroGenreChip({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(AppRadius.pill),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+      ),
+      child: Text(
+        label,
+        style: AppTypography.labelSmall.copyWith(
+          color: Colors.white,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+}
+
+/// Big gradient "Xem ngay" call-to-action.
+class _PlayCtaButton extends StatelessWidget {
+  final VoidCallback onTap;
+  const _PlayCtaButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(AppRadius.md),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        child: Container(
+          height: 54,
+          decoration: BoxDecoration(
+            color: AppColors.primaryValue,
+            borderRadius: BorderRadius.circular(AppRadius.md),
+          ),
+          alignment: Alignment.center,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.play_arrow_rounded,
+                color: AppColors.onPrimary,
+                size: 28,
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Text(
+                'Xem ngay',
+                style: AppTypography.titleMedium.copyWith(
+                  color: AppColors.onPrimary,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Glassy square action (favorite) beside the hero CTA.
+class _HeroSquareAction extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool active;
+  final VoidCallback onTap;
+  const _HeroSquareAction({
+    required this.icon,
+    required this.label,
+    required this.active,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white.withValues(alpha: 0.12),
+      borderRadius: BorderRadius.circular(AppRadius.md),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        child: Container(
+          width: 60,
+          height: 54,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppRadius.md),
+            border: Border.all(
+              color: active
+                  ? AppColors.primaryValue
+                  : Colors.white.withValues(alpha: 0.22),
+            ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                color: active ? AppColors.primaryValue : Colors.white,
+                size: 22,
+              ),
+              const SizedBox(height: 2),
+              Text(
+                label,
+                style: AppTypography.labelSmall.copyWith(
+                  color: active ? AppColors.primaryValue : Colors.white70,
+                  fontSize: 10,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Favorite heart for the collapsed sticky CTA.
+class _StickyFavorite extends ConsumerWidget {
+  final FilmDetail film;
+  final VoidCallback onToggle;
+  const _StickyFavorite({required this.film, required this.onToggle});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isFav =
+        ref.watch(isFavoriteProvider(film.slug ?? '')).valueOrNull ?? false;
+    return GestureDetector(
+      onTap: onToggle,
+      child: Container(
+        width: 42,
+        height: 42,
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.1),
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+        ),
+        child: Icon(
+          isFav ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+          color: isFav ? AppColors.primaryValue : Colors.white,
+          size: 20,
         ),
       ),
     );
