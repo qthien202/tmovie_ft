@@ -27,6 +27,7 @@ export 'src/network/tmdb_service.dart';
 
 // Services
 export 'src/services/auth_service.dart';
+export 'package:firebase_auth/firebase_auth.dart' show User;
 
 // Repositories
 export 'src/repositories/film_repository.dart';
