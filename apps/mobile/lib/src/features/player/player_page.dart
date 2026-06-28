@@ -51,18 +51,12 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
   bool _initialized = false;
   bool _wasPlaying = false;
 
-  // Skip-intro + auto-next-episode state.
-  bool _showSkipIntro = false;
+  // Auto-next-episode state.
   bool _showNextUp = false;
   bool _autoNextCancelled = false;
   bool _advancing = false;
   double _playbackSpeed = 1.0;
 
-  // Heuristic intro window (no per-title markers from the API): offer a skip
-  // button during the opening, only on episodes long enough to have one.
-  static const _introStart = Duration(seconds: 5);
-  static const _introEnd = Duration(seconds: 85);
-  static const _minDurationForIntro = Duration(minutes: 8);
   // Show the "next episode" card this long before the end.
   static const _nextUpLeadTime = Duration(seconds: 18);
   static const _speeds = [1.0, 1.25, 1.5, 2.0];
@@ -214,8 +208,6 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
       return;
     }
 
-    final showSkip =
-        dur >= _minDurationForIntro && pos >= _introStart && pos <= _introEnd;
     final remaining = dur - pos;
     final showNextUp = hasNext &&
         !_autoNextCancelled &&
@@ -224,13 +216,8 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
         remaining > Duration.zero &&
         remaining <= _nextUpLeadTime;
 
-    if (showSkip != _showSkipIntro || showNextUp != _showNextUp) {
-      if (mounted) {
-        setState(() {
-          _showSkipIntro = showSkip;
-          _showNextUp = showNextUp;
-        });
-      }
+    if (showNextUp != _showNextUp) {
+      if (mounted) setState(() => _showNextUp = showNextUp);
     }
   }
 
@@ -254,12 +241,6 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
   void _playNext() {
     final next = _nextEpisode();
     if (next != null) _switchEpisode(next, _selectedServerIndex);
-  }
-
-  void _skipIntro() {
-    _videoController?.seekTo(_introEnd);
-    setState(() => _showSkipIntro = false);
-    _startHideTimer();
   }
 
   void _cycleSpeed() {
@@ -303,7 +284,6 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
       _showPlaylist = false;
       _controlsVisible = true;
       // Reset per-episode overlay state.
-      _showSkipIntro = false;
       _showNextUp = false;
       _autoNextCancelled = false;
       _advancing = false;
@@ -436,10 +416,8 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
           // 3. Custom Controls
           _buildCustomControls(),
 
-          // 4. Skip-intro & next-episode overlays (shown regardless of the
-          // controls' visibility, like Netflix).
-          if (_showSkipIntro && !_showPlaylist && !_hasError)
-            _buildSkipIntroButton(),
+          // 4. Next-episode overlay (shown regardless of the controls'
+          // visibility, like Netflix).
           if (_showNextUp && !_showPlaylist && !_hasError) _buildNextUpCard(),
 
           // 5. Playlist Sidebar
@@ -548,22 +526,6 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
     );
   }
 
-  /// Netflix-style "Skip intro" pill shown during the opening window.
-  Widget _buildSkipIntroButton() {
-    return Positioned(
-      right: 28,
-      bottom: 96,
-      child: SafeArea(
-        child: _GlassActionButton(
-          icon: Icons.fast_forward_rounded,
-          label: 'Bỏ qua Intro',
-          filled: false,
-          onPressed: _skipIntro,
-        ),
-      ),
-    );
-  }
-
   Widget _buildNextUpCard() {
     final next = _nextEpisode();
     if (next == null) return const SizedBox.shrink();
@@ -656,12 +618,15 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
 
   Widget _buildCenterControls() {
     final isPlaying = _videoController?.value.isPlaying ?? false;
+    final hasNext = _nextEpisode() != null;
     return Center(
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           _CircleIconButton(
             icon: Icons.replay_10_rounded,
+            size: 46,
             onPressed: () {
               if (_videoController == null) return;
               final current = _videoController!.value.position;
@@ -669,9 +634,10 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
               _startHideTimer();
             },
           ),
+          const SizedBox(width: 34),
           _CircleIconButton(
             icon: isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
-            size: 64,
+            size: 68,
             isPrimary: true,
             onPressed: () {
               setState(() {
@@ -685,8 +651,10 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
               });
             },
           ),
+          const SizedBox(width: 34),
           _CircleIconButton(
             icon: Icons.forward_10_rounded,
+            size: 46,
             onPressed: () {
               if (_videoController == null) return;
               final current = _videoController!.value.position;
@@ -694,14 +662,17 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
               _startHideTimer();
             },
           ),
-          if (_nextEpisode() != null)
+          if (hasNext) ...[
+            const SizedBox(width: 34),
             _CircleIconButton(
               icon: Icons.skip_next_rounded,
+              size: 46,
               onPressed: () {
                 _playNext();
                 _startHideTimer();
               },
             ),
+          ],
         ],
       ),
     );
