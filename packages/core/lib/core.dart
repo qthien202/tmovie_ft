@@ -24,6 +24,7 @@ export 'src/models/tmdb_season_response.dart';
 export 'src/network/dio_provider.dart';
 export 'src/network/api_service.dart';
 export 'src/network/tmdb_service.dart';
+export 'src/network/trakt_service.dart';
 
 // Services
 export 'src/services/auth_service.dart';

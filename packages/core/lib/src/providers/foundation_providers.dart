@@ -5,6 +5,7 @@ import '../database/app_database.dart';
 import '../network/dio_provider.dart';
 import '../network/api_service.dart';
 import '../network/tmdb_service.dart';
+import '../network/trakt_service.dart';
 import '../repositories/film_repository.dart';
 import '../repositories/film_repository_impl.dart';
 import '../repositories/history_repository.dart';
@@ -53,7 +54,7 @@ final filmRepositoryProvider = Provider<FilmRepository>((ref) {
 final heroRepositoryProvider = Provider<HeroRepository>((ref) {
   return HeroRepository(
     ref.watch(filmRepositoryProvider),
-    ref.watch(tmdbServiceProvider),
+    ref.watch(traktServiceProvider),
     ref.watch(appDatabaseProvider),
     ref.watch(sharedCacheServiceProvider),
   );
@@ -61,6 +62,11 @@ final heroRepositoryProvider = Provider<HeroRepository>((ref) {
 
 final tmdbServiceProvider = Provider<TmdbService>((ref) {
   return TmdbService(ref.watch(dioProvider));
+});
+
+/// Trakt.tv — currently-hot titles (watched right now) for the home hero.
+final traktServiceProvider = Provider<TraktService>((ref) {
+  return TraktService(ref.watch(dioProvider));
 });
 
 final authServiceProvider = Provider<AuthService>((ref) => AuthService());

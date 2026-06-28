@@ -3,9 +3,10 @@ import 'dart:convert';
 import 'package:drift/drift.dart' show Value;
 
 import '../database/app_database.dart';
+import '../models/category.dart';
 import '../models/country.dart';
 import '../models/film_item.dart';
-import '../network/tmdb_service.dart';
+import '../network/trakt_service.dart';
 import '../services/shared_cache_service.dart';
 import 'film_repository.dart';
 
@@ -20,16 +21,17 @@ import 'film_repository.dart';
 ///   the API, re-syncing both caches.
 class HeroRepository {
   final FilmRepository _films;
-  final TmdbService _tmdb;
+  final TraktService _trakt;
   final AppDatabase _db;
   final SharedCacheService _cache;
 
-  HeroRepository(this._films, this._tmdb, this._db, this._cache);
+  HeroRepository(this._films, this._trakt, this._db, this._cache);
 
   // Bump the suffix whenever the build pipeline changes so stale day-caches
   // (local + Firestore) are invalidated immediately instead of lingering till
-  // the next day. v2 = TMDB discover per-language, Hàn/Trung prioritized.
-  static const _cacheKey = 'hero_hot_v2';
+  // the next day. v4 = Trakt trending (watched-right-now) source, animation
+  // excluded, stricter year-validated OPhim match.
+  static const _cacheKey = 'hero_hot_v4';
   static const _preferredCountries = {'han-quoc', 'trung-quoc', 'au-my'};
 
   int get _now => DateTime.now().millisecondsSinceEpoch;
@@ -139,20 +141,19 @@ class HeroRepository {
     }
   }
 
-  // ── API pipeline: TMDB trending → match on OPhim ──
+  // ── API pipeline: Trakt trending (watched-right-now) → match on OPhim ──
   Future<List<FilmItem>> _buildFromApi() async {
-    List<TmdbTrendingTitle> trending;
+    List<TraktTitle> trending;
     try {
-      trending = await _tmdb.getTrending();
+      trending = await _trakt.getTrending();
     } catch (_) {
       trending = const [];
     }
     if (trending.isEmpty) return _freshestFallback();
 
-    // [getTrending] already orders Hàn/Trung-hot first (TMDB discover per
-    // language), then a global tail — so we keep that order and just match the
-    // top candidates against OPhim. No re-sort here: Dart's sort is unstable
-    // and would scramble the carefully prioritized ordering.
+    // [getTrending] already orders Hàn/Trung-hot first, then a Western tail —
+    // so we keep that order and just match the top candidates against OPhim.
+    // No re-sort here: Dart's sort is unstable and would scramble the order.
     final candidates = trending.take(24).toList();
     final matches = await Future.wait(candidates.map(_matchOnOphim));
 
@@ -172,30 +173,59 @@ class HeroRepository {
   String _normalize(String s) =>
       s.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), ' ').trim();
 
-  Future<FilmItem?> _matchOnOphim(TmdbTrendingTitle t) async {
-    for (final query in [t.name, t.originalName]) {
+  Future<FilmItem?> _matchOnOphim(TraktTitle t) async {
+    for (final query in [t.name]) {
       if (query.trim().isEmpty) continue;
       try {
         final res = await _films.searchFilms(query);
-        final items = res.data?.items ?? const <FilmItem>[];
+        // Animation is excluded — the user wants live-action drama/movies only.
+        final items = (res.data?.items ?? const <FilmItem>[])
+            .where((it) => !_isAnimation(it))
+            .toList();
         if (items.isEmpty) continue;
         final q = _normalize(query);
+        FilmItem? best;
         for (final it in items) {
           final origin = _normalize(it.originName ?? '');
           final name = _normalize(it.name ?? '');
-          if (origin == q ||
-              name == q ||
-              (origin.isNotEmpty &&
-                  (origin.contains(q) || q.contains(origin)))) {
-            return it;
+          final exact = origin == q || name == q;
+          final contains =
+              (origin.isNotEmpty && (origin.contains(q) || q.contains(origin))) ||
+                  (name.isNotEmpty && (name.contains(q) || q.contains(name)));
+          if (exact) {
+            // Exact title + agreeing year (when known) → highest confidence.
+            if (t.year == null || it.year == null || it.year == t.year) return it;
+            best ??= it;
+          } else if (contains) {
+            // A loose title match is only trusted outright when the year agrees.
+            if (t.year != null && it.year == t.year) return it;
+            best ??= it;
           }
         }
-        return items.first;
+        if (best != null) return best;
+        // No confident match for this query form; try the next one.
       } catch (_) {
         // try next query form
       }
     }
+    // Give up rather than return an arbitrary search hit (was: items.first),
+    // which used to surface the wrong film.
     return null;
+  }
+
+  /// True for OPhim animation (donghua/anime) — by type or a "Hoạt Hình" genre.
+  bool _isAnimation(FilmItem f) {
+    if ((f.type ?? '').toLowerCase() == 'hoathinh') return true;
+    for (final c in f.category ?? const <FilmCategory>[]) {
+      final slug = (c.slug ?? '').toLowerCase();
+      final name = (c.name ?? '').toLowerCase();
+      if (slug == 'hoat-hinh' ||
+          name.contains('hoạt hình') ||
+          name.contains('hoat hinh')) {
+        return true;
+      }
+    }
+    return false;
   }
 
   Future<List<FilmItem>> _freshestFallback() async {
@@ -215,7 +245,7 @@ class HeroRepository {
     final seen = <String>{};
     for (final f in all) {
       final slug = f.slug;
-      if (slug == null || !seen.add(slug)) continue;
+      if (slug == null || !seen.add(slug) || _isAnimation(f)) continue;
       final pref = (f.country ?? const <FilmCountry>[])
           .any((c) => _preferredCountries.contains(c.slug));
       (pref ? region : rest).add(f);
