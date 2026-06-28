@@ -5,6 +5,7 @@ import '../features/search/search_page.dart';
 import '../features/detail/detail_page.dart';
 import '../features/player/player_page.dart';
 import '../features/film_list/film_list_page.dart';
+import '../features/catalog_tabs/catalog_tab_pages.dart';
 import '../features/genre/genre_page.dart';
 import '../features/profile/profile_page.dart';
 import '../features/profile/history_page.dart';
@@ -42,9 +43,23 @@ final appRouter = GoRouter(
           builder: (context, state) => const HomePage(),
         ),
         GoRoute(
-          path: '/search',
-          name: RouteNames.search,
-          builder: (context, state) => const SearchPage(),
+          path: '/phim-bo',
+          name: RouteNames.tabSeries,
+          builder: (context, state) => const SeriesTabPage(),
+        ),
+        GoRoute(
+          path: '/phim-le',
+          name: RouteNames.tabSingle,
+          builder: (context, state) => const FilmListPage(
+            typeSlug: 'phim-le',
+            title: 'Phim lẻ',
+            isRootTab: true,
+          ),
+        ),
+        GoRoute(
+          path: '/tv-shows',
+          name: RouteNames.tabTvShows,
+          builder: (context, state) => const TvShowsTabPage(),
         ),
         GoRoute(
           path: '/profile',
@@ -52,6 +67,13 @@ final appRouter = GoRouter(
           builder: (context, state) => const ProfilePage(),
         ),
       ],
+    ),
+    // Search is reached from a top-bar icon (Home), not a bottom tab — each
+    // film tab already has its own inline search.
+    GoRoute(
+      path: '/search',
+      name: RouteNames.search,
+      builder: (context, state) => const SearchPage(),
     ),
     GoRoute(
       path: '/history',

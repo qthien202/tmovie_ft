@@ -19,7 +19,9 @@ class MainShell extends ConsumerStatefulWidget {
 class _MainShellState extends ConsumerState<MainShell> {
   static const _tabs = [
     {'route': '/home', 'icon': Icons.home_rounded, 'label': 'Trang chủ'},
-    {'route': '/search', 'icon': Icons.search_rounded, 'label': 'Tìm kiếm'},
+    {'route': '/phim-bo', 'icon': Icons.live_tv_rounded, 'label': 'Phim bộ'},
+    {'route': '/phim-le', 'icon': Icons.movie_rounded, 'label': 'Phim lẻ'},
+    {'route': '/tv-shows', 'icon': Icons.tv_rounded, 'label': 'TV Shows'},
     {'route': '/profile', 'icon': Icons.person_rounded, 'label': 'Cá nhân'},
   ];
 
@@ -92,7 +94,7 @@ class _MainShellState extends ConsumerState<MainShell> {
                           duration: const Duration(milliseconds: 250),
                           curve: Curves.easeOut,
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
+                            horizontal: 9,
                             vertical: 7,
                           ),
                           decoration: BoxDecoration(
@@ -113,14 +115,17 @@ class _MainShellState extends ConsumerState<MainShell> {
                               Icon(
                                 _tabs[index]['icon'] as IconData,
                                 color: isSelected ? active : inactive,
-                                size: 22,
+                                size: 21,
                               ),
                               const SizedBox(height: 2),
                               Text(
                                 _tabs[index]['label'] as String,
+                                maxLines: 1,
+                                softWrap: false,
+                                overflow: TextOverflow.fade,
                                 style: AppTypography.labelSmall.copyWith(
                                   color: isSelected ? active : inactive,
-                                  fontSize: 11,
+                                  fontSize: 10,
                                   fontWeight: isSelected
                                       ? FontWeight.w700
                                       : FontWeight.w500,
