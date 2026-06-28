@@ -8,6 +8,18 @@ Vietnamese block free of Markdown styling (use emoji + "•" bullets).
 
 Every new feature/release must add a `## vX.Y.Z` section with both parts.
 
+## v1.2.1
+
+Player bug fixes on Android.
+- Fix: video frequently failed on the first play on Android — HLS (.m3u8) streams now tell ExoPlayer the format up front and retry on transient cold-starts.
+- Fix: the screen no longer sleeps while a video is playing (wakelock held during playback, released on pause/exit).
+
+<!-- app:vi -->
+🛠 Sửa lỗi
+• Khắc phục video không phát được ở lần bấm play đầu tiên trên Android.
+• Màn hình không còn tự tắt khi đang xem phim.
+<!-- /app:vi -->
+
 ## v1.2.0
 
 Cinematic immersive redesign of the mobile app.
