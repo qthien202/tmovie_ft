@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:design_system/design_system.dart';
 
 class _OnboardingSlide {
@@ -71,9 +72,16 @@ class _OnboardingPageState extends State<OnboardingPage>
     super.dispose();
   }
 
+  /// Mark onboarding as seen so it never shows again, then head to login.
+  Future<void> _finish() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('onboarding_seen', true);
+    if (mounted) context.go('/login');
+  }
+
   void _next() {
     if (_isLast) {
-      context.go('/login');
+      _finish();
     } else {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 450),
@@ -147,7 +155,7 @@ class _OnboardingPageState extends State<OnboardingPage>
                         opacity: _isLast ? 0 : 1,
                         duration: const Duration(milliseconds: 250),
                         child: TextButton(
-                          onPressed: _isLast ? null : () => context.go('/login'),
+                          onPressed: _isLast ? null : _finish,
                           child: Text(
                             'Bỏ qua',
                             style: AppTypography.labelLarge.copyWith(
