@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_player/video_player.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
 import 'package:media_library/media_library.dart';
@@ -48,6 +49,7 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
   BoxFit _videoFit = BoxFit.contain;
 
   bool _initialized = false;
+  bool _wasPlaying = false;
 
   @override
   void initState() {
@@ -100,47 +102,84 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
       _chewieController = null;
     });
 
-    final controller = VideoPlayerController.networkUrl(
-      Uri.parse(_currentVideoUrl),
+    // HLS (.m3u8): tell ExoPlayer the format outright. Without this hint Android
+    // probes the stream on the first attempt and frequently fails the very first
+    // play — passing VideoFormat.hls makes it use the HLS source factory directly.
+    final isHls = _currentVideoUrl.toLowerCase().contains('.m3u8');
+
+    VideoPlayerController? controller;
+    // ExoPlayer cold-start can throw a transient error on the first init; retry a
+    // couple of times with a short backoff before surfacing the error screen.
+    for (var attempt = 0; attempt < 3; attempt++) {
+      final c = VideoPlayerController.networkUrl(
+        Uri.parse(_currentVideoUrl),
+        formatHint: isHls ? VideoFormat.hls : null,
+      );
+      try {
+        await c.initialize();
+        controller = c;
+        break;
+      } catch (_) {
+        await c.dispose();
+        if (!mounted) return;
+        await Future.delayed(const Duration(milliseconds: 400));
+      }
+    }
+
+    if (controller == null) {
+      if (mounted) setState(() => _hasError = true);
+      return;
+    }
+
+    // The page may have been popped while we were initializing/retrying.
+    if (!mounted) {
+      await controller.dispose();
+      return;
+    }
+
+    // Restore saved playback position
+    final repo = ref.read(historyRepositoryProvider);
+    final savedPosition = await repo.getPlaybackPosition(
+      widget.slug,
+      _currentEpisodeName,
     );
 
-    try {
-      await controller.initialize();
+    _videoController = controller;
+    // Keep the screen awake while a video is actually playing.
+    _wasPlaying = false;
+    controller.addListener(_handlePlaybackStateForWakelock);
 
-      // Restore saved playback position
-      final repo = ref.read(historyRepositoryProvider);
-      final savedPosition = await repo.getPlaybackPosition(
-        widget.slug,
-        _currentEpisodeName,
-      );
+    _chewieController = ChewieController(
+      videoPlayerController: _videoController!,
+      autoPlay: true,
+      allowFullScreen: false,
+      allowMuting: true,
+      showControls: false,
+      startAt: savedPosition != null && savedPosition > 0
+          ? Duration(seconds: savedPosition)
+          : null,
+      placeholder: Container(color: Colors.black),
+      errorBuilder: (context, errorMessage) {
+        return _buildErrorView();
+      },
+    );
 
-      _videoController = controller;
+    // Save position periodically
+    _positionSaveTimer ??= Timer.periodic(
+      const Duration(seconds: 10),
+      (_) => _saveCurrentPosition(),
+    );
 
-      _chewieController = ChewieController(
-        videoPlayerController: _videoController!,
-        autoPlay: true,
-        allowFullScreen: false,
-        allowMuting: true,
-        showControls: false,
-        startAt: savedPosition != null && savedPosition > 0
-            ? Duration(seconds: savedPosition)
-            : null,
-        placeholder: Container(color: Colors.black),
-        errorBuilder: (context, errorMessage) {
-          return _buildErrorView();
-        },
-      );
+    if (mounted) setState(() {});
+  }
 
-      // Save position periodically
-      _positionSaveTimer ??= Timer.periodic(
-        const Duration(seconds: 10),
-        (_) => _saveCurrentPosition(),
-      );
-
-      if (mounted) setState(() {});
-    } catch (e) {
-      if (mounted) setState(() => _hasError = true);
-    }
+  /// Toggle the wakelock so the screen never sleeps mid-playback, but is freed
+  /// the moment playback pauses/ends.
+  void _handlePlaybackStateForWakelock() {
+    final playing = _videoController?.value.isPlaying ?? false;
+    if (playing == _wasPlaying) return;
+    _wasPlaying = playing;
+    WakelockPlus.toggle(enable: playing);
   }
 
   Future<void> _saveCurrentPosition() async {
@@ -165,6 +204,7 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
     _saveCurrentPosition();
     _videoController?.pause(); // Đảm bảo ngừng phát tập cũ
 
+    _videoController?.removeListener(_handlePlaybackStateForWakelock);
     _chewieController?.dispose();
     _videoController?.dispose();
 
@@ -251,6 +291,9 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
         repo.savePlaybackPosition(widget.slug, _currentEpisodeName, position);
       }
     }
+
+    _videoController?.removeListener(_handlePlaybackStateForWakelock);
+    WakelockPlus.disable();
 
     _chewieController?.dispose();
     _videoController?.dispose();
