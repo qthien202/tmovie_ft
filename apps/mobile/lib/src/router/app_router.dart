@@ -1,10 +1,9 @@
 import 'package:go_router/go_router.dart';
 import '../features/splash/splash_page.dart';
 import '../features/home/home_page.dart';
-import '../features/search/search_page.dart';
+import '../features/catalog/catalog_page.dart';
 import '../features/detail/detail_page.dart';
 import '../features/player/player_page.dart';
-import '../features/film_list/film_list_page.dart';
 import '../features/catalog_tabs/catalog_tab_pages.dart';
 import '../features/genre/genre_page.dart';
 import '../features/profile/profile_page.dart';
@@ -50,8 +49,8 @@ final appRouter = GoRouter(
         GoRoute(
           path: '/phim-le',
           name: RouteNames.tabSingle,
-          builder: (context, state) => const FilmListPage(
-            typeSlug: 'phim-le',
+          builder: (context, state) => const CatalogPage(
+            initialTypeSlug: 'phim-le',
             title: 'Phim lẻ',
             isRootTab: true,
           ),
@@ -69,11 +68,14 @@ final appRouter = GoRouter(
       ],
     ),
     // Search is reached from a top-bar icon (Home), not a bottom tab — each
-    // film tab already has its own inline search.
+    // film tab already has its own inline search. Shares CatalogPage.
     GoRoute(
       path: '/search',
       name: RouteNames.search,
-      builder: (context, state) => const SearchPage(),
+      builder: (context, state) => const CatalogPage(
+        title: 'Khám phá',
+        autofocusSearch: true,
+      ),
     ),
     GoRoute(
       path: '/history',
@@ -110,8 +112,8 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/film-list/:typeSlug',
       name: RouteNames.filmList,
-      builder: (context, state) => FilmListPage(
-        typeSlug: state.pathParameters['typeSlug']!,
+      builder: (context, state) => CatalogPage(
+        initialTypeSlug: state.pathParameters['typeSlug']!,
         title: state.uri.queryParameters['title'] ?? '',
       ),
     ),
