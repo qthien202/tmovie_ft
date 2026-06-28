@@ -21,6 +21,7 @@ part 'app_database.g.dart';
     WatchHistories,
     PlaybackPositions,
     Favorites,
+    AppCacheEntries,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -28,7 +29,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -43,8 +44,20 @@ class AppDatabase extends _$AppDatabase {
       if (from < 3) {
         await m.createTable(favorites);
       }
+      // v4: generic app cache (daily hero list, etc.).
+      if (from < 4) {
+        await m.createTable(appCacheEntries);
+      }
     },
   );
+
+  // ── Generic app cache ──
+  Future<AppCacheRow?> getAppCache(String key) =>
+      (select(appCacheEntries)..where((t) => t.cacheKey.equals(key)))
+          .getSingleOrNull();
+
+  Future<void> putAppCache(AppCacheEntriesCompanion row) =>
+      into(appCacheEntries).insertOnConflictUpdate(row);
 
   // ── Watch history (local) ──
   /// Newest first.

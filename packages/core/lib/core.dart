@@ -27,6 +27,7 @@ export 'src/network/tmdb_service.dart';
 
 // Services
 export 'src/services/auth_service.dart';
+export 'src/services/shared_cache_service.dart';
 export 'package:firebase_auth/firebase_auth.dart' show User;
 
 // Repositories
@@ -38,6 +39,7 @@ export 'src/repositories/favorites_repository.dart';
 export 'src/repositories/local_favorites_repository.dart';
 export 'src/repositories/firestore_history_repository.dart';
 export 'src/repositories/firestore_favorites_repository.dart';
+export 'src/repositories/hero_repository.dart';
 
 // Foundation providers
 export 'src/providers/foundation_providers.dart';

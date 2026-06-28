@@ -2452,6 +2452,320 @@ class FavoritesCompanion extends UpdateCompanion<FavoriteRow> {
   }
 }
 
+class $AppCacheEntriesTable extends AppCacheEntries
+    with TableInfo<$AppCacheEntriesTable, AppCacheRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AppCacheEntriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _cacheKeyMeta = const VerificationMeta(
+    'cacheKey',
+  );
+  @override
+  late final GeneratedColumn<String> cacheKey = GeneratedColumn<String>(
+    'cache_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _valueMeta = const VerificationMeta('value');
+  @override
+  late final GeneratedColumn<String> value = GeneratedColumn<String>(
+    'value',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dateKeyMeta = const VerificationMeta(
+    'dateKey',
+  );
+  @override
+  late final GeneratedColumn<String> dateKey = GeneratedColumn<String>(
+    'date_key',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [cacheKey, value, dateKey, updatedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'app_cache_entries';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AppCacheRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('cache_key')) {
+      context.handle(
+        _cacheKeyMeta,
+        cacheKey.isAcceptableOrUnknown(data['cache_key']!, _cacheKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_cacheKeyMeta);
+    }
+    if (data.containsKey('value')) {
+      context.handle(
+        _valueMeta,
+        value.isAcceptableOrUnknown(data['value']!, _valueMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_valueMeta);
+    }
+    if (data.containsKey('date_key')) {
+      context.handle(
+        _dateKeyMeta,
+        dateKey.isAcceptableOrUnknown(data['date_key']!, _dateKeyMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {cacheKey};
+  @override
+  AppCacheRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AppCacheRow(
+      cacheKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}cache_key'],
+      )!,
+      value: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}value'],
+      )!,
+      dateKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}date_key'],
+      ),
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $AppCacheEntriesTable createAlias(String alias) {
+    return $AppCacheEntriesTable(attachedDatabase, alias);
+  }
+}
+
+class AppCacheRow extends DataClass implements Insertable<AppCacheRow> {
+  final String cacheKey;
+  final String value;
+  final String? dateKey;
+  final int updatedAt;
+  const AppCacheRow({
+    required this.cacheKey,
+    required this.value,
+    this.dateKey,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['cache_key'] = Variable<String>(cacheKey);
+    map['value'] = Variable<String>(value);
+    if (!nullToAbsent || dateKey != null) {
+      map['date_key'] = Variable<String>(dateKey);
+    }
+    map['updated_at'] = Variable<int>(updatedAt);
+    return map;
+  }
+
+  AppCacheEntriesCompanion toCompanion(bool nullToAbsent) {
+    return AppCacheEntriesCompanion(
+      cacheKey: Value(cacheKey),
+      value: Value(value),
+      dateKey: dateKey == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dateKey),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory AppCacheRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AppCacheRow(
+      cacheKey: serializer.fromJson<String>(json['cacheKey']),
+      value: serializer.fromJson<String>(json['value']),
+      dateKey: serializer.fromJson<String?>(json['dateKey']),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'cacheKey': serializer.toJson<String>(cacheKey),
+      'value': serializer.toJson<String>(value),
+      'dateKey': serializer.toJson<String?>(dateKey),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+    };
+  }
+
+  AppCacheRow copyWith({
+    String? cacheKey,
+    String? value,
+    Value<String?> dateKey = const Value.absent(),
+    int? updatedAt,
+  }) => AppCacheRow(
+    cacheKey: cacheKey ?? this.cacheKey,
+    value: value ?? this.value,
+    dateKey: dateKey.present ? dateKey.value : this.dateKey,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  AppCacheRow copyWithCompanion(AppCacheEntriesCompanion data) {
+    return AppCacheRow(
+      cacheKey: data.cacheKey.present ? data.cacheKey.value : this.cacheKey,
+      value: data.value.present ? data.value.value : this.value,
+      dateKey: data.dateKey.present ? data.dateKey.value : this.dateKey,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AppCacheRow(')
+          ..write('cacheKey: $cacheKey, ')
+          ..write('value: $value, ')
+          ..write('dateKey: $dateKey, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(cacheKey, value, dateKey, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AppCacheRow &&
+          other.cacheKey == this.cacheKey &&
+          other.value == this.value &&
+          other.dateKey == this.dateKey &&
+          other.updatedAt == this.updatedAt);
+}
+
+class AppCacheEntriesCompanion extends UpdateCompanion<AppCacheRow> {
+  final Value<String> cacheKey;
+  final Value<String> value;
+  final Value<String?> dateKey;
+  final Value<int> updatedAt;
+  final Value<int> rowid;
+  const AppCacheEntriesCompanion({
+    this.cacheKey = const Value.absent(),
+    this.value = const Value.absent(),
+    this.dateKey = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  AppCacheEntriesCompanion.insert({
+    required String cacheKey,
+    required String value,
+    this.dateKey = const Value.absent(),
+    required int updatedAt,
+    this.rowid = const Value.absent(),
+  }) : cacheKey = Value(cacheKey),
+       value = Value(value),
+       updatedAt = Value(updatedAt);
+  static Insertable<AppCacheRow> custom({
+    Expression<String>? cacheKey,
+    Expression<String>? value,
+    Expression<String>? dateKey,
+    Expression<int>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (cacheKey != null) 'cache_key': cacheKey,
+      if (value != null) 'value': value,
+      if (dateKey != null) 'date_key': dateKey,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  AppCacheEntriesCompanion copyWith({
+    Value<String>? cacheKey,
+    Value<String>? value,
+    Value<String?>? dateKey,
+    Value<int>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return AppCacheEntriesCompanion(
+      cacheKey: cacheKey ?? this.cacheKey,
+      value: value ?? this.value,
+      dateKey: dateKey ?? this.dateKey,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (cacheKey.present) {
+      map['cache_key'] = Variable<String>(cacheKey.value);
+    }
+    if (value.present) {
+      map['value'] = Variable<String>(value.value);
+    }
+    if (dateKey.present) {
+      map['date_key'] = Variable<String>(dateKey.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AppCacheEntriesCompanion(')
+          ..write('cacheKey: $cacheKey, ')
+          ..write('value: $value, ')
+          ..write('dateKey: $dateKey, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2464,6 +2778,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $PlaybackPositionsTable playbackPositions =
       $PlaybackPositionsTable(this);
   late final $FavoritesTable favorites = $FavoritesTable(this);
+  late final $AppCacheEntriesTable appCacheEntries = $AppCacheEntriesTable(
+    this,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2477,6 +2794,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     watchHistories,
     playbackPositions,
     favorites,
+    appCacheEntries,
   ];
 }
 
@@ -3918,6 +4236,189 @@ typedef $$FavoritesTableProcessedTableManager =
       FavoriteRow,
       PrefetchHooks Function()
     >;
+typedef $$AppCacheEntriesTableCreateCompanionBuilder =
+    AppCacheEntriesCompanion Function({
+      required String cacheKey,
+      required String value,
+      Value<String?> dateKey,
+      required int updatedAt,
+      Value<int> rowid,
+    });
+typedef $$AppCacheEntriesTableUpdateCompanionBuilder =
+    AppCacheEntriesCompanion Function({
+      Value<String> cacheKey,
+      Value<String> value,
+      Value<String?> dateKey,
+      Value<int> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$AppCacheEntriesTableFilterComposer
+    extends Composer<_$AppDatabase, $AppCacheEntriesTable> {
+  $$AppCacheEntriesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get cacheKey => $composableBuilder(
+    column: $table.cacheKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get dateKey => $composableBuilder(
+    column: $table.dateKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$AppCacheEntriesTableOrderingComposer
+    extends Composer<_$AppDatabase, $AppCacheEntriesTable> {
+  $$AppCacheEntriesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get cacheKey => $composableBuilder(
+    column: $table.cacheKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get dateKey => $composableBuilder(
+    column: $table.dateKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$AppCacheEntriesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AppCacheEntriesTable> {
+  $$AppCacheEntriesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get cacheKey =>
+      $composableBuilder(column: $table.cacheKey, builder: (column) => column);
+
+  GeneratedColumn<String> get value =>
+      $composableBuilder(column: $table.value, builder: (column) => column);
+
+  GeneratedColumn<String> get dateKey =>
+      $composableBuilder(column: $table.dateKey, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$AppCacheEntriesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AppCacheEntriesTable,
+          AppCacheRow,
+          $$AppCacheEntriesTableFilterComposer,
+          $$AppCacheEntriesTableOrderingComposer,
+          $$AppCacheEntriesTableAnnotationComposer,
+          $$AppCacheEntriesTableCreateCompanionBuilder,
+          $$AppCacheEntriesTableUpdateCompanionBuilder,
+          (
+            AppCacheRow,
+            BaseReferences<_$AppDatabase, $AppCacheEntriesTable, AppCacheRow>,
+          ),
+          AppCacheRow,
+          PrefetchHooks Function()
+        > {
+  $$AppCacheEntriesTableTableManager(
+    _$AppDatabase db,
+    $AppCacheEntriesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AppCacheEntriesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AppCacheEntriesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AppCacheEntriesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> cacheKey = const Value.absent(),
+                Value<String> value = const Value.absent(),
+                Value<String?> dateKey = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => AppCacheEntriesCompanion(
+                cacheKey: cacheKey,
+                value: value,
+                dateKey: dateKey,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String cacheKey,
+                required String value,
+                Value<String?> dateKey = const Value.absent(),
+                required int updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => AppCacheEntriesCompanion.insert(
+                cacheKey: cacheKey,
+                value: value,
+                dateKey: dateKey,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$AppCacheEntriesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AppCacheEntriesTable,
+      AppCacheRow,
+      $$AppCacheEntriesTableFilterComposer,
+      $$AppCacheEntriesTableOrderingComposer,
+      $$AppCacheEntriesTableAnnotationComposer,
+      $$AppCacheEntriesTableCreateCompanionBuilder,
+      $$AppCacheEntriesTableUpdateCompanionBuilder,
+      (
+        AppCacheRow,
+        BaseReferences<_$AppDatabase, $AppCacheEntriesTable, AppCacheRow>,
+      ),
+      AppCacheRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -3938,4 +4439,6 @@ class $AppDatabaseManager {
       $$PlaybackPositionsTableTableManager(_db, _db.playbackPositions);
   $$FavoritesTableTableManager get favorites =>
       $$FavoritesTableTableManager(_db, _db.favorites);
+  $$AppCacheEntriesTableTableManager get appCacheEntries =>
+      $$AppCacheEntriesTableTableManager(_db, _db.appCacheEntries);
 }

@@ -9,22 +9,27 @@ import '../models/film_item.dart';
 import '../models/film_list_response.dart';
 import '../models/film_people_response.dart';
 import '../network/api_service.dart';
+import '../services/shared_cache_service.dart';
 import 'film_repository.dart';
 
 /// Offline-first film repository.
 ///
-/// Reads from the local Drift database first; only calls the network when the
-/// stored data is missing or older than the TTL, then upserts the fresh data
-/// back into the DB. On network failure it falls back to whatever the DB holds.
+/// Reads from the local Drift database first, then an optional shared Firestore
+/// cache, and only calls the network when both are missing or older than the
+/// TTL — upserting fresh data back into both. On network failure it falls back
+/// to whatever the caches hold.
 class FilmRepositoryImpl implements FilmRepository {
   final ApiService _apiService;
   final AppDatabase _db;
+
+  /// Optional shared (cross-device) cache tier in front of the API.
+  final SharedCacheService? _cache;
 
   static const _blockedCategorySlugs = {'18-plus'};
   static const _listTtl = Duration(minutes: 30);
   static const _detailTtl = Duration(hours: 24);
 
-  FilmRepositoryImpl(this._apiService, this._db);
+  FilmRepositoryImpl(this._apiService, this._db, [this._cache]);
 
   int get _now => DateTime.now().millisecondsSinceEpoch;
 
@@ -189,25 +194,61 @@ class FilmRepositoryImpl implements FilmRepository {
 
   @override
   Future<FilmDetailResponse> getFilmDetail(String slug) async {
+    final docId = 'detail_$slug';
     final stored = await _db.getDetail(slug);
-    final fresh =
+    final localFresh =
         stored != null && _now - stored.fetchedAt < _detailTtl.inMilliseconds;
-    if (fresh) {
+    // 1. Fresh local copy — no network at all.
+    if (localFresh) {
       return FilmDetailResponse.fromJson(
           jsonDecode(stored.json) as Map<String, dynamic>);
     }
+
+    // 2. Shared Firestore cache (only when local was missing/stale).
+    final cache = _cache;
+    if (cache != null) {
+      final remote = await cache.read(docId);
+      final remoteJson = remote?['json'] as String?;
+      final remoteAt = (remote?['fetchedAt'] as num?)?.toInt() ?? 0;
+      if (remoteJson != null &&
+          _now - remoteAt < _detailTtl.inMilliseconds) {
+        // Backfill local so the next read is local-only.
+        await _db.upsertDetail(FilmDetailsCompanion.insert(
+          slug: slug,
+          json: remoteJson,
+          fetchedAt: remoteAt,
+        ));
+        return FilmDetailResponse.fromJson(
+            jsonDecode(remoteJson) as Map<String, dynamic>);
+      }
+    }
+
+    // 3. OPhim — then sync into both caches.
     try {
       final response = await _apiService.getFilmDetail(slug: slug);
+      final jsonStr = jsonEncode(response.toJson());
       await _db.upsertDetail(FilmDetailsCompanion.insert(
         slug: slug,
-        json: jsonEncode(response.toJson()),
+        json: jsonStr,
         fetchedAt: _now,
       ));
+      if (cache != null) {
+        await cache.write(docId, {'json': jsonStr, 'fetchedAt': _now});
+      }
       return response;
     } catch (_) {
+      // 4. Stale fallback: local, then Firestore.
       if (stored != null) {
         return FilmDetailResponse.fromJson(
             jsonDecode(stored.json) as Map<String, dynamic>);
+      }
+      if (cache != null) {
+        final remote = await cache.read(docId);
+        final remoteJson = remote?['json'] as String?;
+        if (remoteJson != null) {
+          return FilmDetailResponse.fromJson(
+              jsonDecode(remoteJson) as Map<String, dynamic>);
+        }
       }
       rethrow;
     }

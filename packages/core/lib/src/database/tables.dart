@@ -93,3 +93,16 @@ class Favorites extends Table {
   @override
   Set<Column> get primaryKey => {slug};
 }
+
+/// Generic local cache (e.g. the daily hero list). [dateKey] (YYYY-MM-DD) lets
+/// callers gate a refresh to once per day; [value] holds arbitrary JSON.
+@DataClassName('AppCacheRow')
+class AppCacheEntries extends Table {
+  TextColumn get cacheKey => text()();
+  TextColumn get value => text()();
+  TextColumn get dateKey => text().nullable()();
+  IntColumn get updatedAt => integer()(); // epoch ms
+
+  @override
+  Set<Column> get primaryKey => {cacheKey};
+}

@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
 import 'package:media_library/media_library.dart';
+import 'package:catalog/catalog.dart';
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
@@ -522,6 +523,30 @@ class ProfilePage extends ConsumerWidget {
           children: [
             Text('Quản lý dữ liệu', style: AppTypography.headlineMedium),
             const SizedBox(height: AppSpacing.xl),
+            _MenuTile(
+              icon: Icons.sync_rounded,
+              label: 'Đồng bộ phim hot mới (từ OPhim)',
+              onTap: () async {
+                Navigator.pop(context);
+                final messenger = ScaffoldMessenger.of(context);
+                messenger.showSnackBar(
+                  const SnackBar(content: Text('Đang đồng bộ phim mới…')),
+                );
+                try {
+                  await ref
+                      .read(heroRepositoryProvider)
+                      .getHero(forceRefresh: true);
+                  ref.invalidate(heroFilmsProvider);
+                  messenger.showSnackBar(
+                    const SnackBar(content: Text('Đã đồng bộ phim hot mới')),
+                  );
+                } catch (_) {
+                  messenger.showSnackBar(
+                    const SnackBar(content: Text('Đồng bộ thất bại, thử lại sau')),
+                  );
+                }
+              },
+            ),
             _MenuTile(
               icon: Icons.delete_sweep_rounded,
               label: 'Xóa lịch sử xem',

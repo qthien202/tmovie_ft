@@ -17,7 +17,9 @@ import '../repositories/drift_favorites_repository.dart';
 import '../repositories/composite_favorites_repository.dart';
 import '../repositories/firestore_favorites_repository.dart';
 import '../repositories/noop_favorites_repository.dart';
+import '../repositories/hero_repository.dart';
 import '../services/auth_service.dart';
+import '../services/shared_cache_service.dart';
 
 // --- Foundation singletons shared by every feature package ---
 
@@ -34,10 +36,26 @@ final appDatabaseProvider = Provider<AppDatabase>((ref) {
   return db;
 });
 
+/// Shared (cross-device) Firestore cache tier in front of OPhim.
+final sharedCacheServiceProvider = Provider<SharedCacheService>((ref) {
+  return SharedCacheService();
+});
+
 final filmRepositoryProvider = Provider<FilmRepository>((ref) {
   return FilmRepositoryImpl(
     ref.watch(apiServiceProvider),
     ref.watch(appDatabaseProvider),
+    ref.watch(sharedCacheServiceProvider),
+  );
+});
+
+/// Builds & caches the home hero list (local → Firestore → OPhim, once/day).
+final heroRepositoryProvider = Provider<HeroRepository>((ref) {
+  return HeroRepository(
+    ref.watch(filmRepositoryProvider),
+    ref.watch(tmdbServiceProvider),
+    ref.watch(appDatabaseProvider),
+    ref.watch(sharedCacheServiceProvider),
   );
 });
 
