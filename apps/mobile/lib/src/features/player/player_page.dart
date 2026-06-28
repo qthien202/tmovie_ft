@@ -51,6 +51,22 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
   bool _initialized = false;
   bool _wasPlaying = false;
 
+  // Skip-intro + auto-next-episode state.
+  bool _showSkipIntro = false;
+  bool _showNextUp = false;
+  bool _autoNextCancelled = false;
+  bool _advancing = false;
+  double _playbackSpeed = 1.0;
+
+  // Heuristic intro window (no per-title markers from the API): offer a skip
+  // button during the opening, only on episodes long enough to have one.
+  static const _introStart = Duration(seconds: 5);
+  static const _introEnd = Duration(seconds: 85);
+  static const _minDurationForIntro = Duration(minutes: 8);
+  // Show the "next episode" card this long before the end.
+  static const _nextUpLeadTime = Duration(seconds: 18);
+  static const _speeds = [1.0, 1.25, 1.5, 2.0];
+
   @override
   void initState() {
     super.initState();
@@ -147,7 +163,8 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
     _videoController = controller;
     // Keep the screen awake while a video is actually playing.
     _wasPlaying = false;
-    controller.addListener(_handlePlaybackStateForWakelock);
+    controller.addListener(_onVideoTick);
+    if (_playbackSpeed != 1.0) controller.setPlaybackSpeed(_playbackSpeed);
 
     _chewieController = ChewieController(
       videoPlayerController: _videoController!,
@@ -173,13 +190,84 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
     if (mounted) setState(() {});
   }
 
-  /// Toggle the wakelock so the screen never sleeps mid-playback, but is freed
-  /// the moment playback pauses/ends.
-  void _handlePlaybackStateForWakelock() {
-    final playing = _videoController?.value.isPlaying ?? false;
-    if (playing == _wasPlaying) return;
-    _wasPlaying = playing;
-    WakelockPlus.toggle(enable: playing);
+  /// Single per-frame listener: keeps the wakelock in sync with playback and
+  /// drives the skip-intro button, the next-episode card and auto-advance.
+  void _onVideoTick() {
+    final v = _videoController?.value;
+    if (v == null || !v.isInitialized) return;
+
+    // Wakelock: on while playing, off the moment it pauses/ends.
+    final playing = v.isPlaying;
+    if (playing != _wasPlaying) {
+      _wasPlaying = playing;
+      WakelockPlus.toggle(enable: playing);
+    }
+
+    final dur = v.duration;
+    final pos = v.position;
+    final hasNext = _nextEpisode() != null;
+
+    // Auto-advance the moment the episode finishes.
+    if (v.isCompleted && hasNext && !_advancing && !_autoNextCancelled) {
+      _advancing = true;
+      _playNext();
+      return;
+    }
+
+    final showSkip =
+        dur >= _minDurationForIntro && pos >= _introStart && pos <= _introEnd;
+    final remaining = dur - pos;
+    final showNextUp = hasNext &&
+        !_autoNextCancelled &&
+        playing &&
+        dur > Duration.zero &&
+        remaining > Duration.zero &&
+        remaining <= _nextUpLeadTime;
+
+    if (showSkip != _showSkipIntro || showNextUp != _showNextUp) {
+      if (mounted) {
+        setState(() {
+          _showSkipIntro = showSkip;
+          _showNextUp = showNextUp;
+        });
+      }
+    }
+  }
+
+  /// The next playable episode in the current server, or null if this is the
+  /// last one.
+  ServerData? _nextEpisode() {
+    if (_selectedServerIndex >= widget.episodes.length) return null;
+    final list = widget.episodes[_selectedServerIndex].serverData ?? [];
+    int i = list.indexWhere(
+      (e) =>
+          e.name == _currentEpisodeName &&
+          (e.linkM3u8 ?? e.linkEmbed) == _currentVideoUrl,
+    );
+    if (i < 0) i = list.indexWhere((e) => e.name == _currentEpisodeName);
+    if (i < 0 || i + 1 >= list.length) return null;
+    final next = list[i + 1];
+    final url = next.linkM3u8 ?? next.linkEmbed;
+    return (url == null || url.isEmpty) ? null : next;
+  }
+
+  void _playNext() {
+    final next = _nextEpisode();
+    if (next != null) _switchEpisode(next, _selectedServerIndex);
+  }
+
+  void _skipIntro() {
+    _videoController?.seekTo(_introEnd);
+    setState(() => _showSkipIntro = false);
+    _startHideTimer();
+  }
+
+  void _cycleSpeed() {
+    final idx = _speeds.indexOf(_playbackSpeed);
+    final next = _speeds[(idx + 1) % _speeds.length];
+    _videoController?.setPlaybackSpeed(next);
+    setState(() => _playbackSpeed = next);
+    _startHideTimer();
   }
 
   Future<void> _saveCurrentPosition() async {
@@ -204,7 +292,7 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
     _saveCurrentPosition();
     _videoController?.pause(); // Đảm bảo ngừng phát tập cũ
 
-    _videoController?.removeListener(_handlePlaybackStateForWakelock);
+    _videoController?.removeListener(_onVideoTick);
     _chewieController?.dispose();
     _videoController?.dispose();
 
@@ -214,6 +302,11 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
       _selectedServerIndex = serverIndex;
       _showPlaylist = false;
       _controlsVisible = true;
+      // Reset per-episode overlay state.
+      _showSkipIntro = false;
+      _showNextUp = false;
+      _autoNextCancelled = false;
+      _advancing = false;
     });
 
     _startHideTimer();
@@ -292,7 +385,7 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
       }
     }
 
-    _videoController?.removeListener(_handlePlaybackStateForWakelock);
+    _videoController?.removeListener(_onVideoTick);
     WakelockPlus.disable();
 
     _chewieController?.dispose();
@@ -343,7 +436,13 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
           // 3. Custom Controls
           _buildCustomControls(),
 
-          // 4. Playlist Sidebar
+          // 4. Skip-intro & next-episode overlays (shown regardless of the
+          // controls' visibility, like Netflix).
+          if (_showSkipIntro && !_showPlaylist && !_hasError)
+            _buildSkipIntroButton(),
+          if (_showNextUp && !_showPlaylist && !_hasError) _buildNextUpCard(),
+
+          // 5. Playlist Sidebar
           if (_showPlaylist) _buildPlaylistOverlay(),
         ],
       ),
@@ -418,6 +517,22 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
                   ],
                 ),
               ),
+              // Playback speed
+              _HUDPill(
+                onPressed: _cycleSpeed,
+                child: Text(
+                  _playbackSpeed == _playbackSpeed.roundToDouble()
+                      ? '${_playbackSpeed.toInt()}x'
+                      : '${_playbackSpeed}x',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              // Episode list
               _HUDButton(
                 icon: Icons.playlist_play_rounded,
                 label: 'TẬP PHIM',
@@ -425,6 +540,112 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
                   _showPlaylist = true;
                   _controlsVisible = true;
                 }),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Netflix-style "Skip intro" pill shown during the opening window.
+  Widget _buildSkipIntroButton() {
+    return Positioned(
+      right: 28,
+      bottom: 96,
+      child: SafeArea(
+        child: _GlassActionButton(
+          icon: Icons.fast_forward_rounded,
+          label: 'Bỏ qua Intro',
+          filled: false,
+          onPressed: _skipIntro,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNextUpCard() {
+    final next = _nextEpisode();
+    if (next == null) return const SizedBox.shrink();
+    return Positioned(
+      right: 28,
+      bottom: 96,
+      child: SafeArea(
+        child: Container(
+          width: 320,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.82),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    'TẬP TIẾP THEO',
+                    style: TextStyle(
+                      color: AppColors.primaryValue,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  const Spacer(),
+                  // Live countdown driven by playback position.
+                  ValueListenableBuilder(
+                    valueListenable: _videoController!,
+                    builder: (context, VideoPlayerValue value, _) {
+                      final left = (value.duration - value.position).inSeconds;
+                      return Text(
+                        'Tự động sau ${left < 0 ? 0 : left}s',
+                        style: const TextStyle(
+                          color: Colors.white60,
+                          fontSize: 12,
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                next.name ?? '',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 14),
+              Row(
+                children: [
+                  Expanded(
+                    child: _GlassActionButton(
+                      icon: Icons.close_rounded,
+                      label: 'Hủy',
+                      filled: false,
+                      onPressed: () => setState(() {
+                        _autoNextCancelled = true;
+                        _showNextUp = false;
+                      }),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _GlassActionButton(
+                      icon: Icons.play_arrow_rounded,
+                      label: 'Phát ngay',
+                      filled: true,
+                      onPressed: _playNext,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -473,6 +694,14 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
               _startHideTimer();
             },
           ),
+          if (_nextEpisode() != null)
+            _CircleIconButton(
+              icon: Icons.skip_next_rounded,
+              onPressed: () {
+                _playNext();
+                _startHideTimer();
+              },
+            ),
         ],
       ),
     );
@@ -685,7 +914,7 @@ class _PlayerPageState extends ConsumerState<PlayerPage>
                             padding: const EdgeInsets.symmetric(horizontal: 25),
                             scrollDirection: Axis.horizontal,
                             itemCount: servers.length,
-                            separatorBuilder: (_, __) =>
+                            separatorBuilder: (_, _) =>
                                 const SizedBox(width: 12),
                             itemBuilder: (context, index) {
                               final isSelected = index == _selectedServerIndex;
@@ -811,6 +1040,80 @@ class _HUDButton extends StatelessWidget {
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Compact translucent pill in the top HUD (wraps arbitrary content).
+class _HUDPill extends StatelessWidget {
+  final Widget child;
+  final VoidCallback onPressed;
+  const _HUDPill({required this.child, required this.onPressed});
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white.withValues(alpha: 0.1),
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          alignment: Alignment.center,
+          child: child,
+        ),
+      ),
+    );
+  }
+}
+
+/// Glassy pill action used by the skip-intro button and next-up card.
+class _GlassActionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool filled;
+  final VoidCallback onPressed;
+  const _GlassActionButton({
+    required this.icon,
+    required this.label,
+    required this.filled,
+    required this.onPressed,
+  });
+  @override
+  Widget build(BuildContext context) {
+    final fg = filled ? Colors.black : Colors.white;
+    return Material(
+      color: filled ? Colors.white : Colors.white.withValues(alpha: 0.12),
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: filled
+                ? null
+                : Border.all(color: Colors.white.withValues(alpha: 0.25)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: fg, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: TextStyle(
+                  color: fg,
+                  fontSize: 13,
                   fontWeight: FontWeight.bold,
                 ),
               ),
