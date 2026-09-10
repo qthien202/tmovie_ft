@@ -1,9 +1,9 @@
 # API Documentation
 
-## OPhim V1 API
+## PhimAPI V1 API (KKPhim)
 
-**Base URL**: `https://ophim1.com/v1/api`
-**Image CDN**: `https://img.ophim.live/uploads/movies/`
+**Base URL**: `https://phimapi.com/v1/api`
+**Image CDN**: `https://phimimg.com/` (or `https://phimimg.com/uploads/movies/`)
 
 ## Endpoints
 

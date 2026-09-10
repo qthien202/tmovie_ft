@@ -56,13 +56,21 @@ class FilmItem {
   String get fullThumbUrl {
     if (thumbUrl == null || thumbUrl!.isEmpty) return '';
     if (thumbUrl!.startsWith('http')) return thumbUrl!;
-    return 'https://img.ophim.live/uploads/movies/$thumbUrl';
+    final path = thumbUrl!.startsWith('/') ? thumbUrl!.substring(1) : thumbUrl!;
+    if (path.startsWith('uploads/')) {
+      return 'https://phimimg.com/$path';
+    }
+    return 'https://phimimg.com/uploads/movies/$path';
   }
 
   String get fullPosterUrl {
     if (posterUrl == null || posterUrl!.isEmpty) return '';
     if (posterUrl!.startsWith('http')) return posterUrl!;
-    return 'https://img.ophim.live/uploads/movies/$posterUrl';
+    final path = posterUrl!.startsWith('/') ? posterUrl!.substring(1) : posterUrl!;
+    if (path.startsWith('uploads/')) {
+      return 'https://phimimg.com/$path';
+    }
+    return 'https://phimimg.com/uploads/movies/$path';
   }
 
   factory FilmItem.fromJson(Map<String, dynamic> json) => _$FilmItemFromJson(json);
