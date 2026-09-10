@@ -8,6 +8,16 @@ Vietnamese block free of Markdown styling (use emoji + "•" bullets).
 
 Every new feature/release must add a `## vX.Y.Z` section with both parts.
 
+## v1.3.2
+
+Switch movie data and stream provider to PhimAPI.
+- Core: migrated API base URL and image CDN to PhimAPI (phimapi.com / phimimg.com) for faster loading and updated movie catalogue.
+
+<!-- app:vi -->
+🚀 Nâng cấp nguồn phim
+• Chuyển đổi nguồn phim sang PhimAPI mới giúp tải phim nhanh hơn, hình ảnh sắc nét và danh sách phim cập nhật liên tục.
+<!-- /app:vi -->
+
 ## v1.3.1
 
 Video player and film-detail polish.
