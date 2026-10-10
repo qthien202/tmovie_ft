@@ -1,0 +1,30 @@
+name: Private core
+description: Checks out the private tmovie-core submodule at its latest main, using a read-only deploy key.
+
+# Sensitive code (API clients, stream/ad filter, accounts, 18+ policy, crawler, Flutter core) lives
+# in the private qthien202/tmovie-core repo, mounted at private/ and reached through symlinks. CI
+# always builds against its latest main, so pushing there is enough to ship a change.
+
+inputs:
+  ssh-key:
+    description: Private key of the tmovie-core deploy key (secret CORE_DEPLOY_KEY).
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        CORE_KEY: ${{ inputs.ssh-key }}
+      run: |
+        if [ -z "$CORE_KEY" ]; then
+          echo "::error::CORE_DEPLOY_KEY is not available (forks and Dependabot don't get secrets)."
+          exit 1
+        fi
+        mkdir -p ~/.ssh
+        printf '%s\n' "$CORE_KEY" > ~/.ssh/tmovie_core
+        chmod 600 ~/.ssh/tmovie_core
+        ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null
+        export GIT_SSH_COMMAND="ssh -i ~/.ssh/tmovie_core -o IdentitiesOnly=yes"
+        git submodule update --init --remote private
+        git -C private log -1 --format='private core @ %h %s'
