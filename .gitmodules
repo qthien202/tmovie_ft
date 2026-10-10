@@ -1,0 +1,3 @@
+[submodule "private"]
+	path = private
+	url = git@github.com:qthien202/tmovie-core.git

@@ -10,12 +10,7 @@ data class FilmCategory(
     val id: String? = null,
     val name: String? = null,
     val slug: String? = null,
-) {
-    companion object {
-        /** The "Phim 18+" genre, which the app never lists or shows. PhimAPI uses `phim-18`, OPhim used `18-plus`. */
-        val adultSlugs = setOf("phim-18", "18-plus")
-    }
-}
+)
 
 @Serializable
 data class TmdbInfo(
@@ -55,8 +50,6 @@ data class FilmItem(
     val thumbImage: String? get() = phimImageUrl(thumbUrl)
     val posterImage: String? get() = phimImageUrl(posterUrl)
 
-    /** Hidden everywhere. */
-    val isAdult: Boolean get() = category.orEmpty().any { it.slug in FilmCategory.adultSlugs }
 
     /** Trailer-only entries; shown only in the "Sắp chiếu" list. */
     val isTrailer: Boolean get() = episodeCurrent?.lowercase() == "trailer"

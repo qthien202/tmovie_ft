@@ -7,9 +7,6 @@ public struct FilmCategory: Codable, Hashable, Sendable {
     public let id: String?
     public let name: String?
     public let slug: String?
-
-    /// The "Phim 18+" genre, which the app never lists or shows.
-    public static let adultSlugs: Set<String> = ["phim-18", "18-plus"]
 }
 
 public typealias FilmCountry = FilmCategory
@@ -52,8 +49,6 @@ public struct FilmItem: Codable, Hashable, Sendable, Identifiable {
     public var thumbURL: URL? { phimImageURL(thumbUrl) }
     public var posterURL: URL? { phimImageURL(posterUrl) }
 
-    /// Hidden everywhere. PhimAPI tags these `phim-18` (OPhim used `18-plus`).
-    public var isAdult: Bool { (category ?? []).contains { FilmCategory.adultSlugs.contains($0.slug ?? "") } }
     /// Trailer-only entries, hidden except in the "Sắp chiếu" list.
     public var isTrailer: Bool { episodeCurrent?.lowercased() == "trailer" }
 }

@@ -9,17 +9,6 @@ import kotlinx.serialization.json.JsonDecoder
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.contentOrNull
 
-/**
- * Whether 18+ titles and the "Phim 18+" genre are shown. Off by default; turned on per account
- * by the `allowAdult` flag on the signed-in user's Firestore profile.
- */
-object ContentPolicy {
-    @Volatile var allowAdult: Boolean = false
-
-    fun visible(film: FilmItem) = allowAdult || !film.isAdult
-    fun visible(genre: FilmCategory) = allowAdult || genre.slug !in FilmCategory.adultSlugs
-}
-
 /** PhimAPI sends some values as either a string or a number (`episode_total`, `tmdb.id`). */
 object LooseStringSerializer : KSerializer<String?> {
     override val descriptor = PrimitiveSerialDescriptor("LooseString", PrimitiveKind.STRING)

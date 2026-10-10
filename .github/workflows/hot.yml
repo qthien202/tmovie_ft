@@ -18,6 +18,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: ./.github/actions/private-core
+        with:
+          ssh-key: ${{ secrets.CORE_DEPLOY_KEY }}
+
       - name: Crawl
         run: python3 tools/hot/crawl_hot.py "$RUNNER_TEMP/hot.json"
 

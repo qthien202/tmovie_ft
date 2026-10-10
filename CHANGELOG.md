@@ -51,7 +51,7 @@ The mobile app is rebuilt natively in Kotlin + Jetpack Compose (android/), repla
 - Home: Apple TV-style hero following Netflix's weekly Top 10 for Vietnam (crawled every 6h), with textless key art, parallax, tilt depth and a muted autoplay preview; Continue Watching, My List and Top 10 shelves.
 - Netflix-style category pages with a full-screen genre picker and filters; New & Hot (upcoming / airing / completed) now works on PhimAPI; Search with genre chips.
 - Player: Media3 with Picture-in-Picture, resume, next episode and an in-player episode panel.
-- Fixes: adult titles are filtered by PhimAPI's `phim-18` tag; images under `upload/vod/` no longer 404.
+- Fixes: content filtering works on PhimAPI's genre tags; images under `upload/vod/` no longer 404.
 
 <!-- app:vi -->
 ✨ TMovie hoàn toàn mới
