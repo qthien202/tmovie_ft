@@ -97,3 +97,18 @@ private func fixture<T: Decodable>(_ name: String, as type: T.Type = T.self) thr
     let item = FilmItem(detail)
     #expect(item.slug == detail.slug && item.thumbURL == detail.thumbURL)
 }
+
+@Test func hlsAdFilterStripsSplicedAds() throws {
+    let url = try #require(Bundle.module.url(forResource: "ad_playlist", withExtension: "m3u8", subdirectory: "Fixtures"))
+    let source = try String(contentsOf: url, encoding: .utf8)
+    let cleaned = HLSAdFilter.clean(source)
+    let segments = cleaned.components(separatedBy: .newlines).filter { $0.hasSuffix(".ts") }
+    #expect(!segments.contains { $0.hasPrefix("convertv8/") })  // mid-roll
+    #expect(!segments.contains { $0.hasPrefix("/v8/") })        // post-roll
+    #expect(segments.allSatisfy { !$0.contains("/") })
+    #expect(segments.count == source.components(separatedBy: .newlines).filter { $0.hasSuffix(".ts") && !$0.contains("/") }.count)
+    #expect(cleaned.trimmingCharacters(in: .whitespacesAndNewlines).hasSuffix("#EXT-X-ENDLIST"))
+
+    let master = "#EXTM3U\n#EXT-X-STREAM-INF:BANDWIDTH=1\n3500kb/hls/index.m3u8\n"
+    #expect(HLSAdFilter.clean(master) == master)
+}
