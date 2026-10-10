@@ -100,6 +100,9 @@ jobs:
         run: |
           V="${{ steps.ver.outputs.version }}"
           N="${{ github.run_number }}"
+          # `flutter pub get` at the workspace root treats android/ as a Flutter host and drops a
+          # GeneratedPluginRegistrant.java into it; the native app must not compile that.
+          rm -rf android/app/src/main/java/io/flutter
           # versionCode keeps using the run number, so it stays above the old Flutter builds.
           (cd android && ./gradlew :app:assembleRelease -PversionName="$V" -PversionCode="$N")
           (cd apps/tv && flutter build apk --release --build-name="$V" --build-number="$N")
