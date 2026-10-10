@@ -79,7 +79,9 @@ fun HeroPager(films: List<FilmItem>, art: Map<String, String>, tint: Color, page
     val autoplaySetting by Settings.heroAutoplay.collectAsStateWithLifecycle()
     val muted by Settings.heroMuted.collectAsStateWithLifecycle()
     val autoplay = autoplaySetting && !reduceMotion && !powerSave
-    val tilt by rememberTilt(enabled = !reduceMotion)
+    // Animated values are passed as lambdas and read only inside graphicsLayer, so the hero
+    // redraws its layers each frame instead of recomposing.
+    val tilt = rememberTilt(enabled = !reduceMotion)
     val haptics = LocalHapticFeedback.current
     val height = (LocalConfiguration.current.screenHeightDp * 0.74f).dp
 
@@ -91,7 +93,7 @@ fun HeroPager(films: List<FilmItem>, art: Map<String, String>, tint: Color, page
     }
     LaunchedEffect(pager.settledPage) { haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove) }
 
-    val kenBurns by rememberInfiniteTransition(label = "kenBurns").animateFloat(
+    val kenBurns = rememberInfiniteTransition(label = "kenBurns").animateFloat(
         1f, if (reduceMotion) 1f else 1.12f,
         infiniteRepeatable(tween(12_000, easing = FastOutSlowInEasing), RepeatMode.Reverse), label = "scale",
     )
@@ -108,14 +110,13 @@ fun HeroPager(films: List<FilmItem>, art: Map<String, String>, tint: Color, page
     ) {
         HorizontalPager(pager, Modifier.fillMaxSize(), key = { films[it].slug }) { page ->
             val film = films[page]
-            val offset = (pager.currentPage - page) + pager.currentPageOffsetFraction
             HeroPage(
                 film = film,
                 art = art[film.slug] ?: film.thumbImage,
                 tint = tint,
-                pageOffset = offset,
-                kenBurns = kenBurns,
-                tilt = tilt,
+                pageOffset = { (pager.currentPage - page) + pager.currentPageOffsetFraction },
+                kenBurns = { kenBurns.value },
+                tilt = { tilt.value },
                 motion = !reduceMotion,
                 preview = autoplay && page == pager.settledPage,
                 muted = muted,
@@ -137,9 +138,9 @@ private fun HeroPage(
     film: FilmItem,
     art: String?,
     tint: Color,
-    pageOffset: Float,
-    kenBurns: Float,
-    tilt: androidx.compose.ui.geometry.Offset,
+    pageOffset: () -> Float,
+    kenBurns: () -> Float,
+    tilt: () -> androidx.compose.ui.geometry.Offset,
     motion: Boolean,
     preview: Boolean,
     muted: Boolean,
@@ -156,10 +157,11 @@ private fun HeroPage(
                 .clickable { nav.openFilm(film.route(sourceId)) }
                 .graphicsLayer {
                     // Paging parallax + tilt depth; scaled up so neither ever shows an edge.
-                    val s = 1.08f * kenBurns
+                    val s = 1.08f * kenBurns()
+                    val t = tilt()
                     scaleX = s; scaleY = s
-                    translationX = (if (motion) pageOffset * size.width * 0.4f else 0f) - tilt.x * 22.dp.toPx()
-                    translationY = -tilt.y * 14.dp.toPx()
+                    translationX = (if (motion) pageOffset() * size.width * 0.4f else 0f) - t.x * 22.dp.toPx()
+                    translationY = -t.y * 14.dp.toPx()
                 },
         ) {
             RemoteImage(art, Modifier.fillMaxSize(), film.name)
@@ -179,9 +181,11 @@ private fun HeroPage(
                 .align(Alignment.BottomCenter)
                 .padding(start = 24.dp, end = 24.dp, bottom = 44.dp)
                 .graphicsLayer {
-                    alpha = 1f - (pageOffset.absoluteValue * 1.4f).coerceAtMost(1f)
-                    translationX = pageOffset * 60.dp.toPx() + tilt.x * 8.dp.toPx()
-                    translationY = tilt.y * 5.dp.toPx()
+                    val o = pageOffset()
+                    val t = tilt()
+                    alpha = 1f - (o.absoluteValue * 1.4f).coerceAtMost(1f)
+                    translationX = o * 60.dp.toPx() + t.x * 8.dp.toPx()
+                    translationY = t.y * 5.dp.toPx()
                 },
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(10.dp),

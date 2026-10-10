@@ -29,13 +29,19 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 
 /** Network image, cropped to fill, over a faint placeholder; Coil caches memory + disk. */
 @Composable
 fun RemoteImage(url: String?, modifier: Modifier = Modifier, contentDescription: String? = null) {
+    val context = LocalContext.current
     AsyncImage(
-        model = url,
+        // Crossfade so images settle in instead of popping.
+        model = remember(url) { ImageRequest.Builder(context).data(url).crossfade(250).build() },
         contentDescription = contentDescription,
         contentScale = ContentScale.Crop,
         modifier = modifier.background(Color.White.copy(alpha = 0.06f)),
