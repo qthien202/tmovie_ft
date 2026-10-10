@@ -12,6 +12,13 @@ Every new feature/release must add a `## vX.Y.Z` section with both parts.
 
 Android fixes.
 - The hero's autoplay preview no longer spills out below the page dots. It now renders into a clipped TextureView sized to aspect-fill, instead of a SurfaceView that ignores Compose clipping.
+- New player:
+  - Custom controls; gestures for double-tap seek, scrub, brightness, volume and pinch-zoom.
+  - Lock; quality, audio, subtitles, speed and aspect settings; sleep timer; skip intro.
+  - Next-episode countdown card, in-player episode list, PiP button and MediaSession.
+- Streams: ads spliced into HLS playlists are stripped.
+  - Deeper buffers, more retries, cross-protocol redirects.
+  - Playback resumes on its own when the network comes back.
 - Redesigned update dialog: app icon, version jump, formatted release notes, and in-place download progress (percent and MB) leading to install.
 - Smoother Home:
   - JSON is decoded off the main thread.
@@ -20,6 +27,14 @@ Android fixes.
   - Shelves animate in only once.
 
 <!-- app:vi -->
+🎬 Trình phát hoàn toàn mới
+• Chạm 2 lần để tua, vuốt chỉnh độ sáng/âm lượng/tua, khoá màn hình, chọn chất lượng, tốc độ, khung hình, hẹn giờ tắt, bỏ qua giới thiệu.
+• Chọn tập ngay trong trình phát, đếm ngược sang tập tiếp theo.
+
+🚫 Không còn quảng cáo chèn giữa phim
+• Tự lọc các đoạn quảng cáo bị chèn vào phim, phát mượt và ổn định hơn.
+• Mất mạng sẽ tự phát lại khi có mạng.
+
 ✨ Cập nhật đẹp hơn
 • Hộp thoại cập nhật mới: hiện rõ phiên bản, ghi chú dễ đọc và tiến trình tải ngay trong app.
 
