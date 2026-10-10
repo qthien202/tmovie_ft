@@ -39,6 +39,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
@@ -146,7 +147,8 @@ private fun HeroPage(
     val nav = rememberNavigator()
     val sourceId = "hero/${film.slug}"
     val animatedTint by animateColorAsState(tint, tween(800), label = "tint")
-    Box(Modifier.fillMaxSize()) {
+    // Clip the page so the Ken Burns / tilt scale never bleeds into neighbours or below the hero.
+    Box(Modifier.fillMaxSize().clipToBounds()) {
         Box(
             Modifier
                 .fillMaxSize()
