@@ -10,7 +10,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import android.view.TextureView
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
@@ -19,8 +26,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.ui.AspectRatioFrameLayout
-import androidx.media3.ui.PlayerView
+import androidx.media3.common.VideoSize
 import com.thientech.tmovie.core.network.PhimApi
 import kotlinx.coroutines.delay
 
@@ -62,16 +68,25 @@ fun HeroPreview(slug: String, muted: Boolean, modifier: Modifier = Modifier) {
         onStopOrDispose { exo.pause() }
     }
 
-    AndroidView(
-        factory = { ctx ->
-            PlayerView(ctx).apply {
-                useController = false
-                resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
-                setShutterBackgroundColor(android.graphics.Color.TRANSPARENT)
-                player = exo
+    // TextureView, not PlayerView's default SurfaceView: a SurfaceView ignores Compose clipping,
+    // so the zoomed video spilled out below the hero. Sized to aspect-fill, then clipped.
+    var videoRatio by remember(slug) { mutableFloatStateOf(16f / 9f) }
+    DisposableEffect(exo) {
+        val listener = object : Player.Listener {
+            override fun onVideoSizeChanged(size: VideoSize) {
+                if (size.width > 0 && size.height > 0) videoRatio = size.width * size.pixelWidthHeightRatio / size.height
             }
-        },
-        update = { it.player = exo },
-        modifier = modifier.graphicsLayer { this.alpha = alpha },
-    )
+        }
+        exo.addListener(listener)
+        onDispose { exo.removeListener(listener) }
+    }
+    BoxWithConstraints(modifier.clipToBounds().graphicsLayer { this.alpha = alpha }, contentAlignment = Alignment.Center) {
+        val boxRatio = maxWidth / maxHeight
+        val (w, h) = if (videoRatio > boxRatio) maxHeight * videoRatio to maxHeight else maxWidth to maxWidth / videoRatio
+        AndroidView(
+            factory = { ctx -> TextureView(ctx).also { exo.setVideoTextureView(it) } },
+            update = { exo.setVideoTextureView(it) },
+            modifier = Modifier.wrapContentSize(unbounded = true).requiredSize(w, h),
+        )
+    }
 }
