@@ -2,6 +2,7 @@
 
 [![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
 [![Riverpod](https://img.shields.io/badge/Riverpod-02569B?style=for-the-badge&logo=riverpod&logoColor=white)](https://riverpod.dev)
+[![SwiftUI](https://img.shields.io/badge/SwiftUI-F05138?style=for-the-badge&logo=swift&logoColor=white)](https://developer.apple.com/xcode/swiftui/)
 [![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
@@ -28,6 +29,61 @@
 
 ---
 
+## 🍎 Native iOS App (SwiftUI)
+
+A native iPhone port of the mobile app lives in [`ios/`](ios/), with its own Apple TV-inspired design. It doesn't touch the Flutter apps.
+
+- 🎞 **Apple TV-style hero**: full-bleed, textless key art with paging parallax, a slow Ken Burns drift, depth from device tilt, and a tint sampled from the artwork.
+  - After a moment, a **muted preview of the film** fades in, with a mute toggle.
+  - Previews are off with Reduce Motion, in Low Power Mode, or via the setting in Profile.
+- 🔥 **What's hot, for real**: the hero and "Top 10 phim bộ tuần này" follow **Netflix's weekly Top 10 for Vietnam**.
+  - A GitHub Action crawls it every 6 hours and matches each title to a PhimAPI film (see [`tools/hot`](tools/hot/crawl_hot.py)).
+- 🧊 **Liquid Glass** on iOS 26 (glass tab bar, chips and buttons), with material fallbacks on iOS 17–18.
+  - Poster → detail **zoom transitions** on iOS 18+.
+- 📺 **Netflix-style browsing**:
+  - Category pages with a full-screen genre picker, a featured card, shelves by country, and an endless filtered grid.
+  - New & Hot (upcoming / airing / completed), Search with genre chips, and Continue Watching with progress bars.
+- ▶️ **AVKit player**: Picture in Picture, AirPlay, landscape, resume at the saved second, and a "next episode" button that also auto-plays.
+- 💾 **On-device library** with SwiftData: My List, watch history and per-episode resume points.
+- 🔗 **Deep links**: `tmovie://phim/{slug}` and `tmovie://the-loai/{slug}`.
+
+| <img src="screenshots/ios/home.png" width="200" /><br><sub><b>Home · Apple TV hero</b></sub> | <img src="screenshots/ios/detail.png" width="200" /><br><sub><b>Detail</b></sub> | <img src="screenshots/ios/category.png" width="200" /><br><sub><b>Category</b></sub> |
+| :---: | :---: | :---: |
+| <img src="screenshots/ios/new_hot.png" width="200" /><br><sub><b>New & Hot</b></sub> | <img src="screenshots/ios/search.png" width="200" /><br><sub><b>Search</b></sub> | <img src="screenshots/ios/profile.png" width="200" /><br><sub><b>Profile</b></sub> |
+| <img src="screenshots/ios/onboarding.png" width="200" /><br><sub><b>Onboarding</b></sub> | | |
+
+| Layer | Technology |
+| :--- | :--- |
+| **UI** | SwiftUI (iOS 17+), Liquid Glass on iOS 26, `@Observable` |
+| **Architecture** | Local Swift package `TMovieKit`, one module per layer and feature |
+| **Networking** | `URLSession` + async/await + `Codable` |
+| **Persistence** | SwiftData |
+| **Player** | AVKit (`AVPlayerViewController`) |
+| **Project** | [Tuist](https://tuist.dev) |
+
+```text
+ios/
+├── App/Sources/          # Thin app target: @main, tab shell, route → screen mapping
+├── TMovieKit/Sources/
+│   ├── Models/  Networking/  Persistence/  DesignSystem/  AppRouter/
+│   ├── FilmUI/  PlayerFeature/
+│   └── HomeFeature/  DetailFeature/  BrowseFeature/  ProfileFeature/  OnboardingFeature/
+├── TMovieKit/Tests/      # Decoding + URL tests against recorded PhimAPI JSON
+└── Tools/make_icon.swift # Generates the app icon
+```
+
+Features depend only on the foundation and shared UI modules, never on each other. They push `FilmRoute` / `ListRoute` values, and the app target maps those to screens.
+
+**Build & run** (Xcode 26, [Tuist](https://tuist.dev)):
+```bash
+cd ios
+tuist generate                      # creates TMovie.xcworkspace (gitignored)
+open TMovie.xcworkspace             # set your signing team, then run on an iPhone
+cd TMovieKit && xcodebuild test -scheme TMovieKit -destination 'platform=iOS Simulator,name=iPhone 17'
+```
+
+---
+
 ## 🛠 Tech Stack
 
 | App Layer | Technology |
@@ -50,6 +106,8 @@ tmovie_ft/
 │   └── tv/              # 📺 Android TV Application (Leanback)
 ├── packages/
 │   └── core/            # 📦 Shared: models, API, providers, widgets
+├── ios/                 # 🍎 Native SwiftUI iPhone app (see above)
+├── tools/hot/           # 🔥 Hot-list crawler (Netflix Top 10 Vietnam → PhimAPI)
 └── screenshots/         # 🖼 App Screenshot Gallery
 ```
 

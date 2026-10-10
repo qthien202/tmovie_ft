@@ -1,0 +1,32 @@
+name: Hot list
+
+# Crawls Netflix's public Top 10 for Vietnam, matches each title on PhimAPI and publishes
+# hot.json on the `hot-data` branch (one force-pushed commit). The iOS and Android heroes
+# and "Top 10" shelves read it from raw.githubusercontent.com.
+
+on:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Crawl
+        run: python3 tools/hot/crawl_hot.py "$RUNNER_TEMP/hot.json"
+
+      - name: Publish to hot-data
+        run: |
+          mkdir "$RUNNER_TEMP/pub" && cd "$RUNNER_TEMP/pub"
+          git init -q -b hot-data
+          cp ../hot.json .
+          git add hot.json
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -qm "hot: $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" hot-data
