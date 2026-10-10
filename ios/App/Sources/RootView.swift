@@ -6,6 +6,7 @@ import Models
 import Networking
 import OnboardingFeature
 import Persistence
+import PlayerFeature
 import ProfileFeature
 import SwiftUI
 
@@ -69,7 +70,7 @@ struct MainTabs: View {
             .environment(router)
     }
 
-    /// `tmovie://phim/{slug}` opens a film, `tmovie://the-loai/{slug}` a genre page, both on Home.
+    /// `tmovie://phim/{slug}[?play=1]` opens (and optionally plays) a film, `tmovie://the-loai/{slug}` a genre page, both on Home.
     private func open(_ url: URL) async {
         guard url.scheme == "tmovie", let slug = url.pathComponents.dropFirst().first else { return }
         switch url.host() {
@@ -77,6 +78,10 @@ struct MainTabs: View {
             guard let detail = try? await PhimAPI.shared.detail(slug: slug) else { return }
             tab = 0
             routers[0].push(FilmRoute(film: FilmItem(detail), sourceID: "link/\(slug)"))
+            // `?play=1` starts (or resumes) playback straight away.
+            if URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems?.contains(where: { $0.name == "play" }) == true {
+                Player.start(detail)
+            }
         case "the-loai":
             let name = (try? await PhimAPI.shared.taxonomy(.genres))?.first { $0.slug == slug }?.name ?? slug
             tab = 0
