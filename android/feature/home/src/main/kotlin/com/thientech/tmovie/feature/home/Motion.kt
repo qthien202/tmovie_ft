@@ -56,7 +56,7 @@ fun rememberTilt(enabled: Boolean): State<Offset> {
             }
             override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
         }
-        sm.registerListener(listener, sensor, SensorManager.SENSOR_DELAY_GAME)
+        sm.registerListener(listener, sensor, SensorManager.SENSOR_DELAY_UI)  // ~60ms is plenty with the low-pass
         onDispose { sm.unregisterListener(listener) }
     }
     return tilt

@@ -35,7 +35,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -80,7 +83,8 @@ fun HomeScreen(vm: HomeViewModel = viewModel()) {
                             if (list.firstVisibleItemIndex == 0) list.firstVisibleItemScrollOffset.toFloat() else 0f
                         }
                     } else {
-                        Box(Modifier.fillMaxWidth().height(520.dp).background(Color.White.copy(alpha = 0.04f)))
+                        // Same height as the hero, so nothing jumps when it arrives.
+                        Box(Modifier.fillMaxWidth().height((LocalConfiguration.current.screenHeightDp * 0.74f).dp).background(Color.White.copy(alpha = 0.04f)))
                     }
                 }
                 if (history.isNotEmpty()) item(key = "continue") {
@@ -94,7 +98,8 @@ fun HomeScreen(vm: HomeViewModel = viewModel()) {
                     val films = vm.rails[rail]
                     if (films == null || films.isNotEmpty()) item(key = rail.title) {
                         Shelf(rail.title, more = rail.route) {
-                            items(films.orEmpty(), key = { it.slug }) { PosterCard(it, "${rail.title}/${it.slug}") }
+                            if (films == null) items(5) { PosterPlaceholder() }
+                            else items(films, key = { it.slug }) { PosterCard(it, "${rail.title}/${it.slug}") }
                         }
                     }
                 }
@@ -108,6 +113,11 @@ fun HomeScreen(vm: HomeViewModel = viewModel()) {
             HomeHeader()
         }
     }
+}
+
+@Composable
+private fun PosterPlaceholder() {
+    Box(Modifier.width(112.dp).height(168.dp).clip(RoundedCornerShape(8.dp)).background(Color.White.copy(alpha = 0.06f)))
 }
 
 /** Wordmark plus category pills, over a fade so content scrolls under it. */

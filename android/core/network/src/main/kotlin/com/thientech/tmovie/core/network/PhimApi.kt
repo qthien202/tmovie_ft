@@ -42,21 +42,21 @@ class PhimApi(
 ) {
     suspend fun list(source: Source, page: Int = 1, filter: Filter = Filter()): FilmPage =
         // "Sắp chiếu" is all trailers by definition, so only that list keeps them.
-        parsePage(get(listUrl(source, page, filter)), keepTrailers = source == Source.Type("phim-sap-chieu"))
+        fetch(listUrl(source, page, filter)) { parsePage(it, keepTrailers = source == Source.Type("phim-sap-chieu")) }
 
     suspend fun detail(slug: String): FilmDetail =
-        json.decodeFromString<Envelope<DetailData>>(get(url("phim/$slug"))).data.item
+        fetch(url("phim/$slug")) { json.decodeFromString<Envelope<DetailData>>(it).data.item }
 
     suspend fun images(slug: String): List<FilmImage> =
-        json.decodeFromString<Envelope<ImagesData>>(get(url("phim/$slug/images"))).data.images.orEmpty()
+        fetch(url("phim/$slug/images")) { json.decodeFromString<Envelope<ImagesData>>(it).data.images.orEmpty() }
 
     suspend fun peoples(slug: String): List<FilmPerson> =
-        json.decodeFromString<Envelope<PeoplesData>>(get(url("phim/$slug/peoples"))).data.peoples.orEmpty()
+        fetch(url("phim/$slug/peoples")) { json.decodeFromString<Envelope<PeoplesData>>(it).data.peoples.orEmpty() }
 
     /** All genres (`/the-loai`) or countries (`/quoc-gia`); these live at the site root. */
     suspend fun taxonomy(kind: Taxonomy): List<FilmCategory> {
         val root = baseUrl.toHttpUrl().newBuilder().encodedPath("/").addPathSegment(kind.path).build()
-        return json.decodeFromString<Envelope<TaxonomyData>>(get(root)).data.items.filter { ContentPolicy.visible(it) }
+        return fetch(root) { body -> json.decodeFromString<Envelope<TaxonomyData>>(body).data.items.filter { ContentPolicy.visible(it) } }
     }
 
     enum class Taxonomy(val path: String) { Genres("the-loai"), Countries("quoc-gia") }
@@ -79,6 +79,12 @@ class PhimApi(
     }
 
     private fun url(path: String): HttpUrl = baseUrl.toHttpUrl().newBuilder().addPathSegments(path).build()
+
+    /** Downloads on IO and decodes on Default, so a caller on the main thread never parses JSON. */
+    private suspend fun <T> fetch(url: HttpUrl, decode: (String) -> T): T {
+        val body = get(url)
+        return withContext(Dispatchers.Default) { decode(body) }
+    }
 
     private suspend fun get(url: HttpUrl): String = withContext(Dispatchers.IO) {
         client.newCall(Request.Builder().url(url).build()).execute().use { res ->
