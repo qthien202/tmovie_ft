@@ -9,3 +9,5 @@ key.properties
 .kotlin/
 captures/
 app/google-services.json
+# Written by `flutter pub get` at the workspace root; not part of the native app.
+app/src/main/java/io/flutter/
