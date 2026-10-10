@@ -96,7 +96,7 @@ fun SettingsPanel(
         Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(20.dp)) {
             val speeds = listOf(0.5f, 0.75f, 1f, 1.25f, 1.5f, 2f)
             Section("Tốc độ", speeds.map { (if (it == 1f) "Bình thường" else "${it.toString().removeSuffix(".0")}×") to (it == playback.speed) }) {
-                playback.setSpeed(speeds[it])
+                playback.changeSpeed(speeds[it])
             }
             val quality = playback.qualityOptions()
             Section("Chất lượng", quality.map { it.label to it.selected }) { quality[it].apply() }

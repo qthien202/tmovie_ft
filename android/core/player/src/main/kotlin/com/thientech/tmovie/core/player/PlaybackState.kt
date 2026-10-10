@@ -67,7 +67,7 @@ class PlaybackState(val exo: ExoPlayer) {
 
     fun seekBy(ms: Long) = seekTo(exo.currentPosition + ms)
 
-    fun setSpeed(value: Float) {
+    fun changeSpeed(value: Float) {
         exo.setPlaybackSpeed(value)
         speed = value
     }
