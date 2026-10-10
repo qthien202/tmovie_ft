@@ -23,13 +23,15 @@ struct Rail: Identifiable, Hashable {
         Rail(title: "Hoạt hình", source: .type("hoat-hinh")),
     ]
 
-    /// Big-number rail.
-    static let top10 = Rail(title: "Top 10 phim bộ hôm nay", source: .type("phim-bo"))
+    /// Big-number rail; its items come from the view ranking, "Tất cả" opens all series.
+    static let top10 = Rail(title: "Top 10 phim bộ tuần này", source: .type("phim-bo"))
 }
 
 @MainActor @Observable
 final class HomeStore {
     private(set) var hero: [FilmItem] = []
+    /// Most-watched series right now (same view ranking as the hero, series only, no boost).
+    private(set) var top10: [FilmItem] = []
     /// Textless TMDB backdrops (w1280) per hero slug: cleaner, sharper key art than PhimAPI thumbs.
     private(set) var heroArt: [String: URL] = [:]
     private(set) var rails: [Rail: [FilmItem]] = [:]
@@ -44,12 +46,12 @@ final class HomeStore {
         failed = false
         async let heroTask = loadHero(refresh: refresh)
         await withTaskGroup(of: (Rail, [FilmItem]).self) { [api] group in
-            for rail in Rail.home + [Rail.top10] {
+            for rail in Rail.home {
                 group.addTask { (rail, (try? await api.list(rail.source).items) ?? []) }
             }
             for await (rail, items) in group { rails[rail] = items }
         }
-        hero = await heroTask
+        (hero, top10) = await heroTask
         await withTaskGroup(of: (String, URL?).self) { [api, hero] group in
             for film in hero {
                 group.addTask {
@@ -68,53 +70,64 @@ final class HomeStore {
     private struct HeroCache: Codable {
         let day: String
         let films: [FilmItem]
+        let series: [FilmItem]
     }
 
-    private static let heroCacheKey = "hero.hot.v5"
+    private static let heroCacheKey = "hero.hot.v6"
     private nonisolated static let preferredCountries: Set<String> = ["han-quoc", "trung-quoc", "au-my"]
 
-    /// The most-watched titles among what is airing / updating now, built at most once a day.
+    /// The hot list: the crawled Netflix Top 10 Vietnam, else the most-watched titles among what
+    /// is airing / updating now (built at most once a day).
     ///
     /// PhimAPI can't sort lists by views (`sort_field=view` is ignored) and Trakt's bundled client ID
     /// is revoked, so this reads each candidate's real KKPhim `view` count from its detail and ranks
     /// by that, favouring Korean / Chinese / Western titles and skipping animation (like the
     /// Flutter hero). Falls back to the freshest list if that fails.
-    private func loadHero(refresh: Bool) async -> [FilmItem] {
+    private func loadHero(refresh: Bool) async -> (hero: [FilmItem], series: [FilmItem]) {
+        // 1. Netflix Top 10 Vietnam, crawled every 6h (see tools/hot). Animation stays out of the hero.
+        if let hot = await HotList.fetch() {
+            let hero = hot.films.filter { !$0.isAnimation }
+            if hero.count >= 5 { return (Array(hero.prefix(12)), Array(hot.series.prefix(10))) }
+        }
+        // 2. Fallback: rank what is updating now by KKPhim views, once a day.
         let today = Date.now.formatted(.iso8601.year().month().day())
         if !refresh, let data = UserDefaults.standard.data(forKey: Self.heroCacheKey),
            let cache = try? JSONDecoder().decode(HeroCache.self, from: data), cache.day == today, !cache.films.isEmpty {
-            return cache.films
+            return (cache.films, cache.series)
         }
-        let hot = await rankByViews()
-        guard hot.count >= 5 else { return await freshest() }
-        if let data = try? JSONEncoder().encode(HeroCache(day: today, films: hot)) {
+        let ranked = await rankByViews()
+        guard ranked.hero.count >= 5 else { return (await freshest(), []) }
+        if let data = try? JSONEncoder().encode(HeroCache(day: today, films: ranked.hero, series: ranked.series)) {
             UserDefaults.standard.set(data, forKey: Self.heroCacheKey)
         }
-        return hot
+        return ranked
     }
 
-    private func rankByViews() async -> [FilmItem] {
+    /// Hero: top 10 by views with the country boost. Series: top 10 series by raw views.
+    private func rankByViews() async -> (hero: [FilmItem], series: [FilmItem]) {
         async let s1 = try? api.list(.type("phim-bo"), page: 1).items
         async let s2 = try? api.list(.type("phim-bo"), page: 2).items
         async let m1 = try? api.list(.type("phim-le"), page: 1).items
         var seen = Set<String>()
         let candidates = ((await s1 ?? []) + (await s2 ?? []) + (await m1 ?? []))
             .filter { seen.insert($0.slug).inserted && !$0.isAnimation }
-        let scored = await withTaskGroup(of: (FilmItem, Double)?.self) { [api] group in
+        let scored = await withTaskGroup(of: (film: FilmItem, views: Double)?.self) { [api] group in
             for film in candidates {
                 group.addTask {
                     guard let detail = try? await api.detail(slug: film.slug),
                           detail.episodes?.contains(where: { ($0.serverData ?? []).contains { $0.streamURL != nil } }) == true
                     else { return nil }
-                    let preferred = (film.country ?? []).contains { Self.preferredCountries.contains($0.slug ?? "") }
-                    return (film, Double(detail.view ?? 0) * (preferred ? 1.5 : 1))
+                    return (film, Double(detail.view ?? 0))
                 }
             }
-            var out: [(FilmItem, Double)] = []
+            var out: [(film: FilmItem, views: Double)] = []
             for await r in group { if let r { out.append(r) } }
             return out
         }
-        return scored.sorted { $0.1 > $1.1 }.prefix(10).map(\.0)
+        let boost = { (f: FilmItem) in (f.country ?? []).contains { Self.preferredCountries.contains($0.slug ?? "") } ? 1.5 : 1.0 }
+        let hero = scored.sorted { $0.views * boost($0.film) > $1.views * boost($1.film) }.prefix(10).map(\.film)
+        let series = scored.filter { $0.film.type == "series" }.sorted { $0.views > $1.views }.prefix(10).map(\.film)
+        return (Array(hero), Array(series))
     }
 
     /// Port of `HeroRepository._freshestFallback`: Hàn/Trung/Âu Mỹ first, no animation, top 10.
