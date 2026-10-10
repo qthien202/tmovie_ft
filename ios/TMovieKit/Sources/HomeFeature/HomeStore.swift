@@ -39,9 +39,10 @@ final class HomeStore {
 
     init(api: PhimAPI = .shared) { self.api = api }
 
-    func load() async {
+    /// `refresh` (pull-to-refresh) skips the once-a-day hero cache.
+    func load(refresh: Bool = false) async {
         failed = false
-        async let heroTask = loadHero()
+        async let heroTask = loadHero(refresh: refresh)
         await withTaskGroup(of: (Rail, [FilmItem]).self) { [api] group in
             for rail in Rail.home + [Rail.top10] {
                 group.addTask { (rail, (try? await api.list(rail.source).items) ?? []) }
@@ -62,16 +63,68 @@ final class HomeStore {
         failed = hero.isEmpty && rails.values.allSatisfy(\.isEmpty)
     }
 
+    // MARK: Hero: what's hot right now
+
+    private struct HeroCache: Codable {
+        let day: String
+        let films: [FilmItem]
+    }
+
+    private static let heroCacheKey = "hero.hot.v5"
+    private nonisolated static let preferredCountries: Set<String> = ["han-quoc", "trung-quoc", "au-my"]
+
+    /// The most-watched titles among what is airing / updating now, built at most once a day.
+    ///
+    /// PhimAPI can't sort lists by views (`sort_field=view` is ignored) and Trakt's bundled client ID
+    /// is revoked, so this reads each candidate's real KKPhim `view` count from its detail and ranks
+    /// by that, favouring Korean / Chinese / Western titles and skipping animation (like the
+    /// Flutter hero). Falls back to the freshest list if that fails.
+    private func loadHero(refresh: Bool) async -> [FilmItem] {
+        let today = Date.now.formatted(.iso8601.year().month().day())
+        if !refresh, let data = UserDefaults.standard.data(forKey: Self.heroCacheKey),
+           let cache = try? JSONDecoder().decode(HeroCache.self, from: data), cache.day == today, !cache.films.isEmpty {
+            return cache.films
+        }
+        let hot = await rankByViews()
+        guard hot.count >= 5 else { return await freshest() }
+        if let data = try? JSONEncoder().encode(HeroCache(day: today, films: hot)) {
+            UserDefaults.standard.set(data, forKey: Self.heroCacheKey)
+        }
+        return hot
+    }
+
+    private func rankByViews() async -> [FilmItem] {
+        async let s1 = try? api.list(.type("phim-bo"), page: 1).items
+        async let s2 = try? api.list(.type("phim-bo"), page: 2).items
+        async let m1 = try? api.list(.type("phim-le"), page: 1).items
+        var seen = Set<String>()
+        let candidates = ((await s1 ?? []) + (await s2 ?? []) + (await m1 ?? []))
+            .filter { seen.insert($0.slug).inserted && !$0.isAnimation }
+        let scored = await withTaskGroup(of: (FilmItem, Double)?.self) { [api] group in
+            for film in candidates {
+                group.addTask {
+                    guard let detail = try? await api.detail(slug: film.slug),
+                          detail.episodes?.contains(where: { ($0.serverData ?? []).contains { $0.streamURL != nil } }) == true
+                    else { return nil }
+                    let preferred = (film.country ?? []).contains { Self.preferredCountries.contains($0.slug ?? "") }
+                    return (film, Double(detail.view ?? 0) * (preferred ? 1.5 : 1))
+                }
+            }
+            var out: [(FilmItem, Double)] = []
+            for await r in group { if let r { out.append(r) } }
+            return out
+        }
+        return scored.sorted { $0.1 > $1.1 }.prefix(10).map(\.0)
+    }
+
     /// Port of `HeroRepository._freshestFallback`: Hàn/Trung/Âu Mỹ first, no animation, top 10.
-    // ponytail: Trakt trending match is skipped until a working Trakt client ID exists (bundled one 403s).
-    private func loadHero() async -> [FilmItem] {
+    private func freshest() async -> [FilmItem] {
         async let p1 = try? api.list(.type("phim-moi-cap-nhat"), page: 1).items
         async let p2 = try? api.list(.type("phim-moi-cap-nhat"), page: 2).items
         let all = (await p1 ?? []) + (await p2 ?? [])
         var seen = Set<String>()
         let films = all.filter { seen.insert($0.slug).inserted && !$0.isAnimation }
-        let preferred: Set<String> = ["han-quoc", "trung-quoc", "au-my"]
-        let isPreferred = { (f: FilmItem) in (f.country ?? []).contains { preferred.contains($0.slug ?? "") } }
+        let isPreferred = { (f: FilmItem) in (f.country ?? []).contains { Self.preferredCountries.contains($0.slug ?? "") } }
         return Array((films.filter(isPreferred) + films.filter { !isPreferred($0) }).prefix(10))
     }
 }

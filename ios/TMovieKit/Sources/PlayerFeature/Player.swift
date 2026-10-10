@@ -8,6 +8,9 @@ import UIKit
 /// keep-awake. A "Tập tiếp theo" button shows in the last 18s and the next episode auto-plays at the end.
 @MainActor
 public final class Player: NSObject, AVPlayerViewControllerDelegate {
+    /// Posted before the full-screen player appears, so inline previews can stop.
+    public static let willPresent = Notification.Name("TMoviePlayerWillPresent")
+
     /// Kept alive while on screen or in Picture in Picture.
     private static var current: Player?
 
@@ -130,6 +133,7 @@ public final class Player: NSObject, AVPlayerViewControllerDelegate {
     // MARK: Presentation
 
     private func present() {
+        NotificationCenter.default.post(name: Player.willPresent, object: nil)
         OrientationLock.rotate(to: .landscape)
         topViewController()?.present(controller, animated: true)
     }

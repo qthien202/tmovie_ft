@@ -62,7 +62,7 @@ public struct HomeView: View {
                 }
             }
         }
-        .refreshable { await store.load() }
+        .refreshable { await store.load(refresh: true) }
         .task { if store.hero.isEmpty { await store.load() } }
         .task(id: heroArt) {
             let sampled = await ColorSampler.tint(of: heroArt) ?? .brand
