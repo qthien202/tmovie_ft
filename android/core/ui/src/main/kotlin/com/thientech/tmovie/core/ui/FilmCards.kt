@@ -29,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -103,7 +104,8 @@ fun RailHeader(title: String, more: ListRoute? = null) {
 /** A titled horizontal rail that rises in the first time it is composed. */
 @Composable
 fun Shelf(title: String, more: ListRoute? = null, spacing: Dp = 8.dp, content: LazyListScope.() -> Unit) {
-    var shown by remember { mutableStateOf(false) }
+    // Saveable, so the rise plays once rather than every time the shelf scrolls back into view.
+    var shown by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(Unit) { shown = true }
     val progress by animateFloatAsState(if (shown) 1f else 0f, cinematic(), label = "rise")
     Column(

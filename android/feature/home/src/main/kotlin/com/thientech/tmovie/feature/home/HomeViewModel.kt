@@ -18,6 +18,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.Serializable
 
 /** A horizontal rail on Home. */
@@ -51,23 +52,34 @@ class HomeViewModel(app: Application) : AndroidViewModel(app) {
         failed = false
         refreshing = refresh
         coroutineScope {
-            val heroJob = async { loadHero(refresh) }
-            homeRails.map { rail ->
-                async { rails[rail] = runCatching { api.list(rail.route.source).items }.getOrDefault(emptyList()) }
-            }.awaitAll()
-            val (h, t) = heroJob.await()
-            hero = h
-            top10 = t
+            // Hero first and independent of the rails, published together with its key art so the
+            // image never swaps from thumb to backdrop on screen.
+            launch {
+                val (h, t) = loadHero(refresh)
+                val art = withTimeoutOrNull(2_500) { heroArtFor(h) }.orEmpty()
+                heroArt.putAll(art)
+                hero = h
+                top10 = t
+            }
+            homeRails.forEach { rail ->
+                launch { rails[rail] = runCatching { api.list(rail.route.source).items }.getOrDefault(emptyList()) }
+            }
         }
-        hero.map { film ->
+        // Art that missed the timeout fills in afterwards (only pages not yet on screen benefit).
+        heroArtFor(hero.filter { it.slug !in heroArt }).let(heroArt::putAll)
+        failed = hero.isEmpty() && rails.values.all { it.isEmpty() }
+        refreshing = false
+    }
+
+    /** Textless TMDB backdrops (w1280) per slug. */
+    private suspend fun heroArtFor(films: List<FilmItem>): Map<String, String> = coroutineScope {
+        films.map { film ->
             async {
                 val images = runCatching { api.images(film.slug) }.getOrDefault(emptyList())
                 (images.firstOrNull { it.type == "backdrop" && it.iso6391 == null } ?: images.firstOrNull { it.type == "backdrop" })
-                    ?.url("w1280")?.let { heroArt[film.slug] = it }
+                    ?.url("w1280")?.let { film.slug to it }
             }
-        }.awaitAll()
-        failed = hero.isEmpty() && rails.values.all { it.isEmpty() }
-        refreshing = false
+        }.awaitAll().filterNotNull().toMap()
     }
 
     /**

@@ -10,9 +10,18 @@ Every new feature/release must add a `## vX.Y.Z` section with both parts.
 
 ## v1.4.1
 
-Android: the hero's autoplay preview no longer spills out below the page dots. It now renders into a clipped TextureView sized to aspect-fill, instead of a SurfaceView that ignores Compose clipping.
+Android fixes.
+- The hero's autoplay preview no longer spills out below the page dots. It now renders into a clipped TextureView sized to aspect-fill, instead of a SurfaceView that ignores Compose clipping.
+- Smoother Home:
+  - JSON is decoded off the main thread.
+  - Hero animations (Ken Burns, tilt, paging) redraw layers instead of recomposing every frame.
+  - The hero appears with its final key art, and placeholders keep the layout stable while loading.
+  - Shelves animate in only once.
 
 <!-- app:vi -->
+⚡️ Trang chủ mượt hơn
+• Tải nhanh, không còn giật khi mở app; ảnh hiện mượt, bố cục không nhảy khi đang tải.
+
 🛠 Sửa lỗi
 • Đoạn xem trước ở trang chủ không còn bị lộ ra bên dưới thanh chuyển trang.
 <!-- /app:vi -->
