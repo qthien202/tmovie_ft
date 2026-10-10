@@ -8,6 +8,28 @@ Vietnamese block free of Markdown styling (use emoji + "•" bullets).
 
 Every new feature/release must add a `## vX.Y.Z` section with both parts.
 
+## v1.4.0
+
+The mobile app is rebuilt natively in Kotlin + Jetpack Compose (android/), replacing the Flutter build; it installs over it as a normal update.
+- Home: Apple TV-style hero following Netflix's weekly Top 10 for Vietnam (crawled every 6h), with textless key art, parallax, tilt depth and a muted autoplay preview; Continue Watching, My List and Top 10 shelves.
+- Netflix-style category pages with a full-screen genre picker and filters; New & Hot (upcoming / airing / completed) now works on PhimAPI; Search with genre chips.
+- Player: Media3 with Picture-in-Picture, resume, next episode and an in-player episode panel.
+- Fixes: adult titles are filtered by PhimAPI's `phim-18` tag; images under `upload/vod/` no longer 404.
+
+<!-- app:vi -->
+✨ TMovie hoàn toàn mới
+• Ứng dụng được viết lại native cho Android: mượt hơn, nhẹ hơn, giao diện mới phong cách Apple TV.
+
+🔥 Phim hot thật sự
+• Trang chủ hiển thị Top 10 phim đang hot nhất tuần ở Việt Nam, tự cập nhật mỗi 6 giờ, kèm đoạn xem trước tự phát.
+
+🎬 Xem phim đã hơn
+• Hình trong hình (PiP), xem tiếp đúng chỗ đã dừng, tự chuyển tập và chọn tập ngay trong trình phát.
+
+📺 Khám phá dễ hơn
+• Trang thể loại mới, mục Mới & Hot (sắp chiếu, đang chiếu, trọn bộ) và tìm kiếm theo thể loại.
+<!-- /app:vi -->
+
 ## v1.3.2
 
 Switch movie data and stream provider to PhimAPI.

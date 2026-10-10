@@ -151,7 +151,8 @@ class PlayerActivity : ComponentActivity() {
                 ).build(),
             )
             val record = Library.record(detail.slug)
-            val resume = record?.positions?.get(ep.slug.orEmpty()) ?: 0.0
+            // Synced Flutter positions are keyed by episode name.
+            val resume = record?.positions?.get(ep.slug.orEmpty()) ?: record?.positions?.get(ep.name.orEmpty()) ?: 0.0
             val total = record?.durations?.get(ep.slug.orEmpty()) ?: 0.0
             if (resume > 5 && (total == 0.0 || resume < total - 20)) exo.seekTo((resume * 1000).toLong())
             exo.prepare()

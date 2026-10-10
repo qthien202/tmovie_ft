@@ -47,6 +47,7 @@ import com.thientech.tmovie.core.designsystem.TMovieColors
 import com.thientech.tmovie.core.designsystem.glass
 import com.thientech.tmovie.core.model.FilmCategory
 import com.thientech.tmovie.core.network.PhimApi
+import com.thientech.tmovie.core.ui.AccountCard
 import com.thientech.tmovie.core.ui.FilmRoute
 import com.thientech.tmovie.core.ui.HomeRoute
 import com.thientech.tmovie.core.ui.ListRoute
@@ -113,7 +114,7 @@ fun AppNavHost(link: String?, onLinkHandled: () -> Unit) {
                         composable<HomeRoute> { CompositionLocalProvider(LocalAnimatedScope provides this) { HomeScreen() } }
                         composable<NewHotRoute> { CompositionLocalProvider(LocalAnimatedScope provides this) { NewHotScreen() } }
                         composable<SearchRoute> { CompositionLocalProvider(LocalAnimatedScope provides this) { SearchScreen() } }
-                        composable<ProfileRoute> { CompositionLocalProvider(LocalAnimatedScope provides this) { ProfileScreen() } }
+                        composable<ProfileRoute> { CompositionLocalProvider(LocalAnimatedScope provides this) { ProfileScreen(account = { AccountCard() }) } }
                         composable<FilmRoute> { back ->
                             CompositionLocalProvider(LocalAnimatedScope provides this) { DetailScreen(back.toRoute()) }
                         }

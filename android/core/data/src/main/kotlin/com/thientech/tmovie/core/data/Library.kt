@@ -112,6 +112,34 @@ object Library {
         }
     }
 
+    /**
+     * Merges synced entries in: missing films are added, newer history wins. Playback positions
+     * from the Flutter app are keyed `{slug}_{episodeName}`, so they are stored under the episode name.
+     */
+    internal fun mergeRemote(favorites: List<LibrarySync.Entry>, history: List<LibrarySync.Entry>, playback: Map<String, Double>) {
+        _saved.update { local ->
+            val known = local.map { it.film.slug }.toSet()
+            (local + favorites.filter { it.film.slug !in known }.map { SavedFilm(it.film, it.timestamp) }).sortedByDescending { it.addedAt }
+        }
+        _history.update { local ->
+            val bySlug = local.associateBy { it.film.slug }.toMutableMap()
+            history.forEach { e ->
+                val existing = bySlug[e.film.slug]
+                if (existing == null || existing.updatedAt < e.timestamp) {
+                    val name = e.episode.orEmpty()
+                    val positions = playback.filterKeys { it.startsWith("${e.film.slug}_") }.mapKeys { it.key.removePrefix("${e.film.slug}_") }
+                    bySlug[e.film.slug] = (existing ?: WatchRecord(e.film)).copy(
+                        episodeName = name,
+                        lastEpisodeSlug = existing?.lastEpisodeSlug?.takeIf { existing.episodeName == name } ?: name,
+                        positions = (existing?.positions.orEmpty()) + positions,
+                        updatedAt = e.timestamp,
+                    )
+                }
+            }
+            bySlug.values.sortedByDescending { it.updatedAt }
+        }
+    }
+
     fun remove(slug: String) = _history.update { list -> list.filterNot { it.film.slug == slug } }
     fun clearHistory() { _history.value = emptyList() }
     fun clearSaved() { _saved.value = emptyList() }

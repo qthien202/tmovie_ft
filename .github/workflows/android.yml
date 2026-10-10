@@ -17,6 +17,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      GS_MOBILE: ${{ secrets.GOOGLE_SERVICES_MOBILE }}
     defaults:
       run:
         working-directory: android
@@ -29,6 +31,11 @@ jobs:
           java-version: '17'
 
       - uses: gradle/actions/setup-gradle@v4
+
+      # google-services.json is gitignored; without it the app still builds and hides sign-in.
+      - name: Restore Firebase config
+        if: env.GS_MOBILE != ''
+        run: printf '%s' "$GS_MOBILE" | base64 -d > app/google-services.json
 
       - name: Unit tests
         run: ./gradlew :core:network:test --stacktrace
