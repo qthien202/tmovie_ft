@@ -1,0 +1,94 @@
+name: Android smoke test
+
+# Installs the debug APK on an emulator, opens a film in the player through the
+# tmovie://phim/{slug}?play=1 deep link, lets it play, and fails if the app crashed.
+# Runs on every push / PR that touches android/ (and on demand).
+
+on:
+  push:
+    paths: ['android/**', 'private', '.github/workflows/android-smoke.yml']
+  pull_request:
+    paths: ['android/**', 'private', '.github/workflows/android-smoke.yml']
+  workflow_dispatch:
+    inputs:
+      slug:
+        description: Film slug to play
+        required: false
+
+concurrency:
+  group: android-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      GS_MOBILE: ${{ secrets.GOOGLE_SERVICES_MOBILE }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/private-core
+        with:
+          ssh-key: ${{ secrets.CORE_DEPLOY_KEY }}
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Restore Firebase config
+        if: env.GS_MOBILE != ''
+        run: printf '%s' "$GS_MOBILE" | base64 -d > android/app/google-services.json
+
+      - name: Build debug APK
+        working-directory: android
+        run: ./gradlew :app:assembleDebug
+
+      - name: Pick a film
+        id: film
+        run: |
+          SLUG="${{ github.event.inputs.slug }}"
+          if [ -z "$SLUG" ]; then
+            SLUG=$(curl -s "https://phimapi.com/v1/api/danh-sach/phim-bo?page=1" | python3 -c "import json,sys;print(json.load(sys.stdin)['data']['items'][0]['slug'])")
+          fi
+          echo "slug=$SLUG" >> "$GITHUB_OUTPUT"
+          echo "Playing $SLUG"
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Play on an emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          script: |
+            adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+            # Skip onboarding: write the settings the app reads on start.
+            adb shell "run-as com.thientech.mobile sh -c 'mkdir -p shared_prefs && printf \"<?xml version=\\\"1.0\\\" encoding=\\\"utf-8\\\" standalone=\\\"yes\\\" ?>\\n<map><boolean name=\\\"onboarded\\\" value=\\\"true\\\" /></map>\" > shared_prefs/settings.xml'"
+            adb logcat -c
+            adb shell am start -W -a android.intent.action.VIEW -d "tmovie://phim/${{ steps.film.outputs.slug }}?play=1" com.thientech.mobile
+            sleep 45
+            adb exec-out screencap -p > player.png
+            adb logcat -d > logcat.txt
+            adb shell dumpsys activity activities | grep -E "mResumedActivity|topResumedActivity" | tee activity.txt
+            if grep -q "FATAL EXCEPTION" logcat.txt; then echo "::error::App crashed"; grep -A40 "FATAL EXCEPTION" logcat.txt; exit 1; fi
+            grep -q "PlayerActivity" activity.txt || { echo "::error::PlayerActivity is not in front"; exit 1; }
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: smoke-test
+          path: |
+            player.png
+            logcat.txt
+          if-no-files-found: ignore

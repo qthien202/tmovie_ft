@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- ExoPlayer's network wake mode keeps Wi-Fi and CPU awake during playback (incl. PiP). -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <application>
         <activity
             android:name=".PlayerActivity"
