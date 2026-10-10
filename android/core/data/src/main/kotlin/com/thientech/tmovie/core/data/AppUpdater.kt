@@ -39,12 +39,12 @@ object AppUpdater {
         }
     }.getOrNull()
 
-    /** Streams the APK into the cache dir, reporting 0..1 progress. */
-    suspend fun download(context: Context, url: String, onProgress: (Float) -> Unit): File = withContext(Dispatchers.IO) {
+    /** Streams the APK into the cache dir, reporting bytes done and total (total ≤ 0 when unknown). */
+    suspend fun download(context: Context, url: String, onProgress: (done: Long, total: Long) -> Unit): File = withContext(Dispatchers.IO) {
         val out = File(context.cacheDir, "updates/tmovie_update.apk").apply { parentFile?.mkdirs(); delete() }
         PhimApi.defaultClient.newCall(Request.Builder().url(url).build()).execute().use { res ->
             val body = res.body ?: error("empty body")
-            val total = body.contentLength().coerceAtLeast(1)
+            val total = body.contentLength()
             body.byteStream().use { input ->
                 out.outputStream().use { output ->
                     val buf = ByteArray(64 * 1024)
@@ -54,7 +54,7 @@ object AppUpdater {
                         if (n < 0) break
                         output.write(buf, 0, n)
                         done += n
-                        onProgress((done.toFloat() / total).coerceAtMost(1f))
+                        onProgress(done, total)
                     }
                 }
             }

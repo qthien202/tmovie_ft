@@ -12,6 +12,7 @@ Every new feature/release must add a `## vX.Y.Z` section with both parts.
 
 Android fixes.
 - The hero's autoplay preview no longer spills out below the page dots. It now renders into a clipped TextureView sized to aspect-fill, instead of a SurfaceView that ignores Compose clipping.
+- Redesigned update dialog: app icon, version jump, formatted release notes, and in-place download progress (percent and MB) leading to install.
 - Smoother Home:
   - JSON is decoded off the main thread.
   - Hero animations (Ken Burns, tilt, paging) redraw layers instead of recomposing every frame.
@@ -19,6 +20,9 @@ Android fixes.
   - Shelves animate in only once.
 
 <!-- app:vi -->
+✨ Cập nhật đẹp hơn
+• Hộp thoại cập nhật mới: hiện rõ phiên bản, ghi chú dễ đọc và tiến trình tải ngay trong app.
+
 ⚡️ Trang chủ mượt hơn
 • Tải nhanh, không còn giật khi mở app; ảnh hiện mượt, bố cục không nhảy khi đang tải.
 
