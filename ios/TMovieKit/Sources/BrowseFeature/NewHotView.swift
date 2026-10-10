@@ -12,17 +12,20 @@ public struct NewHotView: View {
     enum Feed: String, CaseIterable, Identifiable {
         case upcoming = "🍿 Sắp chiếu", airing = "🔥 Đang chiếu", completed = "✅ Trọn bộ"
         var id: Self { self }
-        var source: PhimAPI.Source {
+        /// PhimAPI has no airing / completed lists (those were OPhim slugs), so both slice
+        /// `phim-bo` by its episode label: "Tập 12" is airing, "Hoàn Tất (24/24)" is complete.
+        @MainActor func makePager() -> Pager {
             switch self {
-            case .upcoming: .type("phim-sap-chieu")
-            case .airing: .type("phim-bo-dang-chieu")
-            case .completed: .type("phim-bo-hoan-thanh")
+            case .upcoming: Pager(.type("phim-sap-chieu"))
+            case .airing: Pager(.type("phim-bo")) { ($0.episodeCurrent ?? "").hasPrefix("Tập") }
+            case .completed: Pager(.type("phim-bo")) { ($0.episodeCurrent ?? "").localizedCaseInsensitiveContains("hoàn tất") }
             }
         }
     }
 
     @State private var feed = Feed.upcoming
-    @State private var pager = Pager(Feed.upcoming.source)
+    @State private var pagers = Dictionary(uniqueKeysWithValues: Feed.allCases.map { ($0, $0.makePager()) })
+    private var pager: Pager { pagers[feed]! }
     @Namespace private var pill
 
     public var body: some View {
@@ -43,10 +46,7 @@ public struct NewHotView: View {
         .scrollIndicators(.hidden)
         .background(Color.canvas)
         .navigationTitle("Mới & Hot")
-        .task(id: feed) {
-            pager.source = feed.source
-            await pager.loadMore()
-        }
+        .task(id: feed) { if pager.items.isEmpty { await pager.loadMore() } }
     }
 
     private var pills: some View {

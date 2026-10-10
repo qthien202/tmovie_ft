@@ -13,16 +13,24 @@ struct HeroCarousel: View {
     @Binding var page: String?
 
     @State private var tilt = TiltMotion()
+    @AppStorage("heroAutoplay") private var autoplaySetting = true
+    @AppStorage("heroMuted") private var muted = true
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.scenePhase) private var scenePhase
 
     private var current: String? { page ?? films.first?.slug }
 
+    /// Autoplay previews unless turned off, in Low Power Mode, or with Reduce Motion.
+    private var autoplay: Bool {
+        autoplaySetting && !reduceMotion && !ProcessInfo.processInfo.isLowPowerModeEnabled
+    }
+
     var body: some View {
         ScrollView(.horizontal) {
             LazyHStack(spacing: 0) {
                 ForEach(films) { film in
-                    HeroPage(film: film, art: art[film.slug] ?? film.thumbURL, tint: tint, tilt: tilt, motion: !reduceMotion)
+                    HeroPage(film: film, art: art[film.slug] ?? film.thumbURL, tint: tint, tilt: tilt, motion: !reduceMotion,
+                             preview: autoplay && film.slug == current, muted: $muted)
                         .containerRelativeFrame(.horizontal)
                 }
             }
@@ -46,9 +54,9 @@ struct HeroCarousel: View {
         .onAppear { if !reduceMotion { tilt.start() } }
         .onDisappear { tilt.stop() }
         .task(id: "\(current ?? "")\(films.count)\(scenePhase == .active)") {
-            // Auto-advance every 8s; a manual swipe changes `page` and restarts the timer.
+            // Auto-advance (longer while a preview plays); a manual swipe changes `page` and restarts the timer.
             guard films.count > 1, scenePhase == .active else { return }
-            try? await Task.sleep(for: .seconds(8))
+            try? await Task.sleep(for: .seconds(autoplay ? 30 : 8))
             guard !Task.isCancelled else { return }
             let i = films.firstIndex { $0.slug == current } ?? 0
             withAnimation(reduceMotion ? nil : .cinematic) { page = films[(i + 1) % films.count].slug }
@@ -76,6 +84,8 @@ private struct HeroPage: View {
     let tint: Color
     let tilt: TiltMotion
     let motion: Bool
+    let preview: Bool
+    @Binding var muted: Bool
 
     var body: some View {
         let route = FilmRoute(film: film, sourceID: "hero/\(film.slug)")
@@ -90,6 +100,7 @@ private struct HeroPage: View {
                             CubicKeyframe(1.12, duration: 12)
                             CubicKeyframe(1.0, duration: 12)
                         }
+                        .overlay { if preview { HeroPreview(slug: film.slug, muted: $muted) } }
                         .offset(x: tilt.roll * -22, y: tilt.pitch * -14)
                         .scaleEffect(1.08)  // bleed so tilt never shows an edge
                         // Paging parallax: the art moves slower than the page.
@@ -146,7 +157,20 @@ private struct HeroPage: View {
             HStack(spacing: 12) {
                 PlayFilmButton(film: film, capsule: true)
                 SaveButton(film: film, style: .circle)
+                if preview {
+                    Button { muted.toggle() } label: {
+                        Image(systemName: muted ? "speaker.slash.fill" : "speaker.wave.2.fill")
+                            .font(.title3.weight(.semibold))
+                            .contentTransition(.symbolEffect(.replace))
+                            .frame(width: 50, height: 50)
+                            .glassSurface(in: .circle, interactive: true)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(muted ? "Bật tiếng xem trước" : "Tắt tiếng xem trước")
+                    .transition(.scale.combined(with: .opacity))
+                }
             }
+            .animation(.snappy, value: preview)
             .padding(.top, 6)
         }
         .foregroundStyle(.white)

@@ -12,6 +12,7 @@ public struct ProfileView: View {
     @Query(sort: \WatchRecord.updatedAt, order: .reverse) private var history: [WatchRecord]
     @Query(sort: \SavedFilm.addedAt, order: .reverse) private var saved: [SavedFilm]
     @AppStorage("profileName") private var name = "Bạn"
+    @AppStorage("heroAutoplay") private var heroAutoplay = true
     @State private var confirm: Confirm?
 
     enum Confirm: Identifiable { case history, saved; var id: Self { self } }
@@ -68,6 +69,9 @@ public struct ProfileView: View {
 
     private var settings: some View {
         VStack(spacing: 0) {
+            Toggle(isOn: $heroAutoplay) { Label("Tự phát xem trước", systemImage: "play.rectangle.on.rectangle") }
+                .padding(16)
+            Divider().padding(.leading, 52)
             row("Xoá lịch sử xem", "clock.arrow.circlepath") { confirm = .history }
             Divider().padding(.leading, 52)
             row("Xoá danh sách của tôi", "trash") { confirm = .saved }
