@@ -63,6 +63,7 @@ private func fixture<T: Decodable>(_ name: String, as type: T.Type = T.self) thr
     let json = """
     {"data":{"items":[
       {"name":"A","slug":"a","category":[{"slug":"18-plus"}]},
+      {"name":"A2","slug":"a2","category":[{"slug":"phim-18"}]},
       {"name":"B","slug":"b","episode_current":"Trailer"},
       {"name":"C","slug":"c"}
     ],"params":{"pagination":{"totalItems":49,"totalItemsPerPage":24,"currentPage":1}}}}

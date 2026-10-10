@@ -10,7 +10,7 @@ struct Top10Shelf: View {
     let more: ListRoute
 
     var body: some View {
-        Shelf("Top 10 phim bộ hôm nay", more: more, spacing: 4) {
+        Shelf("Top 10 phim bộ tuần này", more: more, spacing: 4) {
             ForEach(Array(films.enumerated()), id: \.element.id) { i, film in
                 HStack(alignment: .bottom, spacing: -22) {
                     Text("\(i + 1)")

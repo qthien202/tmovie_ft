@@ -33,8 +33,8 @@ public struct HomeView: View {
                         ForEach(saved.compactMap(\.film)) { PosterCard(film: $0, sourceID: "mylist/\($0.slug)") }
                     }
                 }
-                if let top = store.rails[Rail.top10], !top.isEmpty {
-                    Top10Shelf(films: Array(top.prefix(10)), more: Rail.top10.more)
+                if !store.top10.isEmpty {
+                    Top10Shelf(films: store.top10, more: Rail.top10.more)
                 }
                 ForEach(Rail.home.filter { store.rails[$0]?.isEmpty != true }) { rail in
                     Shelf(rail.title, more: rail.more) {

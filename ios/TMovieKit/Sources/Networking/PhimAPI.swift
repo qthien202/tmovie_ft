@@ -59,7 +59,7 @@ public struct PhimAPI: Sendable {
     public func taxonomy(_ kind: Taxonomy) async throws -> [FilmCategory] {
         let root = baseURL.deletingLastPathComponent().deletingLastPathComponent()
         let res: Envelope<TaxonomyData> = try await session.json(root.appending(path: kind.rawValue))
-        return res.data.items
+        return res.data.items.filter { !FilmCategory.adultSlugs.contains($0.slug ?? "") }
     }
 
     public enum Taxonomy: String, Sendable { case genres = "the-loai", countries = "quoc-gia" }
