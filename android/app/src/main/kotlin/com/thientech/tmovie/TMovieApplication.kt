@@ -1,6 +1,7 @@
 package com.thientech.tmovie
 
 import android.app.Application
+import com.thientech.tmovie.core.data.Account
 import com.thientech.tmovie.core.data.Library
 import com.thientech.tmovie.core.data.Settings
 
@@ -9,5 +10,6 @@ class TMovieApplication : Application() {
         super.onCreate()
         Settings.init(this)
         Library.init(this)
+        Account.init(this)
     }
 }

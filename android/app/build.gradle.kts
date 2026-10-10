@@ -7,6 +7,10 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
+// Firebase (Google sign-in, per-account settings, sync) needs app/google-services.json, which
+// is gitignored and restored by CI from a secret. Without it the app builds and simply hides login.
+if (file("google-services.json").exists()) apply(plugin = "com.google.gms.google-services")
+
 // Release signing from android/key.properties (written by CI from secrets). It must be the same
 // key as the Flutter app so this APK installs as an update over it. Falls back to the debug key.
 val keystoreProps = Properties().apply {
