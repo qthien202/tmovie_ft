@@ -63,11 +63,20 @@ tmovie_ft/
 │   ├── TMovieKit/Tests/        # Decoding + URL tests against recorded PhimAPI JSON
 │   └── Tools/make_icon.swift   # Generates the app icon
 ├── tools/hot/crawl_hot.py      # Hot-list crawler (Netflix Top 10 Vietnam → PhimAPI)
-├── .github/workflows/          # Hot-list cron, release builds
+├── android/                    # Native Android app (Kotlin + Jetpack Compose)
+├── private/                    # 🔒 Private submodule (qthien202/tmovie-core), see below
+├── .github/workflows/          # Android CI, hot-list cron, release builds
 └── apps/, packages/            # Legacy Flutter apps (mobile, Android TV)
 ```
 
 Features depend only on the foundation and shared UI modules (`FilmUI`, `PlayerFeature`) and never import each other. They push `FilmRoute` / `ListRoute` values, and the app target maps those to screens.
+
+### 🔒 Private core
+
+The API clients, stream and ad-filter code, account sync, content policy, the hot-list crawler and the Flutter core package live in a **private** repository. It is mounted at `private/` as a git submodule, and the original paths (for example `ios/TMovieKit/Sources/Networking`, `android/core/network`, `packages/core`) are symlinks into it. Builds therefore need access to that repository:
+
+- **CI** checks out the submodule with a read-only deploy key (`CORE_DEPLOY_KEY`) and always builds against its latest `main`.
+- **Locally** you need `git clone --recurse-submodules` with an account that has access. Without it the symlinks dangle and the apps won't build.
 
 ---
 
@@ -75,7 +84,7 @@ Features depend only on the foundation and shared UI modules (`FilmUI`, `PlayerF
 
 The PhimAPI catalogue can't be sorted by popularity, so "what's hot" comes from outside:
 
-1. [`tools/hot/crawl_hot.py`](tools/hot/crawl_hot.py) reads Netflix's public weekly Top 10 for Vietnam (TV and films).
+1. A crawler in the private core reads Netflix's public weekly Top 10 for Vietnam (TV and films).
 2. It searches PhimAPI for each title and matches by original name.
 3. [`.github/workflows/hot.yml`](.github/workflows/hot.yml) runs the crawler every 6 hours. It publishes the result as `hot.json` on the `hot-data` branch, a single force-pushed commit.
 4. The apps read `https://raw.githubusercontent.com/qthien202/tmovie_ft/hot-data/hot.json`. If that's unavailable, they fall back to ranking currently updating titles by view count.
@@ -87,7 +96,7 @@ The PhimAPI catalogue can't be sorted by popularity, so "what's hot" comes from 
 **Requirements:** Xcode 26, [Tuist](https://tuist.dev) 4, and an iPhone or simulator on iOS 17 or later.
 
 ```bash
-git clone https://github.com/qthien202/tmovie_ft.git
+git clone --recurse-submodules git@github.com:qthien202/tmovie_ft.git   # needs access to the private core
 cd tmovie_ft/ios
 tuist generate              # creates TMovie.xcworkspace (gitignored)
 open TMovie.xcworkspace     # set your signing team, then run
@@ -99,10 +108,6 @@ cd ios/TMovieKit
 xcodebuild test -scheme TMovieKit -destination 'platform=iOS Simulator,name=iPhone 17'
 ```
 
-Run the crawler locally (Python 3, standard library only):
-```bash
-python3 tools/hot/crawl_hot.py hot.json
-```
 
 ---
 

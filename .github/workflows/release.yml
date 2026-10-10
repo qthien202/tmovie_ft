@@ -42,6 +42,10 @@ jobs:
         with:
           fetch-depth: 0
 
+      - uses: ./.github/actions/private-core
+        with:
+          ssh-key: ${{ secrets.CORE_DEPLOY_KEY }}
+
       - name: Resolve version
         id: ver
         run: |
