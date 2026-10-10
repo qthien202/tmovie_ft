@@ -25,7 +25,7 @@ import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.ExoPlayer
+import com.thientech.tmovie.core.player.StreamPlayer
 import androidx.media3.common.VideoSize
 import com.thientech.tmovie.core.network.PhimApi
 import kotlinx.coroutines.delay
@@ -38,7 +38,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun HeroPreview(slug: String, muted: Boolean, modifier: Modifier = Modifier) {
     val context = LocalContext.current
-    val exo = remember(slug) { ExoPlayer.Builder(context).build().apply { repeatMode = Player.REPEAT_MODE_OFF } }
+    val exo = remember(slug) { StreamPlayer.create(context, preview = true).apply { repeatMode = Player.REPEAT_MODE_OFF } }
     var visible by remember(slug) { mutableStateOf(false) }
     val alpha by animateFloatAsState(if (visible) 1f else 0f, tween(1200), label = "preview")
 
