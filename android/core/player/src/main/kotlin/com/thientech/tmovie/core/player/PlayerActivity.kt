@@ -5,6 +5,7 @@ import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.util.Rational
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -152,6 +153,13 @@ class PlayerActivity : ComponentActivity() {
             delay(if (network) 500L else 1_000L * recoveries)
             exo.seekTo(at)
             playback.retry()
+        }
+
+        // Keep the screen awake while a film plays (the view's keepScreenOn alone wasn't reliable);
+        // let it sleep again when paused or finished.
+        LaunchedEffect(playback.isPlaying) {
+            if (playback.isPlaying) window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            else window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         }
 
         // Save every 10 s while playing.
