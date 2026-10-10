@@ -47,6 +47,7 @@ import com.thientech.tmovie.core.designsystem.TMovieColors
 import com.thientech.tmovie.core.designsystem.glass
 import com.thientech.tmovie.core.model.FilmCategory
 import com.thientech.tmovie.core.network.PhimApi
+import com.thientech.tmovie.core.player.Player
 import com.thientech.tmovie.core.ui.AccountCard
 import com.thientech.tmovie.core.ui.FilmRoute
 import com.thientech.tmovie.core.ui.HomeRoute
@@ -82,6 +83,7 @@ private val tabs = listOf(
 @Composable
 fun AppNavHost(link: String?, onLinkHandled: () -> Unit) {
     val nav = rememberNavController()
+    val context = androidx.compose.ui.platform.LocalContext.current
     val entry by nav.currentBackStackEntryAsState()
     val navigator = remember(nav) {
         Navigator(
@@ -91,12 +93,16 @@ fun AppNavHost(link: String?, onLinkHandled: () -> Unit) {
         )
     }
 
-    // tmovie://phim/{slug} and tmovie://the-loai/{slug}.
+    // tmovie://phim/{slug}[?play=1] and tmovie://the-loai/{slug}.
     LaunchedEffect(link) {
         val uri = link?.let(android.net.Uri::parse) ?: return@LaunchedEffect
         val slug = uri.pathSegments.firstOrNull() ?: return@LaunchedEffect onLinkHandled()
         when (uri.host) {
-            "phim" -> runCatching { PhimApi.shared.detail(slug) }.getOrNull()?.let { nav.navigate(it.toItem().route("link/$slug")) }
+            "phim" -> runCatching { PhimApi.shared.detail(slug) }.getOrNull()?.let { detail ->
+                nav.navigate(detail.toItem().route("link/$slug"))
+                // `?play=1` starts (or resumes) playback straight away.
+                if (uri.getQueryParameter("play") != null) Player.start(context, detail)
+            }
             "the-loai" -> {
                 val name = runCatching { PhimApi.shared.taxonomy(PhimApi.Taxonomy.Genres) }.getOrDefault(emptyList<FilmCategory>())
                     .firstOrNull { it.slug == slug }?.name ?: slug
