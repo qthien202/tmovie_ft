@@ -8,10 +8,9 @@ Vietnamese block free of Markdown styling (use emoji + "•" bullets).
 
 Every new feature/release must add a `## vX.Y.Z` section with both parts.
 
-## v1.4.1
+## v1.5.0
 
-Android fixes.
-- The hero's autoplay preview no longer spills out below the page dots. It now renders into a clipped TextureView sized to aspect-fill, instead of a SurfaceView that ignores Compose clipping.
+New player, ad-free streams and a redesigned update dialog (Android). The iOS app gets the same player.
 - New player:
   - Custom controls; gestures for double-tap seek, scrub, brightness, volume and pinch-zoom.
   - Lock; quality, audio, subtitles, speed and aspect settings; sleep timer; skip intro.
@@ -19,12 +18,8 @@ Android fixes.
 - Streams: ads spliced into HLS playlists are stripped.
   - Deeper buffers, more retries, cross-protocol redirects.
   - Playback resumes on its own when the network comes back.
+- The screen no longer turns off while a film is playing.
 - Redesigned update dialog: app icon, version jump, formatted release notes, and in-place download progress (percent and MB) leading to install.
-- Smoother Home:
-  - JSON is decoded off the main thread.
-  - Hero animations (Ken Burns, tilt, paging) redraw layers instead of recomposing every frame.
-  - The hero appears with its final key art, and placeholders keep the layout stable while loading.
-  - Shelves animate in only once.
 
 <!-- app:vi -->
 🎬 Trình phát hoàn toàn mới
@@ -34,10 +29,23 @@ Android fixes.
 🚫 Không còn quảng cáo chèn giữa phim
 • Tự lọc các đoạn quảng cáo bị chèn vào phim, phát mượt và ổn định hơn.
 • Mất mạng sẽ tự phát lại khi có mạng.
+• Màn hình không còn tự tắt khi đang xem.
 
 ✨ Cập nhật đẹp hơn
 • Hộp thoại cập nhật mới: hiện rõ phiên bản, ghi chú dễ đọc và tiến trình tải ngay trong app.
+<!-- /app:vi -->
 
+## v1.4.1
+
+Android fixes.
+- The hero's autoplay preview no longer spills out below the page dots. It now renders into a clipped TextureView sized to aspect-fill, instead of a SurfaceView that ignores Compose clipping.
+- Smoother Home:
+  - JSON is decoded off the main thread.
+  - Hero animations (Ken Burns, tilt, paging) redraw layers instead of recomposing every frame.
+  - The hero appears with its final key art, and placeholders keep the layout stable while loading.
+  - Shelves animate in only once.
+
+<!-- app:vi -->
 ⚡️ Trang chủ mượt hơn
 • Tải nhanh, không còn giật khi mở app; ảnh hiện mượt, bố cục không nhảy khi đang tải.
 
