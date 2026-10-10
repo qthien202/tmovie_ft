@@ -2,7 +2,12 @@ package com.thientech.tmovie.core.player
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -324,8 +329,8 @@ private fun LevelHud(icon: ImageVector, level: Float) {
 
 @Composable
 private fun OfflineBanner() {
-    val pulse by androidx.compose.animation.core.rememberInfiniteTransition(label = "offline").animateFloat(
-        0.4f, 1f, androidx.compose.animation.core.infiniteRepeatable(androidx.compose.animation.core.tween(700), androidx.compose.animation.core.RepeatMode.Reverse), label = "pulse",
+    val pulse by rememberInfiniteTransition(label = "offline").animateFloat(
+        0.4f, 1f, infiniteRepeatable(tween(700), RepeatMode.Reverse), label = "pulse",
     )
     Row(
         Modifier.clip(CircleShape).background(Color(0xE6101418)).glass(CircleShape).padding(horizontal = 18.dp, vertical = 10.dp),
