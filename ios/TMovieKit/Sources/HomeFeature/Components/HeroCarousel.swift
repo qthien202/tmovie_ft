@@ -110,6 +110,7 @@ private struct HeroPage: View {
                         .frame(width: geo.size.width, height: geo.size.height)
                         .clipped()
                         .overlay { scrim }
+                        .contentShape(.rect)
                         .zoomSource(id: route.sourceID)
                 }
                 .buttonStyle(.plain)
