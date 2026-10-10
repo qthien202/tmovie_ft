@@ -20,6 +20,9 @@ struct HomeHeader: View {
             }
             .contentMargins(.horizontal, 16, for: .scrollContent)
             .scrollIndicators(.hidden)
+            // A horizontal ScrollView grows to fill the height it's offered; in an overlay that is
+            // the whole screen, which would swallow every tap on the hero below.
+            .fixedSize(horizontal: false, vertical: true)
         }
         .padding(.bottom, 10)
         .background {
