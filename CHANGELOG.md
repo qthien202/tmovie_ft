@@ -8,6 +8,15 @@ Vietnamese block free of Markdown styling (use emoji + "•" bullets).
 
 Every new feature/release must add a `## vX.Y.Z` section with both parts.
 
+## v1.5.1
+
+Android: the new player no longer crashes when playback starts. The `WAKE_LOCK` permission was missing for ExoPlayer's network wake mode. An emulator smoke test now plays a film on every Android change, so a crash like this can't ship again.
+
+<!-- app:vi -->
+🛠 Sửa lỗi
+• Sửa lỗi trình phát mới bị thoát khi bắt đầu xem phim.
+<!-- /app:vi -->
+
 ## v1.5.0
 
 New player, ad-free streams and a redesigned update dialog (Android). The iOS app gets the same player.
