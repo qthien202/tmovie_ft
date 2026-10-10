@@ -8,6 +8,15 @@ Vietnamese block free of Markdown styling (use emoji + "•" bullets).
 
 Every new feature/release must add a `## vX.Y.Z` section with both parts.
 
+## v1.4.1
+
+Android: the hero's autoplay preview no longer spills out below the page dots. It now renders into a clipped TextureView sized to aspect-fill, instead of a SurfaceView that ignores Compose clipping.
+
+<!-- app:vi -->
+🛠 Sửa lỗi
+• Đoạn xem trước ở trang chủ không còn bị lộ ra bên dưới thanh chuyển trang.
+<!-- /app:vi -->
+
 ## v1.4.0
 
 The mobile app is rebuilt natively in Kotlin + Jetpack Compose (android/), replacing the Flutter build; it installs over it as a normal update.
