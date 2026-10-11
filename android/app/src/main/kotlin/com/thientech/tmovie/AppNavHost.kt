@@ -101,7 +101,7 @@ fun AppNavHost(link: String?, onLinkHandled: () -> Unit) {
             "phim" -> runCatching { PhimApi.shared.detail(slug) }.getOrNull()?.let { detail ->
                 nav.navigate(detail.toItem().route("link/$slug"))
                 // `?play=1` starts (or resumes) playback straight away.
-                if (uri.getQueryParameter("play") != null) Player.start(context, detail)
+                if (uri.getQueryParameter("play") != null) Player.start(context, detail, fromDetail = true)
             }
             "the-loai" -> {
                 val name = runCatching { PhimApi.shared.taxonomy(PhimApi.Taxonomy.Genres) }.getOrDefault(emptyList<FilmCategory>())

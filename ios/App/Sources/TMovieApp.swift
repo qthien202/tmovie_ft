@@ -10,6 +10,7 @@ struct TMovieApp: App {
     init() {
         URLCache.shared = URLCache(memoryCapacity: 64 << 20, diskCapacity: 512 << 20)
         try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback)
+        Downloads.start()
     }
 
     var body: some Scene {

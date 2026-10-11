@@ -2,6 +2,7 @@ import DesignSystem
 import FilmUI
 import Models
 import Persistence
+import PlayerFeature
 import SwiftData
 import SwiftUI
 
@@ -26,6 +27,7 @@ public struct ProfileView: View {
                         ForEach(history.prefix(20)) { ContinueCard(record: $0) }
                     }
                 }
+                downloadsRow
                 VStack(alignment: .leading, spacing: 10) {
                     RailHeader(title: "Danh sách của tôi")
                     if saved.isEmpty {
@@ -64,6 +66,31 @@ public struct ProfileView: View {
                 Text("\(saved.count) phim đã lưu · \(history.count) phim đã xem").font(.subheadline).foregroundStyle(.secondary)
             }
         }
+        .padding(.horizontal, 16)
+    }
+
+    private var downloadsRow: some View {
+        let downloads = Downloads.shared
+        let active = downloads.items.filter { $0.state == .queued || $0.state == .downloading }.count
+        return NavigationLink { DownloadsView() } label: {
+            HStack(spacing: 14) {
+                Image(systemName: "arrow.down.circle.fill")
+                    .font(.title2)
+                    .foregroundStyle(.white, Color.brand)
+                    .symbolEffect(.pulse, isActive: active > 0)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Đã tải xuống").font(.headline)
+                    Text(active > 0 ? "Đang tải \(active) tập" : downloads.items.isEmpty ? "Xem phim không cần mạng" : "\(downloads.items.count) tập · \(downloads.totalBytes.formatted(.byteCount(style: .file)))")
+                        .font(.subheadline).foregroundStyle(.secondary)
+                }
+                Spacer()
+                Image(systemName: "chevron.right").foregroundStyle(.tertiary)
+            }
+            .padding(16)
+            .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+        .glassSurface(in: .rect(cornerRadius: 16))
         .padding(.horizontal, 16)
     }
 

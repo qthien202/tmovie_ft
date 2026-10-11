@@ -66,16 +66,21 @@ public struct ActionLabel: View {
 
 /// Outlined glass capsule used for category pills.
 public struct PillLabel: ViewModifier {
-    public init() {}
+    /// An active filter: filled white with dark text.
+    var selected: Bool
+
+    public init(selected: Bool = false) { self.selected = selected }
 
     public func body(content: Content) -> some View {
         content
-            .font(.subheadline.weight(.medium))
-            .foregroundStyle(.white)
+            .font(.subheadline.weight(selected ? .semibold : .medium))
+            .foregroundStyle(selected ? .black : .white)
             .padding(.horizontal, 14)
             .frame(height: 34)
-            .overlay(Capsule().strokeBorder(.white.opacity(0.35), lineWidth: 1))
+            .background(selected ? .white : .clear, in: .capsule)
+            .overlay(Capsule().strokeBorder(.white.opacity(selected ? 0 : 0.35), lineWidth: 1))
             .glassSurface(interactive: true)
+            .animation(.snappy, value: selected)
     }
 }
 

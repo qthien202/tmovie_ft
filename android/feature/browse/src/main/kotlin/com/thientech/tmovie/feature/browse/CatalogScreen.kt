@@ -30,6 +30,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -87,6 +91,11 @@ fun CatalogScreen(route: ListRoute) {
     val pager = remember(route) { Pager(route.source) }
     var shelves by remember(route) { mutableStateOf<List<Pair<String, List<FilmItem>>>>(emptyList()) }
     var tint by remember { mutableStateOf(TMovieColors.Brand) }
+    // Names of the picked genre / country, for their pills.
+    val filterNames = remember(route) { mutableStateMapOf<String, String>() }
+    val f = pager.filter
+    val filtering = f.category != null || f.country != null || f.year != null
+    fun applyFilter(next: Filter) { pager.update(filter = next); scope.launch { pager.loadMore() } }
     val featured = pager.items.firstOrNull()
     val wash by animateColorAsState(tint.copy(alpha = 0.4f), tween(800), label = "wash")
 
@@ -115,19 +124,45 @@ fun CatalogScreen(route: ListRoute) {
                 Text(route.title, style = TMovieType.Title, color = Color.White)
                 Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Pill(route.title, { nav.back() }) { Icon(Icons.Filled.Close, "Đóng", tint = Color.White, modifier = Modifier.size(16.dp)) }
-                    GenrePickerPill(selected = route.slug.takeIf { route.kind == "genre" })
+                    // Genre, country and year combine here; the page's own genre/country isn't offered again.
+                    if (route.kind != "genre") GenrePickerPill(f.category, title = f.category?.let { filterNames[it] }) { g ->
+                        g?.let { filterNames[it.slug.orEmpty()] = it.name.orEmpty() }
+                        applyFilter(f.copy(category = g?.slug))
+                    }
+                    if (route.kind != "country") GenrePickerPill(f.country, PhimApi.Taxonomy.Countries, title = f.country?.let { filterNames[it] }) { c ->
+                        c?.let { filterNames[it.slug.orEmpty()] = it.name.orEmpty() }
+                        applyFilter(f.copy(country = c?.slug))
+                    }
+                    Box {
+                        var years by remember { mutableStateOf(false) }
+                        Pill(f.year?.toString() ?: "Năm", { years = true }, selected = f.year != null) {
+                            Icon(Icons.Filled.KeyboardArrowDown, null, tint = if (f.year != null) Color.Black else Color.White, modifier = Modifier.size(18.dp))
+                        }
+                        DropdownMenu(years, { years = false }) {
+                            DropdownMenuItem({ Text("Tất cả") }, { years = false; applyFilter(f.copy(year = null)) })
+                            (java.time.Year.now().value downTo 2000).forEach { y ->
+                                DropdownMenuItem({ Text("$y") }, { years = false; applyFilter(f.copy(year = y)) })
+                            }
+                        }
+                    }
+                    if (filtering) {
+                        Box(Modifier.size(34.dp).clip(CircleShape).glass(CircleShape).clickable { applyFilter(f.copy(category = null, country = null, year = null)) }, contentAlignment = Alignment.Center) {
+                            Icon(Icons.Filled.Close, "Bỏ lọc", tint = Color.White, modifier = Modifier.size(18.dp))
+                        }
+                    }
                 }
             }
         }
-        if (featured != null) fullSpan("featured") { FeaturedCard(featured, tint) }
-        shelves.forEach { (title, films) ->
+        // A filtered page is just the results.
+        if (featured != null && !filtering) fullSpan("featured") { FeaturedCard(featured, tint) }
+        if (!filtering) shelves.forEach { (title, films) ->
             fullSpan("shelf/$title") {
                 Box(Modifier.bleed(16.dp)) {
                     Shelf(title) { items(films, key = { it.slug }) { PosterCard(it, "${route.title}/$title/${it.slug}") } }
                 }
             }
         }
-        fullSpan("all") { Box(Modifier.bleed(16.dp)) { RailHeader("Tất cả") } }
+        fullSpan("all") { Box(Modifier.bleed(16.dp)) { RailHeader(if (filtering) "Kết quả" else "Tất cả") } }
         posterItems(pager, "catalog/${route.title}") { scope.launch { pager.loadMore() } }
         if (pager.items.isEmpty() && !pager.loading && pager.filter != Filter()) fullSpan("empty") {
             Text("Không có phim · thử bỏ bớt bộ lọc", color = TMovieColors.Secondary, textAlign = TextAlign.Center, modifier = Modifier.padding(32.dp))

@@ -10,14 +10,19 @@ public enum Player {
     /// Posted before the full-screen player appears, so inline previews can stop.
     public static let willPresent = Notification.Name("TMoviePlayerWillPresent")
 
+    /// Opens a film's detail page; set by the app. The player's ⓘ button calls it after closing.
+    public static var showDetail: (@MainActor (FilmDetail) -> Void)?
+
     /// The open player's controller, kept so a new episode replaces it.
-    private static weak var current: PlayerHostingController?
+    fileprivate static weak var current: PlayerHostingController?
 
     /// Plays `episodes[index]` of `server`, resuming at the saved second.
-    public static func play(_ film: FilmDetail, server: Int, episodes: [ServerData], at index: Int) {
+    /// `fromDetail`: the film's detail page is underneath, so the player needn't offer it.
+    public static func play(_ film: FilmDetail, server: Int, episodes: [ServerData], at index: Int, fromDetail: Bool = false) {
         NotificationCenter.default.post(name: willPresent, object: nil)
         current?.closePlayer(animated: false)
         let model = PlayerModel(film: film, server: server, index: index)
+        model.canShowDetail = !fromDetail && showDetail != nil
         let host = PlayerHostingController(model: model)
         current = host
         OrientationLock.rotate(to: .landscape)
@@ -27,16 +32,16 @@ public enum Player {
     /// "Phát" / "Tiếp tục": resumes the last watched episode, else the first playable one.
     /// Returns false when the film has no playable link.
     @discardableResult
-    public static func start(_ detail: FilmDetail) -> Bool {
+    public static func start(_ detail: FilmDetail, fromDetail: Bool = false) -> Bool {
         let servers = (detail.episodes ?? []).map { $0.serverData ?? [] }
         if let r = Library.record(detail.slug), servers.indices.contains(r.serverIndex),
            servers[r.serverIndex].indices.contains(r.episodeIndex), servers[r.serverIndex][r.episodeIndex].streamURL != nil {
-            play(detail, server: r.serverIndex, episodes: servers[r.serverIndex], at: r.episodeIndex)
+            play(detail, server: r.serverIndex, episodes: servers[r.serverIndex], at: r.episodeIndex, fromDetail: fromDetail)
             return true
         }
         for (s, list) in servers.enumerated() {
             if let i = list.firstIndex(where: { $0.streamURL != nil }) {
-                play(detail, server: s, episodes: list, at: i)
+                play(detail, server: s, episodes: list, at: i, fromDetail: fromDetail)
                 return true
             }
         }
@@ -75,7 +80,10 @@ final class PlayerHostingController: UIHostingController<PlayerScreen> {
     func closePlayer(animated: Bool) {
         model.pip?.stopPictureInPicture()
         model.tearDown()
-        OrientationLock.rotate(to: .portrait)
-        dismiss(animated: animated)
+        // Rotate once the landscape-only player is gone; asking while it is still up has no valid orientation.
+        dismiss(animated: animated) { [weak self] in
+            // A replacing player (next episode) is already up and keeps landscape.
+            if Player.current == nil || Player.current === self { OrientationLock.rotate(to: .portrait) }
+        }
     }
 }

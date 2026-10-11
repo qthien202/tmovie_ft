@@ -22,6 +22,8 @@ let project = Project(
                 // Portrait at runtime (AppDelegate); landscape is listed so the player can rotate.
                 "UISupportedInterfaceOrientations": ["UIInterfaceOrientationPortrait", "UIInterfaceOrientationLandscapeLeft", "UIInterfaceOrientationLandscapeRight"],
                 "UIBackgroundModes": ["audio"],
+                // Downloaded episodes are served to AVPlayer from http://127.0.0.1 (LocalHLSServer).
+                "NSAppTransportSecurity": ["NSAllowsLocalNetworking": true],
                 "CFBundleURLTypes": [["CFBundleURLSchemes": ["tmovie"]]],  // tmovie://phim/{slug}  // AVKit PiP / background audio in phase 2
             ]),
             sources: ["App/Sources/**"],

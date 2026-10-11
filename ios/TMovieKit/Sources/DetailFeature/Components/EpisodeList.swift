@@ -1,10 +1,12 @@
 import DesignSystem
 import Models
 import Persistence
+import FilmUI
 import SwiftUI
 
 /// Netflix-style episode rows: still, number, progress. Long series are split into ranges of 50.
 struct EpisodeList: View {
+    let film: FilmDetail?
     let servers: [Episode]
     let record: WatchRecord?
     let stills: [FilmImage]
@@ -60,7 +62,8 @@ struct EpisodeList: View {
         let ep = list[i]
         let progress = record?.progress(ep.slug ?? "") ?? 0
         let isLast = record?.serverIndex == server && record?.episodeIndex == i
-        return Button { play(server, list, i) } label: {
+        return HStack(spacing: 4) {
+            Button { play(server, list, i) } label: {
             HStack(spacing: 12) {
                 RemoteImage(url: stills.isEmpty ? fallback : stills[i % stills.count].url(size: "w300"), maxPoints: 200)
                     .frame(width: 128, height: 72)
@@ -80,8 +83,10 @@ struct EpisodeList: View {
                 Spacer()
             }
             .contentShape(.rect)
+            }
+            .buttonStyle(PressableStyle())
+            if let film, ep.streamURL != nil { DownloadButton(film: film, server: server, index: i) }
         }
-        .buttonStyle(PressableStyle())
         .disabled(ep.streamURL == nil)
         .opacity(ep.streamURL == nil ? 0.4 : 1)
         .padding(.horizontal, 16)

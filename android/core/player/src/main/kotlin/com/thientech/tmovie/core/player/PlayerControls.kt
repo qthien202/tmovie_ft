@@ -42,6 +42,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.BrightnessMedium
 import androidx.compose.material.icons.filled.Forward10
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PictureInPictureAlt
@@ -101,6 +102,8 @@ fun PlayerControls(
     onSettings: () -> Unit,
     onEpisodes: () -> Unit,
     onNext: () -> Unit,
+    /** Opens the film's detail page; null when the player was started from it. */
+    onDetail: (() -> Unit)? = null,
 ) {
     Box(Modifier.fillMaxSize()) {
         // Scrims behind the bars.
@@ -141,6 +144,7 @@ fun PlayerControls(
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     if (playback.speed != 1f) Chip("${playback.speed.toString().removeSuffix(".0")}×") { onSettings() }
+                    if (onDetail != null) RoundIcon(Icons.Filled.Info, "Thông tin phim", onClick = onDetail)
                     RoundIcon(Icons.Filled.LockOpen, "Khoá màn hình", onClick = onToggleLock)
                     RoundIcon(Icons.Filled.PictureInPictureAlt, "Hình trong hình", onClick = onPip)
                     RoundIcon(Icons.Filled.Settings, "Cài đặt", onClick = onSettings)
@@ -180,13 +184,6 @@ fun PlayerControls(
                     if (hasEpisodes) Chip("Đổi server") { onEpisodes() }
                 }
             }
-        }
-
-        // Skip intro: the first couple of minutes of an episode.
-        val showSkip = playback.position in 5_000..150_000 && playback.duration > 600_000 && !playback.buffering
-        AnimatedVisibility(showSkip, enter = fadeIn() + slideInHorizontally { it }, exit = fadeOut() + slideOutHorizontally { it },
-            modifier = Modifier.align(Alignment.BottomEnd).padding(end = 24.dp, bottom = if (visible) 110.dp else 32.dp)) {
-            Chip("Bỏ qua giới thiệu  ⏭", highlighted = true) { playback.seekBy(85_000); onInteract() }
         }
 
         // Next episode card in the last 18 s (auto-plays at the end unless cancelled).

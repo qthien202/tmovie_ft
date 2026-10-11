@@ -16,6 +16,7 @@ struct HomeHeader: View {
                     pill("Phim lẻ", .type("phim-le"))
                     pill("TV Shows", .type("tv-shows"))
                     GenrePickerButton()
+                    GenrePickerButton(kind: .countries)
                 }
             }
             .contentMargins(.horizontal, 16, for: .scrollContent)

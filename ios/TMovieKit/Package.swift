@@ -26,7 +26,7 @@ let package = Package(
         .target(name: "AppRouter", dependencies: ["Models", "Networking"]),
 
         // Shared UI
-        .target(name: "PlayerFeature", dependencies: ["Models", "Persistence"]),
+        .target(name: "PlayerFeature", dependencies: ["Models", "Networking", "Persistence", "DesignSystem"]),
         .target(name: "FilmUI", dependencies: ["Models", "Networking", "Persistence", "DesignSystem", "AppRouter", "PlayerFeature"]),
 
         // Features

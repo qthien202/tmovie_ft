@@ -8,6 +8,24 @@ Vietnamese block free of Markdown styling (use emoji + "•" bullets).
 
 Every new feature/release must add a `## vX.Y.Z` section with both parts.
 
+## v1.6.0
+
+Combined filters, country picker and a way back to the film from the player.
+- Category pages filter in place: genre, country and year combine, each pill shows its pick, and one tap clears them. The home row gets a "Quốc gia" picker next to "Thể loại".
+- The player has a film-info button that opens the detail page when playback started elsewhere (history, hero, downloads).
+- The skip-intro button is gone.
+- iOS: offline downloads (ad-free, served from the device), a cleaner Netflix-style player with working Close, edge brightness/volume bars, the splash animation, and shimmer / scroll motion across the app.
+
+<!-- app:vi -->
+✨ Mới
+• Lọc phim cùng lúc theo thể loại, quốc gia và năm ngay trong trang danh mục.
+• Thêm mục chọn Quốc gia ở trang chủ.
+• Trong trình phát có nút ⓘ để mở trang thông tin phim khi xem từ lịch sử.
+
+🧹 Gọn hơn
+• Bỏ nút "Bỏ qua giới thiệu" trong trình phát.
+<!-- /app:vi -->
+
 ## v1.5.1
 
 Android: the new player no longer crashes when playback starts. The `WAKE_LOCK` permission was missing for ExoPlayer's network wake mode. An emulator smoke test now plays a film on every Android change, so a crash like this can't ship again.

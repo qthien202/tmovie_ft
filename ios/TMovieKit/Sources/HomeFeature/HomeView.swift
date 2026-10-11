@@ -74,5 +74,7 @@ public struct HomeView: View {
 private struct PosterPlaceholder: View {
     var body: some View {
         RoundedRectangle(cornerRadius: 8, style: .continuous).fill(.white.opacity(0.06)).frame(width: 112, height: 168)
+            .shimmering()
+            .clipShape(.rect(cornerRadius: 8, style: .continuous))
     }
 }

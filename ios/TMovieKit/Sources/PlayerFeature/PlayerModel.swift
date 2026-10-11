@@ -29,6 +29,8 @@ final class PlayerModel {
     private(set) var buffered: Double = 0
     private(set) var speed: Float = 1
     private(set) var offline = false
+    /// Playing a downloaded copy: network changes don't matter.
+    private(set) var playingLocal = false
 
     // UI
     var controlsVisible = true
@@ -36,6 +38,7 @@ final class PlayerModel {
     var panel = Panel.none
     var fill = false  // aspect fill vs fit
     var nextCancelled = false
+    var canShowDetail = false
     private(set) var sleepMinutes = 0  // -1 = end of this episode
     private(set) var variants: [Variant] = []
     private(set) var peakBitRate: Double = 0
@@ -100,7 +103,9 @@ final class PlayerModel {
         loader.onVariants = { [weak self] found in
             Task { @MainActor in self?.variants = Array(Set(found)).sorted { $0.bandwidth > $1.bandwidth } }
         }
-        let item = AVPlayerItem(asset: loader.asset(for: url))
+        let local = Downloads.shared.localURL(slug: film.slug, server: server, index: index)
+        playingLocal = local != nil
+        let item = local.map { AVPlayerItem(url: $0) } ?? AVPlayerItem(asset: loader.asset(for: url))
         item.preferredForwardBufferDuration = 30
         item.preferredPeakBitRate = peakBitRate
         item.externalMetadata = [metadata(.commonIdentifierTitle, film.name), metadata(.iTunesMetadataTrackSubTitle, ep.name ?? "")]
@@ -215,6 +220,12 @@ final class PlayerModel {
 
     // MARK: Controls visibility
 
+    #if DEBUG
+    private let keepControls = UserDefaults.standard.bool(forKey: "keepControls")
+    #else
+    private let keepControls = false
+    #endif
+
     func interact() {
         lastInteraction = .now
         controlsVisible = true
@@ -231,8 +242,8 @@ final class PlayerModel {
         buffering = player.timeControlStatus == .waitingToPlayAtSpecifiedRate
         if item?.status == .failed, !failed { streamFailed() }
 
-        // Controls fade 3 s after the last touch while playing.
-        if isPlaying, panel == .none, controlsVisible, Date.now.timeIntervalSince(lastInteraction) > 3 { controlsVisible = false }
+        // Controls fade 3 s after the last touch while playing (`-keepControls YES` holds them, for screenshots).
+        if isPlaying, !keepControls, panel == .none, controlsVisible, Date.now.timeIntervalSince(lastInteraction) > 3 { controlsVisible = false }
         if isPlaying, Date.now.timeIntervalSince(lastSave) >= 10 { save() }
         UIApplication.shared.isIdleTimerDisabled = isPlaying
     }
@@ -251,7 +262,7 @@ final class PlayerModel {
 
     private func networkChanged(online: Bool) {
         let wasOffline = offline
-        offline = !online
+        offline = !online && !playingLocal
         // Back online: pick up where we were if the stream died or stalled meanwhile.
         if wasOffline, online, failed || buffering { recoveries = 0; load(at: position) }
     }

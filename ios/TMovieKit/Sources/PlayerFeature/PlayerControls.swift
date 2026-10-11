@@ -64,62 +64,81 @@ struct PlayerControls: View {
     // MARK: Bars
 
     private var topBar: some View {
-        HStack(spacing: 12) {
-            RoundButton(icon: "xmark", label: "Đóng", action: close)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(model.film.name).font(.headline).lineLimit(1)
-                Text([model.episode?.name, sleepLabel].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: " · "))
-                    .font(.subheadline).foregroundStyle(.secondary).lineLimit(1)
-            }
+        HStack(spacing: 4) {
+            IconButton(icon: "xmark", label: "Đóng", action: close)
             Spacer()
-            if model.speed != 1 { Chip(text: speedLabel(model.speed)) { model.panel = .settings } }
-            RoundButton(icon: "lock.open.fill", label: "Khoá màn hình") { model.locked = true; model.interact() }
+            if model.canShowDetail {
+                IconButton(icon: "info.circle", label: "Thông tin phim") {
+                    close()
+                    Player.showDetail?(model.film)
+                }
+            }
             if model.pip != nil {
-                RoundButton(icon: "pip.enter", label: "Hình trong hình") { model.pip?.startPictureInPicture() }
+                IconButton(icon: "pip.enter", label: "Hình trong hình") { model.pip?.startPictureInPicture() }
             }
-            AirPlayButton().frame(width: 44, height: 44).glassSurface(in: .circle)
-            RoundButton(icon: "gearshape.fill", label: "Cài đặt") { model.panel = .settings; model.interact() }
-            if model.hasEpisodeList {
-                RoundButton(icon: "rectangle.stack.fill", label: "Danh sách tập") { model.panel = .episodes; model.interact() }
+            AirPlayButton().frame(width: 44, height: 44)
+        }
+        .overlay {
+            VStack(spacing: 2) {
+                Text(model.film.name).font(.headline)
+                Text([model.episode?.name, sleepLabel].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: " · "))
+                    .font(.subheadline).foregroundStyle(.white.opacity(0.7))
             }
+            .lineLimit(1)
+            .padding(.horizontal, 120)
         }
         .foregroundStyle(.white)
-        .padding(.horizontal, 24)
-        .padding(.top, 12)
+        .padding(.horizontal, 20)
+        .padding(.top, 8)
     }
 
     private var centerTransport: some View {
-        HStack(spacing: 56) {
-            RoundButton(icon: "gobackward.10", label: "Lùi 10 giây", size: 56) { model.seek(by: -10) }
+        HStack(spacing: 72) {
+            IconButton(icon: "gobackward.10", label: "Lùi 10 giây", size: 64, weight: .regular) { model.seek(by: -10) }
             Button { model.toggle() } label: {
                 Image(systemName: model.ended ? "arrow.counterclockwise" : model.isPlaying ? "pause.fill" : "play.fill")
-                    .font(.system(size: 38, weight: .semibold))
+                    .font(.system(size: 56, weight: .semibold))
                     .contentTransition(.symbolEffect(.replace))
-                    .frame(width: 88, height: 88)
+                    .frame(width: 96, height: 96)
+                    .contentShape(.circle)
             }
             .buttonStyle(.plain)
-            .glassSurface(in: .circle, interactive: true)
             .accessibilityLabel(model.isPlaying ? "Tạm dừng" : "Phát")
-            RoundButton(icon: "goforward.10", label: "Tới 10 giây", size: 56) { model.seek(by: 10) }
+            IconButton(icon: "goforward.10", label: "Tới 10 giây", size: 64, weight: .regular) { model.seek(by: 10) }
         }
         .foregroundStyle(.white)
+        .shadow(color: .black.opacity(0.35), radius: 12)
     }
 
     private var bottomBar: some View {
-        VStack(spacing: 8) {
-            SeekBar(model: model)
-            HStack {
-                Text("\(formatTime(model.position)) / \(formatTime(model.duration))").font(.footnote.monospacedDigit())
-                Spacer()
+        VStack(spacing: 6) {
+            HStack(spacing: 14) {
+                Text(formatTime(model.position)).font(.footnote.monospacedDigit())
+                SeekBar(model: model)
+                Text("−" + formatTime(max(0, model.duration - model.position))).font(.footnote.monospacedDigit())
+            }
+            HStack(spacing: 36) {
+                Menu {
+                    Picker("Tốc độ", selection: Binding(get: { model.speed }, set: { model.setSpeed($0) })) {
+                        ForEach([Float(0.5), 0.75, 1, 1.25, 1.5, 2], id: \.self) { Text(speedLabel($0)).tag($0) }
+                    }
+                } label: {
+                    ActionLabel(icon: "gauge.with.dots.needle.67percent", title: "Tốc độ (\(model.speed == 1 ? "1×" : speedLabel(model.speed)))")
+                }
+                Button { model.locked = true; model.interact() } label: { ActionLabel(icon: "lock.open", title: "Khoá") }
+                if model.hasEpisodeList {
+                    Button { model.panel = .episodes; model.interact() } label: { ActionLabel(icon: "rectangle.stack", title: "Tập") }
+                }
+                Button { model.panel = .settings; model.interact() } label: { ActionLabel(icon: "captions.bubble", title: "Phụ đề & cài đặt") }
                 if model.nextIndex != nil {
-                    Button { model.playNext() } label: { Label("Tập tiếp", systemImage: "forward.end.fill").font(.subheadline.weight(.semibold)) }
-                        .buttonStyle(.plain)
+                    Button { model.playNext() } label: { ActionLabel(icon: "forward.end", title: "Tập tiếp") }
                 }
             }
+            .buttonStyle(.plain)
         }
         .foregroundStyle(.white)
         .padding(.horizontal, 24)
-        .padding(.bottom, 12)
+        .padding(.bottom, 4)
     }
 
     // MARK: Cards
@@ -130,11 +149,6 @@ struct PlayerControls: View {
             HStack {
                 Spacer()
                 VStack(alignment: .trailing, spacing: 10) {
-                    // Skip intro during the first minutes of a long episode.
-                    if (5...150).contains(model.position), model.duration > 600, !model.buffering {
-                        Chip(text: "Bỏ qua giới thiệu  ⏭", highlighted: true) { model.seek(by: 85) }
-                            .transition(.move(edge: .trailing).combined(with: .opacity))
-                    }
                     if let next = model.nextIndex, !model.nextCancelled, model.duration > 60,
                        (0.5...18).contains(model.duration - model.position) {
                         NextEpisodeCard(model: model, name: model.episodes[next].name ?? "Tập \(next + 1)")
@@ -145,7 +159,6 @@ struct PlayerControls: View {
             .padding(.trailing, 24)
             .padding(.bottom, model.controlsVisible ? 100 : 28)
         }
-        .animation(.snappy, value: model.position > 5 && model.position < 150)
     }
 
     private var errorCard: some View {
@@ -203,11 +216,48 @@ struct RoundButton: View {
             Image(systemName: icon)
                 .font(.system(size: size * 0.4, weight: .semibold))
                 .frame(width: size, height: size)
+                .contentShape(.circle)
         }
         .buttonStyle(.plain)
         .foregroundStyle(.white)
         .glassSurface(in: .circle, interactive: true)
         .accessibilityLabel(label)
+    }
+}
+
+/// A bare icon on the video; the whole frame is tappable, not just the glyph.
+struct IconButton: View {
+    let icon: String
+    let label: String
+    var size: CGFloat = 44
+    var weight: Font.Weight = .semibold
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(.system(size: size * 0.45, weight: weight))
+                .frame(width: size, height: size)
+                .contentShape(.circle)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(label)
+    }
+}
+
+/// Icon + title in the bottom action row.
+private struct ActionLabel: View {
+    let icon: String
+    let title: String
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+            Text(title)
+        }
+        .font(.subheadline.weight(.semibold))
+        .frame(minHeight: 44)
+        .contentShape(.rect)
     }
 }
 
@@ -224,6 +274,7 @@ struct Chip: View {
                 .padding(.horizontal, 14)
                 .padding(.vertical, 8)
                 .background(highlighted ? AnyShapeStyle(.white) : AnyShapeStyle(.white.opacity(0.14)), in: .capsule)
+                .contentShape(.capsule)
         }
         .buttonStyle(.plain)
     }
