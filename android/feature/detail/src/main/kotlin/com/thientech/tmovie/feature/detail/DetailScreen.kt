@@ -154,7 +154,7 @@ fun DetailScreen(route: FilmRoute) {
                         loading = false,
                         enabled = d != null,
                         onClick = {
-                            if (d != null && !Player.start(context, d)) Toast.makeText(context, "Phim này chưa có link phát", Toast.LENGTH_SHORT).show()
+                            if (d != null && !Player.start(context, d, fromDetail = true)) Toast.makeText(context, "Phim này chưa có link phát", Toast.LENGTH_SHORT).show()
                         },
                     )
                     if (failed) Text("Không tải được phim · Thử lại", color = TMovieColors.BrandLight, modifier = Modifier.clickable { attempt++ })
@@ -212,7 +212,7 @@ fun DetailScreen(route: FilmRoute) {
             }
             when (current) {
                 Tab.Episodes -> if (d != null) fullSpan("episodes") {
-                    EpisodeList(d, record, backdrops) { s, i -> Player.play(context, d, s, i) }
+                    EpisodeList(d, record, backdrops) { s, i -> Player.play(context, d, s, i, fromDetail = true) }
                 }
                 Tab.Similar -> similar.chunked(3).forEachIndexed { r, row ->
                     fullSpan("similar/$r") {

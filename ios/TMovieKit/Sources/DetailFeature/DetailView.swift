@@ -215,7 +215,7 @@ public struct DetailView: View {
         switch current {
         case .episodes:
             EpisodeList(film: detail, servers: servers, record: record, stills: backdrops, fallback: film.thumbURL) { server, list, i in
-                if let detail { Player.play(detail, server: server, episodes: list, at: i) }
+                if let detail { Player.play(detail, server: server, episodes: list, at: i, fromDetail: true) }
             }
         case .similar:
             LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 3), spacing: 10) {
@@ -240,7 +240,7 @@ public struct DetailView: View {
 
     private func play() {
         guard let detail else { return }
-        noLink = !Player.start(detail)
+        noLink = !Player.start(detail, fromDetail: true)
     }
 
     private func load() async {

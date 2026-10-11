@@ -67,6 +67,12 @@ struct PlayerControls: View {
         HStack(spacing: 4) {
             IconButton(icon: "xmark", label: "Đóng", action: close)
             Spacer()
+            if model.canShowDetail {
+                IconButton(icon: "info.circle", label: "Thông tin phim") {
+                    close()
+                    Player.showDetail?(model.film)
+                }
+            }
             if model.pip != nil {
                 IconButton(icon: "pip.enter", label: "Hình trong hình") { model.pip?.startPictureInPicture() }
             }

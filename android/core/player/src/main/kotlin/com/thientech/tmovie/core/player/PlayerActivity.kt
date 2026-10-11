@@ -2,6 +2,8 @@ package com.thientech.tmovie.core.player
 
 import android.app.PictureInPictureParams
 import android.content.res.Configuration
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Rational
@@ -239,6 +241,11 @@ class PlayerActivity : ComponentActivity() {
                     onSettings = { panel = Panel.Settings; interact() },
                     onEpisodes = { panel = Panel.Episodes; interact() },
                     onNext = { if (sleepMinutes != -1) nextIndex?.let { switchTo(server, it) } },
+                    onDetail = if (intent.getBooleanExtra(EXTRA_FROM_DETAIL, false)) null else ({
+                        // The app's own deep link; MainActivity (singleTask) opens the detail page.
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("tmovie://phim/${detail.slug}")).setPackage(packageName))
+                        finish()
+                    }),
                 )
 
                 AnimatedVisibility(
@@ -304,5 +311,6 @@ class PlayerActivity : ComponentActivity() {
         const val EXTRA_DETAIL = "detail"
         const val EXTRA_SERVER = "server"
         const val EXTRA_INDEX = "index"
+        const val EXTRA_FROM_DETAIL = "fromDetail"
     }
 }

@@ -38,6 +38,7 @@ final class PlayerModel {
     var panel = Panel.none
     var fill = false  // aspect fill vs fit
     var nextCancelled = false
+    var canShowDetail = false
     private(set) var sleepMinutes = 0  // -1 = end of this episode
     private(set) var variants: [Variant] = []
     private(set) var peakBitRate: Double = 0

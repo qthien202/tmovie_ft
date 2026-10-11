@@ -56,6 +56,12 @@ struct MainTabs: View {
             }
         }
         .sensoryFeedback(.selection, trigger: tab)
+        .onAppear {
+            // Reads `tab` when called, so it pushes onto whichever tab is showing then.
+            Player.showDetail = { detail in
+                routers[tab].push(FilmRoute(film: FilmItem(detail), sourceID: "player/\(detail.slug)"))
+            }
+        }
         .onOpenURL { url in Task { await open(url) } }
         #if DEBUG
         // `-openURL tmovie://phim/{slug}` launch argument, for screenshots without the system prompt.
@@ -81,7 +87,7 @@ struct MainTabs: View {
             routers[0].push(FilmRoute(film: FilmItem(detail), sourceID: "link/\(slug)"))
             // `?play=1` starts (or resumes) playback straight away.
             if URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems?.contains(where: { $0.name == "play" }) == true {
-                Player.start(detail)
+                Player.start(detail, fromDetail: true)
             }
         case "the-loai":
             let name = (try? await PhimAPI.shared.taxonomy(.genres))?.first { $0.slug == slug }?.name ?? slug
