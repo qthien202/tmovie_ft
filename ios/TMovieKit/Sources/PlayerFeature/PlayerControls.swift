@@ -143,11 +143,6 @@ struct PlayerControls: View {
             HStack {
                 Spacer()
                 VStack(alignment: .trailing, spacing: 10) {
-                    // Skip intro during the first minutes of a long episode.
-                    if (5...150).contains(model.position), model.duration > 600, !model.buffering {
-                        Chip(text: "Bỏ qua giới thiệu  ⏭", highlighted: true) { model.seek(by: 85) }
-                            .transition(.move(edge: .trailing).combined(with: .opacity))
-                    }
                     if let next = model.nextIndex, !model.nextCancelled, model.duration > 60,
                        (0.5...18).contains(model.duration - model.position) {
                         NextEpisodeCard(model: model, name: model.episodes[next].name ?? "Tập \(next + 1)")
@@ -158,7 +153,6 @@ struct PlayerControls: View {
             .padding(.trailing, 24)
             .padding(.bottom, model.controlsVisible ? 100 : 28)
         }
-        .animation(.snappy, value: model.position > 5 && model.position < 150)
     }
 
     private var errorCard: some View {

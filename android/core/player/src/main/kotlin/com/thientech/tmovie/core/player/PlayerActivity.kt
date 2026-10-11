@@ -51,7 +51,7 @@ private enum class Panel { None, Settings, Episodes }
 /**
  * Full-screen landscape HLS player with custom Compose controls: gestures (double-tap seek,
  * scrub, brightness, volume, pinch zoom), lock, quality / audio / subtitle / speed / aspect,
- * sleep timer, skip intro, next-episode countdown, in-player episode list, PiP and a
+ * sleep timer, next-episode countdown, in-player episode list, PiP and a
  * MediaSession for headset / PiP controls. Resumes at the saved second and saves every 10 s.
  */
 @OptIn(UnstableApi::class)

@@ -182,13 +182,6 @@ fun PlayerControls(
             }
         }
 
-        // Skip intro: the first couple of minutes of an episode.
-        val showSkip = playback.position in 5_000..150_000 && playback.duration > 600_000 && !playback.buffering
-        AnimatedVisibility(showSkip, enter = fadeIn() + slideInHorizontally { it }, exit = fadeOut() + slideOutHorizontally { it },
-            modifier = Modifier.align(Alignment.BottomEnd).padding(end = 24.dp, bottom = if (visible) 110.dp else 32.dp)) {
-            Chip("Bỏ qua giới thiệu  ⏭", highlighted = true) { playback.seekBy(85_000); onInteract() }
-        }
-
         // Next episode card in the last 18 s (auto-plays at the end unless cancelled).
         NextEpisodeCard(playback, nextEpisodeName, nextThumb, onNext, Modifier.align(Alignment.BottomEnd).padding(end = 24.dp, bottom = if (visible) 110.dp else 32.dp))
 
