@@ -13,6 +13,8 @@ public struct CatalogView: View {
     @State private var pager: Pager
     @State private var shelves: [(title: String, films: [FilmItem])] = []
     @State private var tint = Color.brand
+    /// Names of the picked genre / country, for their pills.
+    @State private var filterNames: [String: String] = [:]
     @Environment(\.dismiss) private var dismiss
 
     public init(route: ListRoute) {
@@ -34,14 +36,17 @@ public struct CatalogView: View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 26) {
                 pills
-                if let featured { FeaturedCard(film: featured, tint: tint) }
-                ForEach(shelves, id: \.title) { shelf in
-                    Shelf(shelf.title) {
-                        ForEach(shelf.films) { PosterCard(film: $0, sourceID: "\(route.title)/\(shelf.title)/\($0.slug)") }
+                // A filtered page is just the results.
+                if !filtering {
+                    if let featured { FeaturedCard(film: featured, tint: tint) }
+                    ForEach(shelves, id: \.title) { shelf in
+                        Shelf(shelf.title) {
+                            ForEach(shelf.films) { PosterCard(film: $0, sourceID: "\(route.title)/\(shelf.title)/\($0.slug)") }
+                        }
                     }
                 }
                 VStack(alignment: .leading, spacing: 10) {
-                    RailHeader(title: "Tất cả")
+                    RailHeader(title: filtering ? "Kết quả" : "Tất cả")
                     PosterGrid(pager: pager, idPrefix: "catalog/\(route.title)")
                 }
             }
@@ -70,6 +75,9 @@ public struct CatalogView: View {
         .onChange(of: pager.filter) { Task { await pager.loadMore() } }
     }
 
+    private var filtering: Bool { pager.filter.category != nil || pager.filter.country != nil || pager.filter.year != nil }
+
+    /// Genre, country and year combine on this page; the page's own genre/country isn't offered again.
     private var pills: some View {
         ScrollView(.horizontal) {
             HStack(spacing: 8) {
@@ -79,9 +87,42 @@ public struct CatalogView: View {
                 }
                 .buttonStyle(PressableStyle())
                 .accessibilityLabel("Đóng \(route.title)")
-                GenrePickerButton(selected: genreSlug)
-                GenrePickerButton(selected: countrySlug, kind: .countries)
+                if genreSlug == nil {
+                    GenrePickerButton(selected: pager.filter.category, title: pager.filter.category.flatMap { filterNames[$0] }) { pick in
+                        if let pick { filterNames[pick.slug ?? ""] = pick.name }
+                        pager.filter.category = pick?.slug
+                    }
+                }
+                if countrySlug == nil {
+                    GenrePickerButton(selected: pager.filter.country, kind: .countries, title: pager.filter.country.flatMap { filterNames[$0] }) { pick in
+                        if let pick { filterNames[pick.slug ?? ""] = pick.name }
+                        pager.filter.country = pick?.slug
+                    }
+                }
+                Menu {
+                    Picker("Năm", selection: $pager.filter.year) {
+                        Text("Tất cả").tag(Int?.none)
+                        ForEach((2000...Calendar.current.component(.year, from: .now)).reversed(), id: \.self) { Text(String($0)).tag(Int?($0)) }
+                    }
+                } label: {
+                    HStack(spacing: 4) { Text(pager.filter.year.map(String.init) ?? "Năm"); Image(systemName: "chevron.down").imageScale(.small) }
+                        .modifier(PillLabel(selected: pager.filter.year != nil))
+                }
+                if filtering {
+                    Button {
+                        pager.filter.category = nil
+                        pager.filter.country = nil
+                        pager.filter.year = nil
+                    } label: {
+                        Image(systemName: "xmark").fontWeight(.semibold).frame(width: 34, height: 34).glassSurface(in: .circle, interactive: true)
+                    }
+                    .buttonStyle(PressableStyle())
+                    .foregroundStyle(.white)
+                    .accessibilityLabel("Bỏ lọc")
+                    .transition(.scale.combined(with: .opacity))
+                }
             }
+            .animation(.snappy, value: filtering)
         }
         .contentMargins(.horizontal, 16, for: .scrollContent)
         .scrollIndicators(.hidden)

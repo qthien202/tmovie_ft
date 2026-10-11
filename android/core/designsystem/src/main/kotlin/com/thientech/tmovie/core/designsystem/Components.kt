@@ -90,22 +90,22 @@ fun PlayWide(title: String, loading: Boolean, onClick: () -> Unit, modifier: Mod
     }
 }
 
-/** Outlined glass capsule for category pills. */
+/** Outlined glass capsule for category pills; [selected] = an active filter, filled white. */
 @Composable
-fun Pill(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, trailing: (@Composable () -> Unit)? = null) {
+fun Pill(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, selected: Boolean = false, trailing: (@Composable () -> Unit)? = null) {
     val interaction = rememberInteraction()
     Row(
         modifier
             .pressScale(interaction)
             .clip(CircleShape)
-            .glass(CircleShape)
+            .then(if (selected) Modifier.background(Color.White) else Modifier.glass(CircleShape))
             .clickable(interaction, indication = null, onClick = onClick)
             .height(34.dp)
             .padding(horizontal = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        Text(text, color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Medium)
+        Text(text, color = if (selected) Color.Black else Color.White, fontSize = 15.sp, fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium)
         trailing?.invoke()
     }
 }

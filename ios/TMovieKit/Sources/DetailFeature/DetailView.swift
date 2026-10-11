@@ -154,6 +154,11 @@ public struct DetailView: View {
             if let trailer = detail?.trailerUrl.flatMap(URL.init(string:)) {
                 Link(destination: trailer) { ActionLabel("Trailer", systemImage: "film") }
             }
+            // Series download per episode, in the list below.
+            if let detail, !isSeries,
+               let s = servers.firstIndex(where: { $0.serverData?.first?.streamURL != nil }) {
+                DownloadButton(film: detail, server: s, index: 0, labeled: true)
+            }
         }
         .foregroundStyle(.white)
         .padding(.horizontal, 16)
@@ -209,7 +214,7 @@ public struct DetailView: View {
     @ViewBuilder private var tabContent: some View {
         switch current {
         case .episodes:
-            EpisodeList(servers: servers, record: record, stills: backdrops, fallback: film.thumbURL) { server, list, i in
+            EpisodeList(film: detail, servers: servers, record: record, stills: backdrops, fallback: film.thumbURL) { server, list, i in
                 if let detail { Player.play(detail, server: server, episodes: list, at: i) }
             }
         case .similar:
@@ -247,7 +252,13 @@ public struct DetailView: View {
             synopsis = d.content.map(plainText) ?? ""
             withAnimation(reduceMotion ? nil : .cinematic) { detail = d }
         } catch {
-            failed = true
+            // Offline: fall back to the copy saved with its downloads.
+            if let saved = Downloads.shared.film(route.film.slug) {
+                synopsis = saved.content.map(plainText) ?? ""
+                detail = saved
+            } else {
+                failed = true
+            }
         }
         if let genre = (detail?.category ?? route.film.category)?.first?.slug {
             let list = (try? await PhimAPI.shared.list(.genre(genre)).items) ?? []

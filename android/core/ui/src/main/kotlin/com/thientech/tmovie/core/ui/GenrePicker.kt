@@ -41,26 +41,36 @@ import com.thientech.tmovie.core.model.FilmCategory
 import com.thientech.tmovie.core.network.PhimApi
 import kotlinx.coroutines.delay
 
-/** "Thể loại ⌄" / "Quốc gia ⌄" pill that opens a Netflix-style full-screen list. */
+/**
+ * "Thể loại ⌄" / "Quốc gia ⌄" pill that opens a Netflix-style full-screen list. Picking opens that
+ * genre/country page, or, with [filter], hands the pick back (null = "Tất cả") and shows [title].
+ */
 @Composable
-fun GenrePickerPill(selected: String? = null, kind: PhimApi.Taxonomy = PhimApi.Taxonomy.Genres) {
+fun GenrePickerPill(
+    selected: String? = null,
+    kind: PhimApi.Taxonomy = PhimApi.Taxonomy.Genres,
+    title: String? = null,
+    filter: ((FilmCategory?) -> Unit)? = null,
+) {
     var open by remember { mutableStateOf(false) }
     val nav = rememberNavigator()
     val genres = kind == PhimApi.Taxonomy.Genres
-    Pill(if (genres) "Thể loại" else "Quốc gia", onClick = { open = true }) {
-        Icon(Icons.Filled.KeyboardArrowDown, null, tint = Color.White, modifier = Modifier.size(18.dp))
+    Pill(title ?: if (genres) "Thể loại" else "Quốc gia", onClick = { open = true }, selected = title != null) {
+        Icon(Icons.Filled.KeyboardArrowDown, null, tint = if (title != null) Color.Black else Color.White, modifier = Modifier.size(18.dp))
     }
     if (open) {
-        GenrePicker(selected, kind, onDismiss = { open = false }) { g ->
+        GenrePicker(selected, kind, showsAll = filter != null, onDismiss = { open = false }) { g ->
             open = false
+            if (filter != null) { if (g?.slug != selected) filter(g); return@GenrePicker }
+            if (g == null || g.slug == selected) return@GenrePicker
             val name = g.name.orEmpty(); val slug = g.slug.orEmpty()
-            if (g.slug != selected) nav.openList(if (genres) ListRoute.genre(name, slug) else ListRoute.country(name, slug))
+            nav.openList(if (genres) ListRoute.genre(name, slug) else ListRoute.country(name, slug))
         }
     }
 }
 
 @Composable
-private fun GenrePicker(selected: String?, kind: PhimApi.Taxonomy, onDismiss: () -> Unit, onPick: (FilmCategory) -> Unit) {
+private fun GenrePicker(selected: String?, kind: PhimApi.Taxonomy, showsAll: Boolean, onDismiss: () -> Unit, onPick: (FilmCategory?) -> Unit) {
     var genres by remember { mutableStateOf<List<FilmCategory>>(emptyList()) }
     LaunchedEffect(Unit) { genres = runCatching { PhimApi.shared.taxonomy(kind) }.getOrDefault(emptyList()) }
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
@@ -71,6 +81,16 @@ private fun GenrePicker(selected: String?, kind: PhimApi.Taxonomy, onDismiss: ()
                 verticalArrangement = Arrangement.spacedBy(22.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
+                if (showsAll) item("all") {
+                    Text(
+                        "Tất cả",
+                        color = if (selected == null) Color.White else Color.White.copy(alpha = 0.6f),
+                        fontSize = if (selected == null) 24.sp else 20.sp,
+                        fontWeight = if (selected == null) FontWeight.Bold else FontWeight.Medium,
+                        modifier = Modifier.fillMaxWidth().clickable { onPick(null) },
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    )
+                }
                 itemsIndexed(genres, key = { _, g -> g.slug.orEmpty() }) { i, g ->
                     // Staggered rise-in.
                     var shown by remember { mutableStateOf(false) }
