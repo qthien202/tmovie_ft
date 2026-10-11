@@ -20,7 +20,7 @@ public struct Shelf<Content: View>: View {
         VStack(alignment: .leading, spacing: 10) {
             RailHeader(title: title, more: more)
             ScrollView(.horizontal) {
-                LazyHStack(alignment: .top, spacing: spacing) { content }
+                LazyHStack(alignment: .top, spacing: spacing) { content.railItemMotion() }
                     .scrollTargetLayout()
             }
             .contentMargins(.horizontal, 16, for: .scrollContent)

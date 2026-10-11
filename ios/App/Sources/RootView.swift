@@ -55,6 +55,7 @@ struct MainTabs: View {
                 }
             }
         }
+        .sensoryFeedback(.selection, trigger: tab)
         .onOpenURL { url in Task { await open(url) } }
         #if DEBUG
         // `-openURL tmovie://phim/{slug}` launch argument, for screenshots without the system prompt.

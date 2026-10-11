@@ -22,6 +22,8 @@ public struct RemoteImage: View {
             .overlay {
                 if let image {
                     Image(uiImage: image).resizable().scaledToFill().transition(.opacity)
+                } else if url != nil {
+                    Color.clear.shimmering()
                 }
             }
             .clipped()

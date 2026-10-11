@@ -17,6 +17,7 @@ public struct PosterGrid: View {
         LazyVGrid(columns: columns, spacing: 10) {
             ForEach(pager.items) { film in
                 PosterCard(film: film, sourceID: "\(idPrefix)/\(film.slug)", width: nil)
+                    .gridItemMotion()
                     .onAppear { if film.slug == pager.items.last?.slug { Task { await pager.loadMore() } } }
             }
         }
