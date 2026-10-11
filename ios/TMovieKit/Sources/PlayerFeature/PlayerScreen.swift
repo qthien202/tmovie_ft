@@ -86,6 +86,8 @@ struct PlayerScreen: View {
                         dragMode = value.startLocation.x < size.width / 2 ? 2 : 3
                         dragStart = dragMode == 2 ? Double(model.brightness) : Double(model.volume)
                     }
+                    // The HUD takes the screen; the controls would sit under it.
+                    model.controlsVisible = false
                 }
                 switch dragMode {
                 case 1:
@@ -148,31 +150,44 @@ struct PlayerScreen: View {
     }
 
     @ViewBuilder private var hudView: some View {
-        if let hud {
-            HStack(spacing: 12) {
-                switch hud {
-                case .seek(let target, let delta):
-                    Text("\(formatTime(target))  (\(delta >= 0 ? "+" : "−")\(formatTime(abs(delta))))").font(.title3.bold().monospacedDigit())
-                case .brightness(let level):
-                    levelView(icon: "sun.max.fill", value: level)
-                case .volume(let level):
-                    levelView(icon: "speaker.wave.2.fill", value: level)
-                }
-            }
-            .foregroundStyle(.white)
-            .padding(.horizontal, 18)
-            .padding(.vertical, 12)
-            .glassSurface(in: .rect(cornerRadius: 16))
-            .allowsHitTesting(false)
+        switch hud {
+        case .seek(let target, let delta):
+            Text("\(formatTime(target))  (\(delta >= 0 ? "+" : "−")\(formatTime(abs(delta))))")
+                .font(.title3.bold().monospacedDigit())
+                .foregroundStyle(.white)
+                .padding(.horizontal, 18)
+                .padding(.vertical, 12)
+                .glassSurface(in: .rect(cornerRadius: 16))
+                .allowsHitTesting(false)
+        case .brightness(let level):
+            levelView(icon: "sun.max.fill", value: level)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        case .volume(let level):
+            levelView(icon: level == 0 ? "speaker.slash.fill" : "speaker.wave.2.fill", value: level)
+                .frame(maxWidth: .infinity, alignment: .trailing)
+        case nil:
+            EmptyView()
         }
     }
 
+    /// A vertical level bar pinned to the screen edge the finger is dragging on.
     private func levelView(icon: String, value: Double) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: icon)
-            ProgressView(value: value).tint(.brandLight).frame(width: 160)
-            Text("\(Int(value * 100))%").monospacedDigit()
+        VStack(spacing: 10) {
+            Text("\(Int(value * 100))").font(.caption.bold().monospacedDigit())
+            Capsule()
+                .fill(.white.opacity(0.25))
+                .frame(width: 6, height: 140)
+                .overlay(alignment: .bottom) {
+                    Capsule().fill(Color.brandLight).frame(height: 140 * value)
+                }
+            Image(systemName: icon).font(.subheadline)
         }
+        .foregroundStyle(.white)
+        .padding(.vertical, 14)
+        .frame(width: 48)
+        .glassSurface(in: .capsule)
+        .padding(.horizontal, 32)
+        .allowsHitTesting(false)
     }
 }
 

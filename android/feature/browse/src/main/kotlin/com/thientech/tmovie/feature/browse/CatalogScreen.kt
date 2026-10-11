@@ -116,6 +116,7 @@ fun CatalogScreen(route: ListRoute) {
                 Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Pill(route.title, { nav.back() }) { Icon(Icons.Filled.Close, "Đóng", tint = Color.White, modifier = Modifier.size(16.dp)) }
                     GenrePickerPill(selected = route.slug.takeIf { route.kind == "genre" })
+                    GenrePickerPill(selected = route.slug.takeIf { route.kind == "country" }, kind = PhimApi.Taxonomy.Countries)
                 }
             }
         }

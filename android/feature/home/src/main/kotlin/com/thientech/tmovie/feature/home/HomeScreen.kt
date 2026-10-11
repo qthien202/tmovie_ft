@@ -51,6 +51,7 @@ import com.thientech.tmovie.core.designsystem.Pill
 import com.thientech.tmovie.core.designsystem.TMovieColors
 import com.thientech.tmovie.core.designsystem.Wordmark
 import com.thientech.tmovie.core.ui.ContinueCard
+import com.thientech.tmovie.core.network.PhimApi
 import com.thientech.tmovie.core.ui.GenrePickerPill
 import com.thientech.tmovie.core.ui.ListRoute
 import com.thientech.tmovie.core.ui.PosterCard
@@ -138,6 +139,7 @@ private fun HomeHeader() {
             Pill("Phim lẻ", { nav.openList(ListRoute.type("Phim lẻ", "phim-le")) })
             Pill("TV Shows", { nav.openList(ListRoute.type("TV Shows", "tv-shows")) })
             GenrePickerPill()
+            GenrePickerPill(kind = PhimApi.Taxonomy.Countries)
         }
     }
 }

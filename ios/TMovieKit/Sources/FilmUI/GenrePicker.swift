@@ -4,23 +4,28 @@ import Models
 import Networking
 import SwiftUI
 
-/// "Thể loại ⌄" pill that opens a Netflix-style full-screen genre list over frosted glass.
+/// "Thể loại ⌄" / "Quốc gia ⌄" pill that opens a Netflix-style full-screen list over frosted glass.
 public struct GenrePickerButton: View {
     let selected: String?
+    let kind: PhimAPI.Taxonomy
     @State private var open = false
     @Environment(RouterPath.self) private var router
 
-    public init(selected: String? = nil) { self.selected = selected }
+    public init(selected: String? = nil, kind: PhimAPI.Taxonomy = .genres) {
+        self.selected = selected
+        self.kind = kind
+    }
 
     public var body: some View {
         Button { open = true } label: {
-            HStack(spacing: 4) { Text("Thể loại"); Image(systemName: "chevron.down").imageScale(.small) }
+            HStack(spacing: 4) { Text(kind == .genres ? "Thể loại" : "Quốc gia"); Image(systemName: "chevron.down").imageScale(.small) }
                 .modifier(PillLabel())
         }
         .buttonStyle(PressableStyle())
         .fullScreenCover(isPresented: $open) {
-            GenrePicker(selected: selected) { genre in
-                router.push(ListRoute(title: genre.name ?? "", source: .genre(genre.slug ?? "")))
+            GenrePicker(selected: selected, kind: kind) { item in
+                let slug = item.slug ?? ""
+                router.push(ListRoute(title: item.name ?? "", source: kind == .genres ? .genre(slug) : .country(slug)))
             }
             .presentationBackground(.ultraThinMaterial)
         }
@@ -29,6 +34,7 @@ public struct GenrePickerButton: View {
 
 private struct GenrePicker: View {
     let selected: String?
+    let kind: PhimAPI.Taxonomy
     let pick: (FilmCategory) -> Void
 
     @State private var genres: [FilmCategory] = []
@@ -78,7 +84,7 @@ private struct GenrePicker: View {
         }
         .sensoryFeedback(.impact(weight: .light), trigger: shown)
         .task {
-            genres = (try? await PhimAPI.shared.taxonomy(.genres)) ?? []
+            genres = (try? await PhimAPI.shared.taxonomy(kind)) ?? []
             shown = true
         }
     }

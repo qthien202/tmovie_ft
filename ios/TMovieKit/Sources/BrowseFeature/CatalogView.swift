@@ -26,6 +26,10 @@ public struct CatalogView: View {
         if case .genre(let slug) = route.source { slug } else { nil }
     }
 
+    private var countrySlug: String? {
+        if case .country(let slug) = route.source { slug } else { nil }
+    }
+
     public var body: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 26) {
@@ -76,6 +80,7 @@ public struct CatalogView: View {
                 .buttonStyle(PressableStyle())
                 .accessibilityLabel("Đóng \(route.title)")
                 GenrePickerButton(selected: genreSlug)
+                GenrePickerButton(selected: countrySlug, kind: .countries)
             }
         }
         .contentMargins(.horizontal, 16, for: .scrollContent)

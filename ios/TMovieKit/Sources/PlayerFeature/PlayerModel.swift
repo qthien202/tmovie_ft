@@ -215,6 +215,12 @@ final class PlayerModel {
 
     // MARK: Controls visibility
 
+    #if DEBUG
+    private let keepControls = UserDefaults.standard.bool(forKey: "keepControls")
+    #else
+    private let keepControls = false
+    #endif
+
     func interact() {
         lastInteraction = .now
         controlsVisible = true
@@ -231,8 +237,8 @@ final class PlayerModel {
         buffering = player.timeControlStatus == .waitingToPlayAtSpecifiedRate
         if item?.status == .failed, !failed { streamFailed() }
 
-        // Controls fade 3 s after the last touch while playing.
-        if isPlaying, panel == .none, controlsVisible, Date.now.timeIntervalSince(lastInteraction) > 3 { controlsVisible = false }
+        // Controls fade 3 s after the last touch while playing (`-keepControls YES` holds them, for screenshots).
+        if isPlaying, !keepControls, panel == .none, controlsVisible, Date.now.timeIntervalSince(lastInteraction) > 3 { controlsVisible = false }
         if isPlaying, Date.now.timeIntervalSince(lastSave) >= 10 { save() }
         UIApplication.shared.isIdleTimerDisabled = isPlaying
     }

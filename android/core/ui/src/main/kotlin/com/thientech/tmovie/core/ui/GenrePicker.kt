@@ -41,26 +41,28 @@ import com.thientech.tmovie.core.model.FilmCategory
 import com.thientech.tmovie.core.network.PhimApi
 import kotlinx.coroutines.delay
 
-/** "Thể loại ⌄" pill that opens a Netflix-style full-screen genre list. */
+/** "Thể loại ⌄" / "Quốc gia ⌄" pill that opens a Netflix-style full-screen list. */
 @Composable
-fun GenrePickerPill(selected: String? = null) {
+fun GenrePickerPill(selected: String? = null, kind: PhimApi.Taxonomy = PhimApi.Taxonomy.Genres) {
     var open by remember { mutableStateOf(false) }
     val nav = rememberNavigator()
-    Pill("Thể loại", onClick = { open = true }) {
+    val genres = kind == PhimApi.Taxonomy.Genres
+    Pill(if (genres) "Thể loại" else "Quốc gia", onClick = { open = true }) {
         Icon(Icons.Filled.KeyboardArrowDown, null, tint = Color.White, modifier = Modifier.size(18.dp))
     }
     if (open) {
-        GenrePicker(selected, onDismiss = { open = false }) { g ->
+        GenrePicker(selected, kind, onDismiss = { open = false }) { g ->
             open = false
-            if (g.slug != selected) nav.openList(ListRoute.genre(g.name.orEmpty(), g.slug.orEmpty()))
+            val name = g.name.orEmpty(); val slug = g.slug.orEmpty()
+            if (g.slug != selected) nav.openList(if (genres) ListRoute.genre(name, slug) else ListRoute.country(name, slug))
         }
     }
 }
 
 @Composable
-private fun GenrePicker(selected: String?, onDismiss: () -> Unit, onPick: (FilmCategory) -> Unit) {
+private fun GenrePicker(selected: String?, kind: PhimApi.Taxonomy, onDismiss: () -> Unit, onPick: (FilmCategory) -> Unit) {
     var genres by remember { mutableStateOf<List<FilmCategory>>(emptyList()) }
-    LaunchedEffect(Unit) { genres = runCatching { PhimApi.shared.taxonomy(PhimApi.Taxonomy.Genres) }.getOrDefault(emptyList()) }
+    LaunchedEffect(Unit) { genres = runCatching { PhimApi.shared.taxonomy(kind) }.getOrDefault(emptyList()) }
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
         Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.88f))) {
             LazyColumn(

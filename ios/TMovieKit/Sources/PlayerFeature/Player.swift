@@ -11,7 +11,7 @@ public enum Player {
     public static let willPresent = Notification.Name("TMoviePlayerWillPresent")
 
     /// The open player's controller, kept so a new episode replaces it.
-    private static weak var current: PlayerHostingController?
+    fileprivate static weak var current: PlayerHostingController?
 
     /// Plays `episodes[index]` of `server`, resuming at the saved second.
     public static func play(_ film: FilmDetail, server: Int, episodes: [ServerData], at index: Int) {
@@ -75,7 +75,10 @@ final class PlayerHostingController: UIHostingController<PlayerScreen> {
     func closePlayer(animated: Bool) {
         model.pip?.stopPictureInPicture()
         model.tearDown()
-        OrientationLock.rotate(to: .portrait)
-        dismiss(animated: animated)
+        // Rotate once the landscape-only player is gone; asking while it is still up has no valid orientation.
+        dismiss(animated: animated) { [weak self] in
+            // A replacing player (next episode) is already up and keeps landscape.
+            if Player.current == nil || Player.current === self { OrientationLock.rotate(to: .portrait) }
+        }
     }
 }
