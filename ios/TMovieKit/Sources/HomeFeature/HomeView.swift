@@ -36,6 +36,7 @@ public struct HomeView: View {
                 if !store.top10.isEmpty {
                     Top10Shelf(films: store.top10, more: Rail.top10.more)
                 }
+                CountryShelf()
                 ForEach(Rail.home.filter { store.rails[$0]?.isEmpty != true }) { rail in
                     Shelf(rail.title, more: rail.more) {
                         if let films = store.rails[rail] {

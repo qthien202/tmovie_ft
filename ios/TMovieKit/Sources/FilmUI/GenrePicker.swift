@@ -39,7 +39,7 @@ public struct GenrePickerButton: View {
     }
 }
 
-private struct GenrePicker: View {
+struct GenrePicker: View {
     let selected: String?
     let kind: PhimAPI.Taxonomy
     let showsAll: Bool

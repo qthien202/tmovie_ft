@@ -59,8 +59,8 @@ fun FilterButton(pager: Pager, source: Source, reload: () -> Unit) {
                     }
                     HorizontalDivider()
                     DropdownMenuItem({ Text("Năm" + (f.year?.let { ": $it" } ?: "")) }, { sub = "year" }, trailingIcon = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) })
-                    if (source !is Source.Genre) DropdownMenuItem({ Text("Thể loại") }, { sub = "genre" }, trailingIcon = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) })
                     if (source !is Source.Country) DropdownMenuItem({ Text("Quốc gia") }, { sub = "country" }, trailingIcon = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) })
+                    if (source !is Source.Genre) DropdownMenuItem({ Text("Thể loại") }, { sub = "genre" }, trailingIcon = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) })
                     if (f != Filter()) DropdownMenuItem({ Text("Bỏ lọc", color = Color(0xFFFF6B6B)) }, { apply(Filter()) })
                 }
                 "year" -> {

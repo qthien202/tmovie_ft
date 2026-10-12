@@ -24,19 +24,19 @@ struct FilterMenu: View {
                     ForEach((2000...Calendar.current.component(.year, from: .now)).reversed(), id: \.self) { Text(String($0)).tag(Int?($0)) }
                 }
             }
-            if case .genre = source {} else {
-                Menu("Thể loại") {
-                    Picker("Thể loại", selection: $pager.filter.category) {
-                        Text("Tất cả").tag(String?.none)
-                        ForEach(genres, id: \.slug) { Text($0.name ?? "").tag($0.slug) }
-                    }
-                }
-            }
             if case .country = source {} else {
                 Menu("Quốc gia") {
                     Picker("Quốc gia", selection: $pager.filter.country) {
                         Text("Tất cả").tag(String?.none)
                         ForEach(countries, id: \.slug) { Text($0.name ?? "").tag($0.slug) }
+                    }
+                }
+            }
+            if case .genre = source {} else {
+                Menu("Thể loại") {
+                    Picker("Thể loại", selection: $pager.filter.category) {
+                        Text("Tất cả").tag(String?.none)
+                        ForEach(genres, id: \.slug) { Text($0.name ?? "").tag($0.slug) }
                     }
                 }
             }

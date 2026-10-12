@@ -124,14 +124,14 @@ fun CatalogScreen(route: ListRoute) {
                 Text(route.title, style = TMovieType.Title, color = Color.White)
                 Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Pill(route.title, { nav.back() }) { Icon(Icons.Filled.Close, "Đóng", tint = Color.White, modifier = Modifier.size(16.dp)) }
-                    // Genre, country and year combine here; the page's own genre/country isn't offered again.
-                    if (route.kind != "genre") GenrePickerPill(f.category, title = f.category?.let { filterNames[it] }) { g ->
-                        g?.let { filterNames[it.slug.orEmpty()] = it.name.orEmpty() }
-                        applyFilter(f.copy(category = g?.slug))
-                    }
+                    // Country, genre and year combine here; the page's own genre/country isn't offered again.
                     if (route.kind != "country") GenrePickerPill(f.country, PhimApi.Taxonomy.Countries, title = f.country?.let { filterNames[it] }) { c ->
                         c?.let { filterNames[it.slug.orEmpty()] = it.name.orEmpty() }
                         applyFilter(f.copy(country = c?.slug))
+                    }
+                    if (route.kind != "genre") GenrePickerPill(f.category, title = f.category?.let { filterNames[it] }) { g ->
+                        g?.let { filterNames[it.slug.orEmpty()] = it.name.orEmpty() }
+                        applyFilter(f.copy(category = g?.slug))
                     }
                     Box {
                         var years by remember { mutableStateOf(false) }

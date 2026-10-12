@@ -12,11 +12,11 @@ struct HomeHeader: View {
             Wordmark().padding(.horizontal, 16)
             ScrollView(.horizontal) {
                 HStack(spacing: 8) {
+                    GenrePickerButton(kind: .countries)
+                    GenrePickerButton()
                     pill("Phim bộ", .type("phim-bo"))
                     pill("Phim lẻ", .type("phim-le"))
                     pill("TV Shows", .type("tv-shows"))
-                    GenrePickerButton()
-                    GenrePickerButton(kind: .countries)
                 }
             }
             .contentMargins(.horizontal, 16, for: .scrollContent)
