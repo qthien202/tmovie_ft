@@ -8,6 +8,16 @@ Vietnamese block free of Markdown styling (use emoji + "•" bullets).
 
 Every new feature/release must add a `## vX.Y.Z` section with both parts.
 
+## v1.6.1
+
+Country first. The "Quốc gia" picker now leads the home pills, the category pills and the filter menu, and Home gets a "Phim theo quốc gia" shelf of flag tiles (plus "Tất cả" for the full list).
+
+<!-- app:vi -->
+✨ Mới
+• Thêm mục "Phim theo quốc gia" ở trang chủ: bấm cờ là vào thẳng phim của nước đó.
+• Bộ lọc Quốc gia được đưa lên đầu, chọn quốc gia trước rồi mới chọn thể loại cũng được.
+<!-- /app:vi -->
+
 ## v1.6.0
 
 Combined filters, country picker and a way back to the film from the player.
