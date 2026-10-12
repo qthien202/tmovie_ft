@@ -51,6 +51,7 @@ import com.thientech.tmovie.core.designsystem.Pill
 import com.thientech.tmovie.core.designsystem.TMovieColors
 import com.thientech.tmovie.core.designsystem.Wordmark
 import com.thientech.tmovie.core.ui.ContinueCard
+import com.thientech.tmovie.core.ui.CountryShelf
 import com.thientech.tmovie.core.network.PhimApi
 import com.thientech.tmovie.core.ui.GenrePickerPill
 import com.thientech.tmovie.core.ui.ListRoute
@@ -95,6 +96,7 @@ fun HomeScreen(vm: HomeViewModel = viewModel()) {
                     Shelf("Danh sách của tôi") { items(saved, key = { it.film.slug }) { PosterCard(it.film, "mylist/${it.film.slug}") } }
                 }
                 if (vm.top10.isNotEmpty()) item(key = "top10") { Top10Shelf(vm) }
+                item(key = "countries") { CountryShelf() }
                 homeRails.forEach { rail ->
                     val films = vm.rails[rail]
                     if (films == null || films.isNotEmpty()) item(key = rail.title) {
@@ -135,11 +137,11 @@ private fun HomeHeader() {
     ) {
         Wordmark(Modifier.padding(horizontal = 16.dp, vertical = 4.dp))
         Row(Modifier.horizontalScroll(rememberScrollState()).padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            GenrePickerPill(kind = PhimApi.Taxonomy.Countries)
+            GenrePickerPill()
             Pill("Phim bộ", { nav.openList(ListRoute.type("Phim bộ", "phim-bo")) })
             Pill("Phim lẻ", { nav.openList(ListRoute.type("Phim lẻ", "phim-le")) })
             Pill("TV Shows", { nav.openList(ListRoute.type("TV Shows", "tv-shows")) })
-            GenrePickerPill()
-            GenrePickerPill(kind = PhimApi.Taxonomy.Countries)
         }
     }
 }

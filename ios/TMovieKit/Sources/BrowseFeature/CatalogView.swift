@@ -77,7 +77,7 @@ public struct CatalogView: View {
 
     private var filtering: Bool { pager.filter.category != nil || pager.filter.country != nil || pager.filter.year != nil }
 
-    /// Genre, country and year combine on this page; the page's own genre/country isn't offered again.
+    /// Country, genre and year combine on this page; the page's own genre/country isn't offered again.
     private var pills: some View {
         ScrollView(.horizontal) {
             HStack(spacing: 8) {
@@ -87,16 +87,16 @@ public struct CatalogView: View {
                 }
                 .buttonStyle(PressableStyle())
                 .accessibilityLabel("Đóng \(route.title)")
-                if genreSlug == nil {
-                    GenrePickerButton(selected: pager.filter.category, title: pager.filter.category.flatMap { filterNames[$0] }) { pick in
-                        if let pick { filterNames[pick.slug ?? ""] = pick.name }
-                        pager.filter.category = pick?.slug
-                    }
-                }
                 if countrySlug == nil {
                     GenrePickerButton(selected: pager.filter.country, kind: .countries, title: pager.filter.country.flatMap { filterNames[$0] }) { pick in
                         if let pick { filterNames[pick.slug ?? ""] = pick.name }
                         pager.filter.country = pick?.slug
+                    }
+                }
+                if genreSlug == nil {
+                    GenrePickerButton(selected: pager.filter.category, title: pager.filter.category.flatMap { filterNames[$0] }) { pick in
+                        if let pick { filterNames[pick.slug ?? ""] = pick.name }
+                        pager.filter.category = pick?.slug
                     }
                 }
                 Menu {

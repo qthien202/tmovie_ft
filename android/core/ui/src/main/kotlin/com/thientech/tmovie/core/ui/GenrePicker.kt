@@ -3,7 +3,13 @@ package com.thientech.tmovie.core.ui
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -37,6 +43,8 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.thientech.tmovie.core.designsystem.Pill
 import com.thientech.tmovie.core.designsystem.cinematic
+import com.thientech.tmovie.core.designsystem.pressScale
+import com.thientech.tmovie.core.designsystem.rememberInteraction
 import com.thientech.tmovie.core.model.FilmCategory
 import com.thientech.tmovie.core.network.PhimApi
 import kotlinx.coroutines.delay
@@ -66,6 +74,50 @@ fun GenrePickerPill(
             val name = g.name.orEmpty(); val slug = g.slug.orEmpty()
             nav.openList(if (genres) ListRoute.genre(name, slug) else ListRoute.country(name, slug))
         }
+    }
+}
+
+private val Countries = listOf(
+    Triple("🇰🇷", "Hàn Quốc", "han-quoc"), Triple("🇨🇳", "Trung Quốc", "trung-quoc"), Triple("🇺🇸", "Âu Mỹ", "au-my"),
+    Triple("🇯🇵", "Nhật Bản", "nhat-ban"), Triple("🇹🇭", "Thái Lan", "thai-lan"), Triple("🇻🇳", "Việt Nam", "viet-nam"),
+    Triple("🇹🇼", "Đài Loan", "dai-loan"), Triple("🇭🇰", "Hồng Kông", "hong-kong"), Triple("🇮🇳", "Ấn Độ", "an-do"),
+)
+
+/** "Phim theo quốc gia": one tap into a country's page; the last tile opens the full country list. */
+@Composable
+fun CountryShelf() {
+    val nav = rememberNavigator()
+    var showAll by remember { mutableStateOf(false) }
+    Shelf("Phim theo quốc gia") {
+        items(Countries, key = { it.third }) { (flag, name, slug) -> CountryTile(flag, name) { nav.openList(ListRoute.country(name, slug)) } }
+        item("all") { CountryTile("🌏", "Tất cả") { showAll = true } }
+    }
+    if (showAll) {
+        GenrePicker(null, PhimApi.Taxonomy.Countries, showsAll = false, onDismiss = { showAll = false }) { c ->
+            showAll = false
+            if (c != null) nav.openList(ListRoute.country(c.name.orEmpty(), c.slug.orEmpty()))
+        }
+    }
+}
+
+@Composable
+private fun CountryTile(flag: String, name: String, onClick: () -> Unit) {
+    val shape = RoundedCornerShape(12.dp)
+    val interaction = rememberInteraction()
+    Column(
+        Modifier
+            .width(124.dp)
+            .height(84.dp)
+            .pressScale(interaction)
+            .clip(shape)
+            .background(Color.White.copy(alpha = 0.08f))
+            .border(1.dp, Color.White.copy(alpha = 0.1f), shape)
+            .clickable(interaction, null, onClick = onClick)
+            .padding(12.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Bottom),
+    ) {
+        Text(flag, fontSize = 26.sp)
+        Text(name, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
     }
 }
 
