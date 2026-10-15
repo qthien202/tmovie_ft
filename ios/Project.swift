@@ -27,7 +27,11 @@ let project = Project(
                 "CFBundleURLTypes": [["CFBundleURLSchemes": ["tmovie"]]],  // tmovie://phim/{slug}  // AVKit PiP / background audio in phase 2
             ]),
             sources: ["App/Sources/**"],
-            resources: ["App/Resources/**"],
+            resources: [
+                "App/Resources/**",
+                // "Thuyết minh AI" voice model, ~345 MB (private/ios/Tools/fetch-vieneu.sh).
+                .folderReference(path: "TMovieKit/Vendor/VieNeu"),
+            ],
             dependencies: [.package(product: "TMovieKit")]
         ),
     ]
