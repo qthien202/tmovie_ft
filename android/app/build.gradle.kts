@@ -68,11 +68,11 @@ android {
 }
 
 // Release APKs carry native code for phones only: ONNX Runtime for every ABI would make the 5 MB app
-// ~80 MB. "Thuyết minh AI" runs on arm64 (sea-g2p is built for it); armeabi-v7a stays, minus ONNX Runtime,
+// ~80 MB. "Thuyết minh AI" runs on arm64 (sea-g2p is built for it); armeabi-v7a stays, minus ONNX Runtime and OCR,
 // so 32-bit phones still install, without the voice-over. Debug keeps x86_64 for the emulator.
 androidComponents {
     onVariants(selector().withBuildType("release")) { variant ->
-        variant.packaging.jniLibs.excludes.addAll(listOf("lib/x86/**", "lib/x86_64/**", "lib/armeabi-v7a/libonnxruntime*"))
+        variant.packaging.jniLibs.excludes.addAll(listOf("lib/x86/**", "lib/x86_64/**", "lib/armeabi-v7a/libonnxruntime*", "lib/armeabi-v7a/libmlkit*"))
     }
 }
 

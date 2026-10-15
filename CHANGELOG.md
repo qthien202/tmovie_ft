@@ -8,6 +8,17 @@ Vietnamese block free of Markdown styling (use emoji + "•" bullets).
 
 Every new feature/release must add a `## vX.Y.Z` section with both parts.
 
+## v1.7.1
+
+Android "Thuyết minh AI" fixes. The voice model is now int8-quantized (282 → 84 MB graphs, ~147 MB download, ~3× faster), so 4 GB phones can run it; 3 GB phones don't offer it. OCR is bundled (sideloaded installs never got Play Services' module, so subtitles were never read). The model loads with the first line and the scout starts once the film plays, the voice runs at background priority on two threads, OCR reads only the subtitle band, and slow phones drop to 8 flow steps, which fixes the stutter and the player being killed on low-memory phones. v1.7.0's 345 MB model is deleted; the scout starts 5 s ahead, so the first lines after a seek are voiced too.
+
+<!-- app:vi -->
+🛠 Sửa lỗi
+• Thuyết minh AI: hết bị giật, không còn văng khỏi phim khi bật thuyết minh.
+• Gói giọng đọc gọn hơn nhiều: chỉ còn khoảng 150 MB (trước 345 MB), đọc nhanh gấp 3 lần, chạy được trên máy 4 GB RAM. Gói cũ được tự xoá, cần tải lại gói mới một lần.
+• Sửa lỗi không đọc được phụ đề trên một số máy.
+<!-- /app:vi -->
+
 ## v1.7.0
 
 "Thuyết minh AI": on-device Vietnamese voice-over for Vietsub films. A muted scout copy of the episode runs ahead of the film, its burned-in subtitles are read by OCR, and VieNeu-TTS v3 Nano speaks each line as it comes up, ducking the film while it talks. Off by default; the player settings panel turns it on, downloads the voice model once (~345 MB, Android 10+ on 64-bit) and picks one of 11 voices.
