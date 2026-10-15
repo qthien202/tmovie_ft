@@ -2,6 +2,7 @@ import AVKit
 import DesignSystem
 import Models
 import SwiftUI
+import VoiceOver
 
 /// Everything drawn over the video.
 struct PlayerControls: View {
@@ -426,6 +427,7 @@ private struct SettingsPanel: View {
                     }
                     OptionRow(title: "Âm thanh", options: model.audioOptions.map { ($0.name, $0.selected, $0.select) })
                     OptionRow(title: "Phụ đề", options: model.subtitleOptions.map { ($0.name, $0.selected, $0.select) })
+                    voiceOverRows
                     OptionRow(title: "Khung hình", options: [("Vừa", !model.fill, { model.fill = false }), ("Phóng", model.fill, { model.fill = true })])
                     OptionRow(title: "Hẹn giờ tắt", options: [(0, "Tắt"), (15, "15 phút"), (30, "30 phút"), (45, "45 phút"), (60, "60 phút"), (-1, "Hết tập này")].map { m, label in
                         (label, model.sleepMinutes == m, { model.setSleep(minutes: m) })
@@ -437,6 +439,28 @@ private struct SettingsPanel: View {
         .foregroundStyle(.white)
         .padding(20)
         .task { await model.loadMediaOptions() }
+    }
+
+    /// "Thuyết minh AI" settings: on/off and the voice.
+    @ViewBuilder private var voiceOverRows: some View {
+        let vo = model.voiceOver
+        let voice = VoiceModel.shared
+        switch voice.state {
+        case .missing, .failed:
+            OptionRow(title: "Thuyết minh AI", options: [("Tải giọng đọc (\(ByteCountFormatter.string(fromByteCount: VoiceModel.totalBytes, countStyle: .file)))", false, { voice.download() })])
+        case .downloading(let p):
+            OptionRow(title: "Thuyết minh AI", options: [("Đang tải \(Int(p * 100))% · Huỷ", true, { voice.cancel() })])
+        case .ready:
+            OptionRow(title: "Thuyết minh AI", options: [("Tắt", !vo.enabled, { vo.setEnabled(false) }), ("Bật", vo.enabled, { vo.setEnabled(true) })])
+            if vo.enabled {
+                VStack(alignment: .leading, spacing: 6) {
+                    OptionRow(title: "Giọng đọc", options: AIVoiceOver.voices.map { v in (v.name, vo.voice == v.name, { vo.setVoice(v.name) }) })
+                    if let picked = AIVoiceOver.voices.first(where: { $0.name == vo.voice }) {
+                        Text(picked.description).font(.footnote).foregroundStyle(.secondary)
+                    }
+                }
+            }
+        }
     }
 }
 

@@ -104,8 +104,8 @@ private struct HeroPage: View {
                         .offset(x: tilt.roll * -22, y: tilt.pitch * -14)
                         .scaleEffect(1.08)  // bleed so tilt never shows an edge
                         // Paging parallax: the art moves slower than the page.
-                        .scrollTransition(.interactive, axis: .horizontal) { content, phase in
-                            content.offset(x: motion ? phase.value * -geo.size.width * 0.4 : 0)
+                        .scrollTransition(.interactive, axis: .horizontal) { [width = geo.size.width] content, phase in
+                            content.offset(x: motion ? phase.value * -width * 0.4 : 0)
                         }
                         .frame(width: geo.size.width, height: geo.size.height)
                         .clipped()

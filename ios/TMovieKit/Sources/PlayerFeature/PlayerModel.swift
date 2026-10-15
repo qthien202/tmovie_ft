@@ -6,6 +6,7 @@ import Network
 import Observation
 import Persistence
 import UIKit
+import VoiceOver
 
 /// Everything the custom player screen shows and does: playback state, episode switching,
 /// resume + progress saving, quality / audio / subtitles / speed / aspect, sleep timer,
@@ -53,6 +54,7 @@ final class PlayerModel {
     private var recoveries = 0
     private let pathMonitor = NWPathMonitor()
     var pip: AVPictureInPictureController?
+    let voiceOver = AIVoiceOver()
 
     init(film: FilmDetail, server: Int, index: Int) {
         self.film = film
@@ -68,6 +70,7 @@ final class PlayerModel {
         }
         pathMonitor.start(queue: DispatchQueue(label: "tmovie.path"))
         load()
+        voiceOver.attach(player) { [weak self] in self?.makeScoutItem() }
     }
 
     // MARK: Episodes
@@ -130,6 +133,16 @@ final class PlayerModel {
         updateNowPlaying()
         save()
         interact()
+    }
+
+    /// A second, independent item of the episode now playing, on the same ad-free timeline,
+    /// for the voice-over's look-ahead.
+    private var scoutLoader = AdFreeLoader()
+    private func makeScoutItem() -> AVPlayerItem? {
+        if let local = Downloads.shared.localURL(slug: film.slug, server: server, index: index) { return AVPlayerItem(url: local) }
+        guard let url = episode?.streamURL else { return nil }
+        scoutLoader = AdFreeLoader()
+        return AVPlayerItem(asset: scoutLoader.asset(for: url))
     }
 
     // MARK: Transport
@@ -304,6 +317,7 @@ final class PlayerModel {
 
     func tearDown() {
         save()
+        voiceOver.detach()
         player.pause()
         player.replaceCurrentItem(with: nil)
         if let timeObserver { player.removeTimeObserver(timeObserver) }

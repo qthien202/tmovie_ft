@@ -39,6 +39,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
+import com.thientech.tmovie.core.voiceover.AiVoiceOver
 import androidx.media3.session.MediaSession
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
@@ -59,6 +60,7 @@ private enum class Panel { None, Settings, Episodes }
 @OptIn(UnstableApi::class)
 class PlayerActivity : ComponentActivity() {
     private lateinit var exo: ExoPlayer
+    private lateinit var voiceOver: AiVoiceOver
     private var session: MediaSession? = null
     private var inPip by mutableStateOf(false)
     private var saveNow: () -> Unit = {}
@@ -75,6 +77,7 @@ class PlayerActivity : ComponentActivity() {
             systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
         exo = StreamPlayer.create(this)
+        voiceOver = AiVoiceOver(this, exo) { StreamPlayer.create(this, preview = true) }
         session = MediaSession.Builder(this, exo).build()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) setPictureInPictureParams(pipParams())
 
@@ -134,6 +137,7 @@ class PlayerActivity : ComponentActivity() {
             val resume = record?.positions?.get(ep.slug.orEmpty()) ?: record?.positions?.get(ep.name.orEmpty()) ?: 0.0
             val total = record?.durations?.get(ep.slug.orEmpty()) ?: 0.0
             if (resume > 5 && (total == 0.0 || resume < total - 20)) exo.seekTo((resume * 1000).toLong())
+            voiceOver.load(url)
             exo.prepare()
             exo.play()
             save()
@@ -257,6 +261,7 @@ class PlayerActivity : ComponentActivity() {
                     when (panel) {
                         Panel.Settings -> SettingsPanel(
                             playback = playback,
+                            voiceOver = voiceOver,
                             aspect = aspect,
                             onAspect = { aspect = it; gestures.zoomed = it == AspectMode.Zoom },
                             sleepMinutes = sleepMinutes,
@@ -303,6 +308,7 @@ class PlayerActivity : ComponentActivity() {
     override fun onDestroy() {
         saveNow()
         session?.release()
+        voiceOver.release()
         exo.release()
         super.onDestroy()
     }

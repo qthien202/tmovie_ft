@@ -41,6 +41,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.thientech.tmovie.core.designsystem.TMovieColors
 import com.thientech.tmovie.core.model.ServerData
+import com.thientech.tmovie.core.voiceover.AiVoiceOver
+import com.thientech.tmovie.core.voiceover.VoiceModel
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.LocalContext
 
 enum class AspectMode(val label: String) { Fit("Vừa"), Zoom("Phóng"), Fill("Giãn") }
 
@@ -86,6 +90,7 @@ private fun Section(title: String, options: List<Pair<String, Boolean>>, onPick:
 @Composable
 fun SettingsPanel(
     playback: PlaybackState,
+    voiceOver: AiVoiceOver,
     aspect: AspectMode,
     onAspect: (AspectMode) -> Unit,
     sleepMinutes: Int,
@@ -104,8 +109,34 @@ fun SettingsPanel(
             Section("Âm thanh", audio.map { it.label to it.selected }) { audio[it].apply() }
             val subs = playback.subtitleOptions()
             Section("Phụ đề", subs.map { it.label to it.selected }) { subs[it].apply() }
+            VoiceOverSection(voiceOver)
             Section("Khung hình", AspectMode.entries.map { it.label to (it == aspect) }) { onAspect(AspectMode.entries[it]) }
             Section("Hẹn giờ tắt", sleepChoices.map { it.second to (it.first == sleepMinutes) }) { onSleep(sleepChoices[it].first) }
+        }
+    }
+}
+
+/** "Thuyết minh AI": download the voice model, then on/off and the voice. */
+@Composable
+private fun VoiceOverSection(voiceOver: AiVoiceOver) {
+    val model by VoiceModel.state.collectAsState()
+    val on by voiceOver.enabled.collectAsState()
+    val voice by voiceOver.voice.collectAsState()
+    when (val m = model) {
+        VoiceModel.State.Unsupported -> {}
+        VoiceModel.State.Missing, is VoiceModel.State.Failed ->
+            Section("Thuyết minh AI", listOf("Tải giọng đọc (${VoiceModel.totalBytes / 1_000_000} MB)" to false)) { VoiceModel.download() }
+        is VoiceModel.State.Downloading ->
+            Section("Thuyết minh AI", listOf("Đang tải ${(m.progress * 100).toInt()}% · Huỷ" to true)) { VoiceModel.cancel() }
+        VoiceModel.State.Ready -> {
+            Section("Thuyết minh AI", listOf("Tắt" to !on, "Bật" to on)) { voiceOver.setEnabled(it == 1) }
+            if (on) {
+                val voices = AiVoiceOver.voices(LocalContext.current)
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Section("Giọng đọc", voices.map { it.first to (it.first == voice) }) { voiceOver.setVoice(voices[it].first) }
+                    voices.firstOrNull { it.first == voice }?.let { Text(it.second, color = TMovieColors.Secondary, fontSize = 13.sp) }
+                }
+            }
         }
     }
 }

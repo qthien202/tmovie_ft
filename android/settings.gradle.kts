@@ -24,6 +24,7 @@ include(
     ":core:data",
     ":core:designsystem",
     ":core:player",
+    ":core:voiceover",
     ":core:ui",
     ":feature:home",
     ":feature:detail",

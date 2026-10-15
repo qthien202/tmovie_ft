@@ -8,6 +8,17 @@ Vietnamese block free of Markdown styling (use emoji + "•" bullets).
 
 Every new feature/release must add a `## vX.Y.Z` section with both parts.
 
+## v1.7.0
+
+"Thuyết minh AI": on-device Vietnamese voice-over for Vietsub films. A muted scout copy of the episode runs ahead of the film, its burned-in subtitles are read by OCR, and VieNeu-TTS v3 Nano speaks each line as it comes up, ducking the film while it talks. Off by default; the player settings panel turns it on, downloads the voice model once (~345 MB, Android 10+ on 64-bit) and picks one of 11 voices.
+
+<!-- app:vi -->
+✨ Mới
+• Thuyết minh AI (thử nghiệm): phim Vietsub giờ có thể nghe thuyết minh tiếng Việt, giọng đọc được tạo ngay trên máy theo phụ đề.
+• Bật trong phần Cài đặt của trình phát. Lần đầu cần tải gói giọng đọc khoảng 345 MB (Android 10 trở lên, máy 64-bit). Máy càng mạnh thì giọng đọc càng theo kịp lời thoại.
+• Có 11 giọng đọc để chọn, mặc định là giọng Ái Hân.
+<!-- /app:vi -->
+
 ## v1.6.1
 
 Country first. The "Quốc gia" picker now leads the home pills, the category pills and the filter menu, and Home gets a "Phim theo quốc gia" shelf of flag tiles (plus "Tất cả" for the full list).

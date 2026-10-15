@@ -9,6 +9,7 @@ android { namespace = "com.thientech.tmovie.core.player" }
 dependencies {
     api(project(":core:data"))
     implementation(project(":core:designsystem"))
+    implementation(project(":core:voiceover"))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.media3.exoplayer)
