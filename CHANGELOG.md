@@ -10,11 +10,13 @@ Every new feature/release must add a `## vX.Y.Z` section with both parts.
 
 ## v1.8.1
 
-More "Truyền hình" lists: Phim, Giải trí, Thiếu nhi, Tài liệu and Âm nhạc join Việt Nam, Thể thao and Tin tức (iptv-org categories, same filtering). iOS gets the same tab (AVKit player, landscape, per-channel headers; plain-http media allowed for these streams).
+"Truyền hình" now reads iptv-org's whole index (~11,200 channels, ~180 countries, 29 categories) with Quốc gia / Thể loại pickers (Việt Nam by default, picker overlay shared with Home) and search across every country; lists play as published (only DASH, unsupported, is skipped). Channels open in the film player's live mode: same controls, gestures, lock, quality, aspect, sleep timer and PiP, with a "TRỰC TIẾP" button instead of the seek bar, and no episodes, history or voice-over. Android's tab bar is redrawn: outlined icons that fill when selected, a springy highlight and a light haptic tick. iOS gets the same Truyền hình tab and live mode.
 
 <!-- app:vi -->
 ✨ Mới
-• Truyền hình có thêm các nhóm kênh Phim, Giải trí, Thiếu nhi, Tài liệu và Âm nhạc quốc tế.
+• Truyền hình: hơn 11.000 kênh từ khoảng 180 quốc gia. Lọc theo Quốc gia, Thể loại (29 thể loại), tìm kênh trong toàn bộ danh sách.
+• Xem kênh bằng trình phát giống khi xem phim (khoá màn hình, chất lượng, hẹn giờ, hình trong hình), có nút TRỰC TIẾP để về đúng chỗ đang phát.
+• Thanh tab dưới được làm mới: icon mảnh và gọn hơn, chuyển tab mượt hơn.
 <!-- /app:vi -->
 
 ## v1.8.0

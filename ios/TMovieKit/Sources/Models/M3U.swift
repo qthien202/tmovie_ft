@@ -9,6 +9,10 @@ public struct Channel: Identifiable, Hashable, Sendable {
     public let userAgent: String?
     public let referrer: String?
     public let geoBlocked: Bool
+    /// ISO code from iptv-org's `tvg-id` ("VTV1.vn@SD" → "vn"); nil for other playlists.
+    public let country: String?
+    /// `group-title`, split on ";" ("Movies;Series"); iptv-org's "Undefined" counts as none.
+    public let categories: [String]
 }
 
 public enum M3U {
@@ -34,12 +38,23 @@ public enum M3U {
                 let clean = name.replacing(#/\s*[\[(][^\])]*[\])]/#, with: "").trimmingCharacters(in: .whitespaces)
                 out.append(Channel(
                     name: clean.isEmpty ? name : clean, logo: attr(i, "tvg-logo").flatMap(URL.init(string:)), url: url,
-                    userAgent: ua, referrer: ref, geoBlocked: name.contains("[Geo-blocked]")
+                    userAgent: ua, referrer: ref, geoBlocked: name.contains("[Geo-blocked]"),
+                    country: attr(i, "tvg-id").flatMap(country(fromID:)),
+                    categories: (attr(i, "group-title") ?? "").split(separator: ";")
+                        .map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty && $0 != "Undefined" }
                 ))
                 info = nil; ua = nil; ref = nil
             }
         }
         return out
+    }
+
+    /// "VTV1.vn@SD" → "vn".
+    private static func country(fromID id: String) -> String? {
+        let base = id.split(separator: "@").first.map(String.init) ?? id
+        guard let dot = base.lastIndex(of: ".") else { return nil }
+        let code = base[base.index(after: dot)...].lowercased()
+        return code.count == 2 ? code : nil
     }
 
     private static func attr(_ line: String, _ key: String) -> String? {

@@ -37,12 +37,15 @@ class PlayerGestures(private val activity: Activity, private val playback: Playb
     var hud by mutableStateOf<DragHud?>(null); private set
     var tapSeek by mutableStateOf<TapSeek?>(null); private set
     var zoomed by mutableStateOf(false)
+    /** False for live TV: double-tap and horizontal swipes don't seek. */
+    var seekable = true
 
     private val audio = activity.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     private val maxVolume = audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC).coerceAtLeast(1)
     private var lastTapAt = 0L
 
     fun doubleTap(forward: Boolean) {
+        if (!seekable) return
         val now = System.currentTimeMillis()
         val current = tapSeek
         val seconds = if (current != null && current.forward == forward && now - lastTapAt < 900) current.seconds + 10 else 10
@@ -81,7 +84,7 @@ class PlayerGestures(private val activity: Activity, private val playback: Playb
                 val down = awaitFirstDown(requireUnconsumed = false)
                 val leftHalf = down.position.x < size.width / 2
                 val slop = viewConfiguration.touchSlop
-                var mode = 0 // 0 undecided, 1 seek, 2 vertical, 3 pinch
+                var mode = 0 // 0 undecided, 1 seek, 2 vertical, 3 pinch, 4 ignored (no seeking)
                 var total = Offset.Zero
                 var pinch = 1f
                 val startPos = playback.exo.currentPosition
@@ -94,7 +97,7 @@ class PlayerGestures(private val activity: Activity, private val playback: Playb
                     } else if (mode != 3) {
                         total += event.calculatePan()
                         if (mode == 0 && (abs(total.x) > slop || abs(total.y) > slop)) {
-                            mode = if (abs(total.x) > abs(total.y)) 1 else 2
+                            mode = if (abs(total.x) <= abs(total.y)) 2 else if (seekable) 1 else 4
                         }
                         when (mode) {
                             1 -> {

@@ -29,6 +29,19 @@ public enum Player {
         topViewController()?.present(host, animated: true)
     }
 
+    /// A live TV channel, in the film player's live mode.
+    public static func live(_ channel: Channel) {
+        NotificationCenter.default.post(name: willPresent, object: nil)
+        current?.closePlayer(animated: false)
+        // The player shows `film.name`; a channel has no film, so it gets a bare one with just its name.
+        let json = try? JSONSerialization.data(withJSONObject: ["name": channel.name, "slug": "live:\(channel.url.absoluteString)"])
+        guard let film = json.flatMap({ try? JSONDecoder().decode(FilmDetail.self, from: $0) }) else { return }
+        let host = PlayerHostingController(model: PlayerModel(film: film, server: 0, index: 0, live: channel))
+        current = host
+        OrientationLock.rotate(to: .landscape)
+        topViewController()?.present(host, animated: true)
+    }
+
     /// "Phát" / "Tiếp tục": resumes the last watched episode, else the first playable one.
     /// Returns false when the film has no playable link.
     @discardableResult

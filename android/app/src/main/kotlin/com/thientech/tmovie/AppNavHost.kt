@@ -1,7 +1,15 @@
 package com.thientech.tmovie
 
 import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.border
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.offset
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,11 +24,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.LiveTv
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.VideoLibrary
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.LiveTv
+import androidx.compose.material.icons.outlined.LocalFireDepartment
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.rounded.Home
+import androidx.compose.material.icons.rounded.LiveTv
+import androidx.compose.material.icons.rounded.LocalFireDepartment
+import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -70,15 +83,18 @@ import com.thientech.tmovie.feature.detail.DetailScreen
 import com.thientech.tmovie.feature.home.HomeScreen
 import com.thientech.tmovie.feature.profile.ProfileScreen
 
-private data class TabItem(val route: Any, val label: String, val icon: ImageVector)
+/** Outlined icon at rest, the rounded filled one when selected (as iOS's SF Symbols do). */
+private data class TabItem(val route: Any, val label: String, val icon: ImageVector, val selectedIcon: ImageVector)
 
 private val tabs = listOf(
-    TabItem(HomeRoute, "Trang chủ", Icons.Filled.Home),
-    TabItem(NewHotRoute, "Mới & Hot", Icons.Filled.VideoLibrary),
-    TabItem(LiveRoute, "Truyền hình", Icons.Filled.LiveTv),
-    TabItem(SearchRoute, "Tìm kiếm", Icons.Filled.Search),
-    TabItem(ProfileRoute, "Của tôi", Icons.Filled.AccountCircle),
+    TabItem(HomeRoute, "Trang chủ", Icons.Outlined.Home, Icons.Rounded.Home),
+    TabItem(NewHotRoute, "Mới & Hot", Icons.Outlined.LocalFireDepartment, Icons.Rounded.LocalFireDepartment),
+    TabItem(LiveRoute, "Truyền hình", Icons.Outlined.LiveTv, Icons.Rounded.LiveTv),
+    TabItem(SearchRoute, "Tìm kiếm", Icons.Outlined.Search, Icons.Rounded.Search),
+    TabItem(ProfileRoute, "Của tôi", Icons.Outlined.Person, Icons.Rounded.Person),
 )
+private val TabWidth = 70.dp
+private val TabGap = 2.dp
 
 /**
  * One NavHost for every screen. Features only emit FilmRoute / ListRoute through [LocalNavigator];
@@ -150,35 +166,56 @@ fun AppNavHost(link: String?, onLinkHandled: () -> Unit) {
     }
 }
 
-/** Floating glass tab bar (the Android take on the iOS 26 Liquid Glass bar). */
+/**
+ * Floating glass tab bar (the Android take on the iOS 26 Liquid Glass bar): one highlight that
+ * springs between tabs, thin outlined icons that fill in when selected, a light tick on change.
+ */
 @Composable
 private fun BottomBar(selected: (TabItem) -> Boolean, onSelect: (TabItem) -> Unit, modifier: Modifier = Modifier) {
-    Row(
+    val haptics = LocalHapticFeedback.current
+    val index = tabs.indexOfFirst(selected)
+    val highlightX by animateDpAsState((TabWidth + TabGap) * index.coerceAtLeast(0), spring(dampingRatio = 0.75f, stiffness = 500f), label = "tab")
+    Box(
         modifier
             .navigationBarsPadding()
-            .padding(horizontal = 12.dp, vertical = 10.dp)
+            .padding(horizontal = 8.dp, vertical = 10.dp)
             .clip(CircleShape)
-            .background(Color(0xE6101418))
+            .background(Color(0xD90B0F12))
             .glass(CircleShape)
-            .padding(6.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
+            .border(0.5.dp, Color.White.copy(alpha = 0.12f), CircleShape)
+            .padding(5.dp),
     ) {
-        tabs.forEach { tab ->
-            val on = selected(tab)
-            val scale by animateFloatAsState(if (on) 1f else 0.92f, label = "tab")
-            Column(
-                Modifier
-                    .clip(CircleShape)
-                    .background(if (on) Color.White.copy(alpha = 0.14f) else Color.Transparent)
-                    .clickable { onSelect(tab) }
-                    .width(70.dp)
-                    .padding(vertical = 6.dp)
-                    .graphicsLayer { scaleX = scale; scaleY = scale },
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Icon(tab.icon, null, tint = if (on) TMovieColors.BrandLight else Color.White, modifier = Modifier.size(24.dp))
-                Text(tab.label, color = if (on) TMovieColors.BrandLight else Color.White, fontSize = 11.sp, fontWeight = FontWeight.Medium,
-                    modifier = Modifier.height(16.dp))
+        if (index >= 0) {
+            Box(
+                Modifier.offset(x = highlightX).width(TabWidth).height(52.dp)
+                    .clip(CircleShape).background(Color.White.copy(alpha = 0.12f)),
+            )
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(TabGap)) {
+            tabs.forEach { tab ->
+                val on = selected(tab)
+                val tint by animateColorAsState(if (on) TMovieColors.BrandLight else Color.White.copy(alpha = 0.62f), label = "tint")
+                val scale by animateFloatAsState(if (on) 1f else 0.94f, spring(dampingRatio = 0.6f, stiffness = 600f), label = "scale")
+                Column(
+                    Modifier
+                        .width(TabWidth)
+                        .height(52.dp)
+                        .clip(CircleShape)
+                        .clickable(remember { MutableInteractionSource() }, indication = null) {
+                            if (!on) haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            onSelect(tab)
+                        }
+                        .graphicsLayer { scaleX = scale; scaleY = scale },
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                ) {
+                    Icon(if (on) tab.selectedIcon else tab.icon, null, tint = tint, modifier = Modifier.size(22.dp))
+                    Text(
+                        tab.label, color = tint, fontSize = 10.5.sp, maxLines = 1, softWrap = false,
+                        fontWeight = if (on) FontWeight.SemiBold else FontWeight.Medium,
+                        modifier = Modifier.padding(top = 3.dp),
+                    )
+                }
             }
         }
     }

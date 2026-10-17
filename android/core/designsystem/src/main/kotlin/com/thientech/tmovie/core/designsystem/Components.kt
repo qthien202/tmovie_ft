@@ -2,6 +2,7 @@ package com.thientech.tmovie.core.designsystem
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -92,14 +93,15 @@ fun PlayWide(title: String, loading: Boolean, onClick: () -> Unit, modifier: Mod
 
 /** Outlined glass capsule for category pills; [selected] = an active filter, filled white. */
 @Composable
-fun Pill(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, selected: Boolean = false, trailing: (@Composable () -> Unit)? = null) {
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+fun Pill(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, selected: Boolean = false, onLongClick: (() -> Unit)? = null, trailing: (@Composable () -> Unit)? = null) {
     val interaction = rememberInteraction()
     Row(
         modifier
             .pressScale(interaction)
             .clip(CircleShape)
             .then(if (selected) Modifier.background(Color.White) else Modifier.glass(CircleShape))
-            .clickable(interaction, indication = null, onClick = onClick)
+            .combinedClickable(interaction, indication = null, onLongClick = onLongClick, onClick = onClick)
             .height(34.dp)
             .padding(horizontal = 14.dp),
         verticalAlignment = Alignment.CenterVertically,

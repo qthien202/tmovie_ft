@@ -1,58 +1,50 @@
-import AVKit
 import DesignSystem
 import Models
 import PlayerFeature
 import SwiftUI
 
-/// "Truyền hình": free-to-air channels from iptv-org's public playlists, plus M3U lists the user adds.
+/// "Truyền hình": iptv-org's channels by country and category (Việt Nam first), plus M3U lists the
+/// user adds. Lists play as published; only DASH, which AVPlayer doesn't play, is skipped.
+/// Search covers every country.
 public struct LiveTVView: View {
     public init() {}
 
-    struct Playlist: Hashable {
-        let title: String
-        let url: URL
-        var custom = false
-
-        /// Restreams of paid services (FPT Play, SCTV's DRM feed) and re-hosting sites: never in our lists.
-        static let unlicensed = ["fptplay.net", "sctvdrm", "dethich.pw", "freem3u.xyz", "vietanhtv"]
-
-        /// Our lists keep the broadcasters' own free streams; a list the user adds plays as it is.
-        func keep(_ c: Channel) -> Bool {
-            let u = c.url.absoluteString
-            if u.contains(".mpd") { return false }  // DASH: AVPlayer plays HLS only
-            return custom || (!Self.unlicensed.contains { u.contains($0) } && !(c.geoBlocked && title != "Việt Nam"))
-        }
-    }
-
-    static let builtIn = [
-        Playlist(title: "Việt Nam", url: URL(string: "https://iptv-org.github.io/iptv/countries/vn.m3u")!),
-        Playlist(title: "Phim", url: URL(string: "https://iptv-org.github.io/iptv/categories/movies.m3u")!),
-        Playlist(title: "Thể thao", url: URL(string: "https://iptv-org.github.io/iptv/categories/sports.m3u")!),
-        Playlist(title: "Giải trí", url: URL(string: "https://iptv-org.github.io/iptv/categories/entertainment.m3u")!),
-        Playlist(title: "Thiếu nhi", url: URL(string: "https://iptv-org.github.io/iptv/categories/kids.m3u")!),
-        Playlist(title: "Tài liệu", url: URL(string: "https://iptv-org.github.io/iptv/categories/documentary.m3u")!),
-        Playlist(title: "Âm nhạc", url: URL(string: "https://iptv-org.github.io/iptv/categories/music.m3u")!),
-        Playlist(title: "Tin tức", url: URL(string: "https://iptv-org.github.io/iptv/categories/news.m3u")!),
-    ]
+    /// iptv-org's whole index (~11k channels; every country and category in one file).
+    static let iptvOrg = URL(string: "https://iptv-org.github.io/iptv/index.m3u")!
+    /// Playlists load once per run: the index is 2.5 MB.
+    @MainActor static var cache: [URL: [Channel]] = [:]
 
     /// Lists the user added, one URL per line.
     @AppStorage("liveLists") private var customRaw = ""
-    @State private var selected = builtIn[0].url
-    @State private var loaded: [URL: [Channel]] = [:]
-    @State private var failed: Set<URL> = []
+    @State private var source = iptvOrg
+    @State private var country: String? = "vn"
+    @State private var category: String?
+    @State private var channels: [Channel]?
+    @State private var failed = false
     @State private var query = ""
     @State private var adding = false
     @State private var newURL = ""
-    @State private var playing: Channel?
-    @Namespace private var pill
+    @State private var picking: Picking?
+
+    enum Picking: String, Identifiable { case country, category; var id: Self { self } }
 
     private var custom: [URL] { customRaw.split(separator: "\n").compactMap { URL(string: String($0)) } }
-    private var lists: [Playlist] { Self.builtIn + custom.map { Playlist(title: $0.host() ?? $0.absoluteString, url: $0, custom: true) } }
-    private var playlist: Playlist { lists.first { $0.url == selected } ?? Self.builtIn[0] }
+    private var all: [Channel] { channels ?? [] }
+    private var countries: [String: Int] { all.reduce(into: [:]) { if let c = $1.country { $0[c, default: 0] += 1 } } }
+    private var categories: [String: Int] { all.reduce(into: [:]) { d, ch in ch.categories.forEach { d[$0, default: 0] += 1 } } }
+
+    private var shown: [Channel] {
+        let q = query.trimmingCharacters(in: .whitespaces)
+        return all.filter { c in
+            (!q.isEmpty || country == nil || c.country == country)  // search covers every country
+                && (category == nil || c.categories.contains(category!))
+                && (q.isEmpty || c.name.localizedCaseInsensitiveContains(q))
+        }
+    }
 
     public var body: some View {
         ScrollView {
-            LazyVStack(spacing: 16, pinnedViews: .sectionHeaders) {
+            LazyVStack(alignment: .leading, spacing: 12, pinnedViews: .sectionHeaders) {
                 Section { content } header: { pills }
             }
             .padding(.bottom, 24)
@@ -60,7 +52,7 @@ public struct LiveTVView: View {
         .scrollIndicators(.hidden)
         .background(Color.canvas)
         .navigationTitle("Truyền hình")
-        .searchable(text: $query, prompt: "Tìm kênh")
+        .searchable(text: $query, prompt: "Tìm trong \(all.count.formatted()) kênh")
         .toolbar {
             Button { newURL = ""; adding = true } label: { Image(systemName: "plus") }
                 .accessibilityLabel("Thêm danh sách kênh")
@@ -71,57 +63,70 @@ public struct LiveTVView: View {
             Button("Thêm") { add() }
             Button("Huỷ", role: .cancel) {}
         }
-        .task(id: selected) { await load(playlist) }
-        .fullScreenCover(item: $playing) { LivePlayer(channel: $0) }
+        .task(id: source) { await load() }
+        .sheet(item: $picking) { kind in
+            switch kind {
+            case .country:
+                OptionSheet(
+                    title: "Quốc gia", all: "Tất cả quốc gia", selected: country,
+                    // Việt Nam first, then by name.
+                    options: countries.keys.sorted { ($0 == "vn" ? 0 : 1, Self.countryName($0)) < ($1 == "vn" ? 0 : 1, Self.countryName($1)) }
+                        .map { ($0, "\(Self.flag($0)) \(Self.countryName($0))", countries[$0] ?? 0) }
+                ) { country = $0 }
+            case .category:
+                OptionSheet(
+                    title: "Thể loại", all: "Tất cả thể loại", selected: category,
+                    options: categories.keys.sorted { Self.categoryName($0) < Self.categoryName($1) }
+                        .map { ($0, Self.categoryName($0), categories[$0] ?? 0) }
+                ) { category = $0 }
+            }
+        }
     }
 
     @ViewBuilder private var content: some View {
-        if let channels = loaded[playlist.url] {
-            let q = query.trimmingCharacters(in: .whitespaces)
-            let shown = q.isEmpty ? channels : channels.filter { $0.name.localizedCaseInsensitiveContains(q) }
-            if shown.isEmpty {
-                message("Không có kênh nào")
-            } else {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 104), spacing: 12)], spacing: 16) {
-                    ForEach(shown) { c in
-                        Button { playing = c } label: { ChannelTile(channel: c) }.buttonStyle(.plain)
-                    }
-                }
-                .padding(.horizontal, 16)
-            }
-        } else if failed.contains(playlist.url) {
+        if failed {
             message("Không tải được danh sách kênh")
+        } else if channels == nil {
+            ProgressView().frame(maxWidth: .infinity).padding(32)
+        } else if shown.isEmpty {
+            message("Không có kênh nào")
         } else {
-            ProgressView().padding(32)
+            Text("\(shown.count.formatted()) kênh").font(.footnote).foregroundStyle(.secondary).padding(.horizontal, 16)
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 104), spacing: 12)], spacing: 16) {
+                ForEach(shown) { c in
+                    Button { Player.live(c) } label: { ChannelTile(channel: c) }.buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal, 16)
         }
     }
 
     private func message(_ text: String) -> some View {
-        Text(text).foregroundStyle(.secondary).padding(32)
+        Text(text).foregroundStyle(.secondary).frame(maxWidth: .infinity).padding(32)
     }
 
+    /// Same pills as Home's header.
     private var pills: some View {
         ScrollView(.horizontal) {
             HStack(spacing: 8) {
-                ForEach(lists, id: \.url) { p in
-                    Button { withAnimation(.snappy) { selected = p.url } } label: {
-                        Text(p.title)
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(p.url == playlist.url ? .black : .white)
-                            .padding(.horizontal, 14)
-                            .frame(height: 36)
-                            .background {
-                                if p.url == playlist.url { Capsule().fill(.white).matchedGeometryEffect(id: "pill", in: pill) }
-                            }
+                if !countries.isEmpty {
+                    pickerPill(country.map { "\(Self.flag($0)) \(Self.countryName($0))" } ?? "Quốc gia", selected: country != nil) { picking = .country }
+                }
+                if !categories.isEmpty {
+                    pickerPill(category.map(Self.categoryName) ?? "Thể loại", selected: category != nil) { picking = .category }
+                }
+                if !custom.isEmpty {
+                    Button { source = Self.iptvOrg } label: { Text("iptv-org").modifier(PillLabel(selected: source == Self.iptvOrg)) }
+                }
+                ForEach(custom, id: \.self) { url in
+                    Button { source = url; country = nil; category = nil } label: {
+                        Text(url.host() ?? url.absoluteString).modifier(PillLabel(selected: source == url))
                     }
-                    .buttonStyle(.plain)
-                    .contextMenu {
-                        if p.custom { Button("Xoá danh sách", systemImage: "trash", role: .destructive) { remove(p.url) } }
-                    }
+                    .contextMenu { Button("Xoá danh sách", systemImage: "trash", role: .destructive) { remove(url) } }
                 }
             }
-            .padding(4)
-            .glassSurface()
+            .buttonStyle(.plain)
+            .padding(.vertical, 2)
         }
         .contentMargins(.horizontal, 16, for: .scrollContent)
         .scrollIndicators(.hidden)
@@ -129,14 +134,27 @@ public struct LiveTVView: View {
         .background(Color.canvas)
     }
 
-    private func load(_ p: Playlist) async {
-        guard loaded[p.url] == nil else { return }
-        failed.remove(p.url)
+    private func pickerPill(_ title: String, selected: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 4) {
+                Text(title)
+                Image(systemName: "chevron.down").font(.caption.weight(.semibold))
+            }
+            .modifier(PillLabel(selected: selected))
+        }
+    }
+
+    private func load() async {
+        failed = false
+        if let hit = Self.cache[source] { channels = hit; return }
+        channels = nil
         do {
-            let data = try await URLSession.shared.data(from: p.url).0
-            loaded[p.url] = M3U.parse(String(decoding: data, as: UTF8.self)).filter(p.keep)
+            let data = try await URLSession.shared.data(from: source).0
+            let list = M3U.parse(String(decoding: data, as: UTF8.self)).filter { !$0.url.absoluteString.contains(".mpd") }
+            Self.cache[source] = list
+            channels = list
         } catch {
-            failed.insert(p.url)
+            failed = true
         }
     }
 
@@ -144,13 +162,74 @@ public struct LiveTVView: View {
         let text = newURL.trimmingCharacters(in: .whitespaces)
         guard let url = URL(string: text), ["http", "https"].contains(url.scheme ?? "") else { return }
         if !custom.contains(url) { customRaw = (custom + [url]).map(\.absoluteString).joined(separator: "\n") }
-        selected = url
+        source = url
+        country = nil
+        category = nil
     }
 
     private func remove(_ url: URL) {
         customRaw = custom.filter { $0 != url }.map(\.absoluteString).joined(separator: "\n")
-        loaded[url] = nil
-        if selected == url { selected = Self.builtIn[0].url }
+        Self.cache[url] = nil
+        if source == url { source = Self.iptvOrg }
+    }
+
+    // MARK: Names
+
+    /// iptv-org writes the UK as "uk".
+    private static func iso(_ code: String) -> String { code == "uk" ? "GB" : code.uppercased() }
+
+    static func countryName(_ code: String) -> String {
+        Locale(identifier: "vi").localizedString(forRegionCode: iso(code)) ?? iso(code)
+    }
+
+    static func flag(_ code: String) -> String {
+        String(String.UnicodeScalarView(iso(code).unicodeScalars.compactMap { UnicodeScalar(0x1F1E6 + $0.value - 65) }))
+    }
+
+    /// iptv-org's categories, in Vietnamese.
+    static func categoryName(_ c: String) -> String {
+        [
+            "General": "Tổng hợp", "News": "Tin tức", "Entertainment": "Giải trí", "Movies": "Phim", "Series": "Phim bộ",
+            "Sports": "Thể thao", "Kids": "Thiếu nhi", "Animation": "Hoạt hình", "Music": "Âm nhạc", "Documentary": "Tài liệu",
+            "Education": "Giáo dục", "Comedy": "Hài", "Culture": "Văn hoá", "Lifestyle": "Đời sống", "Classic": "Kinh điển",
+            "Family": "Gia đình", "Travel": "Du lịch", "Cooking": "Ẩm thực", "Outdoor": "Ngoài trời", "Science": "Khoa học",
+            "Business": "Kinh doanh", "Auto": "Ô tô", "Weather": "Thời tiết", "Relax": "Thư giãn", "Shop": "Mua sắm",
+            "Religious": "Tôn giáo", "Legislative": "Nghị viện", "Public": "Công cộng", "Interactive": "Tương tác",
+        ][c] ?? c
+    }
+}
+
+/// A list of choices with channel counts; nil is "all".
+private struct OptionSheet: View {
+    let title: String
+    let all: String
+    let selected: String?
+    let options: [(key: String, label: String, count: Int)]
+    let pick: (String?) -> Void
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            List {
+                row(nil, all, nil)
+                ForEach(options, id: \.key) { row($0.key, $0.label, $0.count) }
+            }
+            .navigationTitle(title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { Button("Xong") { dismiss() } }
+        }
+        .presentationDetents([.medium, .large])
+    }
+
+    private func row(_ key: String?, _ label: String, _ count: Int?) -> some View {
+        Button { pick(key); dismiss() } label: {
+            HStack {
+                Text(label).foregroundStyle(.primary)
+                Spacer()
+                if let count { Text(count.formatted()).foregroundStyle(.secondary) }
+                if key == selected { Image(systemName: "checkmark").foregroundStyle(Color.brand) }
+            }
+        }
     }
 }
 
@@ -176,50 +255,4 @@ private struct ChannelTile: View {
         }
         .contentShape(.rect)
     }
-}
-
-/// A channel full screen in AVKit's player, in landscape. Some playlists need their own User-Agent / Referer.
-private struct LivePlayer: View {
-    let channel: Channel
-    @Environment(\.dismiss) private var dismiss
-    @State private var player: AVPlayer?
-
-    var body: some View {
-        ZStack(alignment: .topLeading) {
-            Color.black.ignoresSafeArea()
-            if let player { AVPlayerControllerView(player: player).ignoresSafeArea() }
-            Button { dismiss() } label: {
-                Image(systemName: "xmark").font(.headline).foregroundStyle(.white).frame(width: 44, height: 44)
-            }
-            .glassSurface(in: .circle, interactive: true)
-            .padding()
-            .accessibilityLabel("Đóng")
-        }
-        .onAppear {
-            var headers: [String: String] = [:]
-            if let ua = channel.userAgent { headers["User-Agent"] = ua }
-            if let ref = channel.referrer { headers["Referer"] = ref }
-            let asset = AVURLAsset(url: channel.url, options: headers.isEmpty ? nil : ["AVURLAssetHTTPHeaderFieldsKey": headers])
-            let p = AVPlayer(playerItem: AVPlayerItem(asset: asset))
-            p.play()
-            player = p
-            OrientationLock.rotate(to: .landscape)
-        }
-        .onDisappear {
-            player?.pause()
-            OrientationLock.rotate(to: .portrait)
-        }
-    }
-}
-
-private struct AVPlayerControllerView: UIViewControllerRepresentable {
-    let player: AVPlayer
-
-    func makeUIViewController(context: Context) -> AVPlayerViewController {
-        let vc = AVPlayerViewController()
-        vc.player = player
-        return vc
-    }
-
-    func updateUIViewController(_ vc: AVPlayerViewController, context: Context) {}
 }

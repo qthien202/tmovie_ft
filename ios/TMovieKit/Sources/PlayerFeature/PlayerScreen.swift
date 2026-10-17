@@ -80,7 +80,8 @@ struct PlayerScreen: View {
             .onChanged { value in
                 if dragMode == 0 {
                     if abs(value.translation.width) > abs(value.translation.height) {
-                        dragMode = 1
+                        // Live TV doesn't seek: a sideways swipe does nothing.
+                        dragMode = model.isLive ? 4 : 1
                         dragStart = model.position
                     } else {
                         dragMode = value.startLocation.x < size.width / 2 ? 2 : 3
@@ -114,6 +115,7 @@ struct PlayerScreen: View {
     }
 
     private func doubleTap(forward: Bool) {
+        guard !model.isLive else { return }
         let seconds = (tapSeek?.forward == forward ? tapSeek?.seconds ?? 0 : 0) + 10
         model.seek(by: forward ? 10 : -10)
         let tap = TapSeek(forward: forward, seconds: seconds)

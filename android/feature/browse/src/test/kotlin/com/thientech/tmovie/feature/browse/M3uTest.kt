@@ -24,5 +24,8 @@ class M3uTest {
         assertEquals("Mozilla/5.0 (KHTML, like Gecko)", list[1].userAgent)
         assertEquals("https://ref/", list[1].referrer)
         assertEquals("https://b/chunklist", list[1].url)
+        assertEquals("vn", list[0].country)
+        assertEquals(listOf("General"), list[0].categories)
+        assertEquals(null, list[2].country)
     }
 }
