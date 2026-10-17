@@ -180,7 +180,7 @@ private fun BottomBar(selected: (TabItem) -> Boolean, onSelect: (TabItem) -> Uni
             .navigationBarsPadding()
             .padding(horizontal = 8.dp, vertical = 10.dp)
             .clip(CircleShape)
-            .background(Color(0xD90B0F12))
+            .background(Color(0xF00B0F12))
             .glass(CircleShape)
             .border(0.5.dp, Color.White.copy(alpha = 0.12f), CircleShape)
             .padding(5.dp),
