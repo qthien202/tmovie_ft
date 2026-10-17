@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.LiveTv
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.material3.Icon
@@ -52,6 +53,7 @@ import com.thientech.tmovie.core.ui.AccountCard
 import com.thientech.tmovie.core.ui.FilmRoute
 import com.thientech.tmovie.core.ui.HomeRoute
 import com.thientech.tmovie.core.ui.ListRoute
+import com.thientech.tmovie.core.ui.LiveRoute
 import com.thientech.tmovie.core.ui.LocalAnimatedScope
 import com.thientech.tmovie.core.ui.LocalNavigator
 import com.thientech.tmovie.core.ui.LocalSharedScope
@@ -61,6 +63,7 @@ import com.thientech.tmovie.core.ui.ProfileRoute
 import com.thientech.tmovie.core.ui.SearchRoute
 import com.thientech.tmovie.core.ui.route
 import com.thientech.tmovie.feature.browse.CatalogScreen
+import com.thientech.tmovie.feature.browse.LiveTvScreen
 import com.thientech.tmovie.feature.browse.NewHotScreen
 import com.thientech.tmovie.feature.browse.SearchScreen
 import com.thientech.tmovie.feature.detail.DetailScreen
@@ -72,6 +75,7 @@ private data class TabItem(val route: Any, val label: String, val icon: ImageVec
 private val tabs = listOf(
     TabItem(HomeRoute, "Trang chủ", Icons.Filled.Home),
     TabItem(NewHotRoute, "Mới & Hot", Icons.Filled.VideoLibrary),
+    TabItem(LiveRoute, "Truyền hình", Icons.Filled.LiveTv),
     TabItem(SearchRoute, "Tìm kiếm", Icons.Filled.Search),
     TabItem(ProfileRoute, "Của tôi", Icons.Filled.AccountCircle),
 )
@@ -119,6 +123,7 @@ fun AppNavHost(link: String?, onLinkHandled: () -> Unit) {
                     NavHost(nav, startDestination = HomeRoute) {
                         composable<HomeRoute> { CompositionLocalProvider(LocalAnimatedScope provides this) { HomeScreen() } }
                         composable<NewHotRoute> { CompositionLocalProvider(LocalAnimatedScope provides this) { NewHotScreen() } }
+                        composable<LiveRoute> { LiveTvScreen() }
                         composable<SearchRoute> { CompositionLocalProvider(LocalAnimatedScope provides this) { SearchScreen() } }
                         composable<ProfileRoute> { CompositionLocalProvider(LocalAnimatedScope provides this) { ProfileScreen(account = { AccountCard() }) } }
                         composable<FilmRoute> { back ->
@@ -151,7 +156,7 @@ private fun BottomBar(selected: (TabItem) -> Boolean, onSelect: (TabItem) -> Uni
     Row(
         modifier
             .navigationBarsPadding()
-            .padding(horizontal = 20.dp, vertical = 10.dp)
+            .padding(horizontal = 12.dp, vertical = 10.dp)
             .clip(CircleShape)
             .background(Color(0xE6101418))
             .glass(CircleShape)
@@ -166,7 +171,7 @@ private fun BottomBar(selected: (TabItem) -> Boolean, onSelect: (TabItem) -> Uni
                     .clip(CircleShape)
                     .background(if (on) Color.White.copy(alpha = 0.14f) else Color.Transparent)
                     .clickable { onSelect(tab) }
-                    .width(78.dp)
+                    .width(70.dp)
                     .padding(vertical = 6.dp)
                     .graphicsLayer { scaleX = scale; scaleY = scale },
                 horizontalAlignment = Alignment.CenterHorizontally,

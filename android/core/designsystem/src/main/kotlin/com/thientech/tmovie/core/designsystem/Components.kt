@@ -37,13 +37,13 @@ import coil3.request.crossfade
 
 /** Network image, cropped to fill, over a faint placeholder; Coil caches memory + disk. */
 @Composable
-fun RemoteImage(url: String?, modifier: Modifier = Modifier, contentDescription: String? = null) {
+fun RemoteImage(url: String?, modifier: Modifier = Modifier, contentDescription: String? = null, contentScale: ContentScale = ContentScale.Crop) {
     val context = LocalContext.current
     AsyncImage(
         // Crossfade so images settle in instead of popping.
         model = remember(url) { ImageRequest.Builder(context).data(url).crossfade(250).build() },
         contentDescription = contentDescription,
-        contentScale = ContentScale.Crop,
+        contentScale = contentScale,
         modifier = modifier.background(Color.White.copy(alpha = 0.06f)),
     )
 }

@@ -21,6 +21,18 @@ object Player {
         )
     }
 
+    /** A live TV channel ([LiveActivity]). */
+    fun live(context: Context, name: String, url: String, userAgent: String? = null, referrer: String? = null) {
+        context.startActivity(
+            Intent(context, LiveActivity::class.java)
+                .putExtra(LiveActivity.EXTRA_NAME, name)
+                .putExtra(LiveActivity.EXTRA_URL, url)
+                .putExtra(LiveActivity.EXTRA_USER_AGENT, userAgent)
+                .putExtra(LiveActivity.EXTRA_REFERRER, referrer)
+                .addFlags(if (context is android.app.Activity) 0 else Intent.FLAG_ACTIVITY_NEW_TASK),
+        )
+    }
+
     /** "Phát" / "Tiếp tục": the last watched episode, else the first playable one. False when nothing plays. */
     fun start(context: Context, detail: FilmDetail, fromDetail: Boolean = false): Boolean {
         val servers = detail.episodes.orEmpty().map { it.serverData.orEmpty() }
