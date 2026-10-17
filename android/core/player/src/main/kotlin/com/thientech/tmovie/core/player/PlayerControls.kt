@@ -104,6 +104,8 @@ fun PlayerControls(
     onNext: () -> Unit,
     /** Opens the film's detail page; null when the player was started from it. */
     onDetail: (() -> Unit)? = null,
+    /** A live channel: no seeking, a "TRỰC TIẾP" button that jumps back to the live edge instead. */
+    onLive: (() -> Unit)? = null,
 ) {
     Box(Modifier.fillMaxSize()) {
         // Scrims behind the bars.
@@ -156,7 +158,7 @@ fun PlayerControls(
         // Center transport.
         AnimatedVisibility(visible && playback.error == null, enter = fadeIn() + scaleIn(initialScale = 0.9f), exit = fadeOut() + scaleOut(targetScale = 0.9f), modifier = Modifier.align(Alignment.Center)) {
             Row(horizontalArrangement = Arrangement.spacedBy(48.dp), verticalAlignment = Alignment.CenterVertically) {
-                RoundIcon(Icons.Filled.Replay10, "Lùi 10 giây", size = 56) { playback.seekBy(-10_000); onInteract() }
+                if (onLive == null) RoundIcon(Icons.Filled.Replay10, "Lùi 10 giây", size = 56) { playback.seekBy(-10_000); onInteract() }
                 Box(
                     Modifier.size(84.dp).clip(CircleShape).glass(CircleShape).clickable { playback.toggle(); onInteract() },
                     contentAlignment = Alignment.Center,
@@ -170,15 +172,15 @@ fun PlayerControls(
                         )
                     }
                 }
-                RoundIcon(Icons.Filled.Forward10, "Tới 10 giây", size = 56) { playback.seekBy(10_000); onInteract() }
+                if (onLive == null) RoundIcon(Icons.Filled.Forward10, "Tới 10 giây", size = 56) { playback.seekBy(10_000); onInteract() }
             }
         }
 
         // Error (network errors are handled by the offline banner + auto-resume).
         playback.error?.takeIf { !(offline && it.errorCode in 2000..2999) }?.let {
             Column(Modifier.align(Alignment.Center).clip(RoundedCornerShape(20.dp)).glass(RoundedCornerShape(20.dp)).padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text("Không phát được tập này", color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
-                Text("Thử lại hoặc đổi server trong danh sách tập.", color = TMovieColors.Secondary, fontSize = 13.sp)
+                Text(if (onLive != null) "Kênh này hiện không phát được" else "Không phát được tập này", color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
+                Text(if (onLive != null) "Thử lại sau hoặc chọn kênh khác." else "Thử lại hoặc đổi server trong danh sách tập.", color = TMovieColors.Secondary, fontSize = 13.sp)
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     Chip("Thử lại", highlighted = true) { playback.retry() }
                     if (hasEpisodes) Chip("Đổi server") { onEpisodes() }
@@ -191,6 +193,12 @@ fun PlayerControls(
 
         // Bottom bar.
         AnimatedVisibility(visible, enter = fadeIn() + slideInVertically { it }, exit = fadeOut() + slideOutVertically { it }, modifier = Modifier.align(Alignment.BottomCenter)) {
+            if (onLive != null) {
+                Row(Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 20.dp)) {
+                    LiveBadge { onLive(); onInteract() }
+                }
+                return@AnimatedVisibility
+            }
             Column(Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 16.dp)) {
                 SeekBar(playback, onInteract)
                 Row(Modifier.fillMaxWidth().padding(top = 6.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -205,6 +213,19 @@ fun PlayerControls(
                 }
             }
         }
+    }
+}
+
+/** Red dot + "TRỰC TIẾP": tapping jumps back to the live edge. */
+@Composable
+private fun LiveBadge(onClick: () -> Unit) {
+    Row(
+        Modifier.clip(CircleShape).glass(CircleShape).clickable(onClick = onClick).padding(horizontal = 14.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Box(Modifier.size(8.dp).clip(CircleShape).background(Color(0xFFFF3B30)))
+        Text("TRỰC TIẾP", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
     }
 }
 

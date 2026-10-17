@@ -90,7 +90,7 @@ private fun Section(title: String, options: List<Pair<String, Boolean>>, onPick:
 @Composable
 fun SettingsPanel(
     playback: PlaybackState,
-    voiceOver: AiVoiceOver,
+    voiceOver: AiVoiceOver?,
     aspect: AspectMode,
     onAspect: (AspectMode) -> Unit,
     sleepMinutes: Int,
@@ -109,7 +109,7 @@ fun SettingsPanel(
             Section("Âm thanh", audio.map { it.label to it.selected }) { audio[it].apply() }
             val subs = playback.subtitleOptions()
             Section("Phụ đề", subs.map { it.label to it.selected }) { subs[it].apply() }
-            VoiceOverSection(voiceOver)
+            voiceOver?.let { VoiceOverSection(it) }
             Section("Khung hình", AspectMode.entries.map { it.label to (it == aspect) }) { onAspect(AspectMode.entries[it]) }
             Section("Hẹn giờ tắt", sleepChoices.map { it.second to (it.first == sleepMinutes) }) { onSleep(sleepChoices[it].first) }
         }

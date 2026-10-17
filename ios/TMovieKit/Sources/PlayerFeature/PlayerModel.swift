@@ -16,6 +16,9 @@ final class PlayerModel {
     enum Panel { case none, settings, episodes }
 
     let film: FilmDetail
+    /// A live TV channel instead of an episode: no seeking, resume, history or voice-over.
+    let live: Channel?
+    var isLive: Bool { live != nil }
     private(set) var server: Int
     private(set) var index: Int
 
@@ -56,8 +59,9 @@ final class PlayerModel {
     var pip: AVPictureInPictureController?
     let voiceOver = AIVoiceOver()
 
-    init(film: FilmDetail, server: Int, index: Int) {
+    init(film: FilmDetail, server: Int, index: Int, live: Channel? = nil) {
         self.film = film
+        self.live = live
         self.server = server
         self.index = index
         player.allowsExternalPlayback = true
@@ -70,7 +74,7 @@ final class PlayerModel {
         }
         pathMonitor.start(queue: DispatchQueue(label: "tmovie.path"))
         load()
-        voiceOver.attach(player) { [weak self] in self?.makeScoutItem() }
+        if live == nil { voiceOver.attach(player) { [weak self] in self?.makeScoutItem() } }
     }
 
     // MARK: Episodes
@@ -96,6 +100,7 @@ final class PlayerModel {
     }
 
     private func load(at resumeOverride: Double? = nil) {
+        if let live { return loadLive(live) }
         guard let ep = episode, let url = ep.streamURL else { return }
         failed = false
         ended = false
@@ -132,6 +137,32 @@ final class PlayerModel {
         player.playImmediately(atRate: speed)
         updateNowPlaying()
         save()
+        interact()
+    }
+
+    /// A channel straight from its playlist (no ad filter), with the playlist's own User-Agent / Referer.
+    private func loadLive(_ channel: Channel) {
+        failed = false
+        buffering = true
+        var headers: [String: String] = [:]
+        if let ua = channel.userAgent { headers["User-Agent"] = ua }
+        if let ref = channel.referrer { headers["Referer"] = ref }
+        let asset = AVURLAsset(url: channel.url, options: headers.isEmpty ? nil : ["AVURLAssetHTTPHeaderFieldsKey": headers])
+        let item = AVPlayerItem(asset: asset)
+        item.preferredPeakBitRate = peakBitRate
+        item.externalMetadata = [metadata(.commonIdentifierTitle, channel.name)]
+        player.replaceCurrentItem(with: item)
+        player.playImmediately(atRate: 1)
+        updateNowPlaying()
+        interact()
+    }
+
+    /// Back to the live edge (after a pause or a stall).
+    func goLive() {
+        if let edge = player.currentItem?.seekableTimeRanges.last?.timeRangeValue.end, edge.isValid {
+            player.seek(to: edge)
+        }
+        player.playImmediately(atRate: 1)
         interact()
     }
 
@@ -281,7 +312,7 @@ final class PlayerModel {
     }
 
     func save() {
-        guard let ep = episode else { return }
+        guard live == nil, let ep = episode else { return }
         lastSave = .now
         Library.save(
             film: FilmItem(film), server: server, episode: index, episodeName: ep.name ?? "", episodeSlug: ep.slug ?? "",

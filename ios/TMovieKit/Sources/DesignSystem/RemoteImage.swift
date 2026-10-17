@@ -7,21 +7,24 @@ public struct RemoteImage: View {
     let url: URL?
     /// Longest edge in points to decode at; keeps posters from decoding at full size.
     let maxPoints: CGFloat
+    /// Whole image on a clear background (logos), instead of filling the frame (posters).
+    let fit: Bool
 
     @State private var image: UIImage?
     @Environment(\.displayScale) private var scale
 
-    public init(url: URL?, maxPoints: CGFloat = 400) {
+    public init(url: URL?, maxPoints: CGFloat = 400, fit: Bool = false) {
         self.url = url
         self.maxPoints = maxPoints
+        self.fit = fit
     }
 
     public var body: some View {
         Rectangle()
-            .fill(Color.white.opacity(0.06))
+            .fill(fit ? Color.clear : Color.white.opacity(0.06))
             .overlay {
                 if let image {
-                    Image(uiImage: image).resizable().scaledToFill().transition(.opacity)
+                    Image(uiImage: image).resizable().aspectRatio(contentMode: fit ? .fit : .fill).transition(.opacity)
                 } else if url != nil {
                     Color.clear.shimmering()
                 }

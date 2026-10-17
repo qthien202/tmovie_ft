@@ -34,22 +34,24 @@ struct RootView: View {
 struct MainTabs: View {
     /// Reopens on the last tab.
     @AppStorage("tab") private var tab = 0
-    /// One navigation stack per tab: home, new & hot, profile, search.
-    @State private var routers = [RouterPath(), RouterPath(), RouterPath(), RouterPath()]
+    /// One navigation stack per tab: home, new & hot, profile, search, live TV.
+    @State private var routers = [RouterPath(), RouterPath(), RouterPath(), RouterPath(), RouterPath()]
 
     var body: some View {
         Group {
             if #available(iOS 18, *) {
                 TabView(selection: $tab) {
-                    Tab("Trang chủ", systemImage: "house.fill", value: 0) { stack(0) { HomeView() } }
-                    Tab("Mới & Hot", systemImage: "play.rectangle.on.rectangle.fill", value: 1) { stack(1) { NewHotView() } }
-                    Tab("Của tôi", systemImage: "person.crop.circle", value: 2) { stack(2) { ProfileView() } }
+                    Tab(value: 0) { stack(0) { HomeView() } } label: { tabLabel("Trang chủ", "house") }
+                    Tab(value: 1) { stack(1) { NewHotView() } } label: { tabLabel("Mới & Hot", "flame") }
+                    Tab(value: 4) { stack(4) { LiveTVView() } } label: { tabLabel("Truyền hình", "play.tv") }
+                    Tab(value: 2) { stack(2) { ProfileView() } } label: { tabLabel("Của tôi", "person.crop.circle") }
                     Tab(value: 3, role: .search) { stack(3) { SearchView() } }
                 }
             } else {
                 TabView(selection: $tab) {
-                    stack(0) { HomeView() }.tabItem { Label("Trang chủ", systemImage: "house.fill") }.tag(0)
-                    stack(1) { NewHotView() }.tabItem { Label("Mới & Hot", systemImage: "play.rectangle.on.rectangle.fill") }.tag(1)
+                    stack(0) { HomeView() }.tabItem { Label("Trang chủ", systemImage: "house") }.tag(0)
+                    stack(1) { NewHotView() }.tabItem { Label("Mới & Hot", systemImage: "flame") }.tag(1)
+                    stack(4) { LiveTVView() }.tabItem { Label("Truyền hình", systemImage: "play.tv") }.tag(4)
                     stack(2) { ProfileView() }.tabItem { Label("Của tôi", systemImage: "person.crop.circle") }.tag(2)
                     stack(3) { SearchView() }.tabItem { Label("Tìm kiếm", systemImage: "magnifyingglass") }.tag(3)
                 }
@@ -69,6 +71,11 @@ struct MainTabs: View {
             if let link = UserDefaults.standard.string(forKey: "openURL"), let url = URL(string: link) { await open(url) }
         }
         #endif
+    }
+
+    /// Thin outline symbols: the system's filled ones look heavy in the glass bar.
+    private func tabLabel(_ title: String, _ symbol: String) -> some View {
+        Label(title, systemImage: symbol).environment(\.symbolVariants, .none)
     }
 
     private func stack(_ i: Int, @ViewBuilder root: () -> some View) -> some View {

@@ -21,14 +21,14 @@ object Player {
         )
     }
 
-    /** A live TV channel ([LiveActivity]). */
+    /** A live TV channel, in the film player's live mode. */
     fun live(context: Context, name: String, url: String, userAgent: String? = null, referrer: String? = null) {
         context.startActivity(
-            Intent(context, LiveActivity::class.java)
-                .putExtra(LiveActivity.EXTRA_NAME, name)
-                .putExtra(LiveActivity.EXTRA_URL, url)
-                .putExtra(LiveActivity.EXTRA_USER_AGENT, userAgent)
-                .putExtra(LiveActivity.EXTRA_REFERRER, referrer)
+            Intent(context, PlayerActivity::class.java)
+                .putExtra(PlayerActivity.EXTRA_LIVE_NAME, name)
+                .putExtra(PlayerActivity.EXTRA_LIVE_URL, url)
+                .putExtra(PlayerActivity.EXTRA_LIVE_USER_AGENT, userAgent)
+                .putExtra(PlayerActivity.EXTRA_LIVE_REFERRER, referrer)
                 .addFlags(if (context is android.app.Activity) 0 else Intent.FLAG_ACTIVITY_NEW_TASK),
         )
     }

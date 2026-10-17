@@ -23,7 +23,8 @@ let project = Project(
                 "UISupportedInterfaceOrientations": ["UIInterfaceOrientationPortrait", "UIInterfaceOrientationLandscapeLeft", "UIInterfaceOrientationLandscapeRight"],
                 "UIBackgroundModes": ["audio"],
                 // Downloaded episodes are served to AVPlayer from http://127.0.0.1 (LocalHLSServer).
-                "NSAppTransportSecurity": ["NSAllowsLocalNetworking": true],
+                // Live TV playlists list some channels over plain http.
+                "NSAppTransportSecurity": ["NSAllowsLocalNetworking": true, "NSAllowsArbitraryLoadsForMedia": true],
                 "CFBundleURLTypes": [["CFBundleURLSchemes": ["tmovie"]]],  // tmovie://phim/{slug}  // AVKit PiP / background audio in phase 2
             ]),
             sources: ["App/Sources/**"],

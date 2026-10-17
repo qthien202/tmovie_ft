@@ -95,7 +95,7 @@ struct PlayerControls: View {
 
     private var centerTransport: some View {
         HStack(spacing: 72) {
-            IconButton(icon: "gobackward.10", label: "Lùi 10 giây", size: 64, weight: .regular) { model.seek(by: -10) }
+            if !model.isLive { IconButton(icon: "gobackward.10", label: "Lùi 10 giây", size: 64, weight: .regular) { model.seek(by: -10) } }
             Button { model.toggle() } label: {
                 Image(systemName: model.ended ? "arrow.counterclockwise" : model.isPlaying ? "pause.fill" : "play.fill")
                     .font(.system(size: 56, weight: .semibold))
@@ -105,13 +105,40 @@ struct PlayerControls: View {
             }
             .buttonStyle(.plain)
             .accessibilityLabel(model.isPlaying ? "Tạm dừng" : "Phát")
-            IconButton(icon: "goforward.10", label: "Tới 10 giây", size: 64, weight: .regular) { model.seek(by: 10) }
+            if !model.isLive { IconButton(icon: "goforward.10", label: "Tới 10 giây", size: 64, weight: .regular) { model.seek(by: 10) } }
         }
         .foregroundStyle(.white)
         .shadow(color: .black.opacity(0.35), radius: 12)
     }
 
-    private var bottomBar: some View {
+    @ViewBuilder private var bottomBar: some View {
+        if model.isLive { liveBar } else { filmBar }
+    }
+
+    /// Live TV: a "TRỰC TIẾP" button back to the live edge instead of the seek bar.
+    private var liveBar: some View {
+        HStack(spacing: 36) {
+            Button { model.goLive() } label: {
+                HStack(spacing: 8) {
+                    Circle().fill(.red).frame(width: 8, height: 8)
+                    Text("TRỰC TIẾP").font(.footnote.weight(.bold)).tracking(1)
+                }
+                .padding(.horizontal, 14)
+                .frame(height: 36)
+                .glassSurface(interactive: true)
+            }
+            .accessibilityLabel("Về phát trực tiếp")
+            Spacer()
+            Button { model.locked = true; model.interact() } label: { ActionLabel(icon: "lock.open", title: "Khoá") }
+            Button { model.panel = .settings; model.interact() } label: { ActionLabel(icon: "slider.horizontal.3", title: "Cài đặt") }
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(.white)
+        .padding(.horizontal, 24)
+        .padding(.bottom, 8)
+    }
+
+    private var filmBar: some View {
         VStack(spacing: 6) {
             HStack(spacing: 14) {
                 Text(formatTime(model.position)).font(.footnote.monospacedDigit())
@@ -164,8 +191,8 @@ struct PlayerControls: View {
 
     private var errorCard: some View {
         VStack(spacing: 12) {
-            Text("Không phát được tập này").font(.headline)
-            Text("Thử lại hoặc đổi server trong danh sách tập.").font(.footnote).foregroundStyle(.secondary)
+            Text(model.isLive ? "Kênh này hiện không phát được" : "Không phát được tập này").font(.headline)
+            Text(model.isLive ? "Thử lại sau hoặc chọn kênh khác." : "Thử lại hoặc đổi server trong danh sách tập.").font(.footnote).foregroundStyle(.secondary)
             HStack(spacing: 10) {
                 Chip(text: "Thử lại", highlighted: true) { model.retry() }
                 if model.hasEpisodeList { Chip(text: "Đổi server") { model.panel = .episodes } }
@@ -427,7 +454,7 @@ private struct SettingsPanel: View {
                     }
                     OptionRow(title: "Âm thanh", options: model.audioOptions.map { ($0.name, $0.selected, $0.select) })
                     OptionRow(title: "Phụ đề", options: model.subtitleOptions.map { ($0.name, $0.selected, $0.select) })
-                    voiceOverRows
+                    if !model.isLive { voiceOverRows }
                     OptionRow(title: "Khung hình", options: [("Vừa", !model.fill, { model.fill = false }), ("Phóng", model.fill, { model.fill = true })])
                     OptionRow(title: "Hẹn giờ tắt", options: [(0, "Tắt"), (15, "15 phút"), (30, "30 phút"), (45, "45 phút"), (60, "60 phút"), (-1, "Hết tập này")].map { m, label in
                         (label, model.sleepMinutes == m, { model.setSleep(minutes: m) })

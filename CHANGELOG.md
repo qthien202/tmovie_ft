@@ -8,6 +8,17 @@ Vietnamese block free of Markdown styling (use emoji + "•" bullets).
 
 Every new feature/release must add a `## vX.Y.Z` section with both parts.
 
+## v1.8.1
+
+"Truyền hình" now reads iptv-org's whole index (~11,200 channels, ~180 countries, 29 categories) with Quốc gia / Thể loại pickers (Việt Nam by default, picker overlay shared with Home) and search across every country; lists play as published (only DASH, unsupported, is skipped). Channels open in the film player's live mode: same controls, gestures, lock, quality, aspect, sleep timer and PiP, with a "TRỰC TIẾP" button instead of the seek bar, and no episodes, history or voice-over. Android's tab bar is redrawn: outlined icons that fill when selected, a springy highlight and a light haptic tick. iOS gets the same Truyền hình tab and live mode.
+
+<!-- app:vi -->
+✨ Mới
+• Truyền hình: hơn 11.000 kênh từ khoảng 180 quốc gia. Lọc theo Quốc gia, Thể loại (29 thể loại), tìm kênh trong toàn bộ danh sách.
+• Xem kênh bằng trình phát giống khi xem phim (khoá màn hình, chất lượng, hẹn giờ, hình trong hình), có nút TRỰC TIẾP để về đúng chỗ đang phát.
+• Thanh tab dưới được làm mới: icon mảnh và gọn hơn, chuyển tab mượt hơn.
+<!-- /app:vi -->
+
 ## v1.8.0
 
 Android "Truyền hình" tab: live channels from iptv-org's public playlists (Việt Nam, Thể thao, Tin tức), with logos and search, played full screen by a new LiveActivity (HLS, per-channel User-Agent / Referer, jumps back to the live edge after a stall). Our lists skip restreams of paid services (FPT Play, SCTV) and re-hosting sites, plus geo-blocked foreign channels; "+" adds any M3U playlist URL, played as it is (long-press removes it). The tab bar now has five tabs.

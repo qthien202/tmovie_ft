@@ -125,6 +125,15 @@ private fun CountryTile(flag: String, name: String, onClick: () -> Unit) {
 private fun GenrePicker(selected: String?, kind: PhimApi.Taxonomy, showsAll: Boolean, onDismiss: () -> Unit, onPick: (FilmCategory?) -> Unit) {
     var genres by remember { mutableStateOf<List<FilmCategory>>(emptyList()) }
     LaunchedEffect(Unit) { genres = runCatching { PhimApi.shared.taxonomy(kind) }.getOrDefault(emptyList()) }
+    PickerOverlay(
+        (if (showsAll) listOf(null to "Tất cả") else emptyList()) + genres.map { it.slug to it.name.orEmpty() },
+        selected, onDismiss,
+    ) { slug -> onPick(genres.firstOrNull { it.slug == slug }) }
+}
+
+/** Full-screen list of choices over a dark scrim, the selected one large and bright. Keys may be null ("Tất cả"). */
+@Composable
+fun PickerOverlay(options: List<Pair<String?, String>>, selected: String?, onDismiss: () -> Unit, onPick: (String?) -> Unit) {
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
         Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.88f))) {
             LazyColumn(
@@ -133,31 +142,21 @@ private fun GenrePicker(selected: String?, kind: PhimApi.Taxonomy, showsAll: Boo
                 verticalArrangement = Arrangement.spacedBy(22.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                if (showsAll) item("all") {
-                    Text(
-                        "Tất cả",
-                        color = if (selected == null) Color.White else Color.White.copy(alpha = 0.6f),
-                        fontSize = if (selected == null) 24.sp else 20.sp,
-                        fontWeight = if (selected == null) FontWeight.Bold else FontWeight.Medium,
-                        modifier = Modifier.fillMaxWidth().clickable { onPick(null) },
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                    )
-                }
-                itemsIndexed(genres, key = { _, g -> g.slug.orEmpty() }) { i, g ->
+                itemsIndexed(options, key = { _, o -> o.first ?: "" }) { i, (key, label) ->
                     // Staggered rise-in.
                     var shown by remember { mutableStateOf(false) }
                     LaunchedEffect(Unit) { delay(minOf(i, 14) * 25L); shown = true }
-                    val p by animateFloatAsState(if (shown) 1f else 0f, cinematic(), label = "genre")
-                    val isSelected = g.slug == selected
+                    val p by animateFloatAsState(if (shown) 1f else 0f, cinematic(), label = "option")
+                    val isSelected = key == selected
                     Text(
-                        g.name.orEmpty(),
+                        label,
                         color = if (isSelected) Color.White else Color.White.copy(alpha = 0.6f),
                         fontSize = if (isSelected) 24.sp else 20.sp,
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                         modifier = Modifier
                             .fillMaxWidth()
                             .graphicsLayer { alpha = p; translationY = (1 - p) * 16.dp.toPx() }
-                            .clickable { onPick(g) },
+                            .clickable { onPick(key) },
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                     )
                 }

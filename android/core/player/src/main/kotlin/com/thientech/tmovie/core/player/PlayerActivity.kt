@@ -37,6 +37,8 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import androidx.media3.common.MimeTypes
+import androidx.media3.common.PlaybackException
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import com.thientech.tmovie.core.voiceover.AiVoiceOver
@@ -60,14 +62,16 @@ private enum class Panel { None, Settings, Episodes }
 @OptIn(UnstableApi::class)
 class PlayerActivity : ComponentActivity() {
     private lateinit var exo: ExoPlayer
-    private lateinit var voiceOver: AiVoiceOver
+    private var voiceOver: AiVoiceOver? = null  // films only
     private var session: MediaSession? = null
     private var inPip by mutableStateOf(false)
     private var saveNow: () -> Unit = {}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val detail = PhimApi.json.decodeFromString(FilmDetail.serializer(), intent.getStringExtra(EXTRA_DETAIL) ?: return finish())
+        val liveUrl = intent.getStringExtra(EXTRA_LIVE_URL)
+        val detail = intent.getStringExtra(EXTRA_DETAIL)?.let { PhimApi.json.decodeFromString(FilmDetail.serializer(), it) }
+        if (detail == null && liveUrl == null) return finish()
         val startServer = intent.getIntExtra(EXTRA_SERVER, 0)
         val startIndex = intent.getIntExtra(EXTRA_INDEX, 0)
 
@@ -76,12 +80,20 @@ class PlayerActivity : ComponentActivity() {
             hide(WindowInsetsCompat.Type.systemBars())
             systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
-        exo = StreamPlayer.create(this)
-        voiceOver = AiVoiceOver(this, exo) { StreamPlayer.create(this, preview = true) }
+        exo = if (liveUrl != null) {
+            StreamPlayer.create(this, live = true, userAgent = intent.getStringExtra(EXTRA_LIVE_USER_AGENT), referrer = intent.getStringExtra(EXTRA_LIVE_REFERRER))
+        } else {
+            StreamPlayer.create(this).also { exo -> voiceOver = AiVoiceOver(this, exo) { StreamPlayer.create(this, preview = true) } }
+        }
         session = MediaSession.Builder(this, exo).build()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) setPictureInPictureParams(pipParams())
 
-        setContent { TMovieTheme { PlayerScreen(detail, startServer, startIndex) } }
+        setContent {
+            TMovieTheme {
+                if (detail != null) PlayerScreen(detail, startServer, startIndex)
+                else LiveScreen(intent.getStringExtra(EXTRA_LIVE_NAME).orEmpty(), liveUrl!!)
+            }
+        }
     }
 
     @Composable
@@ -137,7 +149,7 @@ class PlayerActivity : ComponentActivity() {
             val resume = record?.positions?.get(ep.slug.orEmpty()) ?: record?.positions?.get(ep.name.orEmpty()) ?: 0.0
             val total = record?.durations?.get(ep.slug.orEmpty()) ?: 0.0
             if (resume > 5 && (total == 0.0 || resume < total - 20)) exo.seekTo((resume * 1000).toLong())
-            voiceOver.load(url)
+            voiceOver?.load(url)
             exo.prepare()
             exo.play()
             save()
@@ -278,6 +290,110 @@ class PlayerActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * A live TV channel with the film player's controls, gestures and settings: no seeking (a
+     * "TRỰC TIẾP" button rejoins the live edge), episodes, history or voice-over.
+     */
+    @Composable
+    private fun LiveScreen(name: String, url: String) {
+        val playback = rememberPlaybackState(exo)
+        val gestures = remember { PlayerGestures(this, playback).apply { seekable = false } }
+        var controlsVisible by remember { mutableStateOf(true) }
+        var lastInteraction by remember { mutableLongStateOf(System.currentTimeMillis()) }
+        var locked by remember { mutableStateOf(false) }
+        var settings by remember { mutableStateOf(false) }
+        var aspect by remember { mutableStateOf(AspectMode.Fit) }
+        var sleepMinutes by remember { mutableIntStateOf(0) }
+        fun interact() { lastInteraction = System.currentTimeMillis(); controlsVisible = true }
+        val online by rememberOnline()
+
+        LaunchedEffect(Unit) {
+            val uri = Uri.parse(url)
+            // Playlist URLs often hide the .m3u8 (`/live/kgtv`, `chunklist`): anything not obviously a file is HLS.
+            val ext = uri.path.orEmpty().substringAfterLast('/').substringAfterLast('.', "").lowercase()
+            val hls = ext !in setOf("mp4", "mkv", "ts", "webm", "mp3", "aac")
+            exo.setMediaItem(
+                MediaItem.Builder().setUri(uri).apply { if (hls) setMimeType(MimeTypes.APPLICATION_M3U8) }
+                    .setMediaMetadata(MediaMetadata.Builder().setTitle(name).build()).build(),
+            )
+            exo.prepare()
+            exo.play()
+        }
+        // Fell behind the live window (a stall), or the network is back: rejoin the live edge.
+        LaunchedEffect(playback.error, online) {
+            val e = playback.error ?: return@LaunchedEffect
+            if (e.errorCode == PlaybackException.ERROR_CODE_BEHIND_LIVE_WINDOW || (online && e.errorCode in 2000..2999)) {
+                delay(500)
+                exo.seekToDefaultPosition()
+                playback.retry()
+            }
+        }
+        LaunchedEffect(playback.isPlaying) {
+            if (playback.isPlaying) window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            else window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+        LaunchedEffect(lastInteraction, playback.isPlaying, settings) {
+            if (!playback.isPlaying || settings) return@LaunchedEffect
+            delay(3_000)
+            controlsVisible = false
+        }
+        LaunchedEffect(sleepMinutes) {
+            if (sleepMinutes <= 0) return@LaunchedEffect
+            delay(sleepMinutes * 60_000L)
+            exo.pause()
+            sleepMinutes = 0
+            controlsVisible = true
+        }
+        BackHandler(enabled = settings || locked) {
+            if (settings) settings = false else { locked = false; interact() }
+        }
+
+        Box(Modifier.fillMaxSize().background(Color.Black)) {
+            AndroidView(
+                factory = { ctx -> PlayerView(ctx).apply { useController = false; keepScreenOn = true; player = exo } },
+                update = {
+                    it.resizeMode = when {
+                        aspect == AspectMode.Fill -> AspectRatioFrameLayout.RESIZE_MODE_FILL
+                        aspect == AspectMode.Zoom || gestures.zoomed -> AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+                        else -> AspectRatioFrameLayout.RESIZE_MODE_FIT
+                    }
+                },
+                modifier = Modifier.fillMaxSize().then(
+                    if (inPip) Modifier else gestures.modifier(enabled = !locked && !settings) {
+                        if (settings) settings = false else if (controlsVisible) controlsVisible = false else interact()
+                    },
+                ),
+            )
+            if (!inPip) {
+                PlayerControls(
+                    playback = playback, gestures = gestures, title = name, episodeName = "",
+                    nextEpisodeName = null, nextThumb = null, visible = controlsVisible, locked = locked,
+                    hasEpisodes = false, offline = !online,
+                    sleepLabel = if (sleepMinutes > 0) "Hẹn giờ: $sleepMinutes phút" else null,
+                    onBack = { finish() }, onInteract = ::interact,
+                    onToggleLock = { locked = !locked; interact() },
+                    onPip = { enterPip() },
+                    onSettings = { settings = true; interact() },
+                    onEpisodes = {}, onNext = {},
+                    onLive = { exo.seekToDefaultPosition(); exo.play() },
+                )
+                AnimatedVisibility(
+                    settings,
+                    enter = slideInHorizontally { it } + fadeIn(),
+                    exit = slideOutHorizontally { it } + fadeOut(),
+                    modifier = Modifier.align(Alignment.CenterEnd),
+                ) {
+                    SettingsPanel(
+                        playback = playback, voiceOver = null, aspect = aspect,
+                        onAspect = { aspect = it; gestures.zoomed = it == AspectMode.Zoom },
+                        sleepMinutes = sleepMinutes, onSleep = { sleepMinutes = it.coerceAtLeast(0) },
+                        onClose = { settings = false },
+                    )
+                }
+            }
+        }
+    }
+
     private fun pipParams(): PictureInPictureParams {
         val b = PictureInPictureParams.Builder().setAspectRatio(Rational(16, 9))
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) b.setAutoEnterEnabled(true).setSeamlessResizeEnabled(true)
@@ -294,6 +410,13 @@ class PlayerActivity : ComponentActivity() {
         if (exo.isPlaying && Build.VERSION.SDK_INT in Build.VERSION_CODES.O until Build.VERSION_CODES.S) enterPip()
     }
 
+    // singleTask: a film or channel picked while this one is open (e.g. in PiP) replaces it.
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        recreate()
+    }
+
     override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
         inPip = isInPictureInPictureMode
@@ -308,7 +431,7 @@ class PlayerActivity : ComponentActivity() {
     override fun onDestroy() {
         saveNow()
         session?.release()
-        voiceOver.release()
+        voiceOver?.release()
         exo.release()
         super.onDestroy()
     }
@@ -318,5 +441,9 @@ class PlayerActivity : ComponentActivity() {
         const val EXTRA_SERVER = "server"
         const val EXTRA_INDEX = "index"
         const val EXTRA_FROM_DETAIL = "fromDetail"
+        const val EXTRA_LIVE_URL = "liveUrl"
+        const val EXTRA_LIVE_NAME = "liveName"
+        const val EXTRA_LIVE_USER_AGENT = "liveUserAgent"
+        const val EXTRA_LIVE_REFERRER = "liveReferrer"
     }
 }
