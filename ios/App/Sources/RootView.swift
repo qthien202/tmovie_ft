@@ -41,10 +41,10 @@ struct MainTabs: View {
         Group {
             if #available(iOS 18, *) {
                 TabView(selection: $tab) {
-                    Tab(value: 0) { stack(0) { HomeView() } } label: { tabLabel("Trang chủ", "house") }
-                    Tab(value: 1) { stack(1) { NewHotView() } } label: { tabLabel("Mới & Hot", "flame") }
-                    Tab(value: 4) { stack(4) { LiveTVView() } } label: { tabLabel("Truyền hình", "play.tv") }
-                    Tab(value: 2) { stack(2) { ProfileView() } } label: { tabLabel("Của tôi", "person.crop.circle") }
+                    Tab(value: 0) { stack(0) { HomeView() } } label: { tabLabel("Trang chủ", "house.fill") }
+                    Tab(value: 1) { stack(1) { NewHotView() } } label: { tabLabel("Mới & Hot", "flame.fill") }
+                    Tab(value: 4) { stack(4) { LiveTVView() } } label: { tabLabel("Truyền hình", "play.tv.fill") }
+                    Tab(value: 2) { stack(2) { ProfileView() } } label: { tabLabel("Của tôi", "person.fill") }
                     Tab(value: 3, role: .search) { stack(3) { SearchView() } }
                 }
             } else {
@@ -73,9 +73,9 @@ struct MainTabs: View {
         #endif
     }
 
-    /// Thin outline symbols: the system's filled ones look heavy in the glass bar.
+    /// Icons only: the glass bar reads cleaner without titles (VoiceOver still reads them).
     private func tabLabel(_ title: String, _ symbol: String) -> some View {
-        Label(title, systemImage: symbol).environment(\.symbolVariants, .none)
+        Label(title, systemImage: symbol).labelStyle(.iconOnly)
     }
 
     private func stack(_ i: Int, @ViewBuilder root: () -> some View) -> some View {
