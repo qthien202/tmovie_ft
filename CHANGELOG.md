@@ -8,6 +8,16 @@ Vietnamese block free of Markdown styling (use emoji + "•" bullets).
 
 Every new feature/release must add a `## vX.Y.Z` section with both parts.
 
+## v1.7.2
+
+Android "Thuyết minh AI" can no longer close the film. Synthesis runs in its own process (`:voice`), so running out of memory or a crash in the voice runtime kills only the voice; Android restarts it and the film plays on (three deaths turn the voice-over off). Any error in the voice-over on the player's side turns it off with a message instead of crashing. And if the app is still closed abruptly while it runs, the next launch starts with it off and shows the exit reason, so there's no crash loop and the cause can be reported.
+
+<!-- app:vi -->
+🛠 Sửa lỗi
+• Thuyết minh AI không còn làm văng khỏi phim: phần tạo giọng đọc giờ chạy tách riêng, máy thiếu RAM thì chỉ tạm mất giọng đọc, phim vẫn phát bình thường.
+• Nếu Thuyết minh AI gặp lỗi, app sẽ tự tắt nó và báo lý do thay vì đóng phim.
+<!-- /app:vi -->
+
 ## v1.7.1
 
 Android "Thuyết minh AI" fixes. The voice model is now int8-quantized (282 → 84 MB graphs, ~147 MB download, ~3× faster), so 4 GB phones can run it; 3 GB phones don't offer it. OCR is bundled (sideloaded installs never got Play Services' module, so subtitles were never read). The model loads with the first line and the scout starts once the film plays, the voice runs at background priority on two threads, OCR reads only the subtitle band, and slow phones drop to 8 flow steps, which fixes the stutter and the player being killed on low-memory phones. v1.7.0's 345 MB model is deleted; the scout starts 5 s ahead, so the first lines after a seek are voiced too.
