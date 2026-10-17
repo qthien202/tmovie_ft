@@ -8,6 +8,15 @@ Vietnamese block free of Markdown styling (use emoji + "•" bullets).
 
 Every new feature/release must add a `## vX.Y.Z` section with both parts.
 
+## v1.8.2
+
+New tab bar on both apps, in the style of the big streaming apps: docked, solid, edge to edge with a hairline on top, thin line icons (Lucide on Android, light SF Symbols on iOS); the selected tab turns white with a bolder stroke. No glass capsule or highlight pill. On iOS it replaces the system's floating glass bar (tabs are built on first visit and kept alive; tapping the open tab returns to its first screen).
+
+<!-- app:vi -->
+✨ Mới
+• Thanh tab dưới được thiết kế lại: gọn, phẳng, icon nét mảnh, tab đang chọn nổi bật rõ ràng.
+<!-- /app:vi -->
+
 ## v1.8.1
 
 "Truyền hình" now reads iptv-org's whole index (~11,200 channels, ~180 countries, 29 categories) with Quốc gia / Thể loại pickers (Việt Nam by default, picker overlay shared with Home) and search across every country; lists play as published (only DASH, unsupported, is skipped). Channels open in the film player's live mode: same controls, gestures, lock, quality, aspect, sleep timer and PiP, with a "TRỰC TIẾP" button instead of the seek bar, and no episodes, history or voice-over. Android's tab bar is redrawn: outlined icons that fill when selected, a springy highlight and a light haptic tick. iOS gets the same Truyền hình tab and live mode.
