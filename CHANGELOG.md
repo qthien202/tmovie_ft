@@ -8,6 +8,15 @@ Vietnamese block free of Markdown styling (use emoji + "•" bullets).
 
 Every new feature/release must add a `## vX.Y.Z` section with both parts.
 
+## v1.8.1
+
+More "Truyền hình" lists: Phim, Giải trí, Thiếu nhi, Tài liệu and Âm nhạc join Việt Nam, Thể thao and Tin tức (iptv-org categories, same filtering). iOS gets the same tab (AVKit player, landscape, per-channel headers; plain-http media allowed for these streams).
+
+<!-- app:vi -->
+✨ Mới
+• Truyền hình có thêm các nhóm kênh Phim, Giải trí, Thiếu nhi, Tài liệu và Âm nhạc quốc tế.
+<!-- /app:vi -->
+
 ## v1.8.0
 
 Android "Truyền hình" tab: live channels from iptv-org's public playlists (Việt Nam, Thể thao, Tin tức), with logos and search, played full screen by a new LiveActivity (HLS, per-channel User-Agent / Referer, jumps back to the live edge after a stall). Our lists skip restreams of paid services (FPT Play, SCTV) and re-hosting sites, plus geo-blocked foreign channels; "+" adds any M3U playlist URL, played as it is (long-press removes it). The tab bar now has five tabs.

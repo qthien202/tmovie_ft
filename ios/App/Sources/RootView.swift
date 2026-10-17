@@ -34,8 +34,8 @@ struct RootView: View {
 struct MainTabs: View {
     /// Reopens on the last tab.
     @AppStorage("tab") private var tab = 0
-    /// One navigation stack per tab: home, new & hot, profile, search.
-    @State private var routers = [RouterPath(), RouterPath(), RouterPath(), RouterPath()]
+    /// One navigation stack per tab: home, new & hot, profile, search, live TV.
+    @State private var routers = [RouterPath(), RouterPath(), RouterPath(), RouterPath(), RouterPath()]
 
     var body: some View {
         Group {
@@ -43,6 +43,7 @@ struct MainTabs: View {
                 TabView(selection: $tab) {
                     Tab("Trang chủ", systemImage: "house.fill", value: 0) { stack(0) { HomeView() } }
                     Tab("Mới & Hot", systemImage: "play.rectangle.on.rectangle.fill", value: 1) { stack(1) { NewHotView() } }
+                    Tab("Truyền hình", systemImage: "tv", value: 4) { stack(4) { LiveTVView() } }
                     Tab("Của tôi", systemImage: "person.crop.circle", value: 2) { stack(2) { ProfileView() } }
                     Tab(value: 3, role: .search) { stack(3) { SearchView() } }
                 }
@@ -50,6 +51,7 @@ struct MainTabs: View {
                 TabView(selection: $tab) {
                     stack(0) { HomeView() }.tabItem { Label("Trang chủ", systemImage: "house.fill") }.tag(0)
                     stack(1) { NewHotView() }.tabItem { Label("Mới & Hot", systemImage: "play.rectangle.on.rectangle.fill") }.tag(1)
+                    stack(4) { LiveTVView() }.tabItem { Label("Truyền hình", systemImage: "tv") }.tag(4)
                     stack(2) { ProfileView() }.tabItem { Label("Của tôi", systemImage: "person.crop.circle") }.tag(2)
                     stack(3) { SearchView() }.tabItem { Label("Tìm kiếm", systemImage: "magnifyingglass") }.tag(3)
                 }

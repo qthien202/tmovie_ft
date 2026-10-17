@@ -101,7 +101,12 @@ private class Playlist(val title: String, val url: String, val custom: Boolean =
 
 private val builtIn = listOf(
     Playlist(Playlist.VN, "https://iptv-org.github.io/iptv/countries/vn.m3u"),
+    Playlist("Phim", "https://iptv-org.github.io/iptv/categories/movies.m3u"),
     Playlist("Thể thao", "https://iptv-org.github.io/iptv/categories/sports.m3u"),
+    Playlist("Giải trí", "https://iptv-org.github.io/iptv/categories/entertainment.m3u"),
+    Playlist("Thiếu nhi", "https://iptv-org.github.io/iptv/categories/kids.m3u"),
+    Playlist("Tài liệu", "https://iptv-org.github.io/iptv/categories/documentary.m3u"),
+    Playlist("Âm nhạc", "https://iptv-org.github.io/iptv/categories/music.m3u"),
     Playlist("Tin tức", "https://iptv-org.github.io/iptv/categories/news.m3u"),
 )
 
