@@ -8,4 +8,5 @@ android { namespace = "com.thientech.tmovie.feature.browse" }
 
 dependencies {
     implementation(project(":core:ui"))
+    testImplementation(libs.junit)
 }

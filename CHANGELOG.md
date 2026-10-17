@@ -8,6 +8,16 @@ Vietnamese block free of Markdown styling (use emoji + "•" bullets).
 
 Every new feature/release must add a `## vX.Y.Z` section with both parts.
 
+## v1.8.0
+
+Android "Truyền hình" tab: live channels from iptv-org's public playlists (Việt Nam, Thể thao, Tin tức), with logos and search, played full screen by a new LiveActivity (HLS, per-channel User-Agent / Referer, jumps back to the live edge after a stall). Our lists skip restreams of paid services (FPT Play, SCTV) and re-hosting sites, plus geo-blocked foreign channels; "+" adds any M3U playlist URL, played as it is (long-press removes it). The tab bar now has five tabs.
+
+<!-- app:vi -->
+✨ Mới
+• Tab Truyền hình: xem kênh truyền hình trực tiếp, gồm kênh Việt Nam, kênh thể thao và tin tức quốc tế phát miễn phí. Có logo và ô tìm kênh.
+• Bấm "+" để thêm danh sách kênh (.m3u) của riêng bạn, giữ lâu để xoá.
+<!-- /app:vi -->
+
 ## v1.7.2
 
 Android "Thuyết minh AI" can no longer close the film. Synthesis runs in its own process (`:voice`), so running out of memory or a crash in the voice runtime kills only the voice; Android restarts it and the film plays on (three deaths turn the voice-over off). Any error in the voice-over on the player's side turns it off with a message instead of crashing. And if the app is still closed abruptly while it runs, the next launch starts with it off and shows the exit reason, so there's no crash loop and the cause can be reported.

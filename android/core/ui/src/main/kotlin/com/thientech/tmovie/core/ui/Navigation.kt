@@ -16,6 +16,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable data object HomeRoute
 @Serializable data object NewHotRoute
+@Serializable data object LiveRoute
 @Serializable data object SearchRoute
 @Serializable data object ProfileRoute
 
