@@ -30,35 +30,33 @@ struct RootView: View {
     }
 }
 
-/// The tabs under a docked bar in the style of the big streaming apps (and the Android app):
-/// solid, edge to edge, a hairline on top, light symbols; the selected tab turns white and bolder.
-/// It replaces the system's floating glass bar.
+/// iOS 26 renders this as the floating Liquid Glass tab bar, with search as its own glass button.
 struct MainTabs: View {
     /// Reopens on the last tab.
     @AppStorage("tab") private var tab = 0
     /// One navigation stack per tab: home, new & hot, profile, search, live TV.
     @State private var routers = [RouterPath(), RouterPath(), RouterPath(), RouterPath(), RouterPath()]
-    /// Tabs are built on first visit (live TV loads 11k channels), then kept alive.
-    @State private var visited: Set<Int> = []
-
-    /// Bar order: value (the stored `tab`), title, SF Symbol.
-    static let items = [(0, "Trang chủ", "house"), (1, "Mới & Hot", "flame"), (4, "Truyền hình", "play.tv"),
-                        (3, "Tìm kiếm", "magnifyingglass"), (2, "Của tôi", "person")]
 
     var body: some View {
-        ZStack {
-            ForEach(Self.items, id: \.0) { item in
-                let i = item.0
-                if visited.contains(i) || tab == i {
-                    page(i)
-                        .opacity(tab == i ? 1 : 0)
-                        .allowsHitTesting(tab == i)
-                        .accessibilityHidden(tab != i)
-                        .onAppear { visited.insert(i) }
+        Group {
+            if #available(iOS 18, *) {
+                TabView(selection: $tab) {
+                    Tab(value: 0) { stack(0) { HomeView() } } label: { tabLabel("Trang chủ", "house.fill") }
+                    Tab(value: 1) { stack(1) { NewHotView() } } label: { tabLabel("Mới & Hot", "flame.fill") }
+                    Tab(value: 4) { stack(4) { LiveTVView() } } label: { tabLabel("Truyền hình", "play.tv.fill") }
+                    Tab(value: 2) { stack(2) { ProfileView() } } label: { tabLabel("Của tôi", "person.fill") }
+                    Tab(value: 3, role: .search) { stack(3) { SearchView() } }
+                }
+            } else {
+                TabView(selection: $tab) {
+                    stack(0) { HomeView() }.tabItem { Label("Trang chủ", systemImage: "house") }.tag(0)
+                    stack(1) { NewHotView() }.tabItem { Label("Mới & Hot", systemImage: "flame") }.tag(1)
+                    stack(4) { LiveTVView() }.tabItem { Label("Truyền hình", systemImage: "play.tv") }.tag(4)
+                    stack(2) { ProfileView() }.tabItem { Label("Của tôi", systemImage: "person.crop.circle") }.tag(2)
+                    stack(3) { SearchView() }.tabItem { Label("Tìm kiếm", systemImage: "magnifyingglass") }.tag(3)
                 }
             }
         }
-        .safeAreaInset(edge: .bottom, spacing: 0) { TabBar(tab: $tab) { routers[$0].path = NavigationPath() } }
         .sensoryFeedback(.selection, trigger: tab)
         .onAppear {
             // Reads `tab` when called, so it pushes onto whichever tab is showing then.
@@ -75,14 +73,9 @@ struct MainTabs: View {
         #endif
     }
 
-    @ViewBuilder private func page(_ i: Int) -> some View {
-        switch i {
-        case 0: stack(0) { HomeView() }
-        case 1: stack(1) { NewHotView() }
-        case 2: stack(2) { ProfileView() }
-        case 3: stack(3) { SearchView() }
-        default: stack(4) { LiveTVView() }
-        }
+    /// Icons only: the glass bar reads cleaner without titles (VoiceOver still reads them).
+    private func tabLabel(_ title: String, _ symbol: String) -> some View {
+        Label(title, systemImage: symbol).labelStyle(.iconOnly)
     }
 
     private func stack(_ i: Int, @ViewBuilder root: () -> some View) -> some View {
@@ -110,39 +103,5 @@ struct MainTabs: View {
         default:
             break
         }
-    }
-}
-
-private struct TabBar: View {
-    @Binding var tab: Int
-    /// Tapping the open tab again goes back to its first screen.
-    var popToRoot: (Int) -> Void
-
-    var body: some View {
-        HStack(spacing: 0) {
-            ForEach(MainTabs.items, id: \.0) { value, title, symbol in
-                let on = tab == value
-                Button { if on { popToRoot(value) } else { tab = value } } label: {
-                    VStack(spacing: 4) {
-                        Image(systemName: symbol)
-                            .font(.system(size: 20, weight: on ? .semibold : .light))
-                            .frame(height: 24)
-                        Text(title).font(.system(size: 10, weight: on ? .semibold : .regular))
-                    }
-                    .foregroundStyle(on ? Color.white : Color.white.opacity(0.5))
-                    .frame(maxWidth: .infinity, minHeight: 50)
-                    .contentShape(.rect)
-                }
-                .buttonStyle(.plain)
-                .accessibilityAddTraits(on ? .isSelected : [])
-            }
-        }
-        .padding(.top, 6)
-        .background {
-            Color.canvas
-                .overlay(alignment: .top) { Rectangle().fill(.white.opacity(0.1)).frame(height: 0.5) }
-                .ignoresSafeArea(edges: .bottom)
-        }
-        .animation(.snappy(duration: 0.2), value: tab)
     }
 }

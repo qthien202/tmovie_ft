@@ -27,6 +27,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.draw.clip
+import com.thientech.tmovie.core.designsystem.glass
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.graphics.SolidColor
@@ -91,6 +97,10 @@ private class TabItem(val route: Any, val label: String, vararg paths: String) {
     val icon = lineIcon(label, 1.6f, *paths)
     val selectedIcon = lineIcon(label, 2.3f, *paths)
 }
+
+private val TabWidth = 62.dp
+private val TabHeight = 48.dp
+private val TabGap = 4.dp
 
 private val tabs = listOf(
     TabItem(HomeRoute, "Trang chủ", "M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8",
@@ -173,37 +183,43 @@ fun AppNavHost(link: String?, onLinkHandled: () -> Unit) {
 }
 
 /**
- * Docked tab bar in the style of the big streaming apps (Netflix, Disney+): solid, edge to edge,
- * a hairline on top, thin line icons; the selected tab turns white with a bolder stroke. No glass,
- * no floating capsule, no glow.
+ * Floating glass tab bar (the Android take on the iOS 26 Liquid Glass bar), icons only: one
+ * highlight springs between tabs, the selected icon turns teal with a bolder stroke, a light tick
+ * on change. Labels stay for TalkBack.
  */
 @Composable
 private fun BottomBar(selected: (TabItem) -> Boolean, onSelect: (TabItem) -> Unit, modifier: Modifier = Modifier) {
     val haptics = LocalHapticFeedback.current
-    Column(modifier.fillMaxWidth().background(TMovieColors.Canvas)) {
-        Box(Modifier.fillMaxWidth().height(0.5.dp).background(Color.White.copy(alpha = 0.1f)))
-        Row(Modifier.fillMaxWidth().navigationBarsPadding().height(58.dp)) {
+    val index = tabs.indexOfFirst(selected)
+    val highlightX by animateDpAsState((TabWidth + TabGap) * index.coerceAtLeast(0), spring(dampingRatio = 0.75f, stiffness = 500f), label = "tab")
+    Box(
+        modifier
+            .navigationBarsPadding()
+            .padding(bottom = 10.dp)
+            .clip(CircleShape)
+            .background(Color(0xE60B0F12))
+            .glass(CircleShape)
+            .padding(6.dp),
+    ) {
+        if (index >= 0) {
+            Box(Modifier.offset(x = highlightX).size(TabWidth, TabHeight).clip(CircleShape).background(Color.White.copy(alpha = 0.12f)))
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(TabGap)) {
             tabs.forEach { tab ->
                 val on = selected(tab)
-                val tint by animateColorAsState(if (on) Color.White else Color.White.copy(alpha = 0.5f), tween(180), label = "tab")
-                Column(
+                val tint by animateColorAsState(if (on) TMovieColors.BrandLight else Color.White.copy(alpha = 0.85f), tween(180), label = "tint")
+                Box(
                     Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
+                        .size(TabWidth, TabHeight)
+                        .clip(CircleShape)
                         .clickable(remember { MutableInteractionSource() }, indication = null) {
                             if (!on) haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                             onSelect(tab)
                         }
                         .semantics { role = Role.Tab; this.selected = on },
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
+                    contentAlignment = Alignment.Center,
                 ) {
-                    Icon(if (on) tab.selectedIcon else tab.icon, null, tint = tint, modifier = Modifier.size(24.dp))
-                    Text(
-                        tab.label, color = tint, fontSize = 10.sp, maxLines = 1, softWrap = false,
-                        fontWeight = if (on) FontWeight.SemiBold else FontWeight.Normal,
-                        modifier = Modifier.padding(top = 4.dp),
-                    )
+                    Icon(if (on) tab.selectedIcon else tab.icon, tab.label, tint = tint, modifier = Modifier.size(25.dp))
                 }
             }
         }

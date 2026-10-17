@@ -10,11 +10,11 @@ Every new feature/release must add a `## vX.Y.Z` section with both parts.
 
 ## v1.8.2
 
-New tab bar on both apps, in the style of the big streaming apps: docked, solid, edge to edge with a hairline on top, thin line icons (Lucide on Android, light SF Symbols on iOS); the selected tab turns white with a bolder stroke. No glass capsule or highlight pill. On iOS it replaces the system's floating glass bar (tabs are built on first visit and kept alive; tapping the open tab returns to its first screen).
+Tab bars go icons-only. iOS keeps the system Liquid Glass bar with filled symbols (house, flame, play.tv, person; search stays its own glass button), titles kept for VoiceOver. Android keeps the floating glass capsule and its springy highlight, with thin line icons (Lucide paths) that turn teal with a bolder stroke when selected.
 
 <!-- app:vi -->
 ✨ Mới
-• Thanh tab dưới được thiết kế lại: gọn, phẳng, icon nét mảnh, tab đang chọn nổi bật rõ ràng.
+• Thanh tab dưới gọn hơn: chỉ còn icon, bộ icon mới mảnh và rõ ràng hơn.
 <!-- /app:vi -->
 
 ## v1.8.1
