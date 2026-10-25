@@ -8,6 +8,17 @@ Vietnamese block free of Markdown styling (use emoji + "•" bullets).
 
 Every new feature/release must add a `## vX.Y.Z` section with both parts.
 
+## v1.9.0
+
+Android drops "Thuyết minh AI": the :core:voiceover module (ONNX Runtime, bundled ML Kit OCR, the `:voice` process) is out of the build, so the APK shrinks from ~19.7 MB to ~4.6 MB and playback runs one ExoPlayer instead of two. Voice models already downloaded are deleted on first launch. iOS keeps the feature. The Android tab bar now shows only on the five tab screens and slides away on detail and list pages.
+
+<!-- app:vi -->
+⚡ Tối ưu (Android)
+• Bỏ Thuyết minh AI để app nhẹ và mượt hơn: dung lượng cài đặt giảm từ khoảng 20 MB còn 5 MB, giọng đọc đã tải trước đó được tự xoá để trả lại bộ nhớ.
+🐛 Sửa lỗi
+• Thanh tab dưới chỉ hiện ở các màn hình chính, không còn che trang chi tiết phim và danh sách.
+<!-- /app:vi -->
+
 ## v1.8.2
 
 Tab bars go icons-only. iOS keeps the system Liquid Glass bar with filled symbols (house, flame, play.tv, person; search stays its own glass button), titles kept for VoiceOver. Android keeps the floating glass capsule and its springy highlight, with thin line icons (Lucide paths) that turn teal with a bolder stroke when selected.

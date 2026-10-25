@@ -1,5 +1,10 @@
 package com.thientech.tmovie
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -167,17 +172,25 @@ fun AppNavHost(link: String?, onLinkHandled: () -> Unit) {
                     }
                 }
             }
-            BottomBar(
-                selected = { tab -> entry?.destination?.hasRoute(tab.route::class) == true },
-                onSelect = { tab ->
-                    nav.navigate(tab.route) {
-                        popUpTo(nav.graph.findStartDestination().id) { saveState = true }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                },
+            // Tab screens only: detail and list pages get the whole screen.
+            val onTab = tabs.any { entry?.destination?.hasRoute(it.route::class) == true }
+            AnimatedVisibility(
+                onTab,
+                enter = slideInVertically { it } + fadeIn(),
+                exit = slideOutVertically { it } + fadeOut(),
                 modifier = Modifier.align(Alignment.BottomCenter),
-            )
+            ) {
+                BottomBar(
+                    selected = { tab -> entry?.destination?.hasRoute(tab.route::class) == true },
+                    onSelect = { tab ->
+                        nav.navigate(tab.route) {
+                            popUpTo(nav.graph.findStartDestination().id) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                )
+            }
         }
     }
 }
