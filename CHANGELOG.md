@@ -10,15 +10,16 @@ Every new feature/release must add a `## vX.Y.Z` section with both parts.
 
 ## v1.10.0
 
-Native Android TV app (`android/:tv`) replaces the Flutter TV build, on the same core as the phone app (PhimAPI, ad-free HLS, library, OTA). Remote-first Compose UI: a side nav that expands on focus (Trang chủ, Tìm kiếm, Truyền hình); a Google TV style home where the focused film fills the header over rows that keep focus on one line (Xem tiếp first, then the hot list, hot series, My List and the genre rails); film pages with Play / Continue, My List, server and episode rows with progress, and similar films; search that only opens the keyboard on OK; iptv-org channels by country and category. A TV player driven by the remote: OK plays / pauses, ◀ ▶ seek (faster when held), ▼ opens episodes, quality, subtitles, audio and speed; resume points and auto-next as on the phone. Same package id and key as the Flutter TV app, so it installs over it; releases ship `tmovie-tv` again. Phone: the update dialog moved to `core:ui` and focuses its main button for remotes.
+Native Android TV app (`android/:tv`) replaces the Flutter TV build, on the same core as the phone app (PhimAPI, ad-free HLS, library, OTA), styled after Netflix and Apple TV. Home opens on a full-screen billboard of the hot list (textless key art, TOP n tag, synopsis, Phát / Thông tin / +, rotating every 12 s while on screen), then rows on the plain canvas that pin to the top as focus moves: Xem tiếp (progress, minutes left), a Netflix-style Top 10 row with outlined rank numbers, hot series, My List and the genre rails, each ending in "Xem tất cả" (paginated grid). Landscape cards with titles underneath; focus is a scale + white ring. Film pages: full-bleed art with details and Play / Continue low on the left, dimming as the server, 50-episode block, episode and similar rows scroll up. Search with an on-screen A–Z / 0–9 keyboard (no system IME; the remote's search key lands on it). Live channels by country and category. Remote player: OK plays / pauses, ◀ ▶ seek (faster when held), ▼ opens episodes, quality, subtitles, audio and speed; Apple TV style scrubber with time left; auto-next and resume as on the phone. Back steps out page → nav → Home; a second Back within 2 s exits. Built for low-end boxes: no shadows, blurs or per-focus backdrops, a small image cache (RGB 565 on low-RAM devices) and a baseline profile (also added to the phone app). On the Google TV emulator: ~5 % janky frames, p90 19 ms, ~75 MB PSS. Same package id and key as the Flutter TV app, so it installs over it; releases ship `tmovie-tv` again. Phone: the update dialog moved to `core:ui` and focuses its main button for remotes.
 
 <!-- app:vi -->
 📺 Mới (Android TV)
-• Ứng dụng TV làm lại hoàn toàn, nhẹ và mượt hơn, điều khiển bằng remote.
-• Trang chủ kiểu Google TV: phim đang chọn hiện lớn phía trên, hàng Xem tiếp đầu tiên, phim hot, phim bộ hot và các thể loại.
-• Trang phim có nút Phát / Tiếp tục, thêm vào Danh sách, chọn nguồn và tập (có thanh tiến độ đã xem), phim tương tự.
-• Trình phát cho remote: OK để dừng/phát, ◀ ▶ để tua (giữ để tua nhanh), ▼ để chọn tập, chất lượng, phụ đề, tốc độ; tự phát tập tiếp theo.
-• Có tìm kiếm và Truyền hình (lọc theo quốc gia, thể loại).
+• Ứng dụng TV làm lại hoàn toàn theo phong cách Netflix / Apple TV, nhẹ và mượt cả trên TV box cấu hình yếu.
+• Trang chủ mở đầu bằng phim hot toàn màn hình, có Top 10 tại Việt Nam, Xem tiếp, phim bộ hot và các thể loại (xem tất cả từng mục).
+• Trang phim ảnh tràn màn hình, nút Phát / Tiếp tục, chọn nguồn và tập (phim dài chia theo từng 50 tập).
+• Tìm kiếm có bàn phím ngay trên màn hình, gõ không cần dấu; nút tìm kiếm trên remote mở thẳng.
+• Trình phát cho remote: OK dừng/phát, ◀ ▶ tua (giữ để tua nhanh), ▼ chọn tập, chất lượng, phụ đề, tốc độ; tự phát tập tiếp.
+• Truyền hình lọc theo quốc gia, thể loại. Nhấn Quay lại 2 lần để thoát app.
 <!-- /app:vi -->
 
 ## v1.9.0
