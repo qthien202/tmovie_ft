@@ -1,6 +1,7 @@
 package com.thientech.tmovie.tv
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -36,6 +37,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,6 +59,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
@@ -68,6 +72,7 @@ import com.thientech.tmovie.core.designsystem.TMovieColors
 import com.thientech.tmovie.core.designsystem.TMovieTheme
 import com.thientech.tmovie.core.designsystem.Wordmark
 import com.thientech.tmovie.core.model.FilmItem
+import com.thientech.tmovie.core.network.Source
 import com.thientech.tmovie.core.ui.UpdatePrompt
 
 class TvActivity : ComponentActivity() {
@@ -88,15 +93,24 @@ enum class Tab(val label: String, val icon: ImageVector, val selectedIcon: Image
     Live("Truyền hình", Icons.Outlined.LiveTv, Icons.Rounded.LiveTv),
 }
 
+/** What can be stacked over the tabs. */
+sealed interface Page {
+    data class Film(val film: FilmItem) : Page
+    data class Catalog(val title: String, val source: Source) : Page
+}
+
 /**
- * Side nav + tab content, with film pages stacked on top. Pages under the top one stay composed
+ * Side nav + tab content, with film / list pages stacked on top. Pages under the top one stay composed
  * (scroll and focus intact) but undrawn; Back pops a page and refocuses the card that opened it.
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun TvApp(onExit: () -> Unit) {
     var tab by rememberSaveable { mutableStateOf(Tab.Home) }
-    val pages = remember { mutableStateListOf<FilmItem>() }
+    val context = LocalContext.current
+    val pages = remember { mutableStateListOf<Page>() }
+    var lastBack by remember { mutableLongStateOf(0L) }
+    var searchRequest by remember { mutableIntStateOf(0) }
     val openers = remember { mutableListOf<FocusRequester?>() }
     var restore by remember { mutableStateOf<FocusRequester?>(null) }
     val memory = remember { FocusMemory() }
@@ -105,10 +119,12 @@ fun TvApp(onExit: () -> Unit) {
     var navFocused by remember { mutableStateOf(false) }
     val holder = rememberSaveableStateHolder()
 
-    fun open(film: FilmItem) {
+    fun push(page: Page) {
         openers += memory.last
-        pages += film
+        pages += page
     }
+    fun open(film: FilmItem) = push(Page.Film(film))
+    fun openList(title: String, source: Source) = push(Page.Catalog(title, source))
 
     // Back: close the top page → step out to the nav → leave a tab for Home → exit.
     fun back() {
@@ -116,7 +132,12 @@ fun TvApp(onExit: () -> Unit) {
             pages.isNotEmpty() -> { pages.removeAt(pages.lastIndex); restore = openers.removeAt(openers.lastIndex) }
             !navFocused -> runCatching { navFocus.getValue(tab).requestFocus() }
             tab != Tab.Home -> { tab = Tab.Home; runCatching { navFocus.getValue(Tab.Home).requestFocus() } }
-            else -> onExit()
+            // TV remotes make Back easy to hit by accident: the second press within 2 s exits.
+            System.currentTimeMillis() - lastBack < 2_000 -> onExit()
+            else -> {
+                lastBack = System.currentTimeMillis()
+                Toast.makeText(context, "Nhấn Quay lại lần nữa để thoát", Toast.LENGTH_SHORT).show()
+            }
         }
     }
     BackHandler(onBack = ::back)
@@ -133,22 +154,32 @@ fun TvApp(onExit: () -> Unit) {
             Modifier
                 .fillMaxSize()
                 .background(TMovieColors.Canvas)
-                .onPreviewKeyEvent { e -> (e.key == Key.Back).also { if (it && e.type == KeyEventType.KeyUp) back() } },
+                .onPreviewKeyEvent { e ->
+                    when (e.key) {
+                        Key.Back -> { if (e.type == KeyEventType.KeyUp) back(); true }
+                        // The remote's search / mic key: straight to typing a search.
+                        Key.Search -> {
+                            if (e.type == KeyEventType.KeyUp) { pages.clear(); openers.clear(); tab = Tab.Search; searchRequest++ }
+                            true
+                        }
+                        else -> false
+                    }
+                },
         ) {
             Box(Modifier.fillMaxSize().graphicsLayer { alpha = if (pages.isEmpty()) 1f else 0f }) {
                 // ► from the nav lands back on the card focused last in this tab (or its first one).
                 Box(Modifier.fillMaxSize().focusRequester(content).focusRestorer().focusGroup()) {
                     holder.SaveableStateProvider(tab) {
                         when (tab) {
-                            Tab.Home -> HomeTab(::open)
-                            Tab.Search -> SearchTab(::open)
+                            Tab.Home -> HomeTab(::open, ::openList)
+                            Tab.Search -> SearchTab(::open, searchRequest)
                             Tab.Live -> LiveTab()
                         }
                     }
                 }
                 SideNav(tab, navFocus, onFocused = { navFocused = it }, onRight = { runCatching { content.requestFocus() } }) { tab = it }
             }
-            pages.forEachIndexed { i, film ->
+            pages.forEachIndexed { i, page ->
                 // Each page traps focus so the remote can't wander into what's under it.
                 Box(
                     Modifier
@@ -156,7 +187,12 @@ fun TvApp(onExit: () -> Unit) {
                         .graphicsLayer { alpha = if (i == pages.lastIndex) 1f else 0f }
                         .focusProperties { exit = { FocusRequester.Cancel } }
                         .focusGroup(),
-                ) { DetailPage(film, top = i == pages.lastIndex, onOpen = ::open) }
+                ) {
+                    when (page) {
+                        is Page.Film -> DetailPage(page.film, top = i == pages.lastIndex, onOpen = ::open)
+                        is Page.Catalog -> Box(Modifier.fillMaxSize().background(TMovieColors.Canvas)) { CatalogPage(page.title, page.source, ::open) }
+                    }
+                }
             }
         }
     }

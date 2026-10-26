@@ -180,11 +180,18 @@ private fun UpdateDialog(update: AppUpdate, version: String, @DrawableRes icon: 
                     }
                 }
                 if (!busy) {
+                    var laterFocused by remember { mutableStateOf(false) }
                     Text(
                         "Để sau",
-                        color = TMovieColors.Secondary,
+                        color = if (laterFocused) Color.White else TMovieColors.Secondary,
                         fontSize = 15.sp,
-                        modifier = Modifier.padding(top = 6.dp).clip(CircleShape).clickable(onClick = onDismiss).padding(horizontal = 16.dp, vertical = 10.dp),
+                        modifier = Modifier
+                            .padding(top = 6.dp)
+                            .onFocusChanged { laterFocused = it.isFocused }
+                            .clip(CircleShape)
+                            .border(2.dp, if (laterFocused) Color.White else Color.Transparent, CircleShape)
+                            .clickable(onClick = onDismiss)
+                            .padding(horizontal = 16.dp, vertical = 10.dp),
                     )
                 }
             }

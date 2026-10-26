@@ -335,13 +335,12 @@ class TvPlayerActivity : ComponentActivity() {
 private fun BoxScope.Chrome(playback: PlaybackState, title: String, subtitle: String, live: Boolean, offline: Boolean, visible: Boolean) {
     AnimatedVisibility(visible, Modifier.matchParentSize(), enter = fadeIn(), exit = fadeOut()) {
         Box(Modifier.fillMaxSize()) {
-            Box(Modifier.fillMaxWidth().height(180.dp).background(Brush.verticalGradient(listOf(Color.Black.copy(alpha = 0.75f), Color.Transparent))))
-            Box(Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(220.dp).background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = 0.85f)))))
-            Column(Modifier.padding(start = 56.dp, top = 36.dp, end = 56.dp)) {
-                Text(title, color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                if (subtitle.isNotBlank()) Text(subtitle, color = TMovieColors.Secondary, fontSize = 18.sp, maxLines = 1, modifier = Modifier.padding(top = 4.dp))
-            }
+            Box(Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(300.dp).background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = 0.9f)))))
+            // Apple TV: title and episode sit just above the scrubber.
             Column(Modifier.align(Alignment.BottomStart).fillMaxWidth().padding(horizontal = 56.dp, vertical = 32.dp)) {
+                if (subtitle.isNotBlank()) Text(subtitle, color = TMovieColors.Secondary, fontSize = 18.sp, fontWeight = FontWeight.Medium, maxLines = 1)
+                Text(title, color = Color.White, fontSize = 32.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(bottom = 18.dp))
                 if (live) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(Modifier.size(10.dp).clip(CircleShape).background(Color(0xFFFF3B30)))
@@ -356,12 +355,12 @@ private fun BoxScope.Chrome(playback: PlaybackState, title: String, subtitle: St
                     Row(Modifier.fillMaxWidth().padding(top = 10.dp)) {
                         Text(formatTime(playback.position), color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Medium)
                         Spacer(Modifier.weight(1f))
-                        Text(formatTime(playback.duration), color = TMovieColors.Secondary, fontSize = 16.sp)
+                        Text("-" + formatTime((playback.duration - playback.position).coerceAtLeast(0)), color = TMovieColors.Secondary, fontSize = 16.sp)
                     }
                 }
                 Text(
                     if (live) "OK  Tạm dừng      ▼  Chất lượng & phụ đề" else "OK  Tạm dừng      ◀ ▶  Tua (giữ để tua nhanh)      ▼  Tập & cài đặt",
-                    color = Color.White.copy(alpha = 0.55f), fontSize = 14.sp, modifier = Modifier.padding(top = 14.dp),
+                    color = Color.White.copy(alpha = 0.6f), fontSize = 16.sp, modifier = Modifier.padding(top = 14.dp),
                 )
             }
         }

@@ -90,7 +90,7 @@ fun LiveTab() {
                         RemoteImage(c.logo, Modifier.align(Alignment.Center).fillMaxWidth(0.55f).aspectRatio(16f / 9f).padding(bottom = 18.dp), c.name, ContentScale.Fit)
                     }
                     Text(
-                        c.name, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                        c.name, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis,
                         textAlign = TextAlign.Center, modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth().padding(horizontal = 10.dp, vertical = 8.dp),
                     )
                 }

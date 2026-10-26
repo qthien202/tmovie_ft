@@ -1,0 +1,5 @@
+# Precompile the app's own code at install (ProfileInstaller also applies this on sideloaded
+# APKs), so first launches and first scrolls don't run interpreted on slow TV boxes / phones.
+# Compose, Media3 and Coil ship their own profiles.
+HSPLcom/thientech/tmovie/**->**(**)**
+Lcom/thientech/tmovie/**;
