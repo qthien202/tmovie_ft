@@ -8,6 +8,19 @@ Vietnamese block free of Markdown styling (use emoji + "•" bullets).
 
 Every new feature/release must add a `## vX.Y.Z` section with both parts.
 
+## v1.10.0
+
+Native Android TV app (`android/:tv`) replaces the Flutter TV build, on the same core as the phone app (PhimAPI, ad-free HLS, library, OTA). Remote-first Compose UI: a side nav that expands on focus (Trang chủ, Tìm kiếm, Truyền hình); a Google TV style home where the focused film fills the header over rows that keep focus on one line (Xem tiếp first, then the hot list, hot series, My List and the genre rails); film pages with Play / Continue, My List, server and episode rows with progress, and similar films; search that only opens the keyboard on OK; iptv-org channels by country and category. A TV player driven by the remote: OK plays / pauses, ◀ ▶ seek (faster when held), ▼ opens episodes, quality, subtitles, audio and speed; resume points and auto-next as on the phone. Same package id and key as the Flutter TV app, so it installs over it; releases ship `tmovie-tv` again. Phone: the update dialog moved to `core:ui` and focuses its main button for remotes.
+
+<!-- app:vi -->
+📺 Mới (Android TV)
+• Ứng dụng TV làm lại hoàn toàn, nhẹ và mượt hơn, điều khiển bằng remote.
+• Trang chủ kiểu Google TV: phim đang chọn hiện lớn phía trên, hàng Xem tiếp đầu tiên, phim hot, phim bộ hot và các thể loại.
+• Trang phim có nút Phát / Tiếp tục, thêm vào Danh sách, chọn nguồn và tập (có thanh tiến độ đã xem), phim tương tự.
+• Trình phát cho remote: OK để dừng/phát, ◀ ▶ để tua (giữ để tua nhanh), ▼ để chọn tập, chất lượng, phụ đề, tốc độ; tự phát tập tiếp theo.
+• Có tìm kiếm và Truyền hình (lọc theo quốc gia, thể loại).
+<!-- /app:vi -->
+
 ## v1.9.0
 
 Android drops "Thuyết minh AI": the :core:voiceover module (ONNX Runtime, bundled ML Kit OCR, the `:voice` process) is out of the build, so the APK shrinks from ~19.7 MB to ~4.6 MB and playback runs one ExoPlayer instead of two. Voice models already downloaded are deleted on first launch. iOS keeps the feature. The Android tab bar now shows only on the five tab screens and slides away on detail and list pages.

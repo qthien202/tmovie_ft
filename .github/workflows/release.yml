@@ -1,11 +1,9 @@
 name: Release APK (OTA)
 
-# Builds the native mobile APK (Kotlin/Compose, android/) and publishes it as a GitHub Release.
-# The app's OTA updater reads releases/latest and picks the APK whose name matches its package id
-# ("mobile" / "tv").
-#
-# The Flutter TV build (apps/tv) is paused to keep releases fast: TV apps find no "tv" APK and stay
-# on their version. To resume, restore its signing, Firebase, build, stage and upload lines from git history.
+# Builds the native mobile and Android TV APKs (Kotlin/Compose, android/ :app and :tv) and publishes
+# them as one GitHub Release. Each app's OTA updater reads releases/latest and picks the APK whose
+# name matches its package id ("mobile" / "tv"). The native TV app replaces the Flutter one (apps/tv):
+# same package id and key, so it installs over it.
 #
 # Trigger:
 #   - push a tag  v1.2.3            (git tag v1.2.3 && git push origin v1.2.3)
@@ -88,13 +86,14 @@ jobs:
           V="${{ steps.ver.outputs.version }}"
           N="${{ github.run_number }}"
           # versionCode keeps using the run number, so it stays above the old Flutter builds.
-          (cd android && ./gradlew :app:assembleRelease -PversionName="$V" -PversionCode="$N")
+          (cd android && ./gradlew :app:assembleRelease :tv:assembleRelease -PversionName="$V" -PversionCode="$N")
 
       - name: Stage APK
         run: |
           V="${{ steps.ver.outputs.version }}"
           mkdir -p dist
           cp android/app/build/outputs/apk/release/app-release.apk "dist/tmovie-mobile-v$V.apk"
+          cp android/tv/build/outputs/apk/release/tv-release.apk "dist/tmovie-tv-v$V.apk"
 
       - name: Build release notes
         id: notes
@@ -126,5 +125,7 @@ jobs:
           name: TMovie v${{ steps.ver.outputs.version }}
           body_path: ${{ steps.notes.outputs.path }}
           make_latest: true
+          # TV first: old Flutter TV builds take the first .apk whose name has "tv".
           files: |
+            dist/tmovie-tv-v${{ steps.ver.outputs.version }}.apk
             dist/tmovie-mobile-v${{ steps.ver.outputs.version }}.apk

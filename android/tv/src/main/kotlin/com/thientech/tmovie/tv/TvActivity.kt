@@ -1,0 +1,232 @@
+package com.thientech.tmovie.tv
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.setContent
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusGroup
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.LiveTv
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.rounded.Home
+import androidx.compose.material.icons.rounded.LiveTv
+import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.focusRestorer
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.thientech.tmovie.core.designsystem.TMovieColors
+import com.thientech.tmovie.core.designsystem.TMovieTheme
+import com.thientech.tmovie.core.designsystem.Wordmark
+import com.thientech.tmovie.core.model.FilmItem
+import com.thientech.tmovie.core.ui.UpdatePrompt
+
+class TvActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            TMovieTheme {
+                TvApp(onExit = ::finish)
+                UpdatePrompt(BuildConfig.VERSION_NAME, BuildConfig.DEBUG, R.mipmap.ic_launcher_foreground, keyword = "tv")
+            }
+        }
+    }
+}
+
+enum class Tab(val label: String, val icon: ImageVector, val selectedIcon: ImageVector) {
+    Home("Trang chủ", Icons.Outlined.Home, Icons.Rounded.Home),
+    Search("Tìm kiếm", Icons.Outlined.Search, Icons.Rounded.Search),
+    Live("Truyền hình", Icons.Outlined.LiveTv, Icons.Rounded.LiveTv),
+}
+
+/**
+ * Side nav + tab content, with film pages stacked on top. Pages under the top one stay composed
+ * (scroll and focus intact) but undrawn; Back pops a page and refocuses the card that opened it.
+ */
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun TvApp(onExit: () -> Unit) {
+    var tab by rememberSaveable { mutableStateOf(Tab.Home) }
+    val pages = remember { mutableStateListOf<FilmItem>() }
+    val openers = remember { mutableListOf<FocusRequester?>() }
+    var restore by remember { mutableStateOf<FocusRequester?>(null) }
+    val memory = remember { FocusMemory() }
+    val navFocus = remember { Tab.entries.associateWith { FocusRequester() } }
+    val content = remember { FocusRequester() }
+    var navFocused by remember { mutableStateOf(false) }
+    val holder = rememberSaveableStateHolder()
+
+    fun open(film: FilmItem) {
+        openers += memory.last
+        pages += film
+    }
+
+    // Back: close the top page → step out to the nav → leave a tab for Home → exit.
+    fun back() {
+        when {
+            pages.isNotEmpty() -> { pages.removeAt(pages.lastIndex); restore = openers.removeAt(openers.lastIndex) }
+            !navFocused -> runCatching { navFocus.getValue(tab).requestFocus() }
+            tab != Tab.Home -> { tab = Tab.Home; runCatching { navFocus.getValue(Tab.Home).requestFocus() } }
+            else -> onExit()
+        }
+    }
+    BackHandler(onBack = ::back)
+    LaunchedEffect(restore) {
+        val r = restore ?: return@LaunchedEffect
+        withFrameNanos {}  // after the page leaves the tree
+        runCatching { r.requestFocus() }
+        restore = null
+    }
+
+    CompositionLocalProvider(LocalFocusMemory provides memory) {
+        // Back is taken here before focus sees it: Compose spends a focused Back on clearing focus.
+        Box(
+            Modifier
+                .fillMaxSize()
+                .background(TMovieColors.Canvas)
+                .onPreviewKeyEvent { e -> (e.key == Key.Back).also { if (it && e.type == KeyEventType.KeyUp) back() } },
+        ) {
+            Box(Modifier.fillMaxSize().graphicsLayer { alpha = if (pages.isEmpty()) 1f else 0f }) {
+                // ► from the nav lands back on the card focused last in this tab (or its first one).
+                Box(Modifier.fillMaxSize().focusRequester(content).focusRestorer().focusGroup()) {
+                    holder.SaveableStateProvider(tab) {
+                        when (tab) {
+                            Tab.Home -> HomeTab(::open)
+                            Tab.Search -> SearchTab(::open)
+                            Tab.Live -> LiveTab()
+                        }
+                    }
+                }
+                SideNav(tab, navFocus, onFocused = { navFocused = it }, onRight = { runCatching { content.requestFocus() } }) { tab = it }
+            }
+            pages.forEachIndexed { i, film ->
+                // Each page traps focus so the remote can't wander into what's under it.
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .graphicsLayer { alpha = if (i == pages.lastIndex) 1f else 0f }
+                        .focusProperties { exit = { FocusRequester.Cancel } }
+                        .focusGroup(),
+                ) { DetailPage(film, top = i == pages.lastIndex, onOpen = ::open) }
+            }
+        }
+    }
+}
+
+/**
+ * Icons down the left edge; focusing it slides out the labels over a dark fade (Google TV).
+ * Coming back into the nav lands on the current tab.
+ */
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+private fun SideNav(tab: Tab, focus: Map<Tab, FocusRequester>, onFocused: (Boolean) -> Unit, onRight: () -> Unit, onSelect: (Tab) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    val width by animateDpAsState(if (expanded) 260.dp else 80.dp, label = "nav")
+    Box(
+        Modifier
+            .fillMaxHeight()
+            .width(if (expanded) 520.dp else Tv.Start)
+                        // Collapsed, a short fade so rows scrolling left pass under the icons cleanly.
+            .background(Brush.horizontalGradient(if (expanded) listOf(TMovieColors.Canvas, TMovieColors.Canvas.copy(alpha = 0.92f), Color.Transparent) else listOf(TMovieColors.Canvas, TMovieColors.Canvas.copy(alpha = 0.85f), Color.Transparent))),
+    ) {
+        Column(
+            Modifier
+                .fillMaxHeight()
+                .width(width)
+                .onFocusChanged { expanded = it.hasFocus; onFocused(it.hasFocus) }
+                // The expanded nav overlaps the content, which leaves nothing "to the right" for focus search.
+                .onPreviewKeyEvent { e -> (e.key == Key.DirectionRight).also { if (it && e.type == KeyEventType.KeyDown) onRight() } }
+                .focusRestorer(focus.getValue(tab))
+                .focusGroup()
+                .padding(start = 16.dp, top = 28.dp, bottom = 28.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            Box(Modifier.height(36.dp).padding(start = 12.dp)) {
+                if (expanded) Wordmark(size = 22)
+            }
+            Spacer(Modifier.weight(1f))
+            Tab.entries.forEach { t -> NavItem(t, t == tab, expanded, focus.getValue(t)) { onSelect(t) } }
+            Spacer(Modifier.weight(1.4f))
+        }
+    }
+}
+
+@Composable
+private fun NavItem(tab: Tab, selected: Boolean, expanded: Boolean, focus: FocusRequester, onSelect: () -> Unit) {
+    val interaction = remember { MutableInteractionSource() }
+    val focused by interaction.collectIsFocusedAsState()
+    // Moving onto a tab opens it, like Google TV's nav.
+    LaunchedEffect(focused) { if (focused && !selected) onSelect() }
+    val fg = when {
+        focused -> Color.Black
+        selected -> TMovieColors.BrandLight
+        else -> Color.White.copy(alpha = 0.7f)
+    }
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(end = 12.dp)
+            .height(48.dp)
+            .clip(CircleShape)
+            .background(if (focused) Color.White else if (selected && expanded) Color.White.copy(alpha = 0.1f) else Color.Transparent)
+            .focusRequester(focus)
+            .clickable(interaction, indication = null, onClick = onSelect)
+            .padding(start = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(if (selected || focused) tab.selectedIcon else tab.icon, tab.label, tint = fg, modifier = Modifier.size(26.dp))
+        if (expanded) {
+            Text(tab.label, color = fg, fontSize = 18.sp, fontWeight = if (selected || focused) FontWeight.SemiBold else FontWeight.Medium,
+                maxLines = 1, modifier = Modifier.padding(start = 16.dp))
+        }
+    }
+}

@@ -8,11 +8,14 @@ import com.thientech.tmovie.core.network.PhimApi
 
 /** Entry points for playback, used by every screen with a Play button. */
 object Player {
+    /** The activity that plays; the TV app swaps in its remote-driven player (same extras). */
+    var activity: Class<out android.app.Activity> = PlayerActivity::class.java
+
     /** Plays `servers[server].serverData[index]`, resuming at the saved second. */
     /** [fromDetail]: the film's detail page is underneath, so the player needn't offer it. */
     fun play(context: Context, detail: FilmDetail, server: Int, index: Int, fromDetail: Boolean = false) {
         context.startActivity(
-            Intent(context, PlayerActivity::class.java)
+            Intent(context, activity)
                 .putExtra(PlayerActivity.EXTRA_DETAIL, PhimApi.json.encodeToString(FilmDetail.serializer(), detail))
                 .putExtra(PlayerActivity.EXTRA_SERVER, server)
                 .putExtra(PlayerActivity.EXTRA_INDEX, index)
@@ -24,7 +27,7 @@ object Player {
     /** A live TV channel, in the film player's live mode. */
     fun live(context: Context, name: String, url: String, userAgent: String? = null, referrer: String? = null) {
         context.startActivity(
-            Intent(context, PlayerActivity::class.java)
+            Intent(context, activity)
                 .putExtra(PlayerActivity.EXTRA_LIVE_NAME, name)
                 .putExtra(PlayerActivity.EXTRA_LIVE_URL, url)
                 .putExtra(PlayerActivity.EXTRA_LIVE_USER_AGENT, userAgent)

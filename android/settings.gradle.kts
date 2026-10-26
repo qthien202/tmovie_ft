@@ -31,4 +31,5 @@ include(
     ":feature:profile",
     ":feature:onboarding",
     ":app",
+    ":tv",
 )
