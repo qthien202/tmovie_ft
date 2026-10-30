@@ -98,12 +98,14 @@ import kotlinx.coroutines.delay
 class TvPlayerActivity : ComponentActivity() {
     private lateinit var exo: ExoPlayer
     private var saveNow: () -> Unit = {}
+    private var slug: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val liveUrl = intent.getStringExtra(PlayerActivity.EXTRA_LIVE_URL)
         val detail = intent.getStringExtra(PlayerActivity.EXTRA_DETAIL)?.let { PhimApi.json.decodeFromString(FilmDetail.serializer(), it) }
         if (detail == null && liveUrl == null) return finish()
+        slug = detail?.slug
         exo = if (liveUrl != null) {
             StreamPlayer.create(this, live = true, userAgent = intent.getStringExtra(PlayerActivity.EXTRA_LIVE_USER_AGENT), referrer = intent.getStringExtra(PlayerActivity.EXTRA_LIVE_REFERRER))
         } else {
@@ -121,6 +123,7 @@ class TvPlayerActivity : ComponentActivity() {
         super.onStop()
         saveNow()
         if (::exo.isInitialized) exo.pause()
+        slug?.let(Library::record)?.let { WatchNext.publish(this, it) }
     }
 
     override fun onDestroy() {

@@ -64,6 +64,7 @@ dependencies {
     implementation(project(":feature:browse"))  // M3U channels
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.tvprovider)  // Watch Next on the TV home screen
     implementation(libs.media3.exoplayer)
     implementation(libs.media3.ui)
     debugImplementation(libs.compose.ui.tooling)

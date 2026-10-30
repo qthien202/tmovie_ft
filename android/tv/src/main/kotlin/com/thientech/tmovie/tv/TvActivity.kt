@@ -1,5 +1,6 @@
 package com.thientech.tmovie.tv
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -70,6 +71,7 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.thientech.tmovie.core.data.Library
 import com.thientech.tmovie.core.designsystem.TMovieColors
 import com.thientech.tmovie.core.designsystem.TMovieTheme
 import com.thientech.tmovie.core.designsystem.Wordmark
@@ -78,16 +80,27 @@ import com.thientech.tmovie.core.network.Source
 import com.thientech.tmovie.core.ui.UpdatePrompt
 
 class TvActivity : ComponentActivity() {
+    /** A film opened from the TV home screen's Watch Next row. */
+    private var link by mutableStateOf<String?>(null)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        link = intent.filmSlug()
         setContent {
             TMovieTheme {
-                TvApp(onExit = ::finish)
+                TvApp(onExit = ::finish, link = link, onLinkOpened = { link = null })
                 UpdatePrompt(BuildConfig.VERSION_NAME, BuildConfig.DEBUG, R.mipmap.ic_launcher_foreground, keyword = "tv")
             }
         }
     }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        intent.filmSlug()?.let { link = it }
+    }
 }
+
+private fun Intent.filmSlug() = data?.takeIf { it.scheme == "tmovie" && it.host == "film" }?.lastPathSegment
 
 enum class Tab(val label: String, val icon: ImageVector, val selectedIcon: ImageVector) {
     Home("Trang chủ", Icons.Outlined.Home, Icons.Rounded.Home),
@@ -107,7 +120,7 @@ sealed interface Page {
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun TvApp(onExit: () -> Unit) {
+fun TvApp(onExit: () -> Unit, link: String? = null, onLinkOpened: () -> Unit = {}) {
     var tab by rememberSaveable { mutableStateOf(Tab.Home) }
     val context = LocalContext.current
     val pages = remember { mutableStateListOf<Page>() }
@@ -143,6 +156,12 @@ fun TvApp(onExit: () -> Unit) {
         }
     }
     BackHandler(onBack = ::back)
+    LaunchedEffect(link) {
+        val slug = link ?: return@LaunchedEffect
+        pages.clear(); openers.clear()
+        open(Library.record(slug)?.film ?: FilmItem(name = "", slug = slug))
+        onLinkOpened()
+    }
     LaunchedEffect(restore) {
         val r = restore ?: return@LaunchedEffect
         withFrameNanos {}  // after the page leaves the tree
