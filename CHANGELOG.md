@@ -10,10 +10,11 @@ Every new feature/release must add a `## vX.Y.Z` section with both parts.
 
 ## v1.10.1
 
-Android TV: posters load much faster. The image host (phimimg.com) holds every request ~8 s regardless of size, and OkHttp allowed only 5 requests per host, so a screen of 20 cards took over 30 s. The TV image loader now runs up to 32 requests per host and keeps a 200 MB disk cache, so a screen fills in one wait and revisits are instant.
+Android TV: posters load much faster. The image host (phimimg.com) holds every request ~8 s regardless of size, and OkHttp allowed only 5 requests per host, so a screen of 20 cards took over 30 s. The TV image loader now runs up to 32 requests per host and keeps a 200 MB disk cache, so a screen fills in one wait and revisits are instant. New Lịch sử tab (as the phone's "Của tôi"): everything watched with progress and time left, My List, and a two-press "Xoá lịch sử".
 
 <!-- app:vi -->
 ⚡ Cải thiện (Android TV)
+• Tab Lịch sử mới: xem lại phim đã xem (kèm tiến độ, số phút còn lại) và Danh sách của tôi.
 • Ảnh phim tải nhanh hơn nhiều, mở lại các trang đã xem thì ảnh hiện ngay.
 <!-- /app:vi -->
 

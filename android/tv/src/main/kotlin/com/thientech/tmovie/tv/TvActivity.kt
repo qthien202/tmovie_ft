@@ -29,10 +29,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Explore
+import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.LiveTv
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.rounded.Explore
+import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.LiveTv
 import androidx.compose.material.icons.rounded.Search
@@ -108,6 +110,7 @@ enum class Tab(val label: String, val icon: ImageVector, val selectedIcon: Image
     Home("Trang chủ", Icons.Outlined.Home, Icons.Rounded.Home),
     Search("Tìm kiếm", Icons.Outlined.Search, Icons.Rounded.Search),
     Browse("Khám phá", Icons.Outlined.Explore, Icons.Rounded.Explore),
+    History("Lịch sử", Icons.Outlined.History, Icons.Rounded.History),
     Live("Truyền hình", Icons.Outlined.LiveTv, Icons.Rounded.LiveTv),
 }
 
@@ -200,6 +203,7 @@ fun TvApp(onExit: () -> Unit, link: String? = null, onLinkOpened: () -> Unit = {
                             Tab.Home -> HomeTab(::open, ::openList)
                             Tab.Search -> SearchTab(::open, searchRequest)
                             Tab.Browse -> BrowseTab(::open)
+                            Tab.History -> HistoryTab(::open)
                             Tab.Live -> LiveTab()
                         }
                     }
