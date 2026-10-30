@@ -207,12 +207,13 @@ fun TvApp(onExit: () -> Unit, link: String? = null, onLinkOpened: () -> Unit = {
                 SideNav(tab, navFocus, onFocused = { navFocused = it }, onRight = { runCatching { content.requestFocus() } }) { tab = it }
             }
             pages.forEachIndexed { i, page ->
-                // Each page traps focus so the remote can't wander into what's under it.
+                // The top page traps focus so the remote can't wander into what's under it. Only the top
+                // one: a trap below would also refuse the new page's own focus request (its Play button).
                 Box(
                     Modifier
                         .fillMaxSize()
                         .graphicsLayer { alpha = if (i == pages.lastIndex) 1f else 0f }
-                        .focusProperties { exit = { FocusRequester.Cancel } }
+                        .focusProperties { exit = { if (i == pages.lastIndex) FocusRequester.Cancel else FocusRequester.Default } }
                         .focusGroup(),
                 ) {
                     when (page) {
