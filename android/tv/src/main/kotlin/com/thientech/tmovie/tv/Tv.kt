@@ -254,11 +254,11 @@ fun WideCard(film: FilmItem, onClick: () -> Unit, modifier: Modifier = Modifier.
 
 /** "Xem tiếp": the still with a progress line, and how much is left. */
 @Composable
-fun ContinueCard(record: WatchRecord, onClick: () -> Unit, onFocus: () -> Unit = {}, focusRequester: FocusRequester = remember { FocusRequester() }) {
+fun ContinueCard(record: WatchRecord, onClick: () -> Unit, modifier: Modifier = Modifier.width(Tv.CardWidth), onFocus: () -> Unit = {}, focusRequester: FocusRequester = remember { FocusRequester() }) {
     val slug = record.lastEpisodeSlug
     val left = ((record.durations[slug] ?: 0.0) - (record.positions[slug] ?: 0.0)) / 60
     val sub = listOfNotNull(record.episodeName.ifBlank { null }, if (left >= 1) "còn ${left.toInt()} phút" else null).joinToString(" · ")
-    Captioned(Modifier.width(Tv.CardWidth), record.film.name, sub.ifBlank { null }) { report ->
+    Captioned(modifier, record.film.name, sub.ifBlank { null }) { report ->
         FocusCard(onClick, Modifier.fillMaxWidth().aspectRatio(16f / 9f), focusRequester = focusRequester, onFocusChange = { report(it); if (it) onFocus() }) {
             RemoteImage(record.film.thumbImage, Modifier.fillMaxSize(), record.film.name)
             Box(Modifier.align(Alignment.BottomStart).padding(10.dp).fillMaxWidth().height(4.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.3f))) {
