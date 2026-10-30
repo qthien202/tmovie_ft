@@ -35,9 +35,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
@@ -92,6 +95,23 @@ class FocusMemory { var last: FocusRequester? = null }
 
 val LocalFocusMemory = staticCompositionLocalOf { FocusMemory() }
 
+/** Overlays that Back should close first (the app takes Back before focus sees it). */
+class BackStack { val handlers = mutableStateListOf<() -> Unit>() }
+
+val LocalBackStack = staticCompositionLocalOf { BackStack() }
+
+/** While composed, Back calls [onBack] instead of leaving the page. */
+@Composable
+fun BackOverride(onBack: () -> Unit) {
+    val stack = LocalBackStack.current
+    val current by rememberUpdatedState(onBack)
+    DisposableEffect(stack) {
+        val handler = { current() }
+        stack.handlers += handler
+        onDispose { stack.handlers -= handler }
+    }
+}
+
 /** The one focusable surface: grows and rings white while focused. OK on the remote clicks it. */
 @Composable
 fun FocusCard(
@@ -129,6 +149,7 @@ fun Chip(
     selected: Boolean = false,
     focusRequester: FocusRequester = remember { FocusRequester() },
     leading: (@Composable (Color) -> Unit)? = null,
+    trailing: (@Composable (Color) -> Unit)? = null,
 ) {
     FocusCard(onClick, modifier, CircleShape, scale = 1.06f, focusRequester = focusRequester) { focused ->
         val fg = when {
@@ -146,6 +167,7 @@ fun Chip(
         ) {
             leading?.invoke(fg)
             Text(text, color = fg, fontSize = 18.sp, fontWeight = if (selected || focused) FontWeight.Bold else FontWeight.Medium, maxLines = 1)
+            trailing?.invoke(fg)
         }
     }
 }

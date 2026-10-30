@@ -28,9 +28,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.LiveTv
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.rounded.Explore
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.LiveTv
 import androidx.compose.material.icons.rounded.Search
@@ -105,6 +107,7 @@ private fun Intent.filmSlug() = data?.takeIf { it.scheme == "tmovie" && it.host 
 enum class Tab(val label: String, val icon: ImageVector, val selectedIcon: ImageVector) {
     Home("Trang chủ", Icons.Outlined.Home, Icons.Rounded.Home),
     Search("Tìm kiếm", Icons.Outlined.Search, Icons.Rounded.Search),
+    Browse("Khám phá", Icons.Outlined.Explore, Icons.Rounded.Explore),
     Live("Truyền hình", Icons.Outlined.LiveTv, Icons.Rounded.LiveTv),
 }
 
@@ -129,6 +132,7 @@ fun TvApp(onExit: () -> Unit, link: String? = null, onLinkOpened: () -> Unit = {
     val openers = remember { mutableListOf<FocusRequester?>() }
     var restore by remember { mutableStateOf<FocusRequester?>(null) }
     val memory = remember { FocusMemory() }
+    val overlays = remember { BackStack() }
     val navFocus = remember { Tab.entries.associateWith { FocusRequester() } }
     val content = remember { FocusRequester() }
     var navFocused by remember { mutableStateOf(false) }
@@ -144,6 +148,7 @@ fun TvApp(onExit: () -> Unit, link: String? = null, onLinkOpened: () -> Unit = {
     // Back: close the top page → step out to the nav → leave a tab for Home → exit.
     fun back() {
         when {
+            overlays.handlers.isNotEmpty() -> overlays.handlers.last()()
             pages.isNotEmpty() -> { pages.removeAt(pages.lastIndex); restore = openers.removeAt(openers.lastIndex) }
             !navFocused -> runCatching { navFocus.getValue(tab).requestFocus() }
             tab != Tab.Home -> { tab = Tab.Home; runCatching { navFocus.getValue(Tab.Home).requestFocus() } }
@@ -169,7 +174,7 @@ fun TvApp(onExit: () -> Unit, link: String? = null, onLinkOpened: () -> Unit = {
         restore = null
     }
 
-    CompositionLocalProvider(LocalFocusMemory provides memory) {
+    CompositionLocalProvider(LocalFocusMemory provides memory, LocalBackStack provides overlays) {
         // Back is taken here before focus sees it: Compose spends a focused Back on clearing focus.
         Box(
             Modifier
@@ -194,6 +199,7 @@ fun TvApp(onExit: () -> Unit, link: String? = null, onLinkOpened: () -> Unit = {
                         when (tab) {
                             Tab.Home -> HomeTab(::open, ::openList)
                             Tab.Search -> SearchTab(::open, searchRequest)
+                            Tab.Browse -> BrowseTab(::open)
                             Tab.Live -> LiveTab()
                         }
                     }

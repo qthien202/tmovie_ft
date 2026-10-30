@@ -32,30 +32,41 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.thientech.tmovie.core.designsystem.TMovieColors
 import com.thientech.tmovie.core.model.FilmItem
+import com.thientech.tmovie.core.network.Filter
 import com.thientech.tmovie.core.network.PhimApi
 import com.thientech.tmovie.core.network.Source
 
-/** A whole list ("Xem tất cả" on a row): a poster grid that loads the next page as focus nears the end. */
+/** A whole list ("Xem tất cả" on a row). */
 @Composable
 fun CatalogPage(title: String, source: Source, onOpen: (FilmItem) -> Unit) {
+    Column(Modifier.fillMaxSize().padding(top = 40.dp)) {
+        Text(title, color = Color.White, fontSize = 30.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = Tv.Start))
+        FilmGrid(source, Filter(), onOpen, focusFirst = true)
+    }
+}
+
+/** A 4-across grid of a list that loads the next page as focus nears the end. */
+@Composable
+fun FilmGrid(source: Source, filter: Filter, onOpen: (FilmItem) -> Unit, focusFirst: Boolean = false) {
     val films = remember { mutableStateListOf<FilmItem>() }
     var page by remember { mutableIntStateOf(0) }
     var hasMore by remember { mutableStateOf(true) }
     var loading by remember { mutableStateOf(false) }
+    var failed by remember { mutableStateOf(false) }
     val grid = rememberLazyGridState()
     val first = remember { FocusRequester() }
 
     suspend fun loadMore() {
         if (loading || !hasMore) return
         loading = true
-        runCatching { PhimApi.shared.list(source, page + 1) }
+        runCatching { PhimApi.shared.list(source, page + 1, filter) }
             .onSuccess { p -> films += p.items.filter { f -> films.none { it.slug == f.slug } }; page = p.currentPage; hasMore = p.hasMore }
-            .onFailure { hasMore = false }
+            .onFailure { hasMore = false; failed = films.isEmpty() }
         loading = false
     }
     LaunchedEffect(Unit) {
         loadMore()
-        repeat(30) {
+        if (focusFirst) repeat(30) {
             withFrameNanos {}
             if (runCatching { first.requestFocus() }.isSuccess) return@LaunchedEffect
         }
@@ -65,21 +76,21 @@ fun CatalogPage(title: String, source: Source, onOpen: (FilmItem) -> Unit) {
             .collect { near -> if (near) loadMore() }
     }
 
-    Column(Modifier.fillMaxSize().padding(top = 40.dp)) {
-        Text(title, color = Color.White, fontSize = 30.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = Tv.Start))
-        when {
-            films.isEmpty() && loading -> Box(Modifier.fillMaxSize()) { CircularProgressIndicator(Modifier.align(Alignment.Center), color = TMovieColors.BrandLight) }
-            films.isEmpty() -> Text("Không tải được danh sách", color = TMovieColors.Secondary, fontSize = 18.sp, modifier = Modifier.padding(start = Tv.Start, top = 24.dp))
-            else -> LazyVerticalGrid(
-                GridCells.Fixed(4),
-                state = grid,
-                contentPadding = PaddingValues(start = Tv.Start, end = Tv.End, top = 20.dp, bottom = 48.dp),
-                horizontalArrangement = Arrangement.spacedBy(20.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                itemsIndexed(films, { _, f -> f.slug }) { i, f ->
-                    if (i == 0) WideCard(f, { onOpen(f) }, Modifier.fillMaxWidth(), focusRequester = first) else WideCard(f, { onOpen(f) }, Modifier.fillMaxWidth())
-                }
+    when {
+        films.isEmpty() && (loading || hasMore) -> Box(Modifier.fillMaxSize()) { CircularProgressIndicator(Modifier.align(Alignment.Center), color = TMovieColors.BrandLight) }
+        films.isEmpty() -> Text(
+            if (failed) "Không tải được danh sách" else "Không có phim nào khớp bộ lọc",
+            color = TMovieColors.Secondary, fontSize = 18.sp, modifier = Modifier.padding(start = Tv.Start, top = 24.dp),
+        )
+        else -> LazyVerticalGrid(
+            GridCells.Fixed(4),
+            state = grid,
+            contentPadding = PaddingValues(start = Tv.Start, end = Tv.End, top = 20.dp, bottom = 48.dp),
+            horizontalArrangement = Arrangement.spacedBy(20.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            itemsIndexed(films, { _, f -> f.slug }) { i, f ->
+                if (i == 0) WideCard(f, { onOpen(f) }, Modifier.fillMaxWidth(), focusRequester = first) else WideCard(f, { onOpen(f) }, Modifier.fillMaxWidth())
             }
         }
     }

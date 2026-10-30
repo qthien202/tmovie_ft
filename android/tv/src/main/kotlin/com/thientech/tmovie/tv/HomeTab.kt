@@ -88,6 +88,10 @@ fun HomeTab(onOpen: (FilmItem) -> Unit, onList: (String, Source) -> Unit) {
         }
     }
 
+    // The TV home screen's channel mirrors the billboard (same films, same art).
+    val context = LocalContext.current
+    LaunchedEffect(vm.hero, vm.heroArt.size) { Featured.publish(context, vm.hero, vm.heroArt.toMap()) }
+
     BoxWithConstraints(Modifier.fillMaxSize()) {
         if (vm.hero.isEmpty() && vm.rails.isEmpty()) {
             if (vm.failed) Text("Không tải được, kiểm tra mạng rồi mở lại app.", color = TMovieColors.Secondary, fontSize = 20.sp, modifier = Modifier.align(Alignment.Center))
