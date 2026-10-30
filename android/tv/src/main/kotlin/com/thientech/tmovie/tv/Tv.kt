@@ -82,6 +82,8 @@ object Tv {
     val PosterWidth = 132.dp
     /** Room above and below a row's cards for the focus scale. */
     val RowBleed = 14.dp
+    /** The icon's play mark split: cyan, lavender, pink (banner and wordmark). */
+    val LogoColors = listOf(Color(0xFF5EDBD7), Color(0xFFA595F0), Color(0xFFEF7CBB))
     val Title = TextStyle(fontWeight = FontWeight.ExtraBold, fontSize = 50.sp, lineHeight = 54.sp, letterSpacing = (-0.5).sp)
 }
 

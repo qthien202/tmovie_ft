@@ -121,12 +121,12 @@ fun ProgressStrip(value: Float, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun Wordmark(modifier: Modifier = Modifier, size: Int = 26) {
+fun Wordmark(modifier: Modifier = Modifier, size: Int = 26, colors: List<Color> = listOf(TMovieColors.Brand, TMovieColors.BrandLight)) {
     Text(
         "TMOVIE",
         modifier = modifier,
         style = TextStyle(
-            brush = Brush.horizontalGradient(listOf(TMovieColors.Brand, TMovieColors.BrandLight)),
+            brush = Brush.horizontalGradient(colors),
             fontSize = size.sp,
             fontWeight = FontWeight.Black,
             letterSpacing = (size * 0.06).sp,

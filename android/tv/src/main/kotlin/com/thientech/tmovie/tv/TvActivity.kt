@@ -5,7 +5,8 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
-import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusGroup
@@ -24,6 +25,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.LiveTv
@@ -199,70 +201,70 @@ fun TvApp(onExit: () -> Unit) {
 }
 
 /**
- * Icons down the left edge; focusing it slides out the labels over a dark fade (Google TV).
- * Coming back into the nav lands on the current tab.
+ * Netflix's TV menu: a quiet icon rail; focusing it dims the whole screen (darkest on the left)
+ * and spells out the tabs. Coming back into the nav lands on the current tab.
+ *
+ * Only the dim fades; the rail snaps between widths, as an animated width relayouts every frame.
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun SideNav(tab: Tab, focus: Map<Tab, FocusRequester>, onFocused: (Boolean) -> Unit, onRight: () -> Unit, onSelect: (Tab) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
-    val width by animateDpAsState(if (expanded) 260.dp else 80.dp, label = "nav")
-    Box(
-        Modifier
-            .fillMaxHeight()
-            .width(if (expanded) 520.dp else Tv.Start)
-                        // Collapsed, a short fade so rows scrolling left pass under the icons cleanly.
-            .background(Brush.horizontalGradient(if (expanded) listOf(TMovieColors.Canvas, TMovieColors.Canvas.copy(alpha = 0.92f), Color.Transparent) else listOf(TMovieColors.Canvas, TMovieColors.Canvas.copy(alpha = 0.85f), Color.Transparent))),
-    ) {
+    val shown by animateFloatAsState(if (expanded) 1f else 0f, tween(200), label = "nav")
+    Box(Modifier.fillMaxSize()) {
+        // Collapsed: a short fade so rows scrolling left pass under the icons cleanly.
+        Box(Modifier.fillMaxHeight().width(Tv.Start).background(Brush.horizontalGradient(listOf(TMovieColors.Canvas, TMovieColors.Canvas.copy(alpha = 0.8f), Color.Transparent))))
+        Box(
+            Modifier.fillMaxSize().graphicsLayer { alpha = shown }.background(
+                Brush.horizontalGradient(0f to TMovieColors.Canvas, 0.28f to TMovieColors.Canvas.copy(alpha = 0.96f), 0.6f to TMovieColors.Canvas.copy(alpha = 0.75f), 1f to TMovieColors.Canvas.copy(alpha = 0.6f)),
+            ),
+        )
         Column(
             Modifier
                 .fillMaxHeight()
-                .width(width)
+                .width(if (expanded) 320.dp else 80.dp)
                 .onFocusChanged { expanded = it.hasFocus; onFocused(it.hasFocus) }
                 // The expanded nav overlaps the content, which leaves nothing "to the right" for focus search.
                 .onPreviewKeyEvent { e -> (e.key == Key.DirectionRight).also { if (it && e.type == KeyEventType.KeyDown) onRight() } }
                 .focusRestorer(focus.getValue(tab))
                 .focusGroup()
-                .padding(start = 16.dp, top = 28.dp, bottom = 28.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+                .padding(start = 16.dp, top = 40.dp, bottom = 40.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
-            Box(Modifier.height(36.dp).padding(start = 12.dp)) {
-                if (expanded) Wordmark(size = 22)
+            Box(Modifier.height(36.dp).padding(start = 16.dp).graphicsLayer { alpha = shown }) {
+                if (expanded) Wordmark(size = 24, colors = Tv.LogoColors)
             }
             Spacer(Modifier.weight(1f))
-            Tab.entries.forEach { t -> NavItem(t, t == tab, expanded, focus.getValue(t)) { onSelect(t) } }
+            Tab.entries.forEach { t -> NavItem(t, t == tab, expanded, shown, focus.getValue(t)) { onSelect(t) } }
             Spacer(Modifier.weight(1.4f))
         }
     }
 }
 
 @Composable
-private fun NavItem(tab: Tab, selected: Boolean, expanded: Boolean, focus: FocusRequester, onSelect: () -> Unit) {
+private fun NavItem(tab: Tab, selected: Boolean, expanded: Boolean, shown: Float, focus: FocusRequester, onSelect: () -> Unit) {
     val interaction = remember { MutableInteractionSource() }
     val focused by interaction.collectIsFocusedAsState()
     // Moving onto a tab opens it, like Google TV's nav.
     LaunchedEffect(focused) { if (focused && !selected) onSelect() }
-    val fg = when {
-        focused -> Color.Black
-        selected -> TMovieColors.BrandLight
-        else -> Color.White.copy(alpha = 0.7f)
-    }
+    val fg = if (focused || selected) Color.White else Color.White.copy(alpha = 0.5f)
     Row(
         Modifier
             .fillMaxWidth()
-            .padding(end = 12.dp)
-            .height(48.dp)
-            .clip(CircleShape)
-            .background(if (focused) Color.White else if (selected && expanded) Color.White.copy(alpha = 0.1f) else Color.Transparent)
+            .padding(end = 16.dp)
+            .height(52.dp)
+            .clip(RoundedCornerShape(10.dp))
+            .background(if (focused) Color.White.copy(alpha = 0.14f) else Color.Transparent)
             .focusRequester(focus)
-            .clickable(interaction, indication = null, onClick = onSelect)
-            .padding(start = 12.dp),
+            .clickable(interaction, indication = null, onClick = onSelect),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(if (selected || focused) tab.selectedIcon else tab.icon, tab.label, tint = fg, modifier = Modifier.size(26.dp))
+        // The current tab's mark, collapsed or not.
+        Box(Modifier.padding(start = 4.dp).size(3.dp, 22.dp).clip(CircleShape).background(if (selected) TMovieColors.BrandLight else Color.Transparent))
+        Icon(if (selected || focused) tab.selectedIcon else tab.icon, tab.label, tint = fg, modifier = Modifier.padding(start = 9.dp).size(26.dp))
         if (expanded) {
-            Text(tab.label, color = fg, fontSize = 18.sp, fontWeight = if (selected || focused) FontWeight.SemiBold else FontWeight.Medium,
-                maxLines = 1, modifier = Modifier.padding(start = 16.dp))
+            Text(tab.label, color = fg, fontSize = 20.sp, fontWeight = if (focused || selected) FontWeight.Bold else FontWeight.Medium,
+                maxLines = 1, modifier = Modifier.padding(start = 18.dp).graphicsLayer { alpha = shown })
         }
     }
 }
