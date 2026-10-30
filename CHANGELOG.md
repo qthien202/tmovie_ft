@@ -8,6 +8,15 @@ Vietnamese block free of Markdown styling (use emoji + "•" bullets).
 
 Every new feature/release must add a `## vX.Y.Z` section with both parts.
 
+## v1.10.1
+
+Android TV: posters load much faster. The image host (phimimg.com) holds every request ~8 s regardless of size, and OkHttp allowed only 5 requests per host, so a screen of 20 cards took over 30 s. The TV image loader now runs up to 32 requests per host and keeps a 200 MB disk cache, so a screen fills in one wait and revisits are instant.
+
+<!-- app:vi -->
+⚡ Cải thiện (Android TV)
+• Ảnh phim tải nhanh hơn nhiều, mở lại các trang đã xem thì ảnh hiện ngay.
+<!-- /app:vi -->
+
 ## v1.10.0
 
 Native Android TV app (`android/:tv`) replaces the Flutter TV build, on the same core as the phone app (PhimAPI, ad-free HLS, library, OTA), styled after Netflix and Apple TV. Home opens on a full-screen billboard of the hot list (textless key art, TOP n tag, synopsis, Phát / Thông tin / +, rotating every 12 s while on screen), then rows on the plain canvas that pin to the top as focus moves: Xem tiếp (progress, minutes left), a Netflix-style Top 10 row with outlined rank numbers, hot series, My List and the genre rails, each ending in "Xem tất cả" (paginated grid). Landscape cards with titles underneath; focus is a scale + white ring. Film pages: full-bleed art with details and Play / Continue low on the left, dimming as the server, 50-episode block, episode and similar rows scroll up. Search with an on-screen A–Z / 0–9 keyboard (no system IME; the remote's search key lands on it). Live channels by country and category. Remote player: OK plays / pauses, ◀ ▶ seek (faster when held), ▼ opens episodes, quality, subtitles, audio and speed; Apple TV style scrubber with time left; auto-next and resume as on the phone. Back steps out page → nav → Home; a second Back within 2 s exits. Netflix-style side menu (icon rail; focusing it dims the screen and spells out the tabs). New Khám phá tab: browse every film by kind (all / series / movies / animation / TV shows), genre, country and year through Netflix-style full-screen pickers, with a paginated grid and a one-press reset. The home billboard's films are published as the app's "Phim nổi bật" channel on the TV home screen (same key art). Films being watched appear in the TV home screen's Watch Next row (`androidx.tvprovider`, searchable, 16:9 art) and open via `tmovie://film/<slug>`. New launcher banner and TV wordmark in the icon's cyan → lavender → pink. Built for low-end boxes: no shadows, blurs or per-focus backdrops, a small image cache (RGB 565 on low-RAM devices) and a baseline profile (also added to the phone app). On the Google TV emulator: ~5 % janky frames, p90 19 ms, ~75 MB PSS. Same package id and key as the Flutter TV app, so it installs over it; releases ship `tmovie-tv` again. Phone: the update dialog moved to `core:ui` and focuses its main button for remotes.
