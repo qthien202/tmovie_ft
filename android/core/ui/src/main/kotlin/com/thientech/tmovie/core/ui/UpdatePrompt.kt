@@ -1,4 +1,4 @@
-package com.thientech.tmovie
+package com.thientech.tmovie.core.ui
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.Animatable
@@ -47,7 +47,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -55,6 +54,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.annotation.DrawableRes
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import com.thientech.tmovie.core.data.AppUpdate
 import com.thientech.tmovie.core.data.AppUpdater
 import com.thientech.tmovie.core.designsystem.TMovieColors
@@ -74,23 +77,26 @@ private sealed interface Phase {
  * app icon, version jump, formatted release notes, and an in-place download → install flow.
  */
 @Composable
-fun UpdatePrompt() {
+fun UpdatePrompt(version: String, debug: Boolean, @DrawableRes icon: Int, keyword: String = "mobile") {
     var update by remember { mutableStateOf<AppUpdate?>(null) }
     LaunchedEffect(Unit) {
-        if (BuildConfig.DEBUG) return@LaunchedEffect
-        update = AppUpdater.check(BuildConfig.VERSION_NAME)
+        if (debug) return@LaunchedEffect
+        update = AppUpdater.check(version, keyword)
     }
-    update?.let { UpdateDialog(it) { update = null } }
+    update?.let { UpdateDialog(it, version, icon) { update = null } }
 }
 
 @Composable
-private fun UpdateDialog(update: AppUpdate, onDismiss: () -> Unit) {
+private fun UpdateDialog(update: AppUpdate, version: String, @DrawableRes icon: Int, onDismiss: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var phase by remember { mutableStateOf<Phase>(Phase.Idle) }
     val busy = phase is Phase.Downloading
     val entrance = remember { Animatable(0f) }
     LaunchedEffect(Unit) { entrance.animateTo(1f, spring(dampingRatio = 0.8f, stiffness = Spring.StiffnessMediumLow)) }
+
+    val focus = remember { FocusRequester() }
+    LaunchedEffect(Unit) { runCatching { focus.requestFocus() } }  // TV remotes start on "Cập nhật"
 
     fun start() = scope.launch {
         phase = Phase.Downloading(0, -1)
@@ -128,13 +134,13 @@ private fun UpdateDialog(update: AppUpdate, onDismiss: () -> Unit) {
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Box(Modifier.size(76.dp).clip(RoundedCornerShape(20.dp)).background(colorResource(R.color.icon_background)), contentAlignment = Alignment.Center) {
-                    Image(painterResource(R.mipmap.ic_launcher_foreground), null, Modifier.size(108.dp))
+                Box(Modifier.size(76.dp).clip(RoundedCornerShape(20.dp)).background(Color(0xFF0A0D14)), contentAlignment = Alignment.Center) {
+                    Image(painterResource(icon), null, Modifier.size(108.dp))
                 }
                 Spacer(Modifier.height(16.dp))
                 Text("Đã có bản mới", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.height(10.dp))
-                VersionJump(BuildConfig.VERSION_NAME, update.version)
+                VersionJump(version, update.version)
                 Spacer(Modifier.height(18.dp))
 
                 Column(
@@ -159,6 +165,7 @@ private fun UpdateDialog(update: AppUpdate, onDismiss: () -> Unit) {
                 }
 
                 PrimaryButton(
+                    focus = focus,
                     text = when (phase) {
                         is Phase.Downloading -> "Đang tải…"
                         is Phase.Ready -> "Cài đặt"
@@ -173,11 +180,18 @@ private fun UpdateDialog(update: AppUpdate, onDismiss: () -> Unit) {
                     }
                 }
                 if (!busy) {
+                    var laterFocused by remember { mutableStateOf(false) }
                     Text(
                         "Để sau",
-                        color = TMovieColors.Secondary,
+                        color = if (laterFocused) Color.White else TMovieColors.Secondary,
                         fontSize = 15.sp,
-                        modifier = Modifier.padding(top = 6.dp).clip(CircleShape).clickable(onClick = onDismiss).padding(horizontal = 16.dp, vertical = 10.dp),
+                        modifier = Modifier
+                            .padding(top = 6.dp)
+                            .onFocusChanged { laterFocused = it.isFocused }
+                            .clip(CircleShape)
+                            .border(2.dp, if (laterFocused) Color.White else Color.Transparent, CircleShape)
+                            .clickable(onClick = onDismiss)
+                            .padding(horizontal = 16.dp, vertical = 10.dp),
                     )
                 }
             }
@@ -235,9 +249,12 @@ private fun DownloadProgress(p: Phase.Downloading) {
 }
 
 @Composable
-private fun PrimaryButton(text: String, enabled: Boolean, onClick: () -> Unit) {
+private fun PrimaryButton(focus: FocusRequester, text: String, enabled: Boolean, onClick: () -> Unit) {
+    var focused by remember { mutableStateOf(false) }
     Box(
         Modifier
+            .focusRequester(focus)
+            .onFocusChanged { focused = it.isFocused }
             .fillMaxWidth()
             .height(52.dp)
             .clip(RoundedCornerShape(16.dp))
@@ -245,6 +262,7 @@ private fun PrimaryButton(text: String, enabled: Boolean, onClick: () -> Unit) {
                 if (enabled) Brush.horizontalGradient(listOf(TMovieColors.Brand, Color(0xFF14B8A6)))
                 else Brush.horizontalGradient(listOf(Color.White.copy(alpha = 0.12f), Color.White.copy(alpha = 0.12f))),
             )
+            .border(2.dp, if (focused) Color.White else Color.Transparent, RoundedCornerShape(16.dp))
             .clickable(enabled = enabled, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) { Text(text, color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.SemiBold) }

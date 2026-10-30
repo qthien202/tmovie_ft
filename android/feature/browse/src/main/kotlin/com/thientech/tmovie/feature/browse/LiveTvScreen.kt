@@ -103,7 +103,7 @@ fun parseM3u(text: String): List<Channel> {
 }
 
 /** iptv-org's whole index (~11k channels; every country and category in one file). */
-private const val IPTV_ORG = "https://iptv-org.github.io/iptv/index.m3u"
+const val IPTV_ORG = "https://iptv-org.github.io/iptv/index.m3u"
 private const val ALL = "iptv-org"
 
 /** iptv-org's categories, in Vietnamese. */
@@ -116,10 +116,10 @@ private val categoryNames = mapOf(
     "Religious" to "Tôn giáo", "Legislative" to "Nghị viện", "Public" to "Công cộng", "Interactive" to "Tương tác",
 )
 
-private fun categoryName(c: String) = categoryNames[c] ?: c
+fun categoryName(c: String) = categoryNames[c] ?: c
 
 /** "🇻🇳 Việt Nam" from "vn" (iptv-org writes the UK as "uk"). */
-private fun countryName(code: String): String {
+fun countryName(code: String): String {
     val iso = if (code == "uk") "GB" else code.uppercase()
     val flag = iso.takeIf { it.length == 2 && it.all(Char::isLetter) }?.map { Character.toChars(0x1F1E6 + (it - 'A')).concatToString() }?.joinToString("").orEmpty()
     return "$flag ${java.util.Locale("", iso).getDisplayCountry(java.util.Locale("vi")).ifBlank { iso }}".trim()
@@ -127,6 +127,11 @@ private fun countryName(code: String): String {
 
 /** Playlists load once per run: iptv-org's index is 2.5 MB. */
 private val cache = HashMap<String, List<Channel>>()
+
+/** A playlist's channels, minus DASH (which the player doesn't play); cached for the run. */
+suspend fun loadChannels(url: String = IPTV_ORG): List<Channel> = cache[url] ?: withContext(Dispatchers.IO) {
+    parseM3u(URL(url).readText()).filter { !it.url.contains(".mpd") }
+}.also { cache[url] = it }
 
 private fun customLists(context: Context) =
     context.getSharedPreferences("live", Context.MODE_PRIVATE).getStringSet("lists", emptySet()).orEmpty().sorted()
@@ -153,12 +158,11 @@ fun LiveTvScreen() {
     var adding by remember { mutableStateOf(false) }
 
     LaunchedEffect(source) {
-        channels = cache[source]
+        val url = if (source == ALL) IPTV_ORG else source
+        channels = cache[url]
         failed = false
         if (channels != null) return@LaunchedEffect
-        runCatching {
-            withContext(Dispatchers.IO) { parseM3u(URL(if (source == ALL) IPTV_ORG else source).readText()).filter { !it.url.contains(".mpd") } }
-        }.onSuccess { cache[source] = it; channels = it }.onFailure { failed = true }
+        runCatching { loadChannels(url) }.onSuccess { channels = it }.onFailure { failed = true }
     }
 
     val all = channels.orEmpty()

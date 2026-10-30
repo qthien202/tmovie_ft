@@ -13,6 +13,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.thientech.tmovie.core.data.Settings
 import com.thientech.tmovie.core.designsystem.TMovieTheme
+import com.thientech.tmovie.core.ui.UpdatePrompt
 import com.thientech.tmovie.feature.home.rememberReduceMotion
 import com.thientech.tmovie.feature.onboarding.OnboardingScreen
 import com.thientech.tmovie.feature.onboarding.SplashScreen
@@ -44,7 +45,7 @@ class MainActivity : ComponentActivity() {
                         else -> AppNavHost(link = link, onLinkHandled = { link = null })
                     }
                 }
-                UpdatePrompt()
+                UpdatePrompt(BuildConfig.VERSION_NAME, BuildConfig.DEBUG, R.mipmap.ic_launcher_foreground)
             }
         }
     }
