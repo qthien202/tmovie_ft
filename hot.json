@@ -1,0 +1,1652 @@
+{
+ "source": "netflix-top10-vietnam",
+ "week": "2026-11-01",
+ "updatedAt": "2026-11-06T06:44:09+00:00",
+ "items": [
+  {
+   "rank": 1,
+   "kind": "tv",
+   "title": "Doctor X: Mafia in White: Limited Series",
+   "film": {
+    "tmdb": {
+     "id": "293610",
+     "type": "tv",
+     "season": 1,
+     "vote_average": 9,
+     "vote_count": 2
+    },
+    "imdb": {
+     "id": "tt39328047",
+     "vote_average": 0,
+     "vote_count": 0
+    },
+    "modified": {
+     "time": "2026-11-01T15:31:44.000Z"
+    },
+    "_id": "71ec779093d8834cb2568cb676fc4482",
+    "name": "Bác Sĩ X",
+    "slug": "bac-si-x",
+    "origin_name": "Doctor X: Mafia in White",
+    "alternative_names": [
+     "Doctor X：白色黑手党时代",
+     "ドクターX",
+     "닥터X",
+     "Doctor X",
+     "닥터X: 하얀 마피아의 시대"
+    ],
+    "type": "series",
+    "thumb_url": "https://phimimg.com/uploads/movies/20261010/bac-si-x-thumb.webp",
+    "poster_url": "https://phimimg.com/uploads/movies/20261010/bac-si-x-poster.webp",
+    "sub_docquyen": false,
+    "chieurap": false,
+    "time": "66 phút/tập",
+    "episode_current": "Tập 8",
+    "quality": "FHD",
+    "lang": "Vietsub",
+    "lang_key": [
+     "vs"
+    ],
+    "year": 2026,
+    "category": [
+     {
+      "id": "2fb53017b3be83cd754a08adab3e916c",
+      "name": "Bí Ẩn",
+      "slug": "bi-an"
+     },
+     {
+      "id": "37a7b38b6184a5ebd3c43015aa20709d",
+      "name": "Chính Kịch",
+      "slug": "chinh-kich"
+     },
+     {
+      "id": "7a035ac0b37f5854f0f6979260899c90",
+      "name": "Hình Sự",
+      "slug": "hinh-su"
+     },
+     {
+      "id": "a7b065b92ad356387ef2e075dee66529",
+      "name": "Tâm Lý",
+      "slug": "tam-ly"
+     }
+    ],
+    "country": [
+     {
+      "id": "05de95be5fc404da9680bbb3dd8262e6",
+      "name": "Hàn Quốc",
+      "slug": "han-quoc"
+     }
+    ],
+    "last_episodes": [
+     {
+      "server_name": "Vietsub",
+      "is_ai": false,
+      "name": "Tập 08"
+     }
+    ]
+   }
+  },
+  {
+   "rank": 1,
+   "kind": "films",
+   "title": "Surviving Hurricane Otis",
+   "film": {
+    "tmdb": {
+     "id": "1780005",
+     "type": "movie",
+     "season": null,
+     "vote_average": 0,
+     "vote_count": 0
+    },
+    "imdb": {
+     "id": "tt37961714",
+     "vote_average": 0,
+     "vote_count": 0
+    },
+    "modified": {
+     "time": "2026-10-24T05:26:24.000Z"
+    },
+    "_id": "517d98cebdca61b686d3c9ddc2e58659",
+    "name": "Vượt Qua Bão Otis",
+    "slug": "vuot-qua-bao-otis",
+    "origin_name": "Surviving Hurricane Otis",
+    "alternative_names": [
+     "Surviving Hurricane Otis",
+     "抗击飓风",
+     "Contra el huracán"
+    ],
+    "type": "single",
+    "thumb_url": "https://phimimg.com/uploads/movies/20261024/vuot-qua-bao-otis-thumb.webp",
+    "poster_url": "https://phimimg.com/uploads/movies/20261024/vuot-qua-bao-otis-poster.webp",
+    "sub_docquyen": false,
+    "chieurap": false,
+    "time": "96 phút",
+    "episode_current": "Full",
+    "quality": "FHD",
+    "lang": "Vietsub",
+    "lang_key": [
+     "vs"
+    ],
+    "year": 2026,
+    "category": [
+     {
+      "id": "37a7b38b6184a5ebd3c43015aa20709d",
+      "name": "Chính Kịch",
+      "slug": "chinh-kich"
+     },
+     {
+      "id": "a7b065b92ad356387ef2e075dee66529",
+      "name": "Tâm Lý",
+      "slug": "tam-ly"
+     }
+    ],
+    "country": [
+     {
+      "id": "8dbb07a18d46f63d8b3c8994d5ccc351",
+      "name": "Mexico",
+      "slug": "mexico"
+     }
+    ],
+    "last_episodes": [
+     {
+      "server_name": "Vietsub",
+      "is_ai": false,
+      "name": "Full"
+     }
+    ]
+   }
+  },
+  {
+   "rank": 2,
+   "kind": "tv",
+   "title": "Where the Mask Ends: Season 1",
+   "film": {
+    "tmdb": {
+     "id": "300146",
+     "type": "tv",
+     "season": 1,
+     "vote_average": 9,
+     "vote_count": 1
+    },
+    "imdb": {
+     "id": "tt42576855",
+     "vote_average": 0,
+     "vote_count": 0
+    },
+    "modified": {
+     "time": "2026-11-06T12:53:03.000Z"
+    },
+    "_id": "ce1867990ed63be4b4d0371521e4d6c9",
+    "name": "Gả Kim Thoa / Gả trâm vàng",
+    "slug": "ga-kim-thoa-ga-tram-vang",
+    "origin_name": "Where The Mask Ends",
+    "alternative_names": [
+     "嫁金釵",
+     "Jia Jin Chai",
+     "Transfer Gold Hairpin",
+     "嫁金钗"
+    ],
+    "type": "series",
+    "thumb_url": "https://phimimg.com/uploads/movies/20261016/ga-kim-thoa-ga-tram-vang-thumb.webp",
+    "poster_url": "https://phimimg.com/uploads/movies/20261016/ga-kim-thoa-ga-tram-vang-poster.webp",
+    "sub_docquyen": false,
+    "chieurap": false,
+    "time": "48 phút/tập",
+    "episode_current": "Tập 29",
+    "quality": "FHD",
+    "lang": "Vietsub + Thuyết Minh",
+    "lang_key": [
+     "vs",
+     "tm"
+    ],
+    "year": 2026,
+    "category": [
+     {
+      "id": "37a7b38b6184a5ebd3c43015aa20709d",
+      "name": "Chính Kịch",
+      "slug": "chinh-kich"
+     },
+     {
+      "id": "3a17c7283b71fa84e5a8d76fb790ed3e",
+      "name": "Cổ Trang",
+      "slug": "co-trang"
+     },
+     {
+      "id": "bb2b4b030608ca5984c8dd0770f5b40b",
+      "name": "Tình Cảm",
+      "slug": "tinh-cam"
+     },
+     {
+      "id": "a7b065b92ad356387ef2e075dee66529",
+      "name": "Tâm Lý",
+      "slug": "tam-ly"
+     }
+    ],
+    "country": [
+     {
+      "id": "3e075636c731fe0f889c69e0bf82c083",
+      "name": "Trung Quốc",
+      "slug": "trung-quoc"
+     }
+    ],
+    "last_episodes": [
+     {
+      "server_name": "Vietsub",
+      "is_ai": false,
+      "name": "Tập 29"
+     },
+     {
+      "server_name": "Thuyết Minh",
+      "is_ai": false,
+      "name": "Tập 26"
+     }
+    ]
+   }
+  },
+  {
+   "rank": 2,
+   "kind": "films",
+   "title": "Bunny!",
+   "film": {
+    "tmdb": {
+     "id": "1528577",
+     "type": "movie",
+     "season": null,
+     "vote_average": 7,
+     "vote_count": 1
+    },
+    "imdb": {
+     "id": "tt38934698",
+     "vote_average": 5.9,
+     "vote_count": 49
+    },
+    "modified": {
+     "time": "2026-06-01T01:25:37.000Z"
+    },
+    "_id": "ed5b3698e25bc1b85b239a4cea69f48b",
+    "name": "Thỏ Ơi!!",
+    "slug": "tho-oi",
+    "origin_name": "Bunny!!",
+    "alternative_names": [
+     "Thỏ Ơi!!"
+    ],
+    "type": "single",
+    "thumb_url": "https://phimimg.com/upload/vod/20260601-1/a93bfd52980655de0571d55d9c9f2440.jpg",
+    "poster_url": "https://phimimg.com/upload/vod/20260601-1/034afe4d9f1198904977bb7cd8297a56.jpg",
+    "sub_docquyen": false,
+    "chieurap": true,
+    "time": "127 phút",
+    "episode_current": "Full",
+    "quality": "FHD",
+    "lang": "Vietsub",
+    "lang_key": [
+     "vs"
+    ],
+    "year": 2026,
+    "category": [
+     {
+      "name": "Tình Cảm",
+      "slug": "tinh-cam",
+      "id": "bb2b4b030608ca5984c8dd0770f5b40b"
+     },
+     {
+      "name": "Chính Kịch",
+      "slug": "chinh-kich",
+      "id": "37a7b38b6184a5ebd3c43015aa20709d"
+     },
+     {
+      "name": "Tâm Lý",
+      "slug": "tam-ly",
+      "id": "a7b065b92ad356387ef2e075dee66529"
+     }
+    ],
+    "country": [
+     {
+      "name": "Việt Nam",
+      "slug": "viet-nam",
+      "id": "f6ce1ae8b39af9d38d653b8a0890adb8"
+     }
+    ],
+    "last_episodes": [
+     {
+      "server_name": "Vietsub",
+      "is_ai": false,
+      "name": "Full"
+     }
+    ]
+   }
+  },
+  {
+   "rank": 3,
+   "kind": "tv",
+   "title": "Dead-End Job: Limited Series",
+   "film": {
+    "tmdb": {
+     "id": "289517",
+     "type": "tv",
+     "season": 1,
+     "vote_average": 7.6,
+     "vote_count": 8
+    },
+    "imdb": {
+     "id": "tt36458668",
+     "vote_average": 0,
+     "vote_count": 0
+    },
+    "modified": {
+     "time": "2026-10-31T07:58:00.000Z"
+    },
+    "_id": "abfb4a09f2fb270b986e1267ab3fe58a",
+    "name": "Việc Ma, Lương Quái",
+    "slug": "viec-ma-luong-quai",
+    "origin_name": "Dead-End Job",
+    "alternative_names": [
+     "甜蜜兼职",
+     "Un job mortel",
+     "Идеальная работа",
+     "وظيفة الكوابيس",
+     "งานสนุก จะตาย",
+     "Dead End Job",
+     "꿀알바"
+    ],
+    "type": "series",
+    "thumb_url": "https://phimimg.com/uploads/movies/20261031/viec-ma-luong-quai-thumb.webp",
+    "poster_url": "https://phimimg.com/uploads/movies/20261031/viec-ma-luong-quai-poster.webp",
+    "sub_docquyen": false,
+    "chieurap": false,
+    "time": "44 phút/tập",
+    "episode_current": "Hoàn Tất (8/8)",
+    "quality": "FHD",
+    "lang": "Vietsub",
+    "lang_key": [
+     "vs"
+    ],
+    "year": 2026,
+    "category": [
+     {
+      "id": "2fb53017b3be83cd754a08adab3e916c",
+      "name": "Bí Ẩn",
+      "slug": "bi-an"
+     },
+     {
+      "id": "0bcf4077916678de9b48c89221fcf8ae",
+      "name": "Khoa Học",
+      "slug": "khoa-hoc"
+     },
+     {
+      "id": "68564911f00849030f9c9c144ea1b931",
+      "name": "Viễn Tưởng",
+      "slug": "vien-tuong"
+     },
+     {
+      "id": "a7b065b92ad356387ef2e075dee66529",
+      "name": "Tâm Lý",
+      "slug": "tam-ly"
+     }
+    ],
+    "country": [
+     {
+      "id": "05de95be5fc404da9680bbb3dd8262e6",
+      "name": "Hàn Quốc",
+      "slug": "han-quoc"
+     }
+    ],
+    "last_episodes": [
+     {
+      "server_name": "Vietsub",
+      "is_ai": false,
+      "name": "Tập 08"
+     }
+    ]
+   }
+  },
+  {
+   "rank": 3,
+   "kind": "films",
+   "title": "Black Bag",
+   "film": {
+    "tmdb": {
+     "id": "1233575",
+     "type": "movie",
+     "season": null,
+     "vote_average": 6.4,
+     "vote_count": 1269
+    },
+    "imdb": {
+     "id": "tt30988739",
+     "vote_average": 6.7,
+     "vote_count": 92730
+    },
+    "modified": {
+     "time": "2025-04-03T16:20:42.000Z"
+    },
+    "_id": "dd26f45f0e6f848d617be1f744c91f94",
+    "name": "Chiến Dịch Túi Đen",
+    "slug": "chien-dich-tui-den",
+    "origin_name": "Black Bag",
+    "alternative_names": [
+     "Confidencial",
+     "黑袋行動",
+     "Operacja Black Bag",
+     "Սև Տոպրակ",
+     "Sev Toprak",
+     "Le sac noir",
+     "ブラックバッグ",
+     "Black Bag"
+    ],
+    "type": "single",
+    "thumb_url": "https://phimimg.com/upload/vod/20250403-1/9ec0abbd3cda70aefc44e8ab43094f42.jpg",
+    "poster_url": "https://phimimg.com/upload/vod/20250403-1/fa176a509a7cec4c01313d7d0b8bfb82.jpg",
+    "sub_docquyen": false,
+    "chieurap": false,
+    "time": "94 phút",
+    "episode_current": "Full",
+    "quality": "FHD",
+    "lang": "Vietsub",
+    "lang_key": [
+     "vs"
+    ],
+    "year": 2025,
+    "category": [
+     {
+      "name": "Tâm Lý",
+      "slug": "tam-ly",
+      "id": "a7b065b92ad356387ef2e075dee66529"
+     },
+     {
+      "name": "Chính Kịch",
+      "slug": "chinh-kich",
+      "id": "37a7b38b6184a5ebd3c43015aa20709d"
+     },
+     {
+      "name": "Bí Ẩn",
+      "slug": "bi-an",
+      "id": "2fb53017b3be83cd754a08adab3e916c"
+     }
+    ],
+    "country": [
+     {
+      "name": "Âu Mỹ",
+      "slug": "au-my",
+      "id": "74d9fa92f4dea9ecea8fc2233dc7921a"
+     }
+    ],
+    "last_episodes": [
+     {
+      "server_name": "Vietsub",
+      "is_ai": false,
+      "name": "Full"
+     }
+    ]
+   }
+  },
+  {
+   "rank": 4,
+   "kind": "tv",
+   "title": "100 Days of Deception: Limited Series",
+   "film": {
+    "tmdb": {
+     "id": "293607",
+     "type": "tv",
+     "season": 1,
+     "vote_average": 0,
+     "vote_count": 0
+    },
+    "imdb": {
+     "id": "tt39201866",
+     "vote_average": 0,
+     "vote_count": 0
+    },
+    "modified": {
+     "time": "2026-11-02T06:17:45.000Z"
+    },
+    "_id": "f621ec53febc70f33833d105571dca17",
+    "name": "100 Ngày Lừa Dối",
+    "slug": "100-ngay-lua-doi",
+    "origin_name": "100 Days Of Deception",
+    "alternative_names": [
+     "百日的谎言",
+     "100ilui Geojitmal",
+     "100-il-ui Geo-jit-mal",
+     "Baekilui Geojinmal",
+     "Hundred Days of Lies",
+     "Hundred Days of Deception",
+     "100 Days of Lies",
+     "100일의 거짓말"
+    ],
+    "type": "series",
+    "thumb_url": "https://phimimg.com/uploads/movies/20261011/100-ngay-lua-doi-thumb.webp",
+    "poster_url": "https://phimimg.com/uploads/movies/20261011/100-ngay-lua-doi-poster.webp",
+    "sub_docquyen": false,
+    "chieurap": false,
+    "time": "74 phút/tập",
+    "episode_current": "Tập 8",
+    "quality": "FHD",
+    "lang": "Vietsub",
+    "lang_key": [
+     "vs"
+    ],
+    "year": 2026,
+    "category": [
+     {
+      "id": "9822be111d2ccc29c7172c78b8af8ff5",
+      "name": "Hành Động",
+      "slug": "hanh-dong"
+     },
+     {
+      "id": "66c78b23908113d478d8d85390a244b4",
+      "name": "Phiêu Lưu",
+      "slug": "phieu-luu"
+     },
+     {
+      "id": "a7b065b92ad356387ef2e075dee66529",
+      "name": "Tâm Lý",
+      "slug": "tam-ly"
+     },
+     {
+      "id": "37a7b38b6184a5ebd3c43015aa20709d",
+      "name": "Chính Kịch",
+      "slug": "chinh-kich"
+     }
+    ],
+    "country": [
+     {
+      "id": "05de95be5fc404da9680bbb3dd8262e6",
+      "name": "Hàn Quốc",
+      "slug": "han-quoc"
+     }
+    ],
+    "last_episodes": [
+     {
+      "server_name": "Vietsub",
+      "is_ai": false,
+      "name": "Tập 08"
+     }
+    ]
+   }
+  },
+  {
+   "rank": 4,
+   "kind": "films",
+   "title": "Evil Dead Burn",
+   "film": {
+    "tmdb": {
+     "id": "1212763",
+     "type": "movie",
+     "season": null,
+     "vote_average": 7.7,
+     "vote_count": 434
+    },
+    "imdb": {
+     "id": "tt31170389",
+     "vote_average": 0,
+     "vote_count": 0
+    },
+    "modified": {
+     "time": "2026-08-18T14:24:16.000Z"
+    },
+    "_id": "6a731c3aa2fcca195e0fafa2",
+    "name": "Ma Cây: Lửa Địa Ngục",
+    "slug": "ma-cay-lua-dia-nguc",
+    "origin_name": "Evil Dead Burn",
+    "alternative_names": [
+     "L'opéra de la terreur: l'embrasement",
+     "Smrtelné zlo: V plamenech",
+     "Kötü Ruh: Cehennem Ateşi",
+     "Evil Dead: En llamas",
+     "Evil Dead: Burn",
+     "ผีอมตะแผดเผา",
+     "鬼玩人6：燃烧",
+     "Evil Dead Burn"
+    ],
+    "type": "single",
+    "thumb_url": "https://phimimg.com/uploads/movies/20260805/ma-cay-lua-dia-nguc-thumb.webp",
+    "poster_url": "https://phimimg.com/uploads/movies/20260805/ma-cay-lua-dia-nguc-poster.webp",
+    "sub_docquyen": false,
+    "chieurap": true,
+    "time": "110 phút",
+    "episode_current": "Full",
+    "quality": "FHD",
+    "lang": "Vietsub + Thuyết Minh",
+    "lang_key": [
+     "vs",
+     "tm"
+    ],
+    "year": 2026,
+    "category": [
+     {
+      "id": "37a7b38b6184a5ebd3c43015aa20709d",
+      "name": "Chính Kịch",
+      "slug": "chinh-kich"
+     },
+     {
+      "id": "4db8d7d4b9873981e3eeb76d02997d58",
+      "name": "Kinh Dị",
+      "slug": "kinh-di"
+     },
+     {
+      "id": "a7b065b92ad356387ef2e075dee66529",
+      "name": "Tâm Lý",
+      "slug": "tam-ly"
+     }
+    ],
+    "country": [
+     {
+      "id": "74d9fa92f4dea9ecea8fc2233dc7921a",
+      "name": "Âu Mỹ",
+      "slug": "au-my"
+     }
+    ],
+    "last_episodes": [
+     {
+      "server_name": "Vietsub",
+      "is_ai": false,
+      "name": "Full"
+     },
+     {
+      "server_name": "Thuyết Minh",
+      "is_ai": false,
+      "name": "Full"
+     }
+    ]
+   }
+  },
+  {
+   "rank": 5,
+   "kind": "tv",
+   "title": "Lupin: Part 4",
+   "film": {
+    "tmdb": {
+     "id": "96677",
+     "type": "tv",
+     "season": 4,
+     "vote_average": 7.7,
+     "vote_count": 2701
+    },
+    "imdb": {
+     "id": "tt2531336",
+     "vote_average": 7.5,
+     "vote_count": 162224
+    },
+    "modified": {
+     "time": "2026-10-28T17:07:55.000Z"
+    },
+    "_id": "aa40b422ed866ff1e2649e58633f9de0",
+    "name": "Siêu Trộm Lupin (Phần 4)",
+    "slug": "sieu-trom-lupin-phan-4",
+    "origin_name": "Lupin (Season 4)",
+    "alternative_names": [
+     "绅士怪盗",
+     "亚森·罗苹",
+     "怪盗罗苹",
+     "亚森·罗宾",
+     "Arsène Lupin",
+     "Lupin : dans l'ombre d'Arsène",
+     "لوپن",
+     "Арсен Люпен",
+     "Lupin"
+    ],
+    "type": "series",
+    "thumb_url": "https://phimimg.com/uploads/movies/20261024/lupin-phan-4-thumb.webp",
+    "poster_url": "https://phimimg.com/uploads/movies/20261024/lupin-phan-4-poster.webp",
+    "sub_docquyen": false,
+    "chieurap": false,
+    "time": "50 phút/tập",
+    "episode_current": "Hoàn Tất (8/8)",
+    "quality": "FHD",
+    "lang": "Vietsub + Lồng Tiếng",
+    "lang_key": [
+     "vs",
+     "lt"
+    ],
+    "year": 2026,
+    "category": [
+     {
+      "id": "7a035ac0b37f5854f0f6979260899c90",
+      "name": "Hình Sự",
+      "slug": "hinh-su"
+     },
+     {
+      "id": "37a7b38b6184a5ebd3c43015aa20709d",
+      "name": "Chính Kịch",
+      "slug": "chinh-kich"
+     },
+     {
+      "id": "2fb53017b3be83cd754a08adab3e916c",
+      "name": "Bí Ẩn",
+      "slug": "bi-an"
+     },
+     {
+      "id": "a7b065b92ad356387ef2e075dee66529",
+      "name": "Tâm Lý",
+      "slug": "tam-ly"
+     }
+    ],
+    "country": [
+     {
+      "id": "92f688188aa938a03a61a786d6616dcb",
+      "name": "Pháp",
+      "slug": "phap"
+     }
+    ],
+    "last_episodes": [
+     {
+      "server_name": "Vietsub",
+      "is_ai": false,
+      "name": "Tập 08"
+     },
+     {
+      "server_name": "Lồng Tiếng",
+      "is_ai": false,
+      "name": "Tập 08"
+     }
+    ]
+   }
+  },
+  {
+   "rank": 5,
+   "kind": "films",
+   "title": "Nowhere to Run",
+   "film": {
+    "tmdb": {
+     "id": "10413",
+     "type": "movie",
+     "season": null,
+     "vote_average": 6.6,
+     "vote_count": 870
+    },
+    "imdb": {
+     "id": "tt0107711",
+     "vote_average": 5.7,
+     "vote_count": 28394
+    },
+    "modified": {
+     "time": "2026-10-29T18:28:58.000Z"
+    },
+    "_id": "b2fb19fe374529d3658197da0657ab0c",
+    "name": "Nowhere to Run",
+    "slug": "khong-noi-tron-chay",
+    "origin_name": "Nowhere To Run",
+    "alternative_names": [
+     "Sin escape: ganar o morir",
+     "Нема куди тікати",
+     "无处逃亡",
+     "Vencer ou Morrer",
+     "Nowhere to Run"
+    ],
+    "type": "single",
+    "thumb_url": "https://phimimg.com/uploads/movies/20261029/khong-noi-tron-chay-thumb.webp",
+    "poster_url": "https://phimimg.com/uploads/movies/20261029/khong-noi-tron-chay-poster.webp",
+    "sub_docquyen": false,
+    "chieurap": false,
+    "time": "94 phút",
+    "episode_current": "Full",
+    "quality": "FHD",
+    "lang": "Vietsub",
+    "lang_key": [
+     "vs"
+    ],
+    "year": 1993,
+    "category": [
+     {
+      "id": "9822be111d2ccc29c7172c78b8af8ff5",
+      "name": "Hành Động",
+      "slug": "hanh-dong"
+     },
+     {
+      "id": "37a7b38b6184a5ebd3c43015aa20709d",
+      "name": "Chính Kịch",
+      "slug": "chinh-kich"
+     },
+     {
+      "id": "a7b065b92ad356387ef2e075dee66529",
+      "name": "Tâm Lý",
+      "slug": "tam-ly"
+     }
+    ],
+    "country": [
+     {
+      "id": "74d9fa92f4dea9ecea8fc2233dc7921a",
+      "name": "Âu Mỹ",
+      "slug": "au-my"
+     }
+    ],
+    "last_episodes": [
+     {
+      "server_name": "Vietsub",
+      "is_ai": false,
+      "name": "Full"
+     }
+    ]
+   }
+  },
+  {
+   "rank": 6,
+   "kind": "tv",
+   "title": "Lupin: Part 1",
+   "film": {
+    "tmdb": {
+     "id": "96677",
+     "type": "tv",
+     "season": 4,
+     "vote_average": 7.7,
+     "vote_count": 2701
+    },
+    "imdb": {
+     "id": "tt2531336",
+     "vote_average": 7.5,
+     "vote_count": 162224
+    },
+    "modified": {
+     "time": "2026-10-28T17:07:55.000Z"
+    },
+    "_id": "aa40b422ed866ff1e2649e58633f9de0",
+    "name": "Siêu Trộm Lupin (Phần 4)",
+    "slug": "sieu-trom-lupin-phan-4",
+    "origin_name": "Lupin (Season 4)",
+    "alternative_names": [
+     "绅士怪盗",
+     "亚森·罗苹",
+     "怪盗罗苹",
+     "亚森·罗宾",
+     "Arsène Lupin",
+     "Lupin : dans l'ombre d'Arsène",
+     "لوپن",
+     "Арсен Люпен",
+     "Lupin"
+    ],
+    "type": "series",
+    "thumb_url": "https://phimimg.com/uploads/movies/20261024/lupin-phan-4-thumb.webp",
+    "poster_url": "https://phimimg.com/uploads/movies/20261024/lupin-phan-4-poster.webp",
+    "sub_docquyen": false,
+    "chieurap": false,
+    "time": "50 phút/tập",
+    "episode_current": "Hoàn Tất (8/8)",
+    "quality": "FHD",
+    "lang": "Vietsub + Lồng Tiếng",
+    "lang_key": [
+     "vs",
+     "lt"
+    ],
+    "year": 2026,
+    "category": [
+     {
+      "id": "7a035ac0b37f5854f0f6979260899c90",
+      "name": "Hình Sự",
+      "slug": "hinh-su"
+     },
+     {
+      "id": "37a7b38b6184a5ebd3c43015aa20709d",
+      "name": "Chính Kịch",
+      "slug": "chinh-kich"
+     },
+     {
+      "id": "2fb53017b3be83cd754a08adab3e916c",
+      "name": "Bí Ẩn",
+      "slug": "bi-an"
+     },
+     {
+      "id": "a7b065b92ad356387ef2e075dee66529",
+      "name": "Tâm Lý",
+      "slug": "tam-ly"
+     }
+    ],
+    "country": [
+     {
+      "id": "92f688188aa938a03a61a786d6616dcb",
+      "name": "Pháp",
+      "slug": "phap"
+     }
+    ],
+    "last_episodes": [
+     {
+      "server_name": "Vietsub",
+      "is_ai": false,
+      "name": "Tập 08"
+     },
+     {
+      "server_name": "Lồng Tiếng",
+      "is_ai": false,
+      "name": "Tập 08"
+     }
+    ]
+   }
+  },
+  {
+   "rank": 6,
+   "kind": "films",
+   "title": "Collision Course",
+   "film": {
+    "tmdb": {
+     "id": "1571955",
+     "type": "movie",
+     "season": null,
+     "vote_average": 10,
+     "vote_count": 1
+    },
+    "imdb": {
+     "id": "tt38793125",
+     "vote_average": 0,
+     "vote_count": 0
+    },
+    "modified": {
+     "time": "2026-10-31T07:41:13.000Z"
+    },
+    "_id": "2a5b9de5df16347f35774d872dcb1b5e",
+    "name": "Giao Điểm Xung Đột",
+    "slug": "giao-diem-xung-dot",
+    "origin_name": "Collision Course",
+    "alternative_names": [
+     "Cruzados",
+     "Colisión"
+    ],
+    "type": "single",
+    "thumb_url": "https://phimimg.com/uploads/movies/20261031/giao-diem-xung-dot-thumb.webp",
+    "poster_url": "https://phimimg.com/uploads/movies/20261031/giao-diem-xung-dot-poster.webp",
+    "sub_docquyen": false,
+    "chieurap": false,
+    "time": "106 phút",
+    "episode_current": "Full",
+    "quality": "FHD",
+    "lang": "Vietsub",
+    "lang_key": [
+     "vs"
+    ],
+    "year": 2026,
+    "category": [
+     {
+      "id": "a7b065b92ad356387ef2e075dee66529",
+      "name": "Tâm Lý",
+      "slug": "tam-ly"
+     },
+     {
+      "id": "37a7b38b6184a5ebd3c43015aa20709d",
+      "name": "Chính Kịch",
+      "slug": "chinh-kich"
+     },
+     {
+      "id": "9822be111d2ccc29c7172c78b8af8ff5",
+      "name": "Hành Động",
+      "slug": "hanh-dong"
+     },
+     {
+      "id": "7a035ac0b37f5854f0f6979260899c90",
+      "name": "Hình Sự",
+      "slug": "hinh-su"
+     }
+    ],
+    "country": [
+     {
+      "id": "8a40abac202ab3659bb98f71f05458d1",
+      "name": "Tây Ban Nha",
+      "slug": "tay-ban-nha"
+     }
+    ],
+    "last_episodes": [
+     {
+      "server_name": "Vietsub",
+      "is_ai": false,
+      "name": "Full"
+     }
+    ]
+   }
+  },
+  {
+   "rank": 7,
+   "kind": "tv",
+   "title": "Take Charge of My Heart: Limited Series",
+   "film": {
+    "tmdb": {
+     "id": "289423",
+     "type": "tv",
+     "season": 1,
+     "vote_average": 0,
+     "vote_count": 0
+    },
+    "imdb": {
+     "id": "tt37737331",
+     "vote_average": 0,
+     "vote_count": 0
+    },
+    "modified": {
+     "time": "2026-10-10T11:37:39.000Z"
+    },
+    "_id": "cd0107630e25d3a6df6affbeb3c51942",
+    "name": "Nạp Đầy Trái Tim",
+    "slug": "nap-day-trai-tim",
+    "origin_name": "Take Charge Of My Heart",
+    "alternative_names": [
+     "ハートにチャージして",
+     "ชาร์จรัก สปาร์กเลิฟ",
+     "請為我充電",
+     "Charge Me",
+     "Charge Me Up",
+     "Xem Nạp đầy trái tim",
+     "나를 충전해줘"
+    ],
+    "type": "series",
+    "thumb_url": "https://phimimg.com/uploads/movies/20261010/nap-day-trai-tim-thumb.webp",
+    "poster_url": "https://phimimg.com/uploads/movies/20261010/nap-day-trai-tim-poster.webp",
+    "sub_docquyen": false,
+    "chieurap": false,
+    "time": "61 phút/tập",
+    "episode_current": "Hoàn Tất (10/10)",
+    "quality": "FHD",
+    "lang": "Vietsub",
+    "lang_key": [
+     "vs"
+    ],
+    "year": 2026,
+    "category": [
+     {
+      "id": "0bcf4077916678de9b48c89221fcf8ae",
+      "name": "Khoa Học",
+      "slug": "khoa-hoc"
+     },
+     {
+      "id": "68564911f00849030f9c9c144ea1b931",
+      "name": "Viễn Tưởng",
+      "slug": "vien-tuong"
+     },
+     {
+      "id": "ba6fd52e5a3aca80eaaf1a3b50a182db",
+      "name": "Hài Hước",
+      "slug": "hai-huoc"
+     },
+     {
+      "id": "a7b065b92ad356387ef2e075dee66529",
+      "name": "Tâm Lý",
+      "slug": "tam-ly"
+     }
+    ],
+    "country": [
+     {
+      "id": "05de95be5fc404da9680bbb3dd8262e6",
+      "name": "Hàn Quốc",
+      "slug": "han-quoc"
+     }
+    ],
+    "last_episodes": [
+     {
+      "server_name": "Vietsub",
+      "is_ai": false,
+      "name": "Tập 10"
+     }
+    ]
+   }
+  },
+  {
+   "rank": 7,
+   "kind": "films",
+   "title": "Mai",
+   "film": {
+    "tmdb": {
+     "id": "1446616",
+     "type": "movie",
+     "season": null,
+     "vote_average": 6.5,
+     "vote_count": 50
+    },
+    "imdb": {
+     "id": "tt36118360",
+     "vote_average": 6.9,
+     "vote_count": 4858
+    },
+    "modified": {
+     "time": "2026-04-14T10:32:08.000Z"
+    },
+    "_id": "34c9857f8eaa71063a6db763f5c9ff73",
+    "name": "Tu Yaa Main",
+    "slug": "tu-yaa-main",
+    "origin_name": "Tu Yaa Main",
+    "alternative_names": [
+     "El último Depredador",
+     "Tu Yaa Main",
+     "तू या मैं"
+    ],
+    "type": "single",
+    "thumb_url": "https://phimimg.com/upload/vod/20260413-1/20bfff9dd6d013c27df38630b3829d96.jpg",
+    "poster_url": "https://phimimg.com/upload/vod/20260413-1/7c1daa854d488e6c4f916b70bd50a825.jpg",
+    "sub_docquyen": false,
+    "chieurap": false,
+    "time": "145 phút",
+    "episode_current": "Full",
+    "quality": "FHD",
+    "lang": "Vietsub",
+    "lang_key": [
+     "vs"
+    ],
+    "year": 2026,
+    "category": [
+     {
+      "name": "Tâm Lý",
+      "slug": "tam-ly",
+      "id": "a7b065b92ad356387ef2e075dee66529"
+     },
+     {
+      "name": "Tình Cảm",
+      "slug": "tinh-cam",
+      "id": "bb2b4b030608ca5984c8dd0770f5b40b"
+     }
+    ],
+    "country": [
+     {
+      "name": "Ấn Độ",
+      "slug": "an-do",
+      "id": "aadd510492662beef1a980624b26c685"
+     }
+    ],
+    "last_episodes": [
+     {
+      "server_name": "Vietsub",
+      "is_ai": false,
+      "name": "Full"
+     }
+    ]
+   }
+  },
+  {
+   "rank": 8,
+   "kind": "tv",
+   "title": "Dragon Ball Super: Beerus: Season 1",
+   "film": {
+    "tmdb": {
+     "id": "312359",
+     "type": "tv",
+     "season": 1,
+     "vote_average": 9.6,
+     "vote_count": 23
+    },
+    "imdb": {
+     "id": "tt39395275",
+     "vote_average": 0,
+     "vote_count": 0
+    },
+    "modified": {
+     "time": "2026-10-30T18:50:39.000Z"
+    },
+    "_id": "7b8c86aed4f6151b038a280971685ec4",
+    "name": "Dragon Ball Super: Beerus",
+    "slug": "dragon-ball-super-beerus",
+    "origin_name": "Dragon Ball Super: Beerus",
+    "alternative_names": [
+     "Dragon Ball Super: Bills",
+     "ドラゴンボール超(スーパー) ビルス",
+     "Doragon Bōru Sūpā Birusu",
+     "Dragon Ball Super: Beerus ENHANCED Edition",
+     "Doragon Bôru Sûpâ Birusu",
+     "ドラゴンボール超 ビルス"
+    ],
+    "type": "hoathinh",
+    "thumb_url": "https://phimimg.com/uploads/movies/20261012/dragon-ball-super-beerus-thumb.webp",
+    "poster_url": "https://phimimg.com/uploads/movies/20261012/dragon-ball-super-beerus-poster.webp",
+    "sub_docquyen": false,
+    "chieurap": false,
+    "time": "23 phút/tập",
+    "episode_current": "Tập 3",
+    "quality": "FHD",
+    "lang": "Vietsub",
+    "lang_key": [
+     "vs"
+    ],
+    "year": 2026,
+    "category": [
+     {
+      "id": "d9983d88d8929b1d9f767884e2999e27",
+      "name": "Hoạt Hình",
+      "slug": "hoat-hinh"
+     },
+     {
+      "id": "9822be111d2ccc29c7172c78b8af8ff5",
+      "name": "Hành Động",
+      "slug": "hanh-dong"
+     },
+     {
+      "id": "66c78b23908113d478d8d85390a244b4",
+      "name": "Phiêu Lưu",
+      "slug": "phieu-luu"
+     },
+     {
+      "id": "0bcf4077916678de9b48c89221fcf8ae",
+      "name": "Khoa Học",
+      "slug": "khoa-hoc"
+     },
+     {
+      "id": "68564911f00849030f9c9c144ea1b931",
+      "name": "Viễn Tưởng",
+      "slug": "vien-tuong"
+     }
+    ],
+    "country": [
+     {
+      "id": "d4097fbffa8f7149a61281437171eb83",
+      "name": "Nhật Bản",
+      "slug": "nhat-ban"
+     }
+    ],
+    "last_episodes": [
+     {
+      "server_name": "Vietsub",
+      "is_ai": false,
+      "name": "Tập 03"
+     }
+    ]
+   }
+  },
+  {
+   "rank": 8,
+   "kind": "films",
+   "title": "Fish, Fists and Ambergris",
+   "film": {
+    "tmdb": {
+     "id": "1569555",
+     "type": "movie",
+     "season": null,
+     "vote_average": 5.7,
+     "vote_count": 6
+    },
+    "imdb": {
+     "id": "tt38866268",
+     "vote_average": 7.4,
+     "vote_count": 67
+    },
+    "modified": {
+     "time": "2026-03-06T13:38:59.000Z"
+    },
+    "_id": "772adb25675cbd86f93c5fe8eb6320e0",
+    "name": "Truy Tìm Long Diên Hương",
+    "slug": "truy-tim-long-dien-huong",
+    "origin_name": "Fish, Fists And Ambergris",
+    "alternative_names": [
+     "Fish, Fists and Ambergris",
+     "ปลา กำปั้น อำพันอลวน",
+     "Truy Tìm Long Diên Hương",
+     "Chase for Amber"
+    ],
+    "type": "single",
+    "thumb_url": "https://phimimg.com/upload/vod/20260305-1/0ed392d57a9e67bce3fee7955a903441.jpg",
+    "poster_url": "https://phimimg.com/upload/vod/20260305-1/f27e602f78ac25f30a12c985e91ede32.jpg",
+    "sub_docquyen": false,
+    "chieurap": false,
+    "time": "103 phút",
+    "episode_current": "Full",
+    "quality": "FHD",
+    "lang": "Vietsub",
+    "lang_key": [
+     "vs"
+    ],
+    "year": 2025,
+    "category": [
+     {
+      "name": "Hành Động",
+      "slug": "hanh-dong",
+      "id": "9822be111d2ccc29c7172c78b8af8ff5"
+     },
+     {
+      "name": "Phiêu Lưu",
+      "slug": "phieu-luu",
+      "id": "66c78b23908113d478d8d85390a244b4"
+     },
+     {
+      "name": "Hài Hước",
+      "slug": "hai-huoc",
+      "id": "ba6fd52e5a3aca80eaaf1a3b50a182db"
+     },
+     {
+      "name": "Tâm Lý",
+      "slug": "tam-ly",
+      "id": "a7b065b92ad356387ef2e075dee66529"
+     }
+    ],
+    "country": [
+     {
+      "name": "Việt Nam",
+      "slug": "viet-nam",
+      "id": "f6ce1ae8b39af9d38d653b8a0890adb8"
+     }
+    ],
+    "last_episodes": [
+     {
+      "server_name": "Vietsub",
+      "is_ai": false,
+      "name": "Full"
+     }
+    ]
+   }
+  },
+  {
+   "rank": 9,
+   "kind": "tv",
+   "title": "The Apothecary Diaries: Season 3",
+   "film": {
+    "tmdb": {
+     "id": "220542",
+     "type": "tv",
+     "season": 3,
+     "vote_average": 8.6,
+     "vote_count": 651
+    },
+    "imdb": {
+     "id": "tt26743760",
+     "vote_average": 8.6,
+     "vote_count": 22416
+    },
+    "modified": {
+     "time": "2026-10-31T07:37:51.000Z"
+    },
+    "_id": "f1866ba310e552c4ce66dabd2a92617b",
+    "name": "Dược Sư Tự Sự (Phần 3)",
+    "slug": "duoc-su-tu-su-phan-3",
+    "origin_name": "The Apothecary Diaries (Season 3)",
+    "alternative_names": [
+     "Diários de uma Apotecária",
+     "药屋少女的呢喃",
+     "Zápisky lékárnice",
+     "Deníky Apatykářky",
+     "Les Carnets de l'apothicaire",
+     "The Apothecary Diaries",
+     "药师少女的独语",
+     "خاطرات داروساز",
+     "خاطرات پزشک دختر",
+     "خاطرات دختر داروساز",
+     "Kusuriya no Hitorigoto",
+     "Kusuriya no Hitorigoto 2nd Season",
+     "薬屋のひとりごと(第3期)",
+     "Записки аптекаря",
+     "Монолог фармацевта",
+     "Монолог травниці",
+     "Щоденник аптекарки",
+     "Apothecary's Soliloquy",
+     "薬屋のひとりごと"
+    ],
+    "type": "hoathinh",
+    "thumb_url": "https://phimimg.com/uploads/movies/20261004/duoc-su-tu-su-phan-3-thumb.webp",
+    "poster_url": "https://phimimg.com/uploads/movies/20261004/duoc-su-tu-su-phan-3-poster.webp",
+    "sub_docquyen": false,
+    "chieurap": false,
+    "time": "23 phút/tập",
+    "episode_current": "Tập 5",
+    "quality": "FHD",
+    "lang": "Vietsub",
+    "lang_key": [
+     "vs"
+    ],
+    "year": 2026,
+    "category": [
+     {
+      "id": "d9983d88d8929b1d9f767884e2999e27",
+      "name": "Hoạt Hình",
+      "slug": "hoat-hinh"
+     },
+     {
+      "id": "37a7b38b6184a5ebd3c43015aa20709d",
+      "name": "Chính Kịch",
+      "slug": "chinh-kich"
+     },
+     {
+      "id": "2fb53017b3be83cd754a08adab3e916c",
+      "name": "Bí Ẩn",
+      "slug": "bi-an"
+     },
+     {
+      "id": "a7b065b92ad356387ef2e075dee66529",
+      "name": "Tâm Lý",
+      "slug": "tam-ly"
+     }
+    ],
+    "country": [
+     {
+      "id": "d4097fbffa8f7149a61281437171eb83",
+      "name": "Nhật Bản",
+      "slug": "nhat-ban"
+     }
+    ],
+    "last_episodes": [
+     {
+      "server_name": "Vietsub",
+      "is_ai": false,
+      "name": "Tập 05"
+     }
+    ]
+   }
+  },
+  {
+   "rank": 9,
+   "kind": "films",
+   "title": "The Addams Family",
+   "film": {
+    "tmdb": {
+     "id": "2907",
+     "type": "movie",
+     "season": null,
+     "vote_average": 7.1,
+     "vote_count": 5073
+    },
+    "imdb": {
+     "id": "tt0101272",
+     "vote_average": 7,
+     "vote_count": 198886
+    },
+    "modified": {
+     "time": "2025-12-06T08:51:26.000Z"
+    },
+    "_id": "ac5dab2e99eee9cf9ec672e383691302",
+    "name": "Gia Đình Addams",
+    "slug": "gia-dinh-addams",
+    "origin_name": "The Addams Family",
+    "alternative_names": [
+     "亚当斯一家",
+     "Familien Addams",
+     "משפחת אדאמס",
+     "Addams Family",
+     "A Família Addams",
+     "愛登士家庭",
+     "阿達一族",
+     "The Addams Family"
+    ],
+    "type": "single",
+    "thumb_url": "https://phimimg.com/upload/vod/20251206-1/7ea50b8a1e00cfc49aaf8ef24dde0f8b.jpg",
+    "poster_url": "https://phimimg.com/upload/vod/20251206-1/51adbc222bfe4681a70d3b71cfd19e6f.jpg",
+    "sub_docquyen": false,
+    "chieurap": false,
+    "time": "100 phút",
+    "episode_current": "Full",
+    "quality": "FHD",
+    "lang": "Vietsub",
+    "lang_key": [
+     "vs"
+    ],
+    "year": 1991,
+    "category": [
+     {
+      "name": "Hài Hước",
+      "slug": "hai-huoc",
+      "id": "ba6fd52e5a3aca80eaaf1a3b50a182db"
+     },
+     {
+      "name": "Viễn Tưởng",
+      "slug": "vien-tuong",
+      "id": "68564911f00849030f9c9c144ea1b931"
+     },
+     {
+      "name": "Chính Kịch",
+      "slug": "chinh-kich",
+      "id": "37a7b38b6184a5ebd3c43015aa20709d"
+     },
+     {
+      "name": "Tâm Lý",
+      "slug": "tam-ly",
+      "id": "a7b065b92ad356387ef2e075dee66529"
+     }
+    ],
+    "country": [
+     {
+      "name": "Âu Mỹ",
+      "slug": "au-my",
+      "id": "74d9fa92f4dea9ecea8fc2233dc7921a"
+     }
+    ],
+    "last_episodes": [
+     {
+      "server_name": "Vietsub",
+      "is_ai": false,
+      "name": "Full"
+     }
+    ]
+   }
+  },
+  {
+   "rank": 10,
+   "kind": "tv",
+   "title": "Firefly Wedding: Season 1",
+   "film": {
+    "tmdb": {
+     "id": "320909",
+     "type": "tv",
+     "season": 1,
+     "vote_average": 10,
+     "vote_count": 1
+    },
+    "imdb": {
+     "id": "tt39394153",
+     "vote_average": 0,
+     "vote_count": 0
+    },
+    "modified": {
+     "time": "2026-10-31T07:38:35.000Z"
+    },
+    "_id": "6b79e3d0702e8560ea48c9f8f944a50e",
+    "name": "Đám Cưới Đom Đóm",
+    "slug": "dam-cuoi-dom-dom",
+    "origin_name": "Firefly Wedding",
+    "alternative_names": [
+     "萤火虫的出嫁",
+     "螢火蟲的出嫁",
+     "Hotaru no Yomeiri",
+     "ホタルの嫁入り"
+    ],
+    "type": "hoathinh",
+    "thumb_url": "https://phimimg.com/uploads/movies/20261010/dam-cuoi-dom-dom-thumb.webp",
+    "poster_url": "https://phimimg.com/uploads/movies/20261010/dam-cuoi-dom-dom-poster.webp",
+    "sub_docquyen": false,
+    "chieurap": false,
+    "time": "23 phút/tập",
+    "episode_current": "Tập 4",
+    "quality": "FHD",
+    "lang": "Vietsub",
+    "lang_key": [
+     "vs"
+    ],
+    "year": 2026,
+    "category": [
+     {
+      "id": "d9983d88d8929b1d9f767884e2999e27",
+      "name": "Hoạt Hình",
+      "slug": "hoat-hinh"
+     },
+     {
+      "id": "37a7b38b6184a5ebd3c43015aa20709d",
+      "name": "Chính Kịch",
+      "slug": "chinh-kich"
+     },
+     {
+      "id": "a7b065b92ad356387ef2e075dee66529",
+      "name": "Tâm Lý",
+      "slug": "tam-ly"
+     }
+    ],
+    "country": [
+     {
+      "id": "d4097fbffa8f7149a61281437171eb83",
+      "name": "Nhật Bản",
+      "slug": "nhat-ban"
+     }
+    ],
+    "last_episodes": [
+     {
+      "server_name": "Vietsub",
+      "is_ai": false,
+      "name": "Tập 04"
+     }
+    ]
+   }
+  },
+  {
+   "rank": 10,
+   "kind": "films",
+   "title": "The 4 Rascals",
+   "film": {
+    "tmdb": {
+     "id": "1391703",
+     "type": "movie",
+     "season": null,
+     "vote_average": 5.8,
+     "vote_count": 4
+    },
+    "imdb": {
+     "id": "tt33996602",
+     "vote_average": 5.5,
+     "vote_count": 268
+    },
+    "modified": {
+     "time": "2025-09-01T03:44:10.000Z"
+    },
+    "_id": "3ab2ed1a7ac2cb460fd597c13d77a11c",
+    "name": "Bộ Tứ Báo Thủ",
+    "slug": "bo-tu-bao-thu",
+    "origin_name": "The 4 Rascals",
+    "alternative_names": [
+     "Bộ Tứ Báo Thủ"
+    ],
+    "type": "single",
+    "thumb_url": "https://phimimg.com/upload/vod/20250901-1/40e4f404d92151d8d44fc878fd20cf64.jpg",
+    "poster_url": "https://phimimg.com/upload/vod/20250901-1/4094cc857ac6a13df6eef22ad8b1ae1d.jpg",
+    "sub_docquyen": false,
+    "chieurap": true,
+    "time": "133 phút",
+    "episode_current": "Full",
+    "quality": "FHD",
+    "lang": "Vietsub",
+    "lang_key": [
+     "vs"
+    ],
+    "year": 2025,
+    "category": [
+     {
+      "name": "Hài Hước",
+      "slug": "hai-huoc",
+      "id": "ba6fd52e5a3aca80eaaf1a3b50a182db"
+     },
+     {
+      "name": "Tình Cảm",
+      "slug": "tinh-cam",
+      "id": "bb2b4b030608ca5984c8dd0770f5b40b"
+     },
+     {
+      "name": "Tâm Lý",
+      "slug": "tam-ly",
+      "id": "a7b065b92ad356387ef2e075dee66529"
+     },
+     {
+      "name": "Chính Kịch",
+      "slug": "chinh-kich",
+      "id": "37a7b38b6184a5ebd3c43015aa20709d"
+     }
+    ],
+    "country": [
+     {
+      "name": "Việt Nam",
+      "slug": "viet-nam",
+      "id": "f6ce1ae8b39af9d38d653b8a0890adb8"
+     }
+    ],
+    "last_episodes": [
+     {
+      "server_name": "Vietsub",
+      "is_ai": false,
+      "name": "Full"
+     }
+    ]
+   }
+  }
+ ]
+}
