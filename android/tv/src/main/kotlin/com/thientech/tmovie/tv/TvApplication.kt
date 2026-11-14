@@ -12,6 +12,7 @@ import coil3.PlatformContext
 import coil3.SingletonImageLoader
 import coil3.memory.MemoryCache
 import coil3.request.allowRgb565
+import com.thientech.tmovie.core.data.AccessGate
 import com.thientech.tmovie.core.data.Account
 import com.thientech.tmovie.core.data.Library
 import com.thientech.tmovie.core.data.Settings
@@ -21,6 +22,7 @@ class TvApplication : Application(), SingletonImageLoader.Factory {
     override fun onCreate() {
         super.onCreate()
         Settings.init(this)
+        AccessGate.init(this)
         Library.init(this)
         Account.init(this)  // no google-services.json in the TV build: stays signed out, 18+ hidden
         Player.activity = TvPlayerActivity::class.java

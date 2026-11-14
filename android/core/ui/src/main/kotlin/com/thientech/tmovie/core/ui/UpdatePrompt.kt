@@ -249,7 +249,7 @@ private fun DownloadProgress(p: Phase.Downloading) {
 }
 
 @Composable
-private fun PrimaryButton(focus: FocusRequester, text: String, enabled: Boolean, onClick: () -> Unit) {
+internal fun PrimaryButton(focus: FocusRequester, text: String, enabled: Boolean, onClick: () -> Unit) {
     var focused by remember { mutableStateOf(false) }
     Box(
         Modifier
