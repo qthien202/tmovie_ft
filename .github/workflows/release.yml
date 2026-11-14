@@ -81,19 +81,36 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
+      - name: Pick apps
+        id: apps
+        run: |
+          # Ship only the apps whose code changed since the last release, so a TV-only release
+          # doesn't prompt phones to "update" to the same build (and vice versa). Shared modules
+          # (core, feature, gradle setup) count for both.
+          PREV=$(git describe --tags --abbrev=0 --match 'v*' HEAD 2>/dev/null || true)
+          if [ -z "$PREV" ]; then CHANGED="android/"; else CHANGED=$(git diff --name-only "$PREV" HEAD -- android/); fi
+          shared='^android/(core|feature|gradle|build\.gradle\.kts|settings\.gradle\.kts|gradle\.properties)'
+          tasks=""
+          if echo "$CHANGED" | grep -Eq "^android/app/|$shared"; then tasks="$tasks :app:assembleRelease"; fi
+          if echo "$CHANGED" | grep -Eq "^android/tv/|$shared"; then tasks="$tasks :tv:assembleRelease"; fi
+          if [ -z "$tasks" ]; then echo "::error::No app changed since $PREV; nothing to release."; exit 1; fi
+          echo "Since ${PREV:-the start}:$tasks"
+          echo "tasks=$tasks" >> "$GITHUB_OUTPUT"
+
       - name: Build APK
         run: |
           V="${{ steps.ver.outputs.version }}"
           N="${{ github.run_number }}"
           # versionCode keeps using the run number, so it stays above the old Flutter builds.
-          (cd android && ./gradlew :app:assembleRelease :tv:assembleRelease -PversionName="$V" -PversionCode="$N")
+          (cd android && ./gradlew ${{ steps.apps.outputs.tasks }} -PversionName="$V" -PversionCode="$N")
 
       - name: Stage APK
         run: |
           V="${{ steps.ver.outputs.version }}"
           mkdir -p dist
-          cp android/app/build/outputs/apk/release/app-release.apk "dist/tmovie-mobile-v$V.apk"
-          cp android/tv/build/outputs/apk/release/tv-release.apk "dist/tmovie-tv-v$V.apk"
+          [ -f android/app/build/outputs/apk/release/app-release.apk ] && cp android/app/build/outputs/apk/release/app-release.apk "dist/tmovie-mobile-v$V.apk"
+          [ -f android/tv/build/outputs/apk/release/tv-release.apk ] && cp android/tv/build/outputs/apk/release/tv-release.apk "dist/tmovie-tv-v$V.apk"
+          ls dist
 
       - name: Build release notes
         id: notes
@@ -125,7 +142,5 @@ jobs:
           name: TMovie v${{ steps.ver.outputs.version }}
           body_path: ${{ steps.notes.outputs.path }}
           make_latest: true
-          # TV first: old Flutter TV builds take the first .apk whose name has "tv".
-          files: |
-            dist/tmovie-tv-v${{ steps.ver.outputs.version }}.apk
-            dist/tmovie-mobile-v${{ steps.ver.outputs.version }}.apk
+          # Only the apps built above (see "Pick apps").
+          files: dist/*.apk
