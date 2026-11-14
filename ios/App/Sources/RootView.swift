@@ -10,15 +10,18 @@ import PlayerFeature
 import ProfileFeature
 import SwiftUI
 
-/// Splash → onboarding (first launch) → tabs.
+/// Splash → access code (until this device is let in) → onboarding (first launch) → tabs.
 struct RootView: View {
     @AppStorage("onboarded") private var onboarded = false
+    @AppStorage("access.unlocked") private var unlocked = false
     @State private var splashDone = false
 
     var body: some View {
         ZStack {
             if !splashDone {
                 SplashView { withAnimation(.easeOut(duration: 0.4)) { splashDone = true } }
+            } else if !unlocked {
+                AccessGateView().transition(.opacity)
             } else if !onboarded {
                 OnboardingView { withAnimation(.cinematic) { onboarded = true } }
                     .transition(.opacity)

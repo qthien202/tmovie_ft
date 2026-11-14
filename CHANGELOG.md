@@ -8,6 +8,20 @@ Vietnamese block free of Markdown styling (use emoji + "•" bullets).
 
 Every new feature/release must add a `## vX.Y.Z` section with both parts.
 
+## v1.11.0
+
+TMovie is now for the owner and friends. On first launch (phone, Android TV and iOS) a device asks for access with a name and an email; the owner gets a mail with a "Cấp quyền" button, and once it is pressed the waiting device opens within ~10 s and the requester is mailed. Only the device that filed the request can open with it; a request expires after 24 h; a device that is in stays in. Requests and approvals go through the owner's Google Apps Script (`private/apps-script/access.gs`), so no server is needed. Android phone: push notifications through FCM. A series in the watch history (newest 50) notifies as soon as it gets a new episode, Netflix style (the film's still as a big picture, "Tập 12 đã có · Vietsub", tapping opens the film; a later episode replaces the earlier notification); once a day at 19:30 the most-viewed film new to the catalogue is pushed. Both are sent by `private/apps-script/notify.gs` (every 15 min / daily) and can be turned off per channel ("Tập mới", "Phim mới") in Android's notification settings; Android 13+ asks for the permission once.
+
+<!-- app:vi -->
+🔒 TMovie giờ là app riêng tư
+• Lần đầu mở app, nhập tên và email rồi gửi yêu cầu. Chủ app duyệt xong là app tự mở, bạn nhận mail báo.
+• Máy đã vào rồi thì không phải xin lại.
+🔔 Thông báo (Android)
+• Phim bạn đang xem có tập mới là báo ngay, bấm vào mở thẳng phim.
+• Mỗi tối 19h30 gợi ý một phim mới đang hot.
+• Tắt riêng từng loại trong cài đặt thông báo của máy.
+<!-- /app:vi -->
+
 ## v1.10.1
 
 Android TV: posters load much faster. The image host (phimimg.com) holds every request ~8 s regardless of size, and OkHttp allowed only 5 requests per host, so a screen of 20 cards took over 30 s. The TV image loader now runs up to 32 requests per host and keeps a 200 MB disk cache, so a screen fills in one wait and revisits are instant. New Lịch sử tab (as the phone's "Của tôi"): everything watched with progress and time left, My List, and a two-press "Xoá lịch sử".

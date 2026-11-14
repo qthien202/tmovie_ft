@@ -81,6 +81,7 @@ import com.thientech.tmovie.core.designsystem.TMovieTheme
 import com.thientech.tmovie.core.designsystem.Wordmark
 import com.thientech.tmovie.core.model.FilmItem
 import com.thientech.tmovie.core.network.Source
+import com.thientech.tmovie.core.ui.AccessGate
 import com.thientech.tmovie.core.ui.UpdatePrompt
 
 class TvActivity : ComponentActivity() {
@@ -92,7 +93,7 @@ class TvActivity : ComponentActivity() {
         link = intent.filmSlug()
         setContent {
             TMovieTheme {
-                TvApp(onExit = ::finish, link = link, onLinkOpened = { link = null })
+                AccessGate("androidtv") { TvApp(onExit = ::finish, link = link, onLinkOpened = { link = null }) }
                 UpdatePrompt(BuildConfig.VERSION_NAME, BuildConfig.DEBUG, R.mipmap.ic_launcher_foreground, keyword = "tv")
             }
         }

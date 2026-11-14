@@ -1,18 +1,29 @@
 package com.thientech.tmovie
 
+import android.Manifest
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.Crossfade
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.thientech.tmovie.core.data.Settings
 import com.thientech.tmovie.core.designsystem.TMovieTheme
+import com.thientech.tmovie.core.ui.AccessGate
 import com.thientech.tmovie.core.ui.UpdatePrompt
 import com.thientech.tmovie.feature.home.rememberReduceMotion
 import com.thientech.tmovie.feature.onboarding.OnboardingScreen
@@ -31,18 +42,23 @@ class MainActivity : ComponentActivity() {
                 val onboarded by Settings.onboarded.collectAsStateWithLifecycle()
                 var splashDone by remember { mutableStateOf(savedInstanceState != null) }
                 val reduceMotion = rememberReduceMotion()
-                Crossfade(
-                    when {
-                        !splashDone -> "splash"
-                        !onboarded -> "onboarding"
-                        else -> "main"
-                    },
-                    label = "root",
-                ) { stage ->
-                    when (stage) {
-                        "splash" -> SplashScreen(reduceMotion) { splashDone = true }
-                        "onboarding" -> OnboardingScreen(reduceMotion) { Settings.setOnboarded() }
-                        else -> AppNavHost(link = link, onLinkHandled = { link = null })
+                AccessGate("android") {
+                    Crossfade(
+                        when {
+                            !splashDone -> "splash"
+                            !onboarded -> "onboarding"
+                            else -> "main"
+                        },
+                        label = "root",
+                    ) { stage ->
+                        when (stage) {
+                            "splash" -> SplashScreen(reduceMotion) { splashDone = true }
+                            "onboarding" -> OnboardingScreen(reduceMotion) { Settings.setOnboarded() }
+                            else -> {
+                                AskForNotifications()
+                                AppNavHost(link = link, onLinkHandled = { link = null })
+                            }
+                        }
                     }
                 }
                 UpdatePrompt(BuildConfig.VERSION_NAME, BuildConfig.DEBUG, R.mipmap.ic_launcher_foreground)
@@ -53,5 +69,21 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         link = intent.dataString
+    }
+}
+
+/** Android 13+ asks once, the first time the app's main screen shows, for the new-episode notifications. */
+@Composable
+private fun AskForNotifications() {
+    if (Build.VERSION.SDK_INT < 33) return
+    val context = LocalContext.current
+    val ask = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {}
+    LaunchedEffect(Unit) {
+        val prefs = context.getSharedPreferences("push", Context.MODE_PRIVATE)
+        if (prefs.getBoolean("asked", false)) return@LaunchedEffect
+        prefs.edit().putBoolean("asked", true).apply()
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            ask.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
     }
 }
