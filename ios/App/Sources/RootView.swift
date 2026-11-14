@@ -30,6 +30,7 @@ struct RootView: View {
             }
         }
         .modelContainer(Library.container)
+        .task { await AccessGateView.recheck() }
     }
 }
 

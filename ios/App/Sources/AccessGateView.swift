@@ -3,13 +3,14 @@ import SwiftUI
 
 /// The app is for the owner and friends: a new device asks for access with a name and an email, the owner
 /// approves it from the mail they get (the owner's Apps Script, private/apps-script/access.gs), and the
-/// device, which alone holds the request's random id, opens. Once a device is in, it stays in.
-/// Same contract as Android's `AccessGate`.
+/// device, which alone holds the request's random id, opens. The script lists it in Firestore `members`;
+/// the owner deletes the entry to revoke, which `recheck()` notices at launch. Same as Android's `AccessGate`.
 struct AccessGateView: View {
     @AppStorage("access.unlocked") private var unlocked = false
     @AppStorage("access.email") private var pendingEmail = ""
     @AppStorage("access.id") private var requestID = ""
     @AppStorage("access.requestedAt") private var requestedAt = 0.0
+    @AppStorage("access.member") private var memberID = ""
     @State private var name = ""
     @State private var email = ""
     @State private var busy = false
@@ -115,12 +116,20 @@ struct AccessGateView: View {
     private func check() async {
         guard let res = try? await Self.post(["action": "status", "id": requestID]) else { return }
         if res["ok"] as? Bool == true {
+            memberID = requestID
             requestID = ""
             withAnimation(.cinematic) { unlocked = true }
         } else if res["pending"] as? Bool != true {
             requestID = ""
             error = "Yêu cầu đã hết hạn, gửi lại nhé."
         }
+    }
+
+    /// Locks the app again if the owner removed this device from `members`. Offline keeps it open.
+    static func recheck() async {
+        guard let id = UserDefaults.standard.string(forKey: "access.member"), !id.isEmpty,
+              let res = try? await post(["action": "member", "id": id]) else { return }
+        if res["ok"] as? Bool != true { UserDefaults.standard.set(false, forKey: "access.unlocked") }
     }
 
     private static let endpoint = URL(string: "https://script.google.com/macros/s/AKfycbzM71C8tRgkWqKWYBpr97IcZCOkouZTTU55rWiU1n4g3MZHEq8dm9B9pHd6SC4kicSk-Q/exec")!

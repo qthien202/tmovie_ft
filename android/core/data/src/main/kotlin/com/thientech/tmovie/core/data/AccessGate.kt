@@ -19,10 +19,13 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 
 /**
- * The app is for the owner and friends: a new device asks for access with a name and an email, the owner
- * approves it from the mail they get (the owner's Apps Script, private/apps-script/access.gs), and the
- * device, which alone holds the request's random id, opens. Once a device is in, it stays in.
- * Same contract as the iOS app.
+ * The app is for the owner and friends. A new device asks for access; the owner approves it from the mail
+ * they get (their Apps Script, private/apps-script/access.gs), which lists the requester in Firestore
+ * `members`; deleting that entry revokes access.
+ *
+ * The phone signs in with Google, files the request under its Firebase uid and opens when [Account] sees
+ * `members/{uid}` appear. The TV app (no Firebase) files it under a random request id, polls for the
+ * approval, and asks the script at launch ([recheck]) whether it is still a member. Same as the iOS app.
  */
 object AccessGate {
     private const val URL = "https://script.google.com/macros/s/AKfycbzM71C8tRgkWqKWYBpr97IcZCOkouZTTU55rWiU1n4g3MZHEq8dm9B9pHd6SC4kicSk-Q/exec"
@@ -45,8 +48,22 @@ object AccessGate {
 
     fun forgetRequest() = prefs.edit().remove("id").apply()
 
-    suspend fun request(name: String, email: String, platform: String): Result<Unit> = runCatching {
-        val id = post("action" to "request", "name" to name, "email" to email, "platform" to platform, "device" to "${Build.MANUFACTURER} ${Build.MODEL}")
+    /** Phone: whether `members/{uid}` exists for the signed-in account, as [Account] watches it. */
+    fun setMember(on: Boolean) {
+        prefs.edit().putBoolean("unlocked", on).apply()
+        _unlocked.value = on
+    }
+
+    /** TV: locks the app again if the owner removed this device from `members`. Offline keeps it open. */
+    suspend fun recheck() {
+        val id = prefs.getString("member", null) ?: return
+        runCatching { post("action" to "member", "id" to id) }.onSuccess { if (!it.flag("ok")) setMember(false) }
+    }
+
+    suspend fun request(name: String, email: String, platform: String, uid: String? = null): Result<Unit> = runCatching {
+        val fields = listOfNotNull("action" to "request", "name" to name, "email" to email, "platform" to platform,
+            "device" to "${Build.MANUFACTURER} ${Build.MODEL}", uid?.let { "uid" to it })
+        val id = post(*fields.toTypedArray())
             .takeIf { it.flag("ok") }?.get("id")?.jsonPrimitive?.content ?: error("request refused")
         prefs.edit().putString("email", email).putString("id", id).putLong("requestedAt", System.currentTimeMillis()).apply()
     }
@@ -57,7 +74,7 @@ object AccessGate {
         val res = post("action" to "status", "id" to id)
         when {
             res.flag("ok") -> {
-                prefs.edit().putBoolean("unlocked", true).remove("id").apply()
+                prefs.edit().putBoolean("unlocked", true).putString("member", id).remove("id").apply()
                 _unlocked.value = true
                 Status.Open
             }

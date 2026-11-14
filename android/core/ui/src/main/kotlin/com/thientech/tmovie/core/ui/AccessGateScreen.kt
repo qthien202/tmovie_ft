@@ -42,18 +42,115 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.thientech.tmovie.core.data.AccessGate
+import com.thientech.tmovie.core.data.Account
 import com.thientech.tmovie.core.designsystem.TMovieColors
 import com.thientech.tmovie.core.designsystem.Wordmark
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-/** Shows [content] once this device has been let in; until then, the access request / code screen. */
+/**
+ * Shows [content] once this device has been let in; until then, the access request screen: Google sign-in
+ * on the phone (Firebase), name + email on the TV.
+ */
 @Composable
 fun AccessGate(platform: String, content: @Composable () -> Unit) {
     val unlocked by AccessGate.unlocked.collectAsStateWithLifecycle()
-    if (unlocked) content() else AccessGateScreen(platform)
+    LaunchedEffect(Unit) { if (!Account.available) AccessGate.recheck() }
+    when {
+        unlocked -> content()
+        Account.available -> GoogleGate(platform)
+        else -> AccessGateScreen(platform)
+    }
+}
+
+@Composable
+private fun GoogleGate(platform: String) {
+    val user by Account.user.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var pending by remember { mutableStateOf(AccessGate.pendingEmail()) }
+    var busy by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<String?>(null) }
+    val button = remember { FocusRequester() }
+    LaunchedEffect(user, pending) { runCatching { button.requestFocus() } }
+    val u = user
+    GateFrame(
+        title = if (u != null && pending != null) "Đang chờ duyệt…" else "App riêng tư",
+        message = when {
+            u == null -> "TMovie chỉ dành cho bạn bè của chủ app. Đăng nhập Google rồi xin vào, chủ app duyệt là bạn xem được ngay."
+            pending == null -> "Bạn đang đăng nhập bằng ${u.email}. Gửi yêu cầu để chủ app duyệt."
+            else -> "Đã gửi yêu cầu. Chủ app duyệt xong là app tự mở, và bạn nhận mail báo ở ${u.email}."
+        },
+        error = error,
+    ) {
+        when {
+            u == null -> PrimaryButton(button, if (busy) "Đang đăng nhập…" else "Đăng nhập bằng Google", enabled = !busy) {
+                busy = true; error = null
+                scope.launch {
+                    Account.signIn(context).onFailure { error = "Chưa đăng nhập được, thử lại nhé." }
+                    busy = false
+                }
+            }
+            pending == null -> PrimaryButton(button, if (busy) "Đang gửi…" else "Gửi yêu cầu", enabled = !busy) {
+                busy = true; error = null
+                scope.launch {
+                    AccessGate.request(u.name ?: u.email.orEmpty(), u.email.orEmpty(), platform, uid = u.uid)
+                        .onSuccess { pending = u.email }
+                        .onFailure { error = "Không gửi được, kiểm tra mạng rồi thử lại nhé." }
+                    busy = false
+                }
+            }
+        }
+        if (u != null) TextLink(if (pending == null) "Dùng tài khoản khác" else "Huỷ yêu cầu, dùng tài khoản khác") {
+            AccessGate.forgetRequest(); pending = null; error = null
+            Account.signOut(context)
+        }
+    }
+}
+
+/** The gate's full-screen frame: brand glow, wordmark, title, message, an error line and the actions. */
+@Composable
+private fun GateFrame(title: String, message: String, error: String?, content: @Composable () -> Unit) {
+    Box(
+        Modifier
+            .fillMaxSize()
+            .background(TMovieColors.Canvas)
+            .background(Brush.radialGradient(listOf(TMovieColors.Brand.copy(alpha = 0.35f), Color.Transparent), radius = 1100f, center = Offset(0f, 0f)))
+            .imePadding(),
+        contentAlignment = Alignment.Center,
+    ) {
+        Column(
+            Modifier.widthIn(max = 440.dp).fillMaxWidth().verticalScroll(rememberScrollState()).padding(28.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(14.dp),
+        ) {
+            Wordmark(size = 34)
+            Text(title, color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 8.dp))
+            Text(message, color = TMovieColors.Secondary, fontSize = 15.sp, lineHeight = 21.sp, textAlign = TextAlign.Center)
+            content()
+            error?.let { Text(it, color = Color(0xFFFF8A80), fontSize = 14.sp, textAlign = TextAlign.Center) }
+        }
+    }
+}
+
+/** A quiet text action with the white focus ring TV remotes need. */
+@Composable
+private fun TextLink(text: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    var focused by remember { mutableStateOf(false) }
+    Text(
+        text,
+        color = if (focused) Color.White else TMovieColors.Secondary,
+        fontSize = 15.sp,
+        modifier = modifier
+            .onFocusChanged { focused = it.isFocused }
+            .clip(CircleShape)
+            .border(2.dp, if (focused) Color.White else Color.Transparent, CircleShape)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 10.dp),
+    )
 }
 
 @Composable
@@ -88,61 +185,31 @@ private fun AccessGateScreen(platform: String) {
         }
     }
 
-    Box(
-        Modifier
-            .fillMaxSize()
-            .background(TMovieColors.Canvas)
-            .background(Brush.radialGradient(listOf(TMovieColors.Brand.copy(alpha = 0.35f), Color.Transparent), radius = 1100f, center = Offset(0f, 0f)))
-            .imePadding(),
-        contentAlignment = Alignment.Center,
+    GateFrame(
+        title = if (pending == null) "App riêng tư" else "Đang chờ duyệt…",
+        message = if (pending == null) "TMovie chỉ dành cho bạn bè của chủ app. Gửi yêu cầu, chủ app duyệt là bạn vào được."
+        else "Đã gửi yêu cầu. Chủ app duyệt xong là app tự mở, và bạn nhận mail báo ở $pending.",
+        error = error,
     ) {
-        Column(
-            Modifier.widthIn(max = 440.dp).fillMaxWidth().verticalScroll(rememberScrollState()).padding(28.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(14.dp),
-        ) {
-            Wordmark(size = 34)
-            Text(if (pending == null) "App riêng tư" else "Đang chờ duyệt…", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 8.dp))
-            Text(
-                if (pending == null) "TMovie chỉ dành cho bạn bè của chủ app. Gửi yêu cầu, chủ app duyệt là bạn vào được."
-                else "Đã gửi yêu cầu. Chủ app duyệt xong là app tự mở, và bạn nhận mail báo ở $pending.",
-                color = TMovieColors.Secondary, fontSize = 15.sp, lineHeight = 21.sp, textAlign = TextAlign.Center,
+        if (pending == null) {
+            val colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = TMovieColors.BrandLight, unfocusedBorderColor = Color.White.copy(alpha = 0.25f),
+                focusedLabelColor = TMovieColors.BrandLight, cursorColor = TMovieColors.BrandLight,
             )
-            if (pending == null) {
-                val colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = TMovieColors.BrandLight, unfocusedBorderColor = Color.White.copy(alpha = 0.25f),
-                    focusedLabelColor = TMovieColors.BrandLight, cursorColor = TMovieColors.BrandLight,
-                )
-                OutlinedTextField(
-                    name, { name = it.take(40); error = null }, Modifier.fillMaxWidth().focusRequester(field),
-                    label = { Text("Tên của bạn") }, singleLine = true, colors = colors,
-                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words, imeAction = ImeAction.Next),
-                )
-                OutlinedTextField(
-                    email, { email = it.take(100); error = null }, Modifier.fillMaxWidth(),
-                    label = { Text("Email") }, singleLine = true, colors = colors,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, autoCorrectEnabled = false, imeAction = ImeAction.Send),
-                    keyboardActions = KeyboardActions(onSend = { send() }),
-                )
-            }
-            error?.let { Text(it, color = Color(0xFFFF8A80), fontSize = 14.sp, textAlign = TextAlign.Center) }
-            if (pending == null) {
-                PrimaryButton(button, if (busy) "Đang gửi…" else "Gửi yêu cầu", enabled = name.isNotBlank() && validEmail && !busy, onClick = ::send)
-            } else {
-                var focused by remember { mutableStateOf(false) }
-                Text(
-                    "Gửi lại yêu cầu",
-                    color = if (focused) Color.White else TMovieColors.Secondary,
-                    fontSize = 15.sp,
-                    modifier = Modifier
-                        .focusRequester(button)
-                        .onFocusChanged { focused = it.isFocused }
-                        .clip(CircleShape)
-                        .border(2.dp, if (focused) Color.White else Color.Transparent, CircleShape)
-                        .clickable { AccessGate.forgetRequest(); pending = null; error = null }
-                        .padding(horizontal = 16.dp, vertical = 10.dp),
-                )
-            }
+            OutlinedTextField(
+                name, { name = it.take(40); error = null }, Modifier.fillMaxWidth().focusRequester(field),
+                label = { Text("Tên của bạn") }, singleLine = true, colors = colors,
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words, imeAction = ImeAction.Next),
+            )
+            OutlinedTextField(
+                email, { email = it.take(100); error = null }, Modifier.fillMaxWidth(),
+                label = { Text("Email") }, singleLine = true, colors = colors,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, autoCorrectEnabled = false, imeAction = ImeAction.Send),
+                keyboardActions = KeyboardActions(onSend = { send() }),
+            )
+            PrimaryButton(button, if (busy) "Đang gửi…" else "Gửi yêu cầu", enabled = name.isNotBlank() && validEmail && !busy, onClick = ::send)
+        } else {
+            TextLink("Gửi lại yêu cầu", Modifier.focusRequester(button)) { AccessGate.forgetRequest(); pending = null; error = null }
         }
     }
 }
