@@ -21,7 +21,7 @@ public struct PosterCard: View {
                 .aspectRatio(2 / 3, contentMode: .fit)
                 .frame(width: width)
                 .overlay(alignment: .topLeading) { badge }
-                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                 .zoomSource(id: sourceID)
         }
         .buttonStyle(PressableStyle())

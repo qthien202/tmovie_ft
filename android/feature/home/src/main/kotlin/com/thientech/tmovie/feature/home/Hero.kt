@@ -1,5 +1,13 @@
 package com.thientech.tmovie.feature.home
 
+import androidx.compose.ui.text.font.FontWeight
+import com.thientech.tmovie.core.network.PhimApi
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.runtime.produceState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.border
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -83,7 +91,7 @@ fun HeroPager(films: List<FilmItem>, art: Map<String, String>, tint: Color, page
     // redraws its layers each frame instead of recomposing.
     val tilt = rememberTilt(enabled = !reduceMotion)
     val haptics = LocalHapticFeedback.current
-    val height = (LocalConfiguration.current.screenHeightDp * 0.74f).dp
+    val height = (LocalConfiguration.current.screenHeightDp * 0.78f).dp
 
     // Auto-advance (longer while a preview plays); swiping changes the page and restarts the timer.
     // Keyed on settledPage, not currentPage: currentPage flips halfway through the scroll, which
@@ -115,6 +123,7 @@ fun HeroPager(films: List<FilmItem>, art: Map<String, String>, tint: Color, page
             val film = films[page]
             HeroPage(
                 film = film,
+                rank = page + 1,
                 art = art[film.slug] ?: film.thumbImage,
                 tint = tint,
                 pageOffset = { (pager.currentPage - page) + pager.currentPageOffsetFraction },
@@ -125,12 +134,15 @@ fun HeroPager(films: List<FilmItem>, art: Map<String, String>, tint: Color, page
                 muted = muted,
             )
         }
-        // Page dots.
-        Row(Modifier.align(Alignment.BottomCenter).padding(bottom = 14.dp), horizontalArrangement = Arrangement.spacedBy(7.dp)) {
+        // Page indicator, vertical down the right edge so it never competes with the caption.
+        Column(
+            Modifier.align(Alignment.BottomEnd).padding(end = 12.dp, bottom = 40.dp).clip(CircleShape).glass(CircleShape).padding(horizontal = 5.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(5.dp),
+        ) {
             films.indices.forEach { i ->
                 val selected = i == pager.currentPage
-                val w by animateDpAsState(if (selected) 20.dp else 7.dp, label = "dot")
-                Box(Modifier.width(w).height(7.dp).clip(CircleShape).background(Color.White.copy(alpha = if (selected) 1f else 0.4f)))
+                val h by animateDpAsState(if (selected) 24.dp else 6.dp, label = "dot")
+                Box(Modifier.width(5.dp).height(h).clip(CircleShape).background(Color.White.copy(alpha = if (selected) 1f else 0.4f)))
             }
         }
     }
@@ -139,6 +151,7 @@ fun HeroPager(films: List<FilmItem>, art: Map<String, String>, tint: Color, page
 @Composable
 private fun HeroPage(
     film: FilmItem,
+    rank: Int,
     art: String?,
     tint: Color,
     pageOffset: () -> Float,
@@ -170,19 +183,25 @@ private fun HeroPage(
             RemoteImage(art, Modifier.fillMaxSize(), film.name)
             if (preview) HeroPreview(film.slug, muted, Modifier.fillMaxSize())
         }
-        // Scrim: top fade for the header, tinted fade into the page at the bottom.
+        // Scrim: dark at the top for the status bar; at the bottom a heavier fade (Apple TV's
+        // blurred veil) so the caption reads on any still.
         Box(
             Modifier.fillMaxSize().background(
                 Brush.verticalGradient(
-                    0f to Color.Black.copy(alpha = 0.55f), 0.25f to Color.Transparent,
-                    0.35f to Color.Transparent, 0.65f to animatedTint.copy(alpha = 0.25f), 1f to TMovieColors.Canvas,
+                    0f to Color.Black.copy(alpha = 0.7f), 0.16f to Color.Black.copy(alpha = 0.25f), 0.3f to Color.Transparent,
+                    0.46f to Color.Transparent, 0.62f to Color.Black.copy(alpha = 0.38f), 0.8f to animatedTint.copy(alpha = 0.1f).compositeOver(Color.Black.copy(alpha = 0.72f)),
+                    1f to TMovieColors.Canvas,
                 ),
             ),
         )
+        val story by produceState("", film.slug) {
+            value = runCatching { PhimApi.shared.detail(film.slug).content.orEmpty() }.getOrDefault("")
+                .replace(Regex("<[^>]+>"), "").replace("&nbsp;", " ").replace("&amp;", "&").trim()
+        }
         Column(
             Modifier
-                .align(Alignment.BottomCenter)
-                .padding(start = 24.dp, end = 24.dp, bottom = 44.dp)
+                .align(Alignment.BottomStart)
+                .padding(start = 20.dp, end = 48.dp, bottom = 30.dp)
                 .graphicsLayer {
                     val o = pageOffset()
                     val t = tilt()
@@ -190,28 +209,38 @@ private fun HeroPage(
                     translationX = o * 60.dp.toPx() + t.x * 8.dp.toPx()
                     translationY = t.y * 5.dp.toPx()
                 },
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            Text(
-                captionLine(film).uppercase(),
-                color = Color.White.copy(alpha = 0.75f),
-                fontSize = 12.sp,
-                letterSpacing = 1.2.sp,
-                maxLines = 1,
-            )
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    "TOP $rank", color = Color.Black, fontSize = 10.5.sp, fontWeight = FontWeight.Black, letterSpacing = 0.6.sp,
+                    modifier = Modifier.background(Color.White, RoundedCornerShape(6.dp)).padding(horizontal = 7.dp, vertical = 2.dp),
+                )
+                Text("Đang hot tuần này", color = Color.White.copy(alpha = 0.85f), fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+            }
+            // Long names step down in size rather than being cut.
+            val len = film.name.length
             Text(
                 film.name,
-                style = TMovieType.Display.copy(shadow = Shadow(Color.Black.copy(alpha = 0.5f), blurRadius = 24f)),
                 color = Color.White,
-                textAlign = TextAlign.Center,
-                maxLines = 2,
+                fontSize = if (len > 26) 28.sp else if (len > 16) 34.sp else 40.sp,
+                lineHeight = if (len > 26) 31.sp else if (len > 16) 36.sp else 41.sp,
+                fontWeight = FontWeight.ExtraBold,
+                letterSpacing = (-0.8).sp,
+                maxLines = if (len > 26) 3 else 2,
                 overflow = TextOverflow.Ellipsis,
+                style = TextStyle(shadow = Shadow(Color.Black.copy(alpha = 0.35f), blurRadius = 28f)),
+                modifier = Modifier.padding(top = 10.dp),
             )
-            film.originName?.takeIf { it.isNotBlank() && it != film.name }?.let {
-                Text(it, color = Color.White.copy(alpha = 0.7f), fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Row(Modifier.padding(top = 10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(facts(film), color = Color.White.copy(alpha = 0.85f), fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
+                film.quality?.takeIf { it.isNotBlank() }?.let { HeroBadge(it) }
+                film.lang?.takeIf { it.isNotBlank() }?.let { HeroBadge(if (it.contains("thuyết", true) || it.contains("lồng", true)) "TM" else "VS") }
             }
-            Row(Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                story, color = Color.White.copy(alpha = 0.72f), fontSize = 14.sp, lineHeight = 19.sp, maxLines = 2, overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(top = 8.dp).heightIn(min = 38.dp),
+            )
+            Row(Modifier.padding(top = 16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
                 PlayFilmButton(film, capsule = true)
                 SaveButton(film, SaveStyle.Circle)
                 AnimatedVisibility(preview, enter = fadeIn() + scaleIn(), exit = fadeOut() + scaleOut()) {
@@ -231,17 +260,23 @@ private fun HeroPage(
     }
 }
 
-/** "Phim bộ · Tình cảm · 2026 · ★ 8.4" */
-private fun captionLine(film: FilmItem): String = listOfNotNull(
-    when (film.type) {
-        "series" -> "Phim bộ"
-        "single" -> "Phim lẻ"
-        "tvshows" -> "TV Show"
-        "hoathinh" -> "Hoạt hình"
-        else -> null
-    },
-    film.category?.firstOrNull()?.name,
-    film.year?.toString(),
-    film.rating?.let { "★ " + String.format(java.util.Locale.US, "%.1f", it) },
-).joinToString(" · ")
+@Composable
+private fun HeroBadge(text: String) {
+    Text(
+        text, color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold, maxLines = 1,
+        modifier = Modifier.border(1.dp, Color.White.copy(alpha = 0.55f), RoundedCornerShape(4.dp)).padding(horizontal = 5.dp, vertical = 1.dp),
+    )
+}
 
+/** "Phim bộ · Tình cảm · Hành động · 2026" */
+private fun facts(film: FilmItem): String = (
+    listOf(
+        when (film.type) {
+            "series" -> "Phim bộ"
+            "single" -> "Phim lẻ"
+            "tvshows" -> "TV Show"
+            "hoathinh" -> "Hoạt hình"
+            else -> null
+        },
+    ) + film.category.orEmpty().take(2).map { it.name } + film.year?.toString()
+    ).filterNotNull().joinToString(" · ")

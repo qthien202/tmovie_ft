@@ -38,7 +38,7 @@ struct RootView: View {
 struct MainTabs: View {
     /// Reopens on the last tab.
     @AppStorage("tab") private var tab = 0
-    /// One navigation stack per tab: home, new & hot, profile, search, live TV.
+    /// One navigation stack per tab: home, explore, profile, search, live TV.
     @State private var routers = [RouterPath(), RouterPath(), RouterPath(), RouterPath(), RouterPath()]
 
     var body: some View {
@@ -46,7 +46,7 @@ struct MainTabs: View {
             if #available(iOS 18, *) {
                 TabView(selection: $tab) {
                     Tab(value: 0) { stack(0) { HomeView() } } label: { tabLabel("Trang chủ", "house.fill") }
-                    Tab(value: 1) { stack(1) { NewHotView() } } label: { tabLabel("Mới & Hot", "flame.fill") }
+                    Tab(value: 1) { stack(1) { ExploreView() } } label: { tabLabel("Khám phá", "safari.fill") }
                     Tab(value: 4) { stack(4) { LiveTVView() } } label: { tabLabel("Truyền hình", "play.tv.fill") }
                     Tab(value: 2) { stack(2) { ProfileView() } } label: { tabLabel("Của tôi", "person.fill") }
                     Tab(value: 3, role: .search) { stack(3) { SearchView() } }
@@ -54,7 +54,7 @@ struct MainTabs: View {
             } else {
                 TabView(selection: $tab) {
                     stack(0) { HomeView() }.tabItem { Label("Trang chủ", systemImage: "house") }.tag(0)
-                    stack(1) { NewHotView() }.tabItem { Label("Mới & Hot", systemImage: "flame") }.tag(1)
+                    stack(1) { ExploreView() }.tabItem { Label("Khám phá", systemImage: "safari") }.tag(1)
                     stack(4) { LiveTVView() }.tabItem { Label("Truyền hình", systemImage: "play.tv") }.tag(4)
                     stack(2) { ProfileView() }.tabItem { Label("Của tôi", systemImage: "person.crop.circle") }.tag(2)
                     stack(3) { SearchView() }.tabItem { Label("Tìm kiếm", systemImage: "magnifyingglass") }.tag(3)

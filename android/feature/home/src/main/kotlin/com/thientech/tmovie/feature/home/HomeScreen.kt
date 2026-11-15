@@ -1,5 +1,31 @@
 package com.thientech.tmovie.feature.home
 
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
+import com.thientech.tmovie.core.ui.route
+import com.thientech.tmovie.core.ui.RailHeader
+import com.thientech.tmovie.core.designsystem.RemoteImage
+import androidx.compose.ui.zIndex
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.border
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -90,7 +116,7 @@ fun HomeScreen(vm: HomeViewModel = viewModel()) {
                     }
                 }
                 if (history.isNotEmpty()) item(key = "continue") {
-                    Shelf("Xem tiếp") { items(history.take(15), key = { it.film.slug }) { ContinueCard(it) } }
+                    Shelf("Xem tiếp", spacing = 14.dp) { items(history.take(15), key = { it.film.slug }) { ContinueCard(it) } }
                 }
                 if (saved.isNotEmpty()) item(key = "mylist") {
                     Shelf("Danh sách của tôi") { items(saved, key = { it.film.slug }) { PosterCard(it.film, "mylist/${it.film.slug}") } }
@@ -146,20 +172,94 @@ private fun HomeHeader() {
     }
 }
 
-/** Netflix "Top 10": huge outlined rank numbers tucked behind each poster. */
+/**
+ * "Top 10" as a deck of cards fanned across the width, the rank printed on each poster. Swiping
+ * left pulls the top card out and tucks it under the deck; swiping right pulls the bottom one back
+ * on top. Endless: after 10 comes 1. Tapping the top card opens the film, a card behind brings it up.
+ */
 @Composable
 private fun Top10Shelf(vm: HomeViewModel) {
-    Shelf("Top 10 phim bộ tuần này", more = ListRoute.type("Phim bộ", "phim-bo"), spacing = 4.dp) {
-        itemsIndexed(vm.top10, key = { _, f -> "top10/${f.slug}" }) { i, film ->
-            Row(verticalAlignment = Alignment.Bottom) {
-                Text(
-                    "${i + 1}",
-                    style = TextStyle(fontSize = 120.sp, fontWeight = FontWeight.Black, drawStyle = Stroke(width = 5f)),
-                    color = Color.White.copy(alpha = 0.85f),
-                    modifier = Modifier.padding(bottom = 0.dp).width(if (i + 1 >= 10) 130.dp else 70.dp),
-                )
-                PosterCard(film, "top10/${film.slug}", Modifier.padding(start = 0.dp), width = 104.dp)
+    val films = vm.top10
+    val n = films.size
+    val nav = rememberNavigator()
+    val scope = rememberCoroutineScope()
+    val haptics = LocalHapticFeedback.current
+    var top by remember { mutableIntStateOf(0) }
+    // The card on its way out (or back in), drawn at the side for the first half of the move.
+    var moving by remember { mutableStateOf<Int?>(null) }
+    var movingOnTop by remember { mutableStateOf(true) }
+    var drag by remember { mutableFloatStateOf(0f) }
+    fun step(dir: Int) {
+        if (n < 2 || moving != null) return
+        val next = (top + dir + n) % n
+        movingOnTop = dir > 0
+        moving = if (dir > 0) top else next
+        top = next
+        haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+        scope.launch { delay(260); movingOnTop = !movingOnTop; moving = null }
+    }
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        RailHeader("Top 10 phim bộ tuần này", ListRoute.type("Phim bộ", "phim-bo"))
+        Box(
+            Modifier.fillMaxWidth().height(262.dp).clipToBounds()
+                .pointerInput(n) {
+                    detectHorizontalDragGestures(
+                        onDragEnd = { if (drag < -40.dp.toPx()) step(1) else if (drag > 40.dp.toPx()) step(-1); drag = 0f },
+                        onDragCancel = { drag = 0f },
+                    ) { _, dx -> drag += dx }
+                },
+        ) {
+            films.forEachIndexed { i, film ->
+                val k = (i - top + n) % n
+                val v = minOf(k, 4).toFloat()
+                val isMoving = moving == i
+                val spec = spring<Float>(dampingRatio = if (isMoving) 0.9f else 0.82f, stiffness = Spring.StiffnessMediumLow)
+                val x by animateFloatAsState(if (isMoving) -150f else 18f + v * 64f, spec, label = "x")
+                val y by animateFloatAsState(if (isMoving) -6f else v * 7f, spec, label = "y")
+                val scale by animateFloatAsState(if (isMoving) 0.96f else 1f - v * 0.075f, spec, label = "s")
+                val rot by animateFloatAsState(if (isMoving) -12f else 0f, spec, label = "r")
+                val alpha by animateFloatAsState(if (k > 4 && !isMoving) 0f else 1f, label = "a")
+                Box(
+                    Modifier
+                        .zIndex(if (isMoving) (if (movingOnTop) 40f else -1f) else 20f - k)
+                        .offset(x = x.dp + if (k == 0) (drag * 0.6f / LocalDensity.current.density).dp else 0.dp, y = y.dp)
+                        .graphicsLayer {
+                            scaleX = scale; scaleY = scale; rotationZ = rot; this.alpha = alpha
+                            transformOrigin = TransformOrigin(0f, 1f)
+                        }
+                        .size(162.dp, 243.dp)
+                        .clip(RoundedCornerShape(18.dp))
+                        .border(1.dp, Color.White.copy(alpha = 0.16f), RoundedCornerShape(18.dp))
+                        .clickable(enabled = k <= 4) {
+                            if (k == 0) nav.openFilm(film.route("top10/${film.slug}")) else top = i
+                        },
+                ) {
+                    RemoteImage(film.posterImage, Modifier.fillMaxSize(), film.name)
+                    Box(Modifier.fillMaxSize().background(Brush.verticalGradient(0.55f to Color.Transparent, 1f to Color.Black.copy(alpha = 0.75f))))
+                    Text(
+                        "${i + 1}",
+                        style = TextStyle(
+                            fontSize = 64.sp, fontWeight = FontWeight.Black, letterSpacing = (-3).sp,
+                            brush = medal(i + 1), shadow = Shadow(Color.Black.copy(alpha = 0.6f), blurRadius = 20f),
+                        ),
+                        modifier = Modifier.align(Alignment.BottomStart).padding(start = 10.dp).offset(y = 12.dp),
+                    )
+                    film.episodeCurrent?.takeIf { it.isNotBlank() && !it.equals("full", true) }?.let {
+                        Text(
+                            it.replace("Hoàn Tất", "Trọn bộ"), color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold, maxLines = 1,
+                            modifier = Modifier.background(TMovieColors.Brand, RoundedCornerShape(bottomEnd = 9.dp)).padding(horizontal = 7.dp, vertical = 3.dp),
+                        )
+                    }
+                    Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = minOf(0.5f, v * 0.13f))))
+                }
             }
         }
     }
+}
+
+private fun medal(rank: Int): Brush = when (rank) {
+    1 -> Brush.verticalGradient(listOf(Color(0xFFFFF3CC), Color(0xFFF0B84D)))
+    2 -> Brush.verticalGradient(listOf(Color.White, Color(0xFFB9C2CC)))
+    3 -> Brush.verticalGradient(listOf(Color(0xFFFFE0BF), Color(0xFFD08A4C)))
+    else -> SolidColor(Color.White)
 }
