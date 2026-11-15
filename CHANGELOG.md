@@ -8,6 +8,15 @@ Vietnamese block free of Markdown styling (use emoji + "•" bullets).
 
 Every new feature/release must add a `## vX.Y.Z` section with both parts.
 
+## v1.11.2
+
+Android phone: the home hero's preview no longer plays on under the full player. It loads for a few seconds before starting, and if the player (or another app) covered Home meanwhile, it started anyway, with sound if unmuted; it now starts only while Home is on screen.
+
+<!-- app:vi -->
+🛠 Sửa lỗi (Android)
+• Đoạn xem trước ở đầu trang chủ không còn phát tiếp khi bạn mở xem phim khác.
+<!-- /app:vi -->
+
 ## v1.11.1
 
 Android phone player: the video now fills the camera-hole side of the screen in landscape (`LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES`). Android 15 does this by itself for edge-to-edge apps, but before it (MIUI 14 is Android 13) the default left a black strip where the status bar would be.

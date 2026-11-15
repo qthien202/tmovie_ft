@@ -21,7 +21,9 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleStartEffect
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
@@ -38,6 +40,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun HeroPreview(slug: String, muted: Boolean, modifier: Modifier = Modifier) {
     val context = LocalContext.current
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
     val exo = remember(slug) { StreamPlayer.create(context, preview = true).apply { repeatMode = Player.REPEAT_MODE_OFF } }
     var visible by remember(slug) { mutableStateOf(false) }
     val alpha by animateFloatAsState(if (visible) 1f else 0f, tween(1200), label = "preview")
@@ -54,7 +57,9 @@ fun HeroPreview(slug: String, muted: Boolean, modifier: Modifier = Modifier) {
         while (exo.duration <= 0) delay(250)
         val start = if (exo.duration > 600_000) 240_000L else exo.duration / 10
         exo.seekTo(start)
-        exo.play()
+        // Loading takes a few seconds; if the full player (or another app) covered Home meanwhile,
+        // stay paused: LifecycleStartEffect below starts it when Home is back.
+        if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) exo.play()
         while (true) {
             delay(500)
             if (!visible && exo.isPlaying && exo.currentPosition > start + 300) visible = true
