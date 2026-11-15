@@ -1,5 +1,9 @@
 package com.thientech.tmovie
 
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.foundation.border
+import com.thientech.tmovie.core.designsystem.RemoteImage
+import com.thientech.tmovie.core.data.Account
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -78,7 +82,7 @@ import com.thientech.tmovie.core.ui.SearchRoute
 import com.thientech.tmovie.core.ui.route
 import com.thientech.tmovie.feature.browse.CatalogScreen
 import com.thientech.tmovie.feature.browse.LiveTvScreen
-import com.thientech.tmovie.feature.browse.NewHotScreen
+import com.thientech.tmovie.feature.browse.ExploreScreen
 import com.thientech.tmovie.feature.browse.SearchScreen
 import com.thientech.tmovie.feature.detail.DetailScreen
 import com.thientech.tmovie.feature.home.HomeScreen
@@ -110,9 +114,8 @@ private val TabGap = 4.dp
 private val tabs = listOf(
     TabItem(HomeRoute, "Trang chủ", "M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8",
         "M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"),
-    TabItem(NewHotRoute, "Mới & Hot",
-        "M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"),
-    TabItem(LiveRoute, "Truyền hình", "M4 7h16a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z", "M17 2l-5 5-5-5"),
+    // The second tab is "Khám phá" (ExploreScreen, which holds the Mới & Hot feed); the route keeps its name.
+    TabItem(NewHotRoute, "Khám phá", "M3 12a9 9 0 1 0 18 0a9 9 0 1 0-18 0", "M16.2 7.8l-2 6.4-6.4 2 2-6.4z"),
     TabItem(SearchRoute, "Tìm kiếm", "M3 11a8 8 0 1 0 16 0a8 8 0 1 0-16 0", "M21 21l-4.3-4.3"),
     TabItem(ProfileRoute, "Của tôi", "M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2", "M8 7a4 4 0 1 0 8 0a4 4 0 1 0-8 0"),
 )
@@ -159,7 +162,7 @@ fun AppNavHost(link: String?, onLinkHandled: () -> Unit) {
                 CompositionLocalProvider(LocalSharedScope provides this) {
                     NavHost(nav, startDestination = HomeRoute) {
                         composable<HomeRoute> { CompositionLocalProvider(LocalAnimatedScope provides this) { HomeScreen() } }
-                        composable<NewHotRoute> { CompositionLocalProvider(LocalAnimatedScope provides this) { NewHotScreen() } }
+                        composable<NewHotRoute> { CompositionLocalProvider(LocalAnimatedScope provides this) { ExploreScreen() } }
                         composable<LiveRoute> { LiveTvScreen() }
                         composable<SearchRoute> { CompositionLocalProvider(LocalAnimatedScope provides this) { SearchScreen() } }
                         composable<ProfileRoute> { CompositionLocalProvider(LocalAnimatedScope provides this) { ProfileScreen(account = { AccountCard() }) } }
@@ -203,6 +206,7 @@ fun AppNavHost(link: String?, onLinkHandled: () -> Unit) {
 @Composable
 private fun BottomBar(selected: (TabItem) -> Boolean, onSelect: (TabItem) -> Unit, modifier: Modifier = Modifier) {
     val haptics = LocalHapticFeedback.current
+    val user by Account.user.collectAsStateWithLifecycle()
     val index = tabs.indexOfFirst(selected)
     val highlightX by animateDpAsState((TabWidth + TabGap) * index.coerceAtLeast(0), spring(dampingRatio = 0.75f, stiffness = 500f), label = "tab")
     Box(
@@ -232,7 +236,17 @@ private fun BottomBar(selected: (TabItem) -> Boolean, onSelect: (TabItem) -> Uni
                         .semantics { role = Role.Tab; this.selected = on },
                     contentAlignment = Alignment.Center,
                 ) {
-                    Icon(if (on) tab.selectedIcon else tab.icon, tab.label, tint = tint, modifier = Modifier.size(25.dp))
+                    // Signed in: the profile tab shows the Google account's photo.
+                    val photo = user?.photoUrl.takeIf { tab.route == ProfileRoute }
+                    if (photo != null) {
+                        RemoteImage(
+                            photo, Modifier.size(28.dp).clip(CircleShape)
+                                .border(if (on) 2.dp else 1.dp, if (on) TMovieColors.BrandLight else Color.White.copy(alpha = 0.5f), CircleShape),
+                            tab.label,
+                        )
+                    } else {
+                        Icon(if (on) tab.selectedIcon else tab.icon, tab.label, tint = tint, modifier = Modifier.size(25.dp))
+                    }
                 }
             }
         }

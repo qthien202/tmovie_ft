@@ -12,10 +12,10 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-// Brand: Transformative Teal, dark-first (same tokens as iOS DesignSystem).
+// Brand: electric blue #3D8BFF (was teal), dark-first (same tokens as iOS DesignSystem).
 object TMovieColors {
-    val Brand = Color(0xFF0F9190)
-    val BrandLight = Color(0xFF66E6CC)
+    val Brand = Color(0xFF3D8BFF)
+    val BrandLight = Color(0xFF8ABCFF)
     val Canvas = Color(0xFF05080A)
     val Surface = Color(0xFF12161A)
     val Secondary = Color(0xB3FFFFFF)

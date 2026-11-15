@@ -1,9 +1,9 @@
 import SwiftUI
 
-// Brand: Transformative Teal. Dark-first; the app forces `.dark`.
+// Brand: electric blue #3D8BFF (was teal). Dark-first; the app forces `.dark`.
 extension Color {
-    public static let brand = Color(red: 0.06, green: 0.57, blue: 0.56)
-    public static let brandLight = Color(red: 0.4, green: 0.9, blue: 0.8)
+    public static let brand = Color(red: 0.24, green: 0.545, blue: 1.0)
+    public static let brandLight = Color(red: 0.54, green: 0.74, blue: 1.0)
     public static let canvas = Color(red: 0.02, green: 0.03, blue: 0.04)
 }
 

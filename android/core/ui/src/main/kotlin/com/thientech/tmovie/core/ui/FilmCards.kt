@@ -1,5 +1,18 @@
 package com.thientech.tmovie.core.ui
 
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
+import com.thientech.tmovie.core.data.ContinueFrames
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.runtime.produceState
+import androidx.compose.foundation.border
+import androidx.compose.foundation.Image
+import android.graphics.BitmapFactory
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -117,18 +130,32 @@ fun Shelf(title: String, more: ListRoute? = null, spacing: Dp = 8.dp, content: L
     }
 }
 
-/** "Xem tiếp" card: landscape still with progress; tapping resumes playback straight away. */
+/**
+ * "Xem tiếp" card, Apple TV Up Next: a large 16:9 still (the frame the viewer paused on, else the
+ * film's), the episode as a glass chip, a glass play button, progress along the bottom edge with
+ * the time left, and the title underneath. Tapping resumes playback straight away.
+ */
 @Composable
 fun ContinueCard(record: WatchRecord, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var loading by remember { mutableStateOf(false) }
     val interaction = rememberInteraction()
+    // Read again whenever the record is saved, so a newer paused frame shows up.
+    val frame by produceState<ImageBitmap?>(null, record.film.slug, record.updatedAt) {
+        value = withContext(Dispatchers.IO) {
+            ContinueFrames.file(context, record.film.slug).takeIf { it.exists() }?.let { BitmapFactory.decodeFile(it.path)?.asImageBitmap() }
+        }
+    }
+    val episode = record.episodeName.let { if (it.isNotEmpty() && it.all(Char::isDigit)) "Tập ${it.toInt()}" else it }
+    val left = record.durations[record.lastEpisodeSlug]?.takeIf { it > 0 }?.let { d ->
+        maxOf(1, ((d - (record.positions[record.lastEpisodeSlug] ?: 0.0)) / 60).toInt())
+    }
+    val shape = RoundedCornerShape(20.dp)
     Column(
         modifier
-            .width(210.dp)
+            .width(286.dp)
             .pressScale(interaction)
-            .clip(CardShape)
             .clickable(interaction, indication = null) {
                 scope.launch {
                     loading = true
@@ -136,18 +163,36 @@ fun ContinueCard(record: WatchRecord, modifier: Modifier = Modifier) {
                     loading = false
                 }
             },
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Box(Modifier.fillMaxWidth().aspectRatio(16f / 9f), contentAlignment = Alignment.Center) {
-            RemoteImage(record.film.thumbImage, Modifier.matchParentSize())
-            Box(Modifier.size(44.dp).clip(CircleShape).glass(CircleShape), contentAlignment = Alignment.Center) {
+        Box(Modifier.fillMaxWidth().aspectRatio(16f / 9f).clip(shape).border(1.dp, Color.White.copy(alpha = 0.12f), shape), contentAlignment = Alignment.Center) {
+            frame?.let { Image(it, null, Modifier.matchParentSize(), contentScale = ContentScale.Crop) }
+                ?: RemoteImage(record.film.thumbImage, Modifier.matchParentSize())
+            Box(Modifier.matchParentSize().background(Brush.verticalGradient(0.5f to Color.Transparent, 1f to Color.Black.copy(alpha = 0.72f))))
+            Box(Modifier.size(52.dp).clip(CircleShape).glass(CircleShape), contentAlignment = Alignment.Center) {
                 if (loading) CircularProgressIndicator(Modifier.size(20.dp), color = Color.White, strokeWidth = 2.dp)
-                else Icon(Icons.Filled.PlayArrow, "Tiếp tục xem", tint = Color.White)
+                else Icon(Icons.Filled.PlayArrow, "Tiếp tục xem", tint = Color.White, modifier = Modifier.size(26.dp))
             }
-            ProgressStrip(maxOf(0.03f, record.lastProgress), Modifier.align(Alignment.BottomCenter))
+            if (episode.isNotEmpty()) {
+                Text(
+                    episode, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold, maxLines = 1,
+                    modifier = Modifier.align(Alignment.TopStart).padding(10.dp).clip(CircleShape).glass(CircleShape).padding(horizontal = 9.dp, vertical = 3.dp),
+                )
+            }
+            Row(
+                Modifier.align(Alignment.BottomCenter).fillMaxWidth().padding(horizontal = 12.dp, vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                Box(Modifier.weight(1f).height(4.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.3f))) {
+                    Box(Modifier.fillMaxHeight().fillMaxWidth(maxOf(0.03f, record.lastProgress)).clip(CircleShape).background(Color.White))
+                }
+                left?.let { Text("Còn $it phút", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, maxLines = 1) }
+            }
         }
-        Column(Modifier.fillMaxWidth().background(Color.White.copy(alpha = 0.08f)).padding(horizontal = 10.dp, vertical = 8.dp)) {
-            Text(record.film.name, color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text(record.episodeName, color = TMovieColors.Secondary, fontSize = 12.sp, maxLines = 1)
-        }
+        Text(
+            record.film.name, color = TMovieColors.Secondary, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1,
+            overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(start = 2.dp),
+        )
     }
 }

@@ -50,7 +50,7 @@ import com.thientech.tmovie.core.ui.route
 import com.thientech.tmovie.core.ui.sharedFilm
 import kotlinx.coroutines.launch
 
-private enum class Feed(val title: String) {
+internal enum class Feed(val title: String) {
     Upcoming("🍿 Sắp chiếu"), Airing("🔥 Đang chiếu"), Completed("✅ Trọn bộ");
 
     /** PhimAPI has no airing / completed lists, so both slice `phim-bo` by its episode label. */
@@ -101,7 +101,7 @@ fun NewHotScreen() {
 
 /** Big landscape card for the feed. */
 @Composable
-private fun FeedCard(film: FilmItem) {
+internal fun FeedCard(film: FilmItem) {
     val nav = rememberNavigator()
     val sourceId = "feed/${film.slug}"
     Column(Modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {

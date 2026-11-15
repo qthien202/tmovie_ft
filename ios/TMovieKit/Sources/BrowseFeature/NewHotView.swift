@@ -76,7 +76,7 @@ public struct NewHotView: View {
 }
 
 /// Big landscape card for the New & Hot feed.
-private struct FeedCard: View {
+struct FeedCard: View {
     let film: FilmItem
 
     var body: some View {

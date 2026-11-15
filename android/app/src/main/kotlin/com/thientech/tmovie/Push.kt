@@ -98,7 +98,7 @@ object Push {
         else NotificationCompat.BigTextStyle().bigText(body)
         val notification = NotificationCompat.Builder(context, if (episode) EPISODES else NEW_FILMS)
             .setSmallIcon(R.drawable.ic_stat_tmovie)
-            .setColor(0xFF0F9190.toInt())
+            .setColor(0xFF3D8BFF.toInt())
             .setSubText(if (episode) "Tập mới" else "Phim mới")
             .setContentTitle(title)
             .setContentText(body)

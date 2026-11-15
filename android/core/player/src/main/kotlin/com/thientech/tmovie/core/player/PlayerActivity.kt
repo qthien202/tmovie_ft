@@ -1,5 +1,11 @@
 package com.thientech.tmovie.core.player
 
+import com.thientech.tmovie.core.data.ContinueFrames
+import android.view.SurfaceView
+import android.view.PixelCopy
+import android.os.Looper
+import android.os.Handler
+import android.graphics.Bitmap
 import android.app.PictureInPictureParams
 import android.content.res.Configuration
 import android.content.Intent
@@ -64,6 +70,28 @@ class PlayerActivity : ComponentActivity() {
     private var session: MediaSession? = null
     private var inPip by mutableStateOf(false)
     private var saveNow: () -> Unit = {}
+    /** The film view, for grabbing the frame on screen; the slug it's saved under. */
+    private var playerView: PlayerView? = null
+    private var frameSlug: String? = null
+
+    /** Saves the frame on screen as the film's "Xem tiếp" still (ContinueFrames), about 640 px wide. */
+    private fun snapshot() {
+        val slug = frameSlug ?: return
+        val sv = playerView?.videoSurfaceView as? SurfaceView ?: return
+        if (sv.width == 0 || sv.height == 0 || exo.currentPosition < 3_000) return
+        val bitmap = Bitmap.createBitmap(sv.width, sv.height, Bitmap.Config.ARGB_8888)
+        val out = ContinueFrames.file(this, slug)
+        runCatching {
+            PixelCopy.request(sv, bitmap, { result ->
+                if (result != PixelCopy.SUCCESS) return@request
+                Thread {
+                    val w = minOf(640, bitmap.width)
+                    val scaled = Bitmap.createScaledBitmap(bitmap, w, bitmap.height * w / bitmap.width, true)
+                    runCatching { out.outputStream().use { scaled.compress(Bitmap.CompressFormat.JPEG, 80, it) } }
+                }.start()
+            }, Handler(Looper.getMainLooper()))
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -131,6 +159,7 @@ class PlayerActivity : ComponentActivity() {
             )
         }
         saveNow = ::save
+        frameSlug = detail.slug
 
         fun switchTo(s: Int, i: Int) {
             save()
@@ -182,6 +211,8 @@ class PlayerActivity : ComponentActivity() {
         LaunchedEffect(playback.isPlaying) {
             if (playback.isPlaying) window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             else window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            // Paused: keep this frame for the "Xem tiếp" card.
+            if (!playback.isPlaying && exo.playbackState == androidx.media3.common.Player.STATE_READY) snapshot()
         }
 
         // Save every 10 s while playing.
@@ -224,7 +255,7 @@ class PlayerActivity : ComponentActivity() {
                         useController = false
                         keepScreenOn = true
                         player = exo
-                    }
+                    }.also { playerView = it }
                 },
                 update = {
                     it.resizeMode = when {
@@ -423,6 +454,12 @@ class PlayerActivity : ComponentActivity() {
     override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
         inPip = isInPictureInPictureMode
+    }
+
+    override fun onPause() {
+        // Leaving the film: keep its frame while the surface still holds it.
+        if (!isInPictureInPictureMode) snapshot()
+        super.onPause()
     }
 
     override fun onStop() {

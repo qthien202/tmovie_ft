@@ -24,7 +24,7 @@ public struct HomeView: View {
             LazyVStack(alignment: .leading, spacing: 26) {
                 HeroCarousel(films: store.hero, art: store.heroArt, tint: tint, page: $heroPage)
                 if !history.isEmpty {
-                    Shelf("Xem tiếp") {
+                    Shelf("Xem tiếp", spacing: 14) {
                         ForEach(history.prefix(15)) { ContinueCard(record: $0) }
                     }
                 }

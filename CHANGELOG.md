@@ -8,6 +8,23 @@ Vietnamese block free of Markdown styling (use emoji + "•" bullets).
 
 Every new feature/release must add a `## vX.Y.Z` section with both parts.
 
+## v1.12.0
+
+New look (phone, Android and iOS), from the Liquid Glass prototype. Home hero in the Apple TV style: caption bottom-left over a heavy fade (TOP n chip, the title sized by its length, a facts line with FHD / VS / TM badges, two lines of synopsis, Play + Add), and a vertical page indicator on the right. "Xem tiếp" cards are large 16:9 stills showing the frame the viewer paused on (saved when pausing or leaving the player: PixelCopy of the SurfaceView on Android, AVPlayerItemVideoOutput on iOS), with an episode chip, a glass play button and progress along the bottom edge with the time left. "Top 10" is a deck of posters fanned across the width with the rank on each card; swiping tucks the top card under the deck, endlessly. The Mới & Hot tab becomes "Khám phá": hot titles as stories, mood cards, a shuffle that picks a film, the Mới & Hot feed and themed collections. Brand colour changes from teal to electric blue #3D8BFF. Android: the Truyền hình tab is gone from the bar, and once signed in the profile tab shows the Google account photo. Android phone: the home hero's preview no longer plays on under the full player. It loads for a few seconds before starting, and if the player (or another app) covered Home meanwhile, it started anyway, with sound if unmuted; it now starts only while Home is on screen. The hero no longer stops halfway between two films when it advances on its own (after a preview, or every 8 s without one): the auto-advance effect was keyed on `currentPage`, which changes mid-scroll, so it cancelled its own animation; it is now keyed on `settledPage` and skips while the user is swiping.
+
+<!-- app:vi -->
+✨ Giao diện mới
+• Băng phim đầu trang kiểu Apple TV: tên phim lớn, nội dung ngắn, nút Xem nổi bật.
+• Xem tiếp: ảnh là đúng khung hình lúc bạn tạm dừng, kèm thời gian còn lại.
+• Top 10 dạng xấp thẻ bài, vuốt để lật, xoay vòng mãi.
+• Tab Khám phá mới: phim hot, chọn theo tâm trạng, "để TMovie chọn giúp", Mới & Hot, bộ sưu tập.
+• Màu chủ đạo mới: xanh dương.
+• Đăng nhập Google thì tab Của tôi hiện ảnh đại diện của bạn.
+🛠 Sửa lỗi
+• Đoạn xem trước ở đầu trang chủ không còn phát tiếp khi mở xem phim khác.
+• Băng phim đầu trang không còn bị kẹt giữa hai phim khi tự chuyển.
+<!-- /app:vi -->
+
 ## v1.11.1
 
 Android phone player: the video now fills the camera-hole side of the screen in landscape (`LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES`). Android 15 does this by itself for edge-to-edge apps, but before it (MIUI 14 is Android 13) the default left a black strip where the status bar would be.

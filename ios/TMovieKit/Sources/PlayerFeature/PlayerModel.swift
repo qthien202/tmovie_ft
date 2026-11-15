@@ -1,5 +1,6 @@
 import AVFoundation
 import AVKit
+import CoreImage
 import MediaPlayer
 import Models
 import Network
@@ -126,6 +127,9 @@ final class PlayerModel {
                 if !self.nextCancelled { self.playNext() }
             }
         }
+        let output = AVPlayerItemVideoOutput(pixelBufferAttributes: [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA])
+        item.add(output)
+        frameOutput = output
         player.replaceCurrentItem(with: item)
 
         // Resume unless the episode was basically finished. Synced Flutter positions are keyed by episode name.
@@ -179,7 +183,7 @@ final class PlayerModel {
     // MARK: Transport
 
     func toggle() {
-        if isPlaying { player.pause() } else {
+        if isPlaying { player.pause(); snapshot() } else {
             if ended { seek(to: 0); ended = false }
             player.playImmediately(atRate: speed)
         }
@@ -311,6 +315,26 @@ final class PlayerModel {
         if wasOffline, online, failed || buffering { recoveries = 0; load(at: position) }
     }
 
+    /// Taps the item's decoded frames, so pausing or leaving can keep the frame on screen
+    /// (an image generator can't read an HLS stream).
+    private var frameOutput: AVPlayerItemVideoOutput?
+
+    /// Saves the frame on screen as this film's "Xem tiếp" still (`ContinueFrame`), about 640 px wide.
+    func snapshot() {
+        guard live == nil, let output = frameOutput else { return }
+        let time = player.currentTime()
+        guard time.isValid, time.seconds > 3, let buffer = output.copyPixelBuffer(forItemTime: time, itemTimeForDisplay: nil) else { return }
+        let url = ContinueFrame.url(for: film.slug)
+        let image = CIImage(cvPixelBuffer: buffer)
+        Task.detached(priority: .utility) {
+            let scale = min(1, 640 / max(1, image.extent.width))
+            let scaled = image.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
+            guard let cg = CIContext().createCGImage(scaled, from: scaled.extent),
+                  let jpeg = UIImage(cgImage: cg).jpegData(compressionQuality: 0.78) else { return }
+            try? jpeg.write(to: url, options: .atomic)
+        }
+    }
+
     func save() {
         guard live == nil, let ep = episode else { return }
         lastSave = .now
@@ -348,6 +372,7 @@ final class PlayerModel {
 
     func tearDown() {
         save()
+        snapshot()
         voiceOver.detach()
         player.pause()
         player.replaceCurrentItem(with: nil)
