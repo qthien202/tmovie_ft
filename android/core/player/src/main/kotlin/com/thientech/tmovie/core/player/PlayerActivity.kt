@@ -74,6 +74,13 @@ class PlayerActivity : ComponentActivity() {
         val startIndex = intent.getIntExtra(EXTRA_INDEX, 0)
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
+        // Video under the camera hole too. Android 15 does this for edge-to-edge apps; before it
+        // (MIUI 14 is Android 13) the default leaves a black strip on the hole's side.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            window.attributes = window.attributes.apply {
+                layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+            }
+        }
         WindowInsetsControllerCompat(window, window.decorView).apply {
             hide(WindowInsetsCompat.Type.systemBars())
             systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE

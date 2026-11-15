@@ -8,6 +8,15 @@ Vietnamese block free of Markdown styling (use emoji + "•" bullets).
 
 Every new feature/release must add a `## vX.Y.Z` section with both parts.
 
+## v1.11.1
+
+Android phone player: the video now fills the camera-hole side of the screen in landscape (`LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES`). Android 15 does this by itself for edge-to-edge apps, but before it (MIUI 14 is Android 13) the default left a black strip where the status bar would be.
+
+<!-- app:vi -->
+🛠 Sửa lỗi (Android)
+• Xem phim giờ tràn kín màn hình, hết dải đen phía camera trên một số máy (MIUI 14, Android 13 trở xuống).
+<!-- /app:vi -->
+
 ## v1.11.0
 
 TMovie is now for the owner and friends. On first launch a device asks for access: the phone signs in with Google and sends the request in one tap; Android TV and iOS ask for a name and an email. The owner gets a mail with a "Cấp quyền" button; pressing it lists the requester in Firestore `members` and mails them, and the waiting device opens (the phone at once, through its own `members/{uid}` entry). Deleting an entry in the Firebase console revokes access: the phone locks at once, TV and iOS at their next launch. Requests and approvals go through the owner's Google Apps Script (`private/apps-script/access.gs`), so no server is needed. Android phone: push notifications through FCM. A series in the watch history (newest 50) notifies as soon as it gets a new episode, Netflix style (the film's still as a big picture, "Tập 12 đã có · Vietsub", tapping opens the film; a later episode replaces the earlier notification); once a day at 19:30 the most-viewed film new to the catalogue is pushed. Both are sent by `private/apps-script/notify.gs` (every 15 min / daily) and can be turned off per channel ("Tập mới", "Phim mới") in Android's notification settings; Android 13+ asks for the permission once.
