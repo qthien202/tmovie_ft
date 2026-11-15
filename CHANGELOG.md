@@ -10,11 +10,12 @@ Every new feature/release must add a `## vX.Y.Z` section with both parts.
 
 ## v1.11.2
 
-Android phone: the home hero's preview no longer plays on under the full player. It loads for a few seconds before starting, and if the player (or another app) covered Home meanwhile, it started anyway, with sound if unmuted; it now starts only while Home is on screen.
+Android phone: the home hero's preview no longer plays on under the full player. It loads for a few seconds before starting, and if the player (or another app) covered Home meanwhile, it started anyway, with sound if unmuted; it now starts only while Home is on screen. The hero no longer stops halfway between two films when it advances on its own (after a preview, or every 8 s without one): the auto-advance effect was keyed on `currentPage`, which changes mid-scroll, so it cancelled its own animation; it is now keyed on `settledPage` and skips while the user is swiping.
 
 <!-- app:vi -->
 🛠 Sửa lỗi (Android)
 • Đoạn xem trước ở đầu trang chủ không còn phát tiếp khi bạn mở xem phim khác.
+• Băng phim đầu trang không còn bị kẹt giữa hai phim khi tự chuyển.
 <!-- /app:vi -->
 
 ## v1.11.1

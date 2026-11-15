@@ -86,10 +86,13 @@ fun HeroPager(films: List<FilmItem>, art: Map<String, String>, tint: Color, page
     val height = (LocalConfiguration.current.screenHeightDp * 0.74f).dp
 
     // Auto-advance (longer while a preview plays); swiping changes the page and restarts the timer.
-    LaunchedEffect(pager.currentPage, films.size, autoplay) {
+    // Keyed on settledPage, not currentPage: currentPage flips halfway through the scroll, which
+    // restarted this effect and cancelled its own animation, leaving the hero stuck between pages.
+    LaunchedEffect(pager.settledPage, films.size, autoplay) {
         if (films.size < 2) return@LaunchedEffect
         delay(if (autoplay) 30_000 else 8_000)
-        pager.animateScrollToPage((pager.currentPage + 1) % films.size, animationSpec = cinematic())
+        if (pager.isScrollInProgress) return@LaunchedEffect  // the user is swiping; their fling decides
+        pager.animateScrollToPage((pager.settledPage + 1) % films.size, animationSpec = cinematic())
     }
     LaunchedEffect(pager.settledPage) { haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove) }
 
