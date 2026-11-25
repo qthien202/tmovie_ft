@@ -27,9 +27,6 @@ pub async fn tint_of(url: &str) -> Option<String> {
     wasm_bindgen_futures::JsFuture::from(tint(url)).await.ok()?.as_string()
 }
 
-/// Streams go through the Pages Function that strips the ad breaks.
-pub fn hls(url: &str) -> String { format!("/hls?u={}", crate::api::enc(url)) }
-
 pub fn now() -> f64 { js_sys::Date::now() }
 
 pub fn reduce_motion() -> bool {

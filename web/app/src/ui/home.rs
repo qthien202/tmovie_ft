@@ -278,7 +278,7 @@ fn HeroVideo(url: String, muted: RwSignal<bool>, previewing: RwSignal<bool>) -> 
     let v = NodeRef::<leptos::html::Video>::new();
     let start = StoredValue::new(0.0f64);
     let shown = RwSignal::new(false);
-    let h = set_timeout_with_handle(move || if let Some(el) = v.get_untracked() { glue::attach(&el, &glue::hls(&url)) }, Duration::from_millis(1500)).ok();
+    let h = set_timeout_with_handle(move || if let Some(el) = v.get_untracked() { glue::attach(&el, &url) }, Duration::from_millis(1500)).ok();
     on_cleanup(move || {
         if let Some(h) = h { h.clear(); }
         if let Some(el) = v.get_untracked() { let _ = el.pause(); glue::detach(&el); }

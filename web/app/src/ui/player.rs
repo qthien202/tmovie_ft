@@ -83,7 +83,7 @@ pub fn Player(p: Play) -> impl IntoView {
         error.set(false); ended.set(false); buffering.set(true); cancelled.set(false); pos.set(0.0); dur.set(0.0);
         let slug = e.slug.clone().unwrap_or_default();
         resume_at.set_value(at.unwrap_or_else(|| store::watch(&film_s.with_value(|f| f.slug.clone())).and_then(|w| w.positions.get(&slug).copied()).unwrap_or(0.0)));
-        glue::attach(&el, &glue::hls(&url));
+        glue::attach(&el, &url);
         let _ = el.set_attribute("autoplay", "");
     };
     let switch = move |s: usize, i: usize| { save(); server.set(s); index.set(i); load(None); save(); };

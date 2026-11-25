@@ -18,16 +18,22 @@
 <script>
 // Small browser glue the Rust app calls (window.tm): HLS attach, frame grab, tint sampling, PiP, wake lock, share.
 window.tm = {
-  attach(v, url) {
+  // Through /hls (ad breaks removed) when the stream's CDN lets Cloudflare fetch it, else the original playlist.
+  attach(v, raw) {
     this.detach(v);
-    // Safari plays HLS itself; Chrome answers "maybe" but can't, so it gets hls.js.
-    if (!window.chrome && v.canPlayType('application/vnd.apple.mpegurl')) { v.src = url; return; }
-    const go = () => { if (v._hls) return; const h = new Hls({ maxBufferLength: 30 }); h.loadSource(url); h.attachMedia(v); v._hls = h; };
-    if (window.Hls) return go();
-    const s = document.createElement('script');
-    s.src = 'https://cdn.jsdelivr.net/npm/hls.js@1.5.13/dist/hls.min.js'; s.onload = go; document.head.appendChild(s);
+    const token = v._tok = {};
+    const proxied = '/hls?u=' + encodeURIComponent(raw);
+    fetch(proxied).then(r => (r.ok ? proxied : raw), () => raw).then(url => {
+      if (v._tok !== token) return;
+      // Safari plays HLS itself; Chrome answers "maybe" but can't, so it gets hls.js.
+      if (!window.chrome && v.canPlayType('application/vnd.apple.mpegurl')) { v.src = url; v.play().catch(() => {}); return; }
+      const go = () => { if (v._tok !== token || v._hls) return; const h = new Hls({ maxBufferLength: 30 }); h.loadSource(url); h.attachMedia(v); v._hls = h; v.play().catch(() => {}); };
+      if (window.Hls) return go();
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/hls.js@1.5.13/dist/hls.min.js'; s.onload = go; document.head.appendChild(s);
+    });
   },
-  detach(v) { if (v._hls) { v._hls.destroy(); v._hls = null; } if (v.getAttribute('src')) { v.removeAttribute('src'); v.load(); } },
+  detach(v) { v._tok = null; if (v._hls) { v._hls.destroy(); v._hls = null; } if (v.getAttribute('src')) { v.removeAttribute('src'); v.load(); } },
   snap(v) {
     try {
       if (!v.videoWidth) return null;
