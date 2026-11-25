@@ -272,14 +272,19 @@ pub fn Player(p: Play) -> impl IntoView {
                 on:durationchange=move |_| if let Some(el) = video.get_untracked() { let d = el.duration(); if d.is_finite() { dur.set(d) } }
                 on:timeupdate=move |_| if let Some(el) = video.get_untracked() {
                     pos.set(el.current_time());
+                    // Safari reports passing errors (a source swap, a dropped segment) and then plays on.
+                    if error.get_untracked() && !el.paused() && el.current_time() > 0.0 { error.set(false); }
                     let b = el.buffered();
                     if b.length() > 0 { buffered.set(b.end(b.length() - 1).unwrap_or(0.0)); }
                 }
-                on:playing=move |_| { playing.set(true); buffering.set(false); ended.set(false); glue::wake(true); }
+                on:playing=move |_| { playing.set(true); buffering.set(false); ended.set(false); error.set(false); glue::wake(true); }
                 on:pause=move |_| { playing.set(false); snap(); save(); poke(); glue::wake(false); }
                 on:waiting=move |_| buffering.set(true)
                 on:canplay=move |_| buffering.set(false)
-                on:error=move |_| { error.set(true); buffering.set(false); }
+                on:error=move |_| if let Some(el) = video.get_untracked() {
+                    // Only a real failure: a source is set, it has an error, and nothing is playing.
+                    if el.error().is_some() && !el.current_src().is_empty() && el.paused() { error.set(true); buffering.set(false); }
+                }
                 on:ended=move |_| {
                     save();
                     if sleep.get_untracked() == Some(Sleep::EndOfEpisode) { sleep.set(None); ended.set(true); return; }
@@ -336,9 +341,7 @@ pub fn Player(p: Play) -> impl IntoView {
                                 })}
                                 <div class="ricon glass" style="width:44px;height:44px" aria-label="Khoá màn hình" on:click=move |_| { locked.set(true); panel.set(None); }><Icon d=ic::LOCK_OPEN /></div>
                                 <div class="ricon glass" style="width:44px;height:44px" aria-label="Hình trong hình" on:click=move |_| if let Some(v) = video.get_untracked() { glue::pip(&v) }><Icon d=ic::PIP /></div>
-                                {glue::desktop().then(|| view! {
-                                    <div class="ricon glass" style="width:44px;height:44px" aria-label="Toàn màn hình" on:click=move |_| if let Some(p) = root.get_untracked() { glue::fullscreen(&p) }><Icon d=ic::EXPAND /></div>
-                                })}
+                                <div class="ricon glass" style="width:44px;height:44px" aria-label="Toàn màn hình" on:click=move |_| if let Some(p) = root.get_untracked() { glue::fullscreen(&p) }><Icon d=ic::EXPAND /></div>
                                 <div class="ricon glass" style="width:44px;height:44px" aria-label="Cài đặt" on:click=move |_| panel.set(Some(Panel::Settings))><Icon d=ic::SETTINGS /></div>
                                 {many.then(|| view! {
                                     <div class="ricon glass" style="width:44px;height:44px" aria-label="Danh sách tập" on:click=move |_| panel.set(Some(Panel::Episodes))><Icon d=ic::LIBRARY /></div>

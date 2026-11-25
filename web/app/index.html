@@ -4,6 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <title>TMovie</title>
+<meta name="description" content="Phim bộ, phim lẻ, TV Shows cập nhật mỗi ngày. Xem trên iPhone, máy tính và TV.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="TMovie">
+<meta property="og:title" content="TMovie">
+<meta property="og:description" content="Phim bộ, phim lẻ, TV Shows cập nhật mỗi ngày. Xem trên iPhone, máy tính và TV.">
+<meta property="og:url" content="https://tmovie-ey8.pages.dev/">
+<meta property="og:image" content="https://tmovie-ey8.pages.dev/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://tmovie-ey8.pages.dev/og.png">
+<link data-trunk rel="copy-file" href="assets/og.png">
 <meta name="theme-color" content="#05070a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -75,7 +87,10 @@ window.tm = {
   },
   share(text) { if (navigator.share) navigator.share({ text }).catch(() => {}); else navigator.clipboard && navigator.clipboard.writeText(text); },
   open(url) { window.open(url, '_blank'); },
+  // iPhone has no element full screen (and a web app can't hide the status bar while upright): it gets iOS's own player.
   fullscreen(el) {
+    const v = el.querySelector('video');
+    if (!(document.fullscreenEnabled || document.webkitFullscreenEnabled) && v && v.webkitEnterFullscreen) return v.webkitEnterFullscreen();
     if (document.fullscreenElement || document.webkitFullscreenElement) return (document.exitFullscreen || document.webkitExitFullscreen).call(document);
     (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
   },

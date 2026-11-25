@@ -15,7 +15,7 @@ js-sys = "0.3"
 web-sys = { version = "0.3", features = [
   "Window", "Document", "Element", "HtmlElement", "HtmlVideoElement", "HtmlMediaElement", "HtmlCanvasElement",
   "CanvasRenderingContext2d", "HtmlInputElement", "Storage", "Navigator", "PointerEvent", "Event", "EventTarget",
-  "DomTokenList", "Location", "console", "ServiceWorkerContainer", "ScrollToOptions", "ScrollBehavior", "ShareData","DomRect","MouseEvent","KeyboardEvent","CssStyleDeclaration","TimeRanges","MediaQueryList","HtmlDivElement","ScrollIntoViewOptions","ScrollLogicalPosition",
+  "DomTokenList", "Location", "console", "ServiceWorkerContainer", "ScrollToOptions", "ScrollBehavior", "ShareData","DomRect","MouseEvent","KeyboardEvent","CssStyleDeclaration","TimeRanges","MediaQueryList","HtmlDivElement","ScrollIntoViewOptions","ScrollLogicalPosition","MediaError",
 ] }
 
 [profile.release]
