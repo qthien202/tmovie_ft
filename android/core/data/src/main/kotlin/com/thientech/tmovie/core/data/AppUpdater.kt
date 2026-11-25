@@ -8,32 +8,39 @@ import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.Serializable
 import okhttp3.Request
 
 data class AppUpdate(val version: String, val notes: String, val apkUrl: String)
 
 /**
- * OTA updates from GitHub Releases, same contract as the Flutter `app_update` package:
- * read `releases/latest`, take the APK whose name contains the app keyword ("mobile"),
- * and offer it when its tag is a newer semver than the installed version.
+ * OTA updates from GitHub Releases: the newest published release that carries an APK whose name
+ * contains the app keyword ("mobile" / "tv"), offered when its tag is a newer semver than the
+ * installed version. A release ships only the apps that changed, so a TV-only release doesn't
+ * nag phones, and doesn't hide the phone's own latest update either.
  */
 object AppUpdater {
-    private const val LATEST = "https://api.github.com/repos/qthien202/tmovie_ft/releases/latest"
+    private const val RELEASES = "https://api.github.com/repos/qthien202/tmovie_ft/releases?per_page=15"
 
     @Serializable private class Release(
         @SerialName("tag_name") val tag: String = "",
         val body: String? = null,
+        val draft: Boolean = false,
+        val prerelease: Boolean = false,
         val assets: List<Asset> = emptyList(),
     )
     @Serializable private class Asset(val name: String = "", @SerialName("browser_download_url") val url: String = "")
 
     suspend fun check(currentVersion: String, keyword: String = "mobile"): AppUpdate? = runCatching {
         withContext(Dispatchers.IO) {
-            val request = Request.Builder().url(LATEST).header("Accept", "application/vnd.github+json").build()
+            val request = Request.Builder().url(RELEASES).header("Accept", "application/vnd.github+json").build()
             val body = PhimApi.defaultClient.newCall(request).execute().use { it.body?.string() } ?: return@withContext null
-            val release = PhimApi.json.decodeFromString(Release.serializer(), body)
-            val apk = release.assets.firstOrNull { it.name.endsWith(".apk") && it.name.contains(keyword, true) } ?: return@withContext null
+            fun Release.apk() = assets.firstOrNull { it.name.endsWith(".apk") && it.name.contains(keyword, true) }
+            // Newest first, as GitHub lists them.
+            val release = PhimApi.json.decodeFromString(ListSerializer(Release.serializer()), body)
+                .firstOrNull { !it.draft && !it.prerelease && it.apk() != null } ?: return@withContext null
+            val apk = release.apk()!!
             val version = release.tag.removePrefix("v")
             if (isNewer(currentVersion, version)) AppUpdate(version, release.body.orEmpty(), apk.url) else null
         }
