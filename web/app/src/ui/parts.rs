@@ -77,10 +77,16 @@ pub fn PosterCard(film: Film, #[prop(optional)] cell: bool) -> impl IntoView {
     let n = nav();
     let badge = film.badge();
     let src = film.poster();
+    let name = film.name.clone();
+    let facts = film.year.map(|y| y.to_string()).into_iter()
+        .chain(film.quality.clone().filter(|q| !q.is_empty()))
+        .chain(film.category.first().and_then(|c| c.name.clone())).collect::<Vec<_>>().join(" · ");
     view! {
         <div class="poster" class:cell=cell on:click=move |_| n.open(film.clone())>
             <Img src=src />
             {badge.map(|b| view! { <span class="epb">{b}</span> })}
+            // Desktop hover: the title and the facts over the lower part of the card.
+            <div class="pinfo"><b>{name}</b><span>{facts}</span></div>
         </div>
     }
 }

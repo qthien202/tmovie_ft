@@ -57,7 +57,7 @@ pub fn Profile() -> impl IntoView {
     let history = move || { n.lib.get(); store::history() };
     let saved = move || { n.lib.get(); store::saved() };
     view! {
-        <div class="scroll">
+        <div class="scroll narrow">
             <div class="p-head">
                 <div class="title28">"Của tôi"</div>
                 <div class="p-av">

@@ -36,7 +36,7 @@ pub fn Search() -> impl IntoView {
     });
     let more = move || { let t = term.get_untracked(); if !t.is_empty() { pager.more(Source::Search(t), Filter::default()) } };
     view! {
-        <div class="scroll" on:scroll=move |e| if near_end(&e) { more() }>
+        <div class="scroll narrow" on:scroll=move |e| if near_end(&e) { more() }>
             <div class="s-head">
                 <div class="title28">"Tìm kiếm"</div>
                 <div class="tfield">

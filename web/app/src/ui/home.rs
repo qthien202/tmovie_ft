@@ -145,7 +145,7 @@ pub fn Home() -> impl IntoView {
 fn HomeHeader(scrolled: Signal<bool>) -> impl IntoView {
     let n = nav();
     let pill = move |label: &'static str, slug: &'static str| view! {
-        <div class="pill glass press" on:click=move |_| n.list(label, Source::Type(slug.into()))>{label}</div>
+        <div class="pill glass press dup" on:click=move |_| n.list(label, Source::Type(slug.into()))>{label}</div>
     };
     view! {
         <div class="home-head" class:scrolled=move || scrolled.get()>
@@ -252,6 +252,12 @@ fn Hero(data: HomeData, settled: RwSignal<usize>, scroll_y: RwSignal<f64>) -> im
                                 }}
                                 <div class="btns">
                                     <PlayFilmButton film=film.clone() />
+                                    // Desktop only: the details panel, as streaming sites put next to Play.
+                                    {let info = film.clone(); view! {
+                                        <div class="info-btn glass press" on:click=move |e| { e.stop_propagation(); n.open(info.clone()) }>
+                                            <Icon d=ic::INFO />"Chi tiết"
+                                        </div>
+                                    }}
                                     <SaveButton film=film style=SaveStyle::Circle />
                                     {move || (previewing.get() && settled.get() == i).then(|| view! {
                                         <div class="save-circle glass press" aria-label=move || if muted.get() { "Bật tiếng xem trước" } else { "Tắt tiếng xem trước" }
@@ -336,9 +342,25 @@ fn Top10(films: Vec<Film>) -> impl IntoView {
             if k == 0 { n.open(films_at(i)) } else if k <= 4 { top.set(i) }
         }
     };
+    // Desktop: the ten in a row, each behind its big rank number (CSS shows this or the deck).
+    let ten = films.clone();
+    let ranked = view! {
+        <HScroll class="t10">
+            {ten.into_iter().enumerate().map(|(i, f)| {
+                let rank = match i { 0 => "rk r1", 1 => "rk r2", 2 => "rk r3", _ => "rk" };
+                view! {
+                    <div class="t10i" on:click=move |_| n.open(f.clone())>
+                        <span class=rank>{i + 1}</span>
+                        <div class="poster"><Img src=f.poster() />{f.badge().map(|b| view! { <span class="epb">{b}</span> })}</div>
+                    </div>
+                }
+            }).collect_view()}
+        </HScroll>
+    };
     view! {
         <div class="shelf">
             <RailHeader title="Top 10 phim bộ tuần này" more=Some(("Phim bộ".into(), Source::Type("phim-bo".into()))) />
+            {ranked}
             <div class="deck"
                 on:pointermove=move |e| if let Some((x0, _)) = start.get_value() { drag.set(e.client_x() as f64 - x0) }
                 on:pointerup=move |e| up(e.client_x() as f64)

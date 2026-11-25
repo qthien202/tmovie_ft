@@ -17,6 +17,7 @@ use leptos::task::spawn_local;
 use crate::api::{self, Category, Detail, Film, Source};
 use crate::gate::{self, Gate};
 use crate::{glue, store};
+use wasm_bindgen::JsCast;
 pub use parts::*;
 
 #[derive(Clone)]
@@ -274,6 +275,17 @@ fn Shell() -> impl IntoView {
             let _ = h.replace_state_with_url(&wasm_bindgen::JsValue::NULL, "", Some(&path));
         }
     });
+    // Any scrolled view turns the desktop menu solid (scroll events don't bubble; capture sees them all).
+    let solid = RwSignal::new(false);
+    if let Some(doc) = web_sys::window().and_then(|w| w.document()) {
+        let on_scroll = wasm_bindgen::closure::Closure::<dyn FnMut(web_sys::Event)>::new(move |e: web_sys::Event| {
+            if let Some(el) = e.target().and_then(|t| t.dyn_into::<web_sys::Element>().ok()) {
+                if el.class_list().contains("scroll") { solid.set(el.scroll_top() > 40) }
+            }
+        });
+        let _ = doc.add_event_listener_with_callback_and_bool("scroll", on_scroll.as_ref().unchecked_ref(), true);
+        on_scroll.forget();
+    }
     // Tabs keep their state once opened (saveState/restoreState).
     let visited = RwSignal::new([true, false, false, false]);
     let go = move |i: usize| {
@@ -294,12 +306,27 @@ fn Shell() -> impl IntoView {
         <For each=move || n.stack.get() key=|(id, _)| *id let:item>
             <Page route=item.1 />
         </For>
-        // Desktop: a menu across the top instead of the floating tab bar (CSS shows one or the other).
-        <nav class="topnav">
+        // Desktop: a menu across the top instead of the floating tab bar (CSS shows one or the other). Clear over the
+        // hero, glass once anything scrolls; browse links on the left, search and the account on the right.
+        <nav class="topnav" class:solid=move || solid.get()>
             <div class="wordmark" on:click=move |_| go(0)>"TMOVIE"</div>
-            {TABS.iter().enumerate().map(|(i, (label, _))| view! {
+            {TABS.iter().enumerate().take(2).map(|(i, (label, _))| view! {
                 <span class="tn" class:on=move || n.tab.get() == i && n.stack.with(|s| s.is_empty()) on:click=move |_| go(i)>{*label}</span>
             }).collect_view()}
+            {[("Phim bộ", "phim-bo"), ("Phim lẻ", "phim-le"), ("TV Shows", "tv-shows"), ("Hoạt hình", "hoat-hinh")].into_iter().map(|(label, slug)| view! {
+                <span class="tn" class:on=move || n.stack.with(|s| matches!(s.last(), Some((_, Route::List(t, _))) if t == label))
+                    on:click=move |_| n.list(label, Source::Type(slug.into()))>{label}</span>
+            }).collect_view()}
+            <span class="tn-gap"></span>
+            <span class="tn-ic" class:on=move || n.tab.get() == 2 && n.stack.with(|s| s.is_empty()) aria-label="Tìm kiếm" on:click=move |_| go(2)>
+                <svg viewBox="0 0 24 24"><path d=TABS[2].1[0] /><path d=TABS[2].1[1] /></svg>
+            </span>
+            <span class="tn-ic av" class:on=move || n.tab.get() == 3 && n.stack.with(|s| s.is_empty()) aria-label="Của tôi" on:click=move |_| go(3)>
+                {move || match acct.user.get().and_then(|u| u.photo) {
+                    Some(photo) => view! { <img src=photo alt="" referrerpolicy="no-referrer" /> }.into_any(),
+                    None => view! { <b>{store::get::<String>("profileName").and_then(|s| s.chars().next()).map(|c| c.to_uppercase().to_string()).unwrap_or_else(|| "B".into())}</b> }.into_any(),
+                }}
+            </span>
         </nav>
         <div class="bar glass" class:hide=move || n.stack.with(|s| !s.is_empty())>
             <div class="hl" style:transform=move || format!("translateX({}px)", n.tab.get() * 66)></div>
@@ -328,12 +355,15 @@ fn Shell() -> impl IntoView {
 fn Page(route: Route) -> impl IntoView {
     let n = nav();
     let start = StoredValue::new(None::<(i32, i32)>);
+    let film = matches!(route, Route::Film(_));
     let body = match route {
         Route::Film(f) => view! { <detail::DetailPage film=f /> }.into_any(),
         Route::List(t, s) => view! { <catalog::Catalog title=t source=s /> }.into_any(),
     };
     view! {
-        <div class="page"
+        // On desktop a film opens as a panel over a dimmed page; a click on the dim closes it.
+        <div class="page" class:film=film
+            on:click=move |e| if film && e.target().and_then(|t| t.dyn_into::<web_sys::Element>().ok()).is_some_and(|el| el.class_list().contains("scroll") || el.class_list().contains("page")) { n.back() }
             on:pointerdown=move |e| start.set_value((e.client_x() < 24).then(|| (e.client_x(), e.client_y())))
             on:pointerup=move |e| if let Some((x, y)) = start.get_value() {
                 start.set_value(None);
