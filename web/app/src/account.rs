@@ -108,7 +108,11 @@ pub fn init() -> Account {
 
 
 /// "" when done; "cancelled" when the picker was closed; else an error code.
-pub async fn sign_in() -> String { text(fb_sign_in()).await }
+/// Starts right away (not on first poll) so the sign-in window opens inside the tap.
+pub fn sign_in() -> impl std::future::Future<Output = String> {
+    let p = fb_sign_in();
+    async move { text(p).await }
+}
 
 pub fn sign_out() {
     UID.with(|u| *u.borrow_mut() = None);

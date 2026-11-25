@@ -17,7 +17,8 @@ extern "C" {
     #[wasm_bindgen(js_namespace = tm)]
     pub fn wake(on: bool);
     #[wasm_bindgen(js_namespace = tm)]
-    pub fn share(text: &str);
+    /// False when there is no share sheet and the link was copied instead.
+    pub fn share(text: &str, url: &str) -> bool;
     #[wasm_bindgen(js_namespace = tm)]
     pub fn open(url: &str);
     #[wasm_bindgen(js_namespace = tm)]

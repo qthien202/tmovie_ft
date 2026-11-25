@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <title>TMovie</title>
+<link rel="canonical" href="https://tmovie-ey8.pages.dev/">
 <meta name="description" content="Phim bộ, phim lẻ, TV Shows cập nhật mỗi ngày. Xem trên iPhone, máy tính và TV.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="TMovie">
@@ -21,12 +22,12 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="TMovie">
-<link rel="apple-touch-icon" href="icons/icon-180.png">
-<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="/icons/icon-180.png">
+<link rel="icon" href="/icons/icon-192.png">
 <link data-trunk rel="copy-dir" href="assets/icons">
 <link data-trunk rel="copy-file" href="assets/manifest.webmanifest">
 <link data-trunk rel="copy-file" href="assets/sw.js">
-<link rel="manifest" href="manifest.webmanifest">
+<link rel="manifest" href="/manifest.webmanifest">
 <script>
 // Small browser glue the Rust app calls (window.tm): HLS attach, frame grab, tint sampling, PiP, wake lock, share.
 window.tm = {
@@ -85,7 +86,12 @@ window.tm = {
   async wake(on) {
     try { if (on && !this._wl && navigator.wakeLock) this._wl = await navigator.wakeLock.request('screen'); else if (!on && this._wl) { this._wl.release(); this._wl = null; } } catch (e) {}
   },
-  share(text) { if (navigator.share) navigator.share({ text }).catch(() => {}); else navigator.clipboard && navigator.clipboard.writeText(text); },
+  // The share sheet where there is one; otherwise the link is copied.
+  share(text, url) {
+    if (navigator.share) { navigator.share({ text, url }).catch(() => {}); return true; }
+    navigator.clipboard && navigator.clipboard.writeText(text + '\n' + url);
+    return false;
+  },
   open(url) { window.open(url, '_blank'); },
   // iPhone has no element full screen (and a web app can't hide the status bar while upright): it gets iOS's own player.
   fullscreen(el) {
@@ -100,6 +106,7 @@ window.tm = {
 // sign-in redirect working in Safari and in the home-screen app.
 (() => {
   const V = '11.0.2';
+  const WEB_CLIENT = '320728716423-ot9e6g429mtd2huq570vg0v6i823p8la.apps.googleusercontent.com';
   const CONFIG = { apiKey: 'AIzaSyA-il46C_UnDYGWdfz-MXcqY4yiACWLubY', authDomain: 'tmovie-1db06.firebaseapp.com', projectId: 'tmovie-1db06',
     storageBucket: 'tmovie-1db06.firebasestorage.app', messagingSenderId: '320728716423', appId: '1:320728716423:web:3d94cfd09b8794032ad422' };
   let ready;
@@ -120,12 +127,24 @@ window.tm = {
         f.auth.onAuthStateChanged(f.au, u => cb(u ? JSON.stringify({ uid: u.uid, name: u.displayName, email: u.email, photo: u.photoURL }) : ''));
       }, () => cb('error:offline'));
     },
-    // Popup where it works; the home-screen app on iOS has no popups, so it goes by redirect.
+    // A popup everywhere except the iOS home-screen app, where Google opens in a separate sheet: there the ID token
+    // comes back through /__/tm/token (see functions/__). Must run straight from the tap (window.open).
     fbSignIn() {
+      const fail = e => (e && (e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request')) ? 'cancelled' : ((e && e.code) || 'error');
+      if (navigator.standalone) {
+        const state = 'tm-' + crypto.randomUUID();
+        const q = new URLSearchParams({ client_id: WEB_CLIENT, redirect_uri: location.origin + '/__/auth/handler', response_type: 'id_token',
+          response_mode: 'form_post', scope: 'openid email profile', nonce: crypto.randomUUID(), state, prompt: 'select_account' });
+        window.open('https://accounts.google.com/o/oauth2/v2/auth?' + q, '_blank');
+        const until = Date.now() + 180000;
+        const poll = () => fetch('/__/tm/token?state=' + state, { cache: 'no-store' }).then(r => r.status === 200 ? r.text() : null, () => null)
+          .then(t => t || (Date.now() > until ? Promise.reject({ code: 'auth/popup-closed-by-user' }) : new Promise(r => setTimeout(r, 1500)).then(poll)));
+        return poll().then(token => fb().then(f => f.auth.signInWithCredential(f.au, f.auth.GoogleAuthProvider.credential(token)))).then(() => '', fail);
+      }
       return fb().then(f => {
         const p = new f.auth.GoogleAuthProvider(); p.setCustomParameters({ prompt: 'select_account' });
-        return navigator.standalone ? f.auth.signInWithRedirect(f.au, p).then(() => '') : f.auth.signInWithPopup(f.au, p).then(() => '');
-      }).catch(e => (e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request') ? 'cancelled' : (e.code || 'error'));
+        return f.auth.signInWithPopup(f.au, p);
+      }).then(() => '', fail);
     },
     fbSignOut() { return fb().then(f => f.auth.signOut()); },
     // cb(true/false) while members/{uid} exists; a cache miss offline is not "removed".

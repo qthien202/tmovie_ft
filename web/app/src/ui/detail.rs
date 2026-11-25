@@ -102,7 +102,7 @@ pub fn DetailPage(film: Film) -> impl IntoView {
                     <div class="d-act" on:click=move |_| {
                         let f = cur();
                         let orig = f.origin_name.filter(|o| !o.is_empty()).map(|o| format!(" ({o})")).unwrap_or_default();
-                        glue::share(&format!("{}{} — đang xem trên TMovie", f.name, orig));
+                        if !glue::share(&format!("{}{} — đang xem trên TMovie", f.name, orig), &film_url(&f.slug)) { n.toast("Đã chép link phim") }
                     }><Icon d=ic::SEND /><span>"Chia sẻ"</span></div>
                     {move || d.get().and_then(|d| d.trailer_url).filter(|t| !t.is_empty()).map(|t| view! {
                         <div class="d-act" on:click=move |_| glue::open(&t)><Icon d=ic::MOVIE /><span>"Trailer"</span></div>

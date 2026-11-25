@@ -17,8 +17,9 @@ fn AccountCard() -> impl IntoView {
     let sign_in = move |_| {
         if busy.get_untracked() { return; }
         busy.set(true);
+        let started = account::sign_in();
         spawn_local(async move {
-            let r = account::sign_in().await;
+            let r = started.await;
             if !r.is_empty() && r != "cancelled" { n.toast("Đăng nhập chưa hoàn tất, thử lại nhé.") }
             busy.set(false);
         });

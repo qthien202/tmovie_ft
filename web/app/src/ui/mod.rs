@@ -238,6 +238,18 @@ const TABS: [(&str, [&str; 2]); 4] = [
     ("Của tôi", ["M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2", "M8 7a4 4 0 1 0 8 0a4 4 0 1 0-8 0"]),
 ];
 
+fn film_path() -> Option<String> {
+    let path = web_sys::window()?.location().pathname().ok()?;
+    let slug = path.strip_prefix("/phim/")?.trim_end_matches('/');
+    (!slug.is_empty() && !slug.contains('/')).then(|| slug.to_string())
+}
+
+/// The shareable address of a film (its preview comes from functions/phim/[slug].js).
+pub fn film_url(slug: &str) -> String {
+    let origin = web_sys::window().and_then(|w| w.location().origin().ok()).unwrap_or_default();
+    format!("{origin}/phim/{slug}")
+}
+
 #[component]
 fn Shell() -> impl IntoView {
     let n = Nav {
@@ -252,6 +264,16 @@ fn Shell() -> impl IntoView {
     };
     provide_context(n);
     let acct = crate::account::account();
+    // /phim/<slug> opens that film (shared links); the address follows the film on top, else "/".
+    if let Some(slug) = film_path() {
+        n.open(Film { slug, ..Default::default() });
+    }
+    Effect::new(move |_| {
+        let path = n.stack.with(|s| match s.last() { Some((_, Route::Film(f))) => format!("/phim/{}", f.slug), _ => "/".into() });
+        if let Some(h) = web_sys::window().and_then(|w| w.history().ok()) {
+            let _ = h.replace_state_with_url(&wasm_bindgen::JsValue::NULL, "", Some(&path));
+        }
+    });
     // Tabs keep their state once opened (saveState/restoreState).
     let visited = RwSignal::new([true, false, false, false]);
     let go = move |i: usize| {

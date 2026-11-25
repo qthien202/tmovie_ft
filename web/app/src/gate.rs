@@ -73,8 +73,9 @@ pub fn Gate() -> impl IntoView {
     let sign_in = move || {
         busy.set(true);
         error.set(None);
+        let started = account::sign_in();
         spawn_local(async move {
-            let r = account::sign_in().await;
+            let r = started.await;
             if !r.is_empty() && r != "cancelled" { error.set(Some("Chưa đăng nhập được, thử lại nhé.".into())) }
             busy.set(false);
         });

@@ -12,7 +12,7 @@ use leptos::prelude::*;
 fn main() {
     console_error_panic_hook_lite();
     if let Some(sw) = web_sys::window().map(|w| w.navigator().service_worker()) {
-        let _ = sw.register("sw.js");
+        let _ = sw.register("/sw.js");
     }
     mount_to_body(ui::App);
 }

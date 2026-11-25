@@ -1,0 +1,8 @@
+name = "tmovie"
+pages_build_output_dir = "app/dist"
+compatibility_date = "2026-11-01"
+
+# Short-lived hand-over of a Google ID token from the sign-in sheet to the iOS home-screen app (functions/__).
+[[kv_namespaces]]
+binding = "AUTH"
+id = "b0e52d6dd40f48b7abf11af4bd5b3a06"
