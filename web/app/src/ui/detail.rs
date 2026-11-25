@@ -112,14 +112,14 @@ pub fn DetailPage(film: Film) -> impl IntoView {
                 {move || {
                     let cast: Vec<Person> = people.get().into_iter().filter(|p| p.known_for_department.as_deref() == Some("Acting")).collect();
                     (!cast.is_empty()).then(|| view! {
-                        <div class="cast">
+                        <HScroll class="cast">
                             {cast.into_iter().map(|p| view! {
                                 <div class="p">
                                     <Img src=p.profile_path.as_deref().map(|x| api::tmdb(x, "w185")).unwrap_or_default() class="ph" />
                                     <b>{p.name.unwrap_or_default()}</b><span>{p.character.unwrap_or_default()}</span>
                                 </div>
                             }).collect_view()}
-                        </div>
+                        </HScroll>
                     })
                 }}
 

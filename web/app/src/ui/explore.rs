@@ -65,7 +65,7 @@ pub fn Explore() -> impl IntoView {
         <div class="scroll"><div class="list28">
             <div class="pg-head">
                 <div class="title28">"Khám phá"</div>
-                <div class="stories">
+                <HScroll class="stories">
                     {move || hot.get().into_iter().take(12).enumerate().map(|(i, f)| {
                         let label = format!("{}{}", if i < 3 { "🔥 " } else { "" }, short_name(&f.name));
                         let src = f.poster();
@@ -76,12 +76,12 @@ pub fn Explore() -> impl IntoView {
                             </div>
                         }
                     }).collect_view()}
-                </div>
+                </HScroll>
             </div>
 
             <div class="shelf" style="gap:12px">
                 <div class="section-title" style="padding:0 16px">"Hôm nay bạn muốn xem gì?"</div>
-                <div class="moods">
+                <HScroll class="moods">
                     {MOODS.iter().enumerate().map(|(i, (emoji, title, _, _, a, b))| view! {
                         <div class="mood" class:on=move || mood.get() == i style=format!("background:linear-gradient(135deg,{a},{b})")
                             on:click=move |_| mood.set(i)>
@@ -89,7 +89,7 @@ pub fn Explore() -> impl IntoView {
                             <div class="lab glass"><span class="e">{*emoji}</span><b>{*title}</b></div>
                         </div>
                     }).collect_view()}
-                </div>
+                </HScroll>
                 {move || {
                     let i = mood.get();
                     let (emoji, title, k, slug, ..) = MOODS[i];
@@ -109,7 +109,7 @@ pub fn Explore() -> impl IntoView {
                 </div>
                 {move || match feeds[seg.get()].get() {
                     None => view! { <div class="center-spin">{spinner(36)}</div> }.into_any(),
-                    Some(v) => v.into_iter().take(5).map(|f| view! { <FeedCard film=f /> }).collect_view().into_any(),
+                    Some(v) => view! { <div class="feeds">{v.into_iter().take(5).map(|f| view! { <FeedCard film=f /> }).collect_view()}</div> }.into_any(),
                 }}
             </div>
 

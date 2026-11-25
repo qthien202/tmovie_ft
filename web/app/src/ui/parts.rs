@@ -15,6 +15,8 @@ pub mod ic {
     pub const PLUS: &str = "M12 5v14M5 12h14";
     pub const CHECK: &str = "M5 12.5l4.5 4.5L19 7.5";
     pub const CHEV_R: &str = "M9.5 6l6 6-6 6";
+    pub const CHEV_L: &str = "M14.5 6l-6 6 6 6";
+    pub const EXPAND: &str = "M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5";
     pub const CHEV_D: &str = "M6.5 9.5l5.5 5.5 5.5-5.5";
     pub const BACK: &str = "M20 12H4.5M11 5l-7 7 7 7";
     pub const CLOSE: &str = "M18 6L6 18M6 6l12 12";
@@ -102,7 +104,26 @@ pub fn Shelf(#[prop(into)] title: String, #[prop(default = None)] more: Option<(
     view! {
         <div class="shelf">
             <RailHeader title=title more=more />
-            <div class="row" style=format!("gap:{gap}px")>{children()}</div>
+            <HScroll class="row" style=format!("gap:{gap}px")>{children()}</HScroll>
+        </div>
+    }
+}
+
+/// A horizontal row; on desktop, arrows on hover scroll it by most of its width.
+#[component]
+pub fn HScroll(class: &'static str, #[prop(optional, into)] style: String, children: Children) -> impl IntoView {
+    let row = NodeRef::<leptos::html::Div>::new();
+    let by = move |dir: f64| if let Some(el) = row.get_untracked() {
+        let o = web_sys::ScrollToOptions::new();
+        o.set_left(el.scroll_left() as f64 + dir * el.client_width() as f64 * 0.8);
+        o.set_behavior(web_sys::ScrollBehavior::Smooth);
+        el.scroll_to_with_scroll_to_options(&o);
+    };
+    view! {
+        <div class="hwrap">
+            <div class=class style=style node_ref=row>{children()}</div>
+            <div class="arr l" aria-label="Trước" on:click=move |_| by(-1.0)><Icon d=ic::CHEV_L /></div>
+            <div class="arr r" aria-label="Sau" on:click=move |_| by(1.0)><Icon d=ic::CHEV_R /></div>
         </div>
     }
 }

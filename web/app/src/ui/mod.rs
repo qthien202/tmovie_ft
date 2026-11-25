@@ -260,6 +260,13 @@ fn Shell() -> impl IntoView {
         <For each=move || n.stack.get() key=|(id, _)| *id let:item>
             <Page route=item.1 />
         </For>
+        // Desktop: a menu across the top instead of the floating tab bar (CSS shows one or the other).
+        <nav class="topnav">
+            <div class="wordmark" on:click=move |_| go(0)>"TMOVIE"</div>
+            {TABS.iter().enumerate().map(|(i, (label, _))| view! {
+                <span class="tn" class:on=move || n.tab.get() == i && n.stack.with(|s| s.is_empty()) on:click=move |_| go(i)>{*label}</span>
+            }).collect_view()}
+        </nav>
         <div class="bar glass" class:hide=move || n.stack.with(|s| !s.is_empty())>
             <div class="hl" style:transform=move || format!("translateX({}px)", n.tab.get() * 66)></div>
             {TABS.iter().enumerate().map(|(i, (label, paths))| view! {

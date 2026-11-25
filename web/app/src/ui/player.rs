@@ -36,6 +36,11 @@ pub fn Player(p: Play) -> impl IntoView {
     let server = RwSignal::new(p.server);
     let index = RwSignal::new(p.index);
     let video = NodeRef::<leptos::html::Video>::new();
+    let root = NodeRef::<leptos::html::Div>::new();
+    let full = || web_sys::window().and_then(|w| w.document()).and_then(|d| d.fullscreen_element()).is_some();
+    let toggle_ref = StoredValue::new_local(None::<Box<dyn Fn()>>);
+    let seek_ref = StoredValue::new_local(None::<Box<dyn Fn(f64)>>);
+    let close_ref = StoredValue::new_local(None::<Box<dyn Fn()>>);
     let (playing, buffering, ended, error) = (RwSignal::new(false), RwSignal::new(true), RwSignal::new(false), RwSignal::new(false));
     let (pos, dur, buffered) = (RwSignal::new(0.0f64), RwSignal::new(0.0f64), RwSignal::new(0.0f64));
     let controls = RwSignal::new(true);
@@ -108,13 +113,29 @@ pub fn Player(p: Play) -> impl IntoView {
     }, Duration::from_secs(1)).ok();
     let on_resize = window_event_listener(leptos::ev::resize, move |_| size.set(glue::win()));
     let on_off = window_event_listener(leptos::ev::offline, move |_| offline.set(true));
+    // Desktop: keys as in most web players; Esc closes a panel, then the player.
+    let on_key = window_event_listener(leptos::ev::keydown, move |e| {
+        let vol = |d: f64| if let Some(v) = video.get_untracked() { let l = (v.volume() + d).clamp(0.0, 1.0); v.set_volume(l); v.set_muted(false); hud.set(Some(Hud::Level(false, l))); set_timeout(move || hud.set(None), Duration::from_millis(700)); };
+        match e.key().as_str() {
+            " " | "k" | "K" => { e.prevent_default(); toggle_ref.with_value(|t| if let Some(t) = t { t() }); }
+            "ArrowLeft" | "j" | "J" => seek_ref.with_value(|s| if let Some(s) = s { s(-10.0) }),
+            "ArrowRight" | "l" | "L" => seek_ref.with_value(|s| if let Some(s) = s { s(10.0) }),
+            "ArrowUp" => { e.prevent_default(); vol(0.1) }
+            "ArrowDown" => { e.prevent_default(); vol(-0.1) }
+            "m" | "M" => if let Some(v) = video.get_untracked() { v.set_muted(!v.muted()) },
+            "f" | "F" => if let Some(p) = root.get_untracked() { glue::fullscreen(&p) },
+            "Escape" => if panel.get_untracked().is_some() { panel.set(None) } else if !full() { close_ref.with_value(|c| if let Some(c) = c { c() }) },
+            _ => return,
+        }
+        poke();
+    });
     let on_on = window_event_listener(leptos::ev::online, move |_| {
         offline.set(false);
         if error.get_untracked() { load(Some(pos.get_untracked())); }
     });
     on_cleanup(move || {
         if let Some(h) = h { h.clear(); }
-        on_resize.remove(); on_off.remove(); on_on.remove();
+        on_resize.remove(); on_off.remove(); on_on.remove(); on_key.remove();
         if let Some(el) = video.get_untracked() { glue::detach(&el); }
         glue::wake(false);
     });
@@ -125,6 +146,10 @@ pub fn Player(p: Play) -> impl IntoView {
         if ended.get_untracked() { el.set_current_time(0.0); ended.set(false); let _ = el.play(); }
         else if el.paused() { let _ = el.play(); } else { let _ = el.pause(); }
     };
+
+    toggle_ref.set_value(Some(Box::new(toggle)));
+    seek_ref.set_value(Some(Box::new(seek_by)));
+    close_ref.set_value(Some(Box::new(close)));
 
     // Local (landscape) coordinates, whether or not the player is rotated.
     let local = move |cx: f64, cy: f64| -> (f64, f64, f64, f64) {
@@ -172,6 +197,15 @@ pub fn Player(p: Play) -> impl IntoView {
         pointers.update_value(|p| p.retain(|q| q.0 != e.pointer_id()));
         let Some(t) = touch.get_value() else { return };
         touch.set_value(None);
+        if e.pointer_type() == "mouse" && t.axis == 0 {
+            // Mouse: a click plays/pauses (a second one within 300 ms undoes it and goes full screen).
+            let now = glue::now();
+            let (prev, _) = last_tap.get_value();
+            toggle();
+            if now - prev < 300.0 { toggle(); if let Some(p) = root.get_untracked() { glue::fullscreen(&p) } last_tap.set_value((0.0, false)); } else { last_tap.set_value((now, false)); }
+            poke();
+            return;
+        }
         if let Some(Hud::Scrub(target, _)) = hud.get_untracked() { seek_to(target); }
         let was_drag = t.axis != 0;
         set_timeout(move || hud.set(None), Duration::from_millis(if was_drag { 400 } else { 0 }));
@@ -223,7 +257,8 @@ pub fn Player(p: Play) -> impl IntoView {
     let title = film.name.clone();
 
     view! {
-        <div class="player" style=rot_style on:pointermove=move |_| ()>
+        <div class="player" node_ref=root style=rot_style class:idle=move || !controls.get()
+            on:mousemove=move |e| if e.movement_x() != 0 || e.movement_y() != 0 { poke() }>
             <video node_ref=video playsinline=true crossorigin="anonymous" poster=poster
                 class:zoom=move || fit.get() == 1 class:fill=move || fit.get() == 2
                 prop:playbackRate=move || speed.get()
@@ -301,6 +336,9 @@ pub fn Player(p: Play) -> impl IntoView {
                                 })}
                                 <div class="ricon glass" style="width:44px;height:44px" aria-label="Khoá màn hình" on:click=move |_| { locked.set(true); panel.set(None); }><Icon d=ic::LOCK_OPEN /></div>
                                 <div class="ricon glass" style="width:44px;height:44px" aria-label="Hình trong hình" on:click=move |_| if let Some(v) = video.get_untracked() { glue::pip(&v) }><Icon d=ic::PIP /></div>
+                                {glue::desktop().then(|| view! {
+                                    <div class="ricon glass" style="width:44px;height:44px" aria-label="Toàn màn hình" on:click=move |_| if let Some(p) = root.get_untracked() { glue::fullscreen(&p) }><Icon d=ic::EXPAND /></div>
+                                })}
                                 <div class="ricon glass" style="width:44px;height:44px" aria-label="Cài đặt" on:click=move |_| panel.set(Some(Panel::Settings))><Icon d=ic::SETTINGS /></div>
                                 {many.then(|| view! {
                                     <div class="ricon glass" style="width:44px;height:44px" aria-label="Danh sách tập" on:click=move |_| panel.set(Some(Panel::Episodes))><Icon d=ic::LIBRARY /></div>

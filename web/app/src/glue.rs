@@ -20,6 +20,8 @@ extern "C" {
     pub fn share(text: &str);
     #[wasm_bindgen(js_namespace = tm)]
     pub fn open(url: &str);
+    #[wasm_bindgen(js_namespace = tm)]
+    pub fn fullscreen(el: &web_sys::Element);
 }
 
 /// "r,g,b" of the image's tuned average colour, as ColorSampler.kt.
@@ -29,11 +31,21 @@ pub async fn tint_of(url: &str) -> Option<String> {
 
 pub fn now() -> f64 { js_sys::Date::now() }
 
+/// A wide screen with a mouse: the desktop layout (same query as app.css).
+pub fn desktop() -> bool {
+    web_sys::window().and_then(|w| w.match_media("(min-width: 1024px) and (hover: hover)").ok().flatten()).map(|m| m.matches()).unwrap_or(false)
+}
+
 pub fn reduce_motion() -> bool {
     web_sys::window().and_then(|w| w.match_media("(prefers-reduced-motion: reduce)").ok().flatten()).map(|m| m.matches()).unwrap_or(false)
 }
 
+/// The app's own box (see #app in app.css), which on iOS is taller than `innerHeight`.
 pub fn win() -> (f64, f64) {
     let w = web_sys::window().unwrap();
+    if let Some(app) = w.document().and_then(|d| d.get_element_by_id("app")) {
+        let (cw, ch) = (app.client_width() as f64, app.client_height() as f64);
+        if cw > 0.0 && ch > 0.0 { return (cw, ch); }
+    }
     (w.inner_width().ok().and_then(|v| v.as_f64()).unwrap_or(390.0), w.inner_height().ok().and_then(|v| v.as_f64()).unwrap_or(844.0))
 }

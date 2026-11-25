@@ -51,14 +51,14 @@ pub fn Search() -> impl IntoView {
             {move || if term.with(|t| t.is_empty()) {
                 view! {
                     <div class="section-title" style="padding:20px 16px 12px">"Khám phá thể loại"</div>
-                    <div class="gc2">
+                    <HScroll class="gc2">
                         {move || genres.get().into_iter().map(|c| {
                             let name = c.name.clone().unwrap_or_default();
                             let slug = c.slug.clone().unwrap_or_default();
                             let n2 = name.clone();
                             view! { <div class="gchip glass press" on:click=move |_| n.list(n2.clone(), Source::Genre(slug.clone()))>{name}</div> }
                         }).collect_view()}
-                    </div>
+                    </HScroll>
                     <div class="section-title" style="padding:28px 16px 12px">"Tìm kiếm hàng đầu"</div>
                     {move || top.get().into_iter().map(|f| {
                         let src = f.thumb();

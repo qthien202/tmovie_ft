@@ -121,7 +121,7 @@ pub fn Catalog(title: String, source: Source) -> impl IntoView {
         <div class="home-bg" style:background=move || format!("linear-gradient(rgba({},.4), var(--canvas) 50%)", tint.get())></div>
         <div class="scroll" on:scroll=move |e| if near_end(&e) { more() }>
             <div class="cat-top">
-                <div class="r1" style="padding-top:calc(var(--top) + 4px)">
+                <div class="r1">
                     <div class="circ40 glass press" aria-label="Quay lại" on:click=move |_| n.back()><Icon d=ic::BACK /></div>
                     <div class="circ40 glass press" class:tint=filtering aria-label="Bộ lọc" on:click=root_menu><Icon d=ic::FILTER /></div>
                 </div>

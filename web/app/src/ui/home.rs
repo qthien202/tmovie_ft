@@ -137,18 +137,18 @@ pub fn Home() -> impl IntoView {
                 })}
             </div>
         </div>
-        <HomeHeader />
+        <HomeHeader scrolled=Signal::derive(move || scroll_y.get() > 80.0) />
     }
 }
 
 #[component]
-fn HomeHeader() -> impl IntoView {
+fn HomeHeader(scrolled: Signal<bool>) -> impl IntoView {
     let n = nav();
     let pill = move |label: &'static str, slug: &'static str| view! {
         <div class="pill glass press" on:click=move |_| n.list(label, Source::Type(slug.into()))>{label}</div>
     };
     view! {
-        <div class="home-head">
+        <div class="home-head" class:scrolled=move || scrolled.get()>
             <div class="wordmark">"TMOVIE"</div>
             <div class="pills">
                 <GenrePickerPill countries=true />
@@ -266,8 +266,10 @@ fn Hero(data: HomeData, settled: RwSignal<usize>, scroll_y: RwSignal<f64>) -> im
                 }).collect_view()}
             </div>
             <div class="dots glass">
-                {(0..count).map(|i| view! { <i class:on=move || settled.get() == i></i> }).collect_view()}
+                {(0..count).map(|i| view! { <i class:on=move || settled.get() == i on:click=move |_| go_to(i)></i> }).collect_view()}
             </div>
+            <div class="harr l" aria-label="Trước" on:click=move |_| go_to((settled.get_untracked() + count - 1) % count)><Icon d=ic::CHEV_L /></div>
+            <div class="harr r" aria-label="Sau" on:click=move |_| go_to((settled.get_untracked() + 1) % count)><Icon d=ic::CHEV_R /></div>
         </div>
     }
 }

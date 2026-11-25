@@ -75,6 +75,10 @@ window.tm = {
   },
   share(text) { if (navigator.share) navigator.share({ text }).catch(() => {}); else navigator.clipboard && navigator.clipboard.writeText(text); },
   open(url) { window.open(url, '_blank'); },
+  fullscreen(el) {
+    if (document.fullscreenElement || document.webkitFullscreenElement) return (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
+  },
 };
 </script>
 <link data-trunk rel="css" href="assets/app.css">
