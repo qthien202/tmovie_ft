@@ -91,9 +91,24 @@ pub fn Player(p: Play) -> impl IntoView {
         glue::attach(&el, &url);
         let _ = el.set_attribute("autoplay", "");
     };
-    let switch = move |s: usize, i: usize| { save(); server.set(s); index.set(i); load(None); save(); };
+    // iPhone/iPad: iOS's own full-screen player (no playsinline, so playing opens it); leaving it closes ours.
+    let native = glue::ios();
+    let switching = StoredValue::new(false);
+    let switch = move |s: usize, i: usize| { switching.set_value(true); save(); server.set(s); index.set(i); load(None); save(); };
     let close = move || { save(); snap(); glue::wake(false); n.play.set(None); n.bump(); };
 
+    // Leaving iOS's player (Xong / swipe down) leaves ours too, except while it hops to the next episode.
+    if native {
+        Effect::new(move |done: Option<bool>| {
+            if done == Some(true) { return true; }
+            let Some(el) = video.get() else { return false };
+            use wasm_bindgen::JsCast;
+            let cb = wasm_bindgen::closure::Closure::<dyn FnMut()>::new(move || if !switching.get_value() { close() });
+            let _ = el.add_event_listener_with_callback("webkitendfullscreen", cb.as_ref().unchecked_ref());
+            cb.forget();
+            true
+        });
+    }
     // Start once the <video> exists.
     Effect::new(move |done: Option<bool>| {
         if done == Some(true) { return true; }
@@ -248,7 +263,7 @@ pub fn Player(p: Play) -> impl IntoView {
     };
     let rot_style = move || {
         let (w, h) = size.get();
-        if h > w {
+        if h > w && !native {
             format!("width:{h}px;height:{w}px;right:auto;bottom:auto;transform-origin:0 0;transform:translateX({w}px) rotate(90deg);\
                 --left:env(safe-area-inset-top,0px);--right:env(safe-area-inset-bottom,0px);--top:0px;--bottom:0px")
         } else { String::new() }
@@ -257,9 +272,9 @@ pub fn Player(p: Play) -> impl IntoView {
     let title = film.name.clone();
 
     view! {
-        <div class="player" node_ref=root style=rot_style class:idle=move || !controls.get()
+        <div class="player" node_ref=root style=rot_style class:idle=move || !controls.get() class:native=native
             on:mousemove=move |e| if e.movement_x() != 0 || e.movement_y() != 0 { poke() }>
-            <video node_ref=video playsinline=true crossorigin="anonymous" poster=poster
+            <video node_ref=video playsinline=!native controls=native crossorigin="anonymous" poster=poster
                 class:zoom=move || fit.get() == 1 class:fill=move || fit.get() == 2
                 prop:playbackRate=move || speed.get()
                 on:loadedmetadata=move |_| if let Some(el) = video.get_untracked() {
@@ -277,7 +292,7 @@ pub fn Player(p: Play) -> impl IntoView {
                     let b = el.buffered();
                     if b.length() > 0 { buffered.set(b.end(b.length() - 1).unwrap_or(0.0)); }
                 }
-                on:playing=move |_| { playing.set(true); buffering.set(false); ended.set(false); error.set(false); glue::wake(true); }
+                on:playing=move |_| { switching.set_value(false); playing.set(true); buffering.set(false); ended.set(false); error.set(false); glue::wake(true); }
                 on:pause=move |_| { playing.set(false); snap(); save(); poke(); glue::wake(false); }
                 on:waiting=move |_| buffering.set(true)
                 on:canplay=move |_| buffering.set(false)
@@ -291,6 +306,19 @@ pub fn Player(p: Play) -> impl IntoView {
                     match next_index() { Some(i) if !cancelled.get_untracked() => switch(server.get_untracked(), i), _ => ended.set(true) }
                 }>
             </video>
+            {native.then(|| {
+                let title = film_s.with_value(|f| f.name.clone());
+                view! {
+                    <div class="nat">
+                        <div class="ricon glass" style="width:44px;height:44px" aria-label="Quay lại" on:click=move |_| close()><Icon d=ic::BACK /></div>
+                        <b>{title}</b>
+                        <span>{move || ep_name()}</span>
+                        <div class="big glass" aria-label="Phát" on:click=move |_| if let Some(v) = video.get_untracked() { let _ = v.play(); }>
+                            <svg viewBox="0 0 24 24"><path d=ic::PLAY /></svg>
+                        </div>
+                    </div>
+                }
+            })}
             <div class="pscrim" style:opacity=move || if controls.get() && !locked.get() { "1" } else { "0" }></div>
             <div class="dimmer" style:opacity=move || ((1.0 - bright.get()) * 0.85).to_string()></div>
             <div class="surface" on:pointerdown=down on:pointermove=mv on:pointerup=up on:pointercancel=move |_| { touch.set_value(None); pointers.set_value(vec![]); hud.set(None); }

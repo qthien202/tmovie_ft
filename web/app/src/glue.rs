@@ -33,6 +33,13 @@ pub async fn tint_of(url: &str) -> Option<String> {
 pub fn now() -> f64 { js_sys::Date::now() }
 
 
+/// iPhone/iPad (iPadOS reports a Mac with touch): films play in iOS's own player there.
+pub fn ios() -> bool {
+    let Some(n) = web_sys::window().map(|w| w.navigator()) else { return false };
+    let ua = n.user_agent().unwrap_or_default();
+    ua.contains("iPhone") || ua.contains("iPad") || ua.contains("iPod") || (ua.contains("Macintosh") && n.max_touch_points() > 1)
+}
+
 pub fn reduce_motion() -> bool {
     web_sys::window().and_then(|w| w.match_media("(prefers-reduced-motion: reduce)").ok().flatten()).map(|m| m.matches()).unwrap_or(false)
 }
