@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>TMovie</title>
+<link rel="canonical" href="https://tmovie-ey8.pages.dev/">
+<meta name="description" content="Phim bộ, phim lẻ, TV Shows cập nhật mỗi ngày. Xem trên iPhone, máy tính và TV.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="TMovie">
+<meta property="og:title" content="TMovie">
+<meta property="og:description" content="Phim bộ, phim lẻ, TV Shows cập nhật mỗi ngày. Xem trên iPhone, máy tính và TV.">
+<meta property="og:url" content="https://tmovie-ey8.pages.dev/">
+<meta property="og:image" content="https://tmovie-ey8.pages.dev/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://tmovie-ey8.pages.dev/og.png">
+<link data-trunk rel="copy-file" href="assets/og.png">
+<meta name="theme-color" content="#05070a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TMovie">
+<link rel="apple-touch-icon" href="/icons/icon-180.png">
+<link rel="icon" href="/icons/icon-192.png">
+<link data-trunk rel="copy-dir" href="assets/icons">
+<link data-trunk rel="copy-file" href="assets/manifest.webmanifest">
+<link data-trunk rel="copy-file" href="assets/sw.js">
+<link rel="manifest" href="/manifest.webmanifest">
+<script>
+// Small browser glue the Rust app calls (window.tm): HLS attach, frame grab, tint sampling, PiP, wake lock, share.
+window.tm = {
+  // Through /hls (ad breaks removed) when the stream's CDN lets Cloudflare fetch it, else the original playlist.
+  attach(v, raw) {
+    this.detach(v);
+    const token = v._tok = {};
+    const proxied = '/hls?u=' + encodeURIComponent(raw);
+    fetch(proxied).then(r => (r.ok ? proxied : raw), () => raw).then(url => {
+      if (v._tok !== token) return;
+      // Safari plays HLS itself; Chrome answers "maybe" but can't, so it gets hls.js.
+      if (!window.chrome && v.canPlayType('application/vnd.apple.mpegurl')) { v.src = url; v.play().catch(() => {}); return; }
+      const go = () => { if (v._tok !== token || v._hls) return; const h = new Hls({ maxBufferLength: 30 }); h.loadSource(url); h.attachMedia(v); v._hls = h; v.play().catch(() => {}); };
+      if (window.Hls) return go();
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/hls.js@1.5.13/dist/hls.min.js'; s.onload = go; document.head.appendChild(s);
+    });
+  },
+  detach(v) { v._tok = null; if (v._hls) { v._hls.destroy(); v._hls = null; } if (v.getAttribute('src')) { v.removeAttribute('src'); v.load(); } },
+  snap(v) {
+    try {
+      if (!v.videoWidth) return null;
+      const w = 640, h = Math.round(640 * v.videoHeight / v.videoWidth), c = document.createElement('canvas');
+      c.width = w; c.height = h; c.getContext('2d').drawImage(v, 0, 0, w, h);
+      return c.toDataURL('image/jpeg', 0.7);
+    } catch (e) { return null; }
+  },
+  // Average colour at 48 px, then saturation min(1, s*1.6+.15) and value clamp(v*1.5, .55, .9), as ColorSampler.kt.
+  tint(url) {
+    return new Promise(done => {
+      if (!url) return done(null);
+      const i = new Image(); i.crossOrigin = 'anonymous';
+      i.onerror = () => done(null);
+      i.onload = () => {
+        try {
+          const c = document.createElement('canvas'); c.width = c.height = 48;
+          const x = c.getContext('2d'); x.drawImage(i, 0, 0, 48, 48);
+          const d = x.getImageData(0, 0, 48, 48).data; let r = 0, g = 0, b = 0;
+          for (let k = 0; k < d.length; k += 4) { r += d[k]; g += d[k + 1]; b += d[k + 2]; }
+          const n = d.length / 4; r /= n * 255; g /= n * 255; b /= n * 255;
+          const mx = Math.max(r, g, b), mn = Math.min(r, g, b), df = mx - mn;
+          let h = df === 0 ? 0 : mx === r ? ((g - b) / df) % 6 : mx === g ? (b - r) / df + 2 : (r - g) / df + 4; h = (h * 60 + 360) % 360;
+          const s = Math.min(1, (mx === 0 ? 0 : df / mx) * 1.6 + 0.15), v = Math.min(0.9, Math.max(0.55, mx * 1.5));
+          const f = m => { const k = (m + h / 60) % 6; return Math.round(255 * (v - v * s * Math.max(0, Math.min(k, 4 - k, 1)))); };
+          done(f(5) + ',' + f(3) + ',' + f(1));
+        } catch (e) { done(null); }
+      };
+      i.src = url.includes('image.tmdb.org') ? url : '/img?u=' + encodeURIComponent(url);
+    });
+  },
+  pip(v) {
+    if (document.pictureInPictureElement) return document.exitPictureInPicture();
+    if (v.requestPictureInPicture) return v.requestPictureInPicture().catch(() => {});
+    if (v.webkitSetPresentationMode) v.webkitSetPresentationMode('picture-in-picture');
+  },
+  async wake(on) {
+    try { if (on && !this._wl && navigator.wakeLock) this._wl = await navigator.wakeLock.request('screen'); else if (!on && this._wl) { this._wl.release(); this._wl = null; } } catch (e) {}
+  },
+  // The share sheet where there is one; otherwise the link is copied.
+  share(text, url) {
+    if (navigator.share) { navigator.share({ text, url }).catch(() => {}); return true; }
+    navigator.clipboard && navigator.clipboard.writeText(text + '\n' + url);
+    return false;
+  },
+  open(url) { window.open(url, '_blank'); },
+  // iPhone has no element full screen (and a web app can't hide the status bar while upright): it gets iOS's own player.
+  fullscreen(el) {
+    const v = el.querySelector('video');
+    if (!(document.fullscreenEnabled || document.webkitFullscreenEnabled) && v && v.webkitEnterFullscreen) return v.webkitEnterFullscreen();
+    if (document.fullscreenElement || document.webkitFullscreenElement) return (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
+  },
+};
+// Firebase (same project as the phone apps): Google sign-in, members/{uid}, entitlements, library sync.
+// On the deployed site auth runs through our own domain (/__/auth proxied by functions/__), which keeps the
+// sign-in redirect working in Safari and in the home-screen app.
+(() => {
+  const V = '11.0.2';
+  const WEB_CLIENT = '320728716423-ot9e6g429mtd2huq570vg0v6i823p8la.apps.googleusercontent.com';
+  const CONFIG = { apiKey: 'AIzaSyA-il46C_UnDYGWdfz-MXcqY4yiACWLubY', authDomain: 'tmovie-1db06.firebaseapp.com', projectId: 'tmovie-1db06',
+    storageBucket: 'tmovie-1db06.firebasestorage.app', messagingSenderId: '320728716423', appId: '1:320728716423:web:3d94cfd09b8794032ad422' };
+  let ready;
+  const fb = () => ready ||= Promise.all(['app', 'auth', 'firestore'].map(m => import(`https://www.gstatic.com/firebasejs/${V}/firebase-${m}.js`)))
+    .then(([app, auth, fs]) => {
+      const local = /^(localhost|127\.|192\.168\.)/.test(location.hostname);
+      const a = app.initializeApp({ ...CONFIG, authDomain: local ? CONFIG.authDomain : location.host });
+      const au = auth.initializeAuth(a, { persistence: [auth.indexedDBLocalPersistence, auth.browserLocalPersistence], popupRedirectResolver: auth.browserPopupRedirectResolver });
+      return { auth, fs, au, db: fs.getFirestore(a) };
+    });
+  const doc = (f, path) => f.fs.doc(f.db, ...path.split('/'));
+  let memberUnsub = null;
+  Object.assign(window.tm, {
+    // cb(json user | '' signed out | 'error:<code>')
+    fbUser(cb) {
+      fb().then(f => {
+        f.auth.getRedirectResult(f.au).catch(e => cb('error:' + (e.code || e.message)));
+        f.auth.onAuthStateChanged(f.au, u => cb(u ? JSON.stringify({ uid: u.uid, name: u.displayName, email: u.email, photo: u.photoURL }) : ''));
+      }, () => cb('error:offline'));
+    },
+    // A popup everywhere except the iOS home-screen app, where Google opens in a separate sheet: there the ID token
+    // comes back through /__/tm/token (see functions/__). Must run straight from the tap (window.open).
+    fbSignIn() {
+      const fail = e => (e && (e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request')) ? 'cancelled' : ((e && e.code) || 'error');
+      if (navigator.standalone) {
+        const state = 'tm-' + crypto.randomUUID();
+        const q = new URLSearchParams({ client_id: WEB_CLIENT, redirect_uri: location.origin + '/__/auth/handler', response_type: 'id_token',
+          response_mode: 'form_post', scope: 'openid email profile', nonce: crypto.randomUUID(), state, prompt: 'select_account' });
+        window.open('https://accounts.google.com/o/oauth2/v2/auth?' + q, '_blank');
+        const until = Date.now() + 180000;
+        const poll = () => fetch('/__/tm/token?state=' + state, { cache: 'no-store' }).then(r => r.status === 200 ? r.text() : null, () => null)
+          .then(t => t || (Date.now() > until ? Promise.reject({ code: 'auth/popup-closed-by-user' }) : new Promise(r => setTimeout(r, 1500)).then(poll)));
+        return poll().then(token => fb().then(f => f.auth.signInWithCredential(f.au, f.auth.GoogleAuthProvider.credential(token)))).then(() => '', fail);
+      }
+      return fb().then(f => {
+        const p = new f.auth.GoogleAuthProvider(); p.setCustomParameters({ prompt: 'select_account' });
+        return f.auth.signInWithPopup(f.au, p);
+      }).then(() => '', fail);
+    },
+    fbSignOut() { return fb().then(f => f.auth.signOut()); },
+    // cb(true/false) while members/{uid} exists; a cache miss offline is not "removed".
+    fbMember(uid, cb) {
+      if (memberUnsub) { memberUnsub(); memberUnsub = null; }
+      if (!uid) return;
+      fb().then(f => { memberUnsub = f.fs.onSnapshot(doc(f, 'members/' + uid), { includeMetadataChanges: false }, s => { if (!(s.metadata.fromCache && !s.exists())) cb(s.exists()); }, () => {}); });
+    },
+    fbGet(path) { return fb().then(f => f.fs.getDoc(doc(f, path))).then(s => s.exists() ? JSON.stringify(s.data()) : '', () => ''); },
+    // {favorites:[...], history:[...], playback:{id: seconds}}
+    fbPull(uid) {
+      return fb().then(async f => {
+        const all = async c => (await f.fs.getDocs(f.fs.collection(f.db, 'users', uid, c))).docs;
+        const [fav, hist, pb] = await Promise.all([all('favorites'), all('history'), all('playback')]);
+        return JSON.stringify({ favorites: fav.map(d => d.data()), history: hist.map(d => d.data()),
+          playback: Object.fromEntries(pb.map(d => [d.id, d.data().position || 0])) });
+      }).catch(() => '');
+    },
+    fbSet(path, json) { return fb().then(f => f.fs.setDoc(doc(f, path), JSON.parse(json))).catch(() => {}); },
+    fbDel(path) { return fb().then(f => f.fs.deleteDoc(doc(f, path))).catch(() => {}); },
+  });
+})();
+</script>
+<link data-trunk rel="css" href="assets/app.css">
+<link data-trunk rel="rust" data-wasm-opt="z">
+</head>
+<body></body>
+</html>
