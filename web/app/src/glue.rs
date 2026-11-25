@@ -23,6 +23,8 @@ extern "C" {
     pub fn open(url: &str);
     #[wasm_bindgen(js_namespace = tm)]
     pub fn fullscreen(el: &web_sys::Element);
+    #[wasm_bindgen(js_namespace = tm, js_name = nativeFull)]
+    pub fn native_full(v: &web_sys::HtmlVideoElement);
 }
 
 /// "r,g,b" of the image's tuned average colour, as ColorSampler.kt.

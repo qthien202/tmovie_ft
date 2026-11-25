@@ -443,11 +443,10 @@ img[src=""] { display:none; }
 .tab-av.on { border:2px solid var(--brand-light); }
 @media (min-width: 1024px) and (hover: hover) { .acct, .acct-in { max-width:680px; } }
 
-/* iPhone/iPad: iOS's own player does the controls; ours only shows while it opens (tap to play if iOS waits). */
-.player.native .p-ui, .player.native .surface, .player.native .pscrim, .player.native .dimmer, .player.native .nextc,
+/* iPhone/iPad: iOS's own player and controls; ours is only a back button above the 16:9 picture. */
+.player.native .p-ui, .player.native .surface, .player.native .pscrim, .player.native .dimmer, .player.native .nextc, .player.native .pspin,
 .player.native .dbl, .player.native .hud, .player.native .ppanel, .player.native .offline { display:none !important; }
-.nat { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; text-align:center;
-  padding:calc(var(--top) + 16px) 24px calc(var(--bottom) + 24px); background:linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.75)); }
-.nat > .ricon { position:absolute; top:calc(var(--top) + 12px); left:16px; }
-.nat b { font:700 20px var(--sans); } .nat span { color:var(--secondary); font-size:14px; }
-.nat .big { margin-top:18px; width:84px; height:84px; border-radius:50%; display:grid; place-items:center; cursor:pointer; } .nat .big svg { width:44px; height:44px; fill:#fff; stroke:none; }
+.player.native video { top:50%; bottom:auto; height:auto; aspect-ratio:16/9; transform:translateY(-50%); }
+@media (orientation: landscape) { .player.native video { top:0; bottom:0; height:100%; aspect-ratio:auto; transform:none; } }
+.nat-back { position:absolute; z-index:2; top:calc(var(--top) + 12px); left:16px; }
+@media (orientation: landscape) { .nat-back { top:16px; left:calc(var(--left) + 16px); } }

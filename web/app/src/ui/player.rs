@@ -94,6 +94,9 @@ pub fn Player(p: Play) -> impl IntoView {
     // iPhone/iPad: iOS's own full-screen player (no playsinline, so playing opens it); leaving it closes ours.
     let native = glue::ios();
     let switching = StoredValue::new(false);
+    // Asks iOS for its full-screen player once, when playback starts; iOS may refuse outside a tap, then the
+    // full-screen button in its controls does it.
+    let full_once = StoredValue::new(false);
     let switch = move |s: usize, i: usize| { switching.set_value(true); save(); server.set(s); index.set(i); load(None); save(); };
     let close = move || { save(); snap(); glue::wake(false); n.play.set(None); n.bump(); };
 
@@ -292,7 +295,7 @@ pub fn Player(p: Play) -> impl IntoView {
                     let b = el.buffered();
                     if b.length() > 0 { buffered.set(b.end(b.length() - 1).unwrap_or(0.0)); }
                 }
-                on:playing=move |_| { switching.set_value(false); playing.set(true); buffering.set(false); ended.set(false); error.set(false); glue::wake(true); }
+                on:playing=move |_| { switching.set_value(false); if native && !full_once.get_value() { full_once.set_value(true); if let Some(v) = video.get_untracked() { glue::native_full(&v) } } playing.set(true); buffering.set(false); ended.set(false); error.set(false); glue::wake(true); }
                 on:pause=move |_| { playing.set(false); snap(); save(); poke(); glue::wake(false); }
                 on:waiting=move |_| buffering.set(true)
                 on:canplay=move |_| buffering.set(false)
@@ -306,18 +309,8 @@ pub fn Player(p: Play) -> impl IntoView {
                     match next_index() { Some(i) if !cancelled.get_untracked() => switch(server.get_untracked(), i), _ => ended.set(true) }
                 }>
             </video>
-            {native.then(|| {
-                let title = film_s.with_value(|f| f.name.clone());
-                view! {
-                    <div class="nat">
-                        <div class="ricon glass" style="width:44px;height:44px" aria-label="Quay lại" on:click=move |_| close()><Icon d=ic::BACK /></div>
-                        <b>{title}</b>
-                        <span>{move || ep_name()}</span>
-                        <div class="big glass" aria-label="Phát" on:click=move |_| if let Some(v) = video.get_untracked() { let _ = v.play(); }>
-                            <svg viewBox="0 0 24 24"><path d=ic::PLAY /></svg>
-                        </div>
-                    </div>
-                }
+            {native.then(|| view! {
+                <div class="nat-back ricon glass" style="width:44px;height:44px" aria-label="Quay lại" on:click=move |_| close()><Icon d=ic::BACK /></div>
             })}
             <div class="pscrim" style:opacity=move || if controls.get() && !locked.get() { "1" } else { "0" }></div>
             <div class="dimmer" style:opacity=move || ((1.0 - bright.get()) * 0.85).to_string()></div>

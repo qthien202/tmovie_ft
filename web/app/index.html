@@ -93,6 +93,7 @@ window.tm = {
     return false;
   },
   open(url) { window.open(url, '_blank'); },
+  nativeFull(v) { try { if (v.webkitEnterFullscreen && !v.webkitDisplayingFullscreen) v.webkitEnterFullscreen(); } catch (e) {} },
   // iPhone has no element full screen (and a web app can't hide the status bar while upright): it gets iOS's own player.
   fullscreen(el) {
     const v = el.querySelector('video');
