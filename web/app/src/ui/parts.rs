@@ -41,6 +41,8 @@ pub mod ic {
     pub const TRASH: &str = "M4 6.5h16M9 6.5V4h6v2.5M6 6.5l1 14h10l1-14M10 10.5v6M14 10.5v6";
     pub const SLIDES: &str = "M3 4.5h18v12H3zM8 20.5h8M10.5 8.5v4l3.5-2z";
     pub const WIFI_OFF: &str = "M2 2l20 20M8.5 16.4a5 5 0 0 1 7 0M5 12.6a10 10 0 0 1 4.8-2.6M19 12.6a10 10 0 0 0-2.2-1.6M2 8.8A15 15 0 0 1 6.1 6.3M22 8.8A15 15 0 0 0 11 5.1M12 20h.01";
+    pub const LOGOUT: &str = "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9";
+    pub const USER: &str = "M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2M8 7a4 4 0 1 0 8 0a4 4 0 1 0-8 0";
     pub const SPARKLE: &str = "M12 3l1.9 5.6 5.6 1.9-5.6 1.9L12 18l-1.9-5.6-5.6-1.9 5.6-1.9zM19 15l.8 2.2 2.2.8-2.2.8L19 21l-.8-2.2-2.2-.8 2.2-.8z";
 }
 
@@ -306,7 +308,10 @@ pub fn open_menu(n: Nav, e: &web_sys::MouseEvent, right: bool, items: Vec<MenuIt
     let Some(el) = e.current_target().and_then(|t| t.dyn_into::<web_sys::Element>().ok()) else { return };
     let r = el.get_bounding_client_rect();
     let (w, _) = crate::glue::win();
-    n.menu.set(Some(Menu { x: if right { w - r.right() } else { r.left() }, y: r.bottom() + 6.0, right, items }));
+    // Keep the menu (min 200 px wide) on screen: a pill near the right edge gets a right-aligned menu.
+    let right = right || r.left() + 216.0 > w;
+    let x = if right { (w - r.right()).max(8.0) } else { r.left().max(8.0) };
+    n.menu.set(Some(Menu { x, y: r.bottom() + 6.0, right, items }));
 }
 
 #[component]

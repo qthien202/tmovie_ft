@@ -31,10 +31,6 @@ pub async fn tint_of(url: &str) -> Option<String> {
 
 pub fn now() -> f64 { js_sys::Date::now() }
 
-/// A wide screen with a mouse: the desktop layout (same query as app.css).
-pub fn desktop() -> bool {
-    web_sys::window().and_then(|w| w.match_media("(min-width: 1024px) and (hover: hover)").ok().flatten()).map(|m| m.matches()).unwrap_or(false)
-}
 
 pub fn reduce_motion() -> bool {
     web_sys::window().and_then(|w| w.match_media("(prefers-reduced-motion: reduce)").ok().flatten()).map(|m| m.matches()).unwrap_or(false)

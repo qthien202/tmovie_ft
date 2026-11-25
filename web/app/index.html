@@ -95,6 +95,59 @@ window.tm = {
     (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
   },
 };
+// Firebase (same project as the phone apps): Google sign-in, members/{uid}, entitlements, library sync.
+// On the deployed site auth runs through our own domain (/__/auth proxied by functions/__), which keeps the
+// sign-in redirect working in Safari and in the home-screen app.
+(() => {
+  const V = '11.0.2';
+  const CONFIG = { apiKey: 'AIzaSyA-il46C_UnDYGWdfz-MXcqY4yiACWLubY', authDomain: 'tmovie-1db06.firebaseapp.com', projectId: 'tmovie-1db06',
+    storageBucket: 'tmovie-1db06.firebasestorage.app', messagingSenderId: '320728716423', appId: '1:320728716423:web:3d94cfd09b8794032ad422' };
+  let ready;
+  const fb = () => ready ||= Promise.all(['app', 'auth', 'firestore'].map(m => import(`https://www.gstatic.com/firebasejs/${V}/firebase-${m}.js`)))
+    .then(([app, auth, fs]) => {
+      const local = /^(localhost|127\.|192\.168\.)/.test(location.hostname);
+      const a = app.initializeApp({ ...CONFIG, authDomain: local ? CONFIG.authDomain : location.host });
+      const au = auth.initializeAuth(a, { persistence: [auth.indexedDBLocalPersistence, auth.browserLocalPersistence], popupRedirectResolver: auth.browserPopupRedirectResolver });
+      return { auth, fs, au, db: fs.getFirestore(a) };
+    });
+  const doc = (f, path) => f.fs.doc(f.db, ...path.split('/'));
+  let memberUnsub = null;
+  Object.assign(window.tm, {
+    // cb(json user | '' signed out | 'error:<code>')
+    fbUser(cb) {
+      fb().then(f => {
+        f.auth.getRedirectResult(f.au).catch(e => cb('error:' + (e.code || e.message)));
+        f.auth.onAuthStateChanged(f.au, u => cb(u ? JSON.stringify({ uid: u.uid, name: u.displayName, email: u.email, photo: u.photoURL }) : ''));
+      }, () => cb('error:offline'));
+    },
+    // Popup where it works; the home-screen app on iOS has no popups, so it goes by redirect.
+    fbSignIn() {
+      return fb().then(f => {
+        const p = new f.auth.GoogleAuthProvider(); p.setCustomParameters({ prompt: 'select_account' });
+        return navigator.standalone ? f.auth.signInWithRedirect(f.au, p).then(() => '') : f.auth.signInWithPopup(f.au, p).then(() => '');
+      }).catch(e => (e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request') ? 'cancelled' : (e.code || 'error'));
+    },
+    fbSignOut() { return fb().then(f => f.auth.signOut()); },
+    // cb(true/false) while members/{uid} exists; a cache miss offline is not "removed".
+    fbMember(uid, cb) {
+      if (memberUnsub) { memberUnsub(); memberUnsub = null; }
+      if (!uid) return;
+      fb().then(f => { memberUnsub = f.fs.onSnapshot(doc(f, 'members/' + uid), { includeMetadataChanges: false }, s => { if (!(s.metadata.fromCache && !s.exists())) cb(s.exists()); }, () => {}); });
+    },
+    fbGet(path) { return fb().then(f => f.fs.getDoc(doc(f, path))).then(s => s.exists() ? JSON.stringify(s.data()) : '', () => ''); },
+    // {favorites:[...], history:[...], playback:{id: seconds}}
+    fbPull(uid) {
+      return fb().then(async f => {
+        const all = async c => (await f.fs.getDocs(f.fs.collection(f.db, 'users', uid, c))).docs;
+        const [fav, hist, pb] = await Promise.all([all('favorites'), all('history'), all('playback')]);
+        return JSON.stringify({ favorites: fav.map(d => d.data()), history: hist.map(d => d.data()),
+          playback: Object.fromEntries(pb.map(d => [d.id, d.data().position || 0])) });
+      }).catch(() => '');
+    },
+    fbSet(path, json) { return fb().then(f => f.fs.setDoc(doc(f, path), JSON.parse(json))).catch(() => {}); },
+    fbDel(path) { return fb().then(f => f.fs.deleteDoc(doc(f, path))).catch(() => {}); },
+  });
+})();
 </script>
 <link data-trunk rel="css" href="assets/app.css">
 <link data-trunk rel="rust" data-wasm-opt="z">

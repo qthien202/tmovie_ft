@@ -1,5 +1,6 @@
 //! TMovie for the web (an iOS home-screen app): the Android phone app's screens, 1:1, in Leptos.
 
+mod account;
 mod api;
 mod gate;
 mod glue;

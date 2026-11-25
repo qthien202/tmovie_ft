@@ -67,7 +67,9 @@ pub fn save_watch(film: &Film, server: usize, episode: usize, name: &str, ep_slu
     w.positions.insert(ep_slug.to_string(), position);
     if duration > 0.0 { w.durations.insert(ep_slug.to_string(), duration); }
     w.updated_at = js_sys::Date::now();
+    let w = w.clone();
     set("tm.hist", &all);
+    crate::account::push_watch(&w, false);
 }
 
 pub fn forget(slug: &str) {
@@ -75,6 +77,12 @@ pub fn forget(slug: &str) {
     all.remove(slug);
     set("tm.hist", &all);
     remove(&frame_key(slug));
+    crate::account::push_forget(slug);
+}
+
+pub fn clear_saved() {
+    for f in saved() { crate::account::push_saved(&f, false) }
+    set("tm.list", &Vec::<Film>::new());
 }
 
 /// "Danh sách của tôi", newest first.
@@ -88,6 +96,7 @@ pub fn toggle_saved(film: &Film) -> bool {
     let on = !l.iter().any(|f| f.slug == film.slug);
     if on { l.insert(0, film.clone()); } else { l.retain(|f| f.slug != film.slug); }
     set("tm.list", &l);
+    crate::account::push_saved(film, on);
     on
 }
 

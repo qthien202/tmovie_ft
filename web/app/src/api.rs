@@ -214,8 +214,13 @@ pub fn img_url(u: Option<&str>) -> String {
     }
 }
 
-/// Hidden unless the account allows it (web: never), and trailers outside "Sắp chiếu".
-pub fn visible(f: &Film) -> bool { !f.is_adult() }
+thread_local! {
+    /// `entitlements/{uid}.allowAdult` of the signed-in account.
+    pub static ADULT: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+/// 18+ titles stay hidden unless the account allows them.
+pub fn visible(f: &Film) -> bool { !f.is_adult() || ADULT.with(|a| a.get()) }
 
 thread_local! {
     static CACHE: RefCell<HashMap<String, Value>> = RefCell::new(HashMap::new());

@@ -3,7 +3,49 @@
 
 use leptos::prelude::*;
 
+use leptos::task::spawn_local;
+
 use super::*;
+use crate::account;
+
+/// AccountCard: "Đăng nhập với Google để đồng bộ", or the account with "Đã đồng bộ · email" and the logout button.
+#[component]
+fn AccountCard() -> impl IntoView {
+    let n = nav();
+    let acct = account::account();
+    let busy = RwSignal::new(false);
+    let sign_in = move |_| {
+        if busy.get_untracked() { return; }
+        busy.set(true);
+        spawn_local(async move {
+            let r = account::sign_in().await;
+            if !r.is_empty() && r != "cancelled" { n.toast("Đăng nhập chưa hoàn tất, thử lại nhé.") }
+            busy.set(false);
+        });
+    };
+    move || match acct.user.get() {
+        None => view! {
+            <div class="acct-in press" on:click=sign_in>
+                {move || if busy.get() { view! { <span class="mini-spin"></span> }.into_any() } else {
+                    view! { <b class="g">"G"</b><span>"  Đăng nhập với Google để đồng bộ"</span> }.into_any()
+                }}
+            </div>
+        }.into_any(),
+        Some(u) => view! {
+            <div class="acct glass">
+                {match u.photo.clone() {
+                    Some(p) => view! { <img src=p alt="" referrerpolicy="no-referrer" /> }.into_any(),
+                    None => view! { <div class="ph"><Icon d=ic::USER /></div> }.into_any(),
+                }}
+                <div class="t">
+                    <b>{u.name.clone().unwrap_or_else(|| "Tài khoản Google".into())}</b>
+                    <span>{format!("Đã đồng bộ · {}", u.email.clone().unwrap_or_default())}</span>
+                </div>
+                <div class="out" aria-label="Đăng xuất" on:click=move |_| account::sign_out()><Icon d=ic::LOGOUT /></div>
+            </div>
+        }.into_any(),
+    }
+}
 
 #[component]
 pub fn Profile() -> impl IntoView {
@@ -28,6 +70,7 @@ pub fn Profile() -> impl IntoView {
                         <div class="sub">{move || format!("{} phim đã lưu · {} phim đã xem", saved().len(), history().len())}</div>
                     </div>
                 </div>
+                <AccountCard />
             </div>
             {move || { let h = history(); (!h.is_empty()).then(|| view! {
                 <Shelf title="Xem gần đây" gap=14>{h.into_iter().take(20).map(|w| view! { <ContinueCard w=w /> }).collect_view()}</Shelf>
@@ -61,7 +104,7 @@ pub fn Profile() -> impl IntoView {
                     <div class="acts">
                         <span on:click=move |_| confirm.set(None)>"Huỷ"</span>
                         <span class="red" on:click=move |_| {
-                            if hist { for w in store::history() { store::forget(&w.film.slug) } } else { store::set("tm.list", &Vec::<Film>::new()) }
+                            if hist { for w in store::history() { store::forget(&w.film.slug) } } else { store::clear_saved() }
                             n.bump();
                             confirm.set(None);
                         }>"Xoá"</span>

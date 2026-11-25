@@ -103,9 +103,14 @@ impl Nav {
     }
     /// Player.start: the last-watched episode, else the first playable one. False when nothing plays.
     pub fn start(&self, d: Detail, from_detail: bool) -> bool {
-        let resume = store::watch(&d.film.slug)
-            .filter(|w| d.episodes.get(w.server).and_then(|s| s.server_data.get(w.episode)).is_some_and(|e| e.stream().is_some()))
-            .map(|w| (w.server, w.episode));
+        // By episode name first (synced history only has the name), then by the saved indices.
+        let playable = |s: usize, i: usize| d.episodes.get(s).and_then(|sv| sv.server_data.get(i)).is_some_and(|e| e.stream().is_some());
+        let resume = store::watch(&d.film.slug).and_then(|w| {
+            let by_name = |s: usize| d.episodes.get(s)?.server_data.iter().position(|e| e.name.as_deref() == Some(w.episode_name.as_str()) && e.stream().is_some());
+            by_name(w.server).map(|i| (w.server, i))
+                .or_else(|| (0..d.episodes.len()).find_map(|s| by_name(s).map(|i| (s, i))))
+                .or_else(|| playable(w.server, w.episode).then_some((w.server, w.episode)))
+        });
         let first = || d.episodes.iter().enumerate().find_map(|(s, sv)| sv.server_data.iter().position(|e| e.stream().is_some()).map(|i| (s, i)));
         match resume.or_else(first) {
             Some((server, index)) => {
@@ -127,13 +132,19 @@ impl Nav {
     }
 }
 
+/// Open when the signed-in account is a member (the last answer is used until Firebase replies), or when this
+/// browser was let in by the old form.
 #[component]
 pub fn App() -> impl IntoView {
-    let unlocked = RwSignal::new(gate::access().unlocked);
-    spawn_local(gate::recheck(unlocked));
+    let acct = crate::account::init();
+    provide_context(acct);
+    let by_form = RwSignal::new(gate::access().unlocked);
+    spawn_local(gate::recheck(by_form));
+    let last = store::get::<bool>("tm.member").unwrap_or(false);
+    let unlocked = move || by_form.get() || acct.member.get().unwrap_or(last);
     view! {
         <div id="app">
-            <Show when=move || unlocked.get() fallback=move || view! { <Gate unlocked=unlocked /> }>
+            <Show when=unlocked fallback=move || view! { <Gate /> }>
                 <Main />
             </Show>
         </div>
@@ -236,10 +247,11 @@ fn Shell() -> impl IntoView {
         toast_msg: RwSignal::new(None),
         picker: RwSignal::new(None),
         menu: RwSignal::new(None),
-        lib: RwSignal::new(0),
+        lib: crate::account::account().lib,
         ids: StoredValue::new(0),
     };
     provide_context(n);
+    let acct = crate::account::account();
     // Tabs keep their state once opened (saveState/restoreState).
     let visited = RwSignal::new([true, false, false, false]);
     let go = move |i: usize| {
@@ -272,7 +284,11 @@ fn Shell() -> impl IntoView {
             {TABS.iter().enumerate().map(|(i, (label, paths))| view! {
                 <div class="tab" role="tab" aria-label=*label aria-selected=move || (n.tab.get() == i).to_string()
                     class:on=move || n.tab.get() == i on:click=move |_| go(i)>
-                    <svg viewBox="0 0 24 24"><path d=paths[0] /><path d=paths[1] /></svg>
+                    {move || match (i, acct.user.get().and_then(|u| u.photo)) {
+                        // Signed in: the Google photo instead of the profile icon.
+                        (3, Some(photo)) => view! { <img class="tab-av" class:on=move || n.tab.get() == 3 src=photo alt="" referrerpolicy="no-referrer" /> }.into_any(),
+                        _ => view! { <svg viewBox="0 0 24 24"><path d=paths[0] /><path d=paths[1] /></svg> }.into_any(),
+                    }}
                 </div>
             }).collect_view()}
         </div>
